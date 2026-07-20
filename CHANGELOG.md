@@ -1,8 +1,17 @@
 # Changelog
 
-## 2026-07-20
+## v0.1.0
 
-- Instalação do Debian 13
-- Configuração do SSH
-- Configuração do UFW
-- Autenticação por chave SSH
+### Infraestrutura
+
+- Debian 13
+- Docker
+- Docker Compose
+- Portainer
+- Homepage
+
+### Organização
+
+- Estrutura inicial do repositório
+- Documentação
+- Roadmap
