@@ -1,23 +1,28 @@
-# Próximas etapas
+# Infraestrutura
 
-## Infraestrutura
+- [x] Debian
+- [x] SSH
+- [x] Docker
+- [x] Docker Compose
+- [x] Portainer
+- [x] Homepage
 
-- [ ] Docker
-- [ ] Portainer
+# Serviços
 
-## Arquivos
-
+- [ ] Gitea
 - [ ] Samba
 - [ ] FileBrowser
 
-## Desenvolvimento
+# Monitoramento
 
-- [ ] Gitea
+- [ ] Dozzle
+- [ ] Uptime Kuma
 
-## Backup
+# Segurança
 
-- [ ] Backup automático
+- [ ] Nginx Proxy Manager
+- [ ] Backups automáticos
 
-## Monitoramento
+# Multimídia
 
-- [ ] Uptime Kuma (avaliar futuramente)
+- [ ] Jellyfin
