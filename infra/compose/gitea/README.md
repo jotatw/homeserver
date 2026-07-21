@@ -24,6 +24,25 @@ Servidor Git auto-hospedado do HomeLab.
 
 ## Status
 
-- [ ] Instalado
-- [ ] Configurado
-- [ ] Testado
+[x] Compose criado
+[x] .env criado
+[x] README criado
+[ ] Deploy
+[ ] Configuração inicial
+[ ] Testes
+[ ] Homepage
+[ ] Backup validado
+
+## Acesso
+
+Web:
+http://IP_DO_SERVIDOR:3001
+
+SSH:
+ssh -p 2222 git@IP_DO_SERVIDOR
+
+## Backup
+
+Dados persistidos em:
+
+/srv/data/gitea
