@@ -1,36 +1,31 @@
-# Sprint 01
+# Sprint 01 - Gitea
 
 ## Objetivo
 
-Preparar o HomeServer.
+Implantar um servidor Git privado integrado ao HomeLab.
 
-## Atividades
+## Entregas
 
-- Instalação do Debian 13
-- Configuração do SSH
-- Configuração do acesso remoto
-- Instalação do Docker
-- Instalação do Docker Compose
+- [x] compose.yaml
+- [x] .env
+- [x] README
+- [x] Deploy realizado
+- [x] Usuário administrador criado
+- [x] Primeiro repositório criado
+- [x] Git Push funcionando
+- [x] Git Pull funcionando
+- [x] Homepage integrado
+- [x] Persistência validada após reinicialização
 
-## Problemas encontrados
+## Lições aprendidas
 
-### SSH
+- Uso de volumes persistentes.
+- Configuração inicial do Gitea.
+- Autenticação via Token HTTP.
+- Organização do Compose e da documentação.
 
-Problemas de autenticação e conexão.
+## Próximas melhorias
 
-### Docker
-
-Permissões do Docker e primeiros testes.
-
-## Resultado
-
-Servidor preparado para receber containers.
-
-## Concluído
-
-- Gitea implantado com Docker Compose.
-- Banco SQLite configurado.
-- Primeiro usuário administrador criado.
-- Primeiro repositório criado.
-- Primeiro push realizado com sucesso.
-- Autenticação Git validada.
+- Configurar autenticação SSH.
+- Definir política de backup.
+- Integrar com Proxy Reverso futuramente.

@@ -25,3 +25,12 @@
 - Gitea.
 - Integração Git.
 - Documentação inicial.
+
+## v0.2.0 - Gitea
+
+### Added
+
+- Servidor Git privado.
+- Banco SQLite persistente.
+- Repositório HomeServer.
+- Integração com Homepage.
