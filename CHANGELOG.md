@@ -15,3 +15,13 @@
 - Estrutura inicial do repositório
 - Documentação
 - Roadmap
+
+## 2026-07-21
+
+### Added
+
+- Estrutura inicial do HomeServer.
+- Homepage.
+- Gitea.
+- Integração Git.
+- Documentação inicial.
