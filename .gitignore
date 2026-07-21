@@ -17,3 +17,12 @@ Thumbs.db
 
 # Docker
 .env
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Runtime
+config/
+database/
