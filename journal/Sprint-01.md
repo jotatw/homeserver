@@ -25,3 +25,12 @@ Permissões do Docker e primeiros testes.
 ## Resultado
 
 Servidor preparado para receber containers.
+
+## Concluído
+
+- Gitea implantado com Docker Compose.
+- Banco SQLite configurado.
+- Primeiro usuário administrador criado.
+- Primeiro repositório criado.
+- Primeiro push realizado com sucesso.
+- Autenticação Git validada.

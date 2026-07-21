@@ -27,7 +27,7 @@ Servidor Git auto-hospedado do HomeLab.
 [x] Compose criado
 [x] .env criado
 [x] README criado
-[ ] Deploy
+[x] Deploy
 [ ] Configuração inicial
 [ ] Testes
 [ ] Homepage
@@ -46,3 +46,9 @@ ssh -p 2222 git@IP_DO_SERVIDOR
 Dados persistidos em:
 
 /srv/data/gitea
+
+## Autenticação Git
+
+Durante a configuração inicial foi utilizado um Token de Acesso para validar o funcionamento do serviço.
+
+Após a configuração das chaves SSH, todas as operações Git passarão a utilizar SSH.
