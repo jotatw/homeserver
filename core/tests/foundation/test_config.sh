@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-source "../../../bootstrap.sh"
+source "../common/test_bootstrap.sh"
 
 echo "========================================"
 echo " HomeServer Core"
@@ -25,19 +25,19 @@ echo
 
 echo "Common"
 
-echo "    ${HS_COMMON_DIR}"
+echo "    ${HS_CORE_COMMON_DIR}"
 
 echo
 
 echo "Infrastructure"
 
-echo "    ${HS_INFRASTRUCTURE_DIR}"
+echo "    ${HS_CORE_INFRASTRUCTURE_DIR}"
 
 echo
 
 echo "Core Services"
 
-echo "    ${HS_SERVICES_CORE_DIR}"
+echo "    ${HS_CORE_SERVICES_CORE_DIR}"
 
 echo
 
