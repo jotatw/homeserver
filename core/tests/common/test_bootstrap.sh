@@ -2,7 +2,11 @@
 
 set -euo pipefail
 
-source ../../bootstrap.sh
+TEST_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+CORE_ROOT="$(cd "${TEST_ROOT}/../.." && pwd)"
+
+source "${CORE_ROOT}/bootstrap.sh"
 
 echo "==========================="
 echo " Bootstrap Test"
