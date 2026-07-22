@@ -57,7 +57,7 @@ _load_foundation() {
 #
 _load_infrastructure() {
 
-    return 0
+    _load_library "${HS_CORE_INFRASTRUCTURE_DIR}/filesystem.sh"
 
 }
 

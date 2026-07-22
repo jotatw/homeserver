@@ -1,66 +1,146 @@
 #!/usr/bin/env bash
 
 # ==========================================================
-# Biblioteca FileSystem
-# Responsável pelas operações de arquivos e diretórios.
+# HomeServer Core
+#
+# Arquivo......: filesystem.sh
+# Módulo.......: Infrastructure
+#
+# Objetivo.....:
+# Fornecer uma API para manipulação de arquivos,
+# diretórios e links simbólicos.
+#
+# Responsabilidades:
+#   - Criar diretórios
+#   - Manipular arquivos
+#   - Criar links simbólicos
+#   - Inicializar o workspace
+#
+# Não faz:
+#   - Não imprime mensagens
+#   - Não encerra scripts
+#   - Não executa Docker
+#
 # ==========================================================
 
 #
-# Cria um diretório caso ele não exista.
+# Verifica se um diretório existe.
+#
+# Uso:
+#   directory_exists "/caminho"
+#
+# Retorno:
+#   0 -> Existe
+#   1 -> Não existe
+#
+directory_exists() {
+
+    local directory="$1"
+
+    [[ -d "${directory}" ]]
+
+}
+#
+# Cria um diretório.
+#
+# Uso:
+#   create_directory "/caminho"
+#
+# Retorno:
+#   0 -> Criado com sucesso
+#   1 -> Erro
 #
 create_directory() {
 
     local directory="$1"
 
-    mkdir -p "$directory"
-}
-#
-# Cria múltiplos diretórios.
-#
-create_directories() {
+    mkdir -p "${directory}"
 
-    mkdir -p "$@"
 }
 #
-# Remove um diretório recursivamente.
+# Remove um diretório vazio.
+#
+# Uso:
+#   remove_directory "/caminho"
+#
+# Retorno:
+#   0 -> Removido
+#   1 -> Erro
 #
 remove_directory() {
 
     local directory="$1"
 
-    rm -rf "$directory"
+    rmdir "${directory}"
+
+}
+
+#
+# Verifica se um arquivo existe.
+#
+# Uso:
+#   file_exists "/etc/hosts"
+#
+# Retorno:
+#   0 -> Existe
+#   1 -> Não existe
+#
+file_exists() {
+
+    local file="$1"
+
+    [[ -f "${file}" ]]
+
 }
 #
-# Copia um arquivo preservando atributos.
+# Cria um arquivo vazio.
+#
+# Uso:
+#   create_file "/tmp/test.txt"
+#
+# Retorno:
+#   0 -> Sucesso
+#   1 -> Erro
+#
+create_file() {
+
+    local file="$1"
+
+    touch "${file}"
+
+}
+#
+# Remove um arquivo.
+#
+# Uso:
+#   remove_file "/tmp/test.txt"
+#
+remove_file() {
+
+    local file="$1"
+
+    rm -f "${file}"
+
+}
+#
+# Copia um arquivo.
 #
 copy_file() {
 
     local source="$1"
     local destination="$2"
 
-    cp -a "$source" "$destination"
+    cp "${source}" "${destination}"
+
 }
 #
-# Copia um diretório preservando atributos.
+# Move um arquivo.
 #
-copy_directory() {
+move_file() {
 
     local source="$1"
     local destination="$2"
 
-    cp -a "$source" "$destination"
-}
-#
-# Define permissões.
-#
-set_permissions() {
+    mv "${source}" "${destination}"
 
-    chmod "$1" "$2"
-}
-#
-# Define proprietário.
-#
-set_owner() {
-
-    chown -R "$1":"$2" "$3"
 }

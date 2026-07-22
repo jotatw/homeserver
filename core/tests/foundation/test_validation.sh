@@ -2,32 +2,12 @@
 
 set -euo pipefail
 
-source "../../../bootstrap.sh"
+source "../common/test_bootstrap.sh"
 
 echo "========================================"
 echo " HomeServer Core"
 echo " Validation Test"
 echo "========================================"
-echo
-
-echo "Arquivo bootstrap.sh"
-
-if is_file "${HS_CORE_ROOT}/bootstrap.sh"; then
-    echo "PASS"
-else
-    echo "FAIL"
-fi
-
-echo
-
-echo "Diretório common"
-
-if is_directory "${HS_COMMON_DIR}"; then
-    echo "PASS"
-else
-    echo "FAIL"
-fi
-
 echo
 
 echo "Comando bash"

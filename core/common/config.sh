@@ -36,19 +36,19 @@ readonly HS_PROJECT_ROOT="$(dirname "${HS_CORE_ROOT}")"
 # Diretórios do Core
 # ----------------------------------------------------------
 
-readonly HS_COMMON_DIR="${HS_CORE_ROOT}/common"
+readonly HS_CORE_COMMON_DIR="${HS_CORE_ROOT}/common"
 
-readonly HS_INFRASTRUCTURE_DIR="${HS_CORE_ROOT}/infrastructure"
+readonly HS_CORE_INFRASTRUCTURE_DIR="${HS_CORE_ROOT}/infrastructure"
 
-readonly HS_SERVICES_CORE_DIR="${HS_CORE_ROOT}/services"
+readonly HS_CORE_SERVICES_CORE_DIR="${HS_CORE_ROOT}/services"
 
-readonly HS_OPERATIONS_DIR="${HS_CORE_ROOT}/operations"
+readonly HS_CORE_OPERATIONS_DIR="${HS_CORE_ROOT}/operations"
 
-readonly HS_INTERFACE_DIR="${HS_CORE_ROOT}/interface"
+readonly HS_CORE_INTERFACE_DIR="${HS_CORE_ROOT}/interface"
 
-readonly HS_DOCS_DIR="${HS_CORE_ROOT}/docs"
+readonly HS_CORE_DOCS_DIR="${HS_CORE_ROOT}/docs"
 
-readonly HS_TESTS_DIR="${HS_CORE_ROOT}/tests"
+readonly HS_CORE_TESTS_DIR="${HS_CORE_ROOT}/tests"
 
 # ----------------------------------------------------------
 # Diretórios do Projeto

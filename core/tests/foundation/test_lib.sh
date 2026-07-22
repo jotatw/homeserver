@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-source ../../bootstrap.sh
+source "../common/test_bootstrap.sh"
 
 echo "================================="
 echo " HomeServer Core"
