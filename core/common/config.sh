@@ -67,3 +67,15 @@ readonly HS_BACKUP_DIR="${HS_PROJECT_ROOT}/backup"
 readonly HS_SCRIPTS_DIR="${HS_PROJECT_ROOT}/scripts"
 
 readonly HS_DOCS_ROOT_DIR="${HS_PROJECT_ROOT}/docs"
+
+# ----------------------------------------------------------
+# Workspace
+# ----------------------------------------------------------
+
+readonly HS_WORKSPACE_DIRECTORIES=(
+    "${HS_CONFIG_DIR}"
+    "${HS_DATA_DIR}"
+    "${HS_LOGS_DIR}"
+    "${HS_BACKUP_DIR}"
+    "${HS_SERVICES_DIR}"
+)

@@ -2,7 +2,9 @@
 
 set -euo pipefail
 
-source "../common/test_bootstrap.sh"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+source "${SCRIPT_DIR}/../bootstrap.sh"
 
 echo "========================================"
 echo " HomeServer Core"

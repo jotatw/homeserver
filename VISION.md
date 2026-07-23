@@ -1,267 +1,166 @@
 # HomeServer Vision
 
->HomeServer
->
->Um HomeServer simples de usar, simples de administrar e construído para evoluir.
->
-> Simples para utilizar.
->
-> Simples para administrar.
->
-> Simples para evoluir.
+> Construindo uma plataforma simples, modular e sustentável para centralizar serviços digitais em ambientes domésticos.
 
 ---
 
-# Nossa Missão
+# Visão
 
-Construir uma plataforma de HomeServer que permita qualquer pessoa administrar serviços domésticos de forma simples, organizada e confiável.
+O HomeServer nasceu com um objetivo simples: reaproveitar um computador antigo como um servidor doméstico.
 
-O HomeServer deve esconder a complexidade da infraestrutura sem limitar a flexibilidade para usuários avançados.
+Durante seu desenvolvimento, o projeto evoluiu além dessa ideia inicial. Em vez de ser apenas um conjunto de scripts ou um servidor para hospedar aplicações, o HomeServer passou a ser concebido como uma plataforma modular capaz de integrar serviços, dispositivos e aplicações em um único ambiente.
 
----
+A visão do projeto é construir um pequeno ecossistema doméstico onde diferentes serviços possam coexistir de forma organizada, reutilizável e fácil de manter.
 
-# Nossa Visão
-
-A administração de um HomeServer não deve exigir conhecimento profundo sobre Docker, Linux ou redes.
-
-O administrador deve conseguir instalar, atualizar, monitorar e manter seus serviços utilizando uma interface intuitiva e consistente.
-
-Nosso objetivo é que a infraestrutura trabalhe para o usuário, e não o contrário.
+O servidor deixa de ser o objetivo principal e passa a ser a base que conecta todo esse ecossistema.
 
 ---
 
-# Nosso Público
+# Missão
 
-O HomeServer foi pensado para atender diferentes perfis de usuários.
-
-## Iniciante
-
-Quer utilizar um servidor doméstico sem aprender dezenas de comandos Linux.
-
-Exemplo:
-
-- armazenamento de arquivos
-- streaming
-- backups
-- automações simples
+Criar uma plataforma modular que simplifique a administração de servidores Linux e permita centralizar serviços, aplicações e dispositivos em um único ambiente, priorizando organização, reutilização, documentação e manutenção de longo prazo.
 
 ---
 
-## Entusiasta
+# O Problema
 
-Deseja explorar novos serviços mantendo uma administração organizada.
+Administrar um servidor doméstico normalmente significa lidar com:
 
-Exemplo:
+- Scripts independentes;
+- Configurações espalhadas;
+- Serviços sem padronização;
+- Pouca documentação;
+- Difícil manutenção;
+- Baixa reutilização de código.
 
-- Gitea
-- Jellyfin
-- Immich
-- Home Assistant
-- Nextcloud
+Com o crescimento do ambiente, essas dificuldades aumentam e tornam a administração cada vez mais complexa.
 
----
-
-## Desenvolvedor
-
-Busca uma plataforma organizada para testar, desenvolver e aprender.
-
-Exemplo:
-
-- ambientes Docker
-- CI/CD
-- Git
-- bancos de dados
-- laboratórios
+O HomeServer busca resolver esse problema através de uma arquitetura organizada e consistente.
 
 ---
 
-# Nossos Princípios
+# Nossa Visão de Longo Prazo
+
+O objetivo não é construir apenas um servidor.
+
+O objetivo é construir um ecossistema.
+
+Um ambiente onde diferentes serviços possam compartilhar uma mesma base de infraestrutura, mantendo simplicidade para quem utiliza e sustentabilidade para quem desenvolve.
+
+Exemplos de componentes desse ecossistema incluem:
+
+- Compartilhamento de arquivos;
+- Backup automatizado;
+- Gerenciamento de containers;
+- Painel central de serviços;
+- Integração entre dispositivos;
+- Automações;
+- Monitoramento;
+- Serviços auto-hospedados.
+
+Todos esses componentes fazem parte de uma única plataforma.
+
+---
+
+# Princípios
+
+Todo componente do HomeServer deve seguir os mesmos princípios.
 
 ## Simplicidade
 
-A simplicidade sempre terá prioridade sobre soluções complexas.
-
-Se uma funcionalidade puder ser simplificada sem perda significativa de flexibilidade, essa será a abordagem adotada.
-
----
-
-## Organização
-
-Tudo possui um lugar definido.
-
-Serviços, documentação, scripts e configurações seguem uma estrutura consistente.
+A solução mais simples que resolva o problema deve ser preferida.
 
 ---
 
 ## Modularidade
 
-Cada componente possui apenas uma responsabilidade.
-
-Novos módulos podem ser adicionados sem alterar os existentes.
+Cada componente possui uma responsabilidade única e pode evoluir de forma independente.
 
 ---
 
-## Padronização
+## Sustentabilidade
 
-Todos os serviços seguem a mesma organização.
-
-Todos os scripts seguem os mesmos padrões.
-
-Toda documentação segue o mesmo modelo.
+O projeto deve permanecer fácil de manter mesmo após anos de evolução.
 
 ---
 
 ## Reutilização
 
-Uma solução deve ser implementada apenas uma vez.
-
-Sempre que possível, novas funcionalidades reutilizam componentes existentes.
+Sempre que possível, funcionalidades devem ser reutilizadas em vez de duplicadas.
 
 ---
 
-## Transparência
+## Padronização
 
-O HomeServer não esconde como funciona.
-
-A automação simplifica tarefas, mas o usuário continua tendo acesso à infraestrutura quando desejar.
+Código, testes e documentação seguem padrões consistentes em todo o projeto.
 
 ---
 
-## Evolução Contínua
+## Qualidade
 
-O projeto deve crescer de forma incremental.
-
-Cada nova funcionalidade deve fortalecer a arquitetura existente, nunca substituí-la desnecessariamente.
-
----
-
-# O que o HomeServer NÃO é
-
-O HomeServer não pretende ser:
-
-- uma distribuição Linux;
-- um substituto para Docker;
-- um painel que impede acesso ao sistema operacional;
-- um ambiente exclusivo para usuários avançados.
-
-O HomeServer é uma plataforma de administração construída sobre tecnologias consolidadas.
-
----
-
-# Objetivos
-
-## Curto Prazo
-
-- HomeServer funcional
-- Homepage
-- FileBrowser
-- Core
-- hsctl
-
----
-
-## Médio Prazo
-
-- Instalação automatizada
-- Atualizações simplificadas
-- Backups completos
-- Diagnóstico automático
-- Biblioteca de serviços homologados
-
----
-
-## Longo Prazo
-
-- Interface Web administrativa
-- Interface TUI
-- Plugins
-- API
-- Templates de serviços
-- Assistente de configuração
-- Cluster doméstico
+Toda funcionalidade deve ser acompanhada por testes e documentação.
 
 ---
 
 # Filosofia de Desenvolvimento
 
-Antes de implementar qualquer funcionalidade, fazemos três perguntas.
+O HomeServer é desenvolvido de forma incremental.
 
-## Resolve um problema real?
+Cada novo módulo segue o mesmo ciclo.
 
-Toda funcionalidade deve existir para resolver uma necessidade concreta.
-
----
-
-## Mantém a simplicidade?
-
-Automação não deve aumentar a complexidade do projeto.
-
----
-
-## Pode ser reutilizada?
-
-Soluções reutilizáveis têm prioridade sobre implementações específicas.
-
----
-
-# Nossa Arquitetura
-
-A arquitetura do projeto segue uma hierarquia simples.
-
-```
-Usuário
+Planejamento
 
 ↓
 
-Interface
+Arquitetura
 
 ↓
 
-Operations
+Documentação
 
 ↓
 
-Services
+Implementação
 
 ↓
 
-Infrastructure
+Testes
 
 ↓
 
-Foundation
+Revisão
 
-↓
-
-Linux + Docker
-```
-
-Cada camada possui responsabilidades bem definidas.
+A infraestrutura sempre vem antes das funcionalidades.
 
 ---
 
-# Nossa Regra Fundamental
+# Escopo
 
-> A complexidade pertence ao Core.
+O HomeServer pretende:
 
-> A simplicidade pertence ao usuário.
-
----
-
-# Nossa Definição de Sucesso
-
-O projeto será considerado bem-sucedido quando um administrador puder instalar, configurar e manter um HomeServer completo utilizando poucos comandos simples, sem abrir mão da flexibilidade para personalizações futuras.
+- Centralizar serviços domésticos;
+- Integrar aplicações;
+- Facilitar manutenção;
+- Servir como plataforma para novos módulos;
+- Evoluir continuamente.
 
 ---
 
-# Nosso Compromisso
+# Fora do Escopo
 
-Sempre priorizar:
+O HomeServer não pretende:
 
-- simplicidade;
-- organização;
-- documentação;
-- padronização;
-- estabilidade.
+- Substituir soluções corporativas;
+- Competir com plataformas de orquestração;
+- Concentrar toda a lógica em um único script;
+- Depender de uma distribuição Linux específica.
 
-Antes de adicionar novas funcionalidades, garantimos que a base permaneça sólida e consistente.
+---
+
+# O Futuro
+
+O HomeServer foi concebido para crescer de forma sustentável.
+
+Novos módulos poderão ser adicionados sem alterar a arquitetura principal, preservando a organização do projeto e garantindo que a plataforma continue simples de utilizar e fácil de evoluir.
+
+Mais do que um servidor, o HomeServer busca se tornar o ponto central da infraestrutura digital doméstica.
