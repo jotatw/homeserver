@@ -64,6 +64,15 @@ main() {
 
     success "HomeServer Core inicializado com sucesso."
 
+    info "Inicializando Workspace..."
+
+    if initialize_workspace; then
+        success "Workspace inicializado."
+    else
+        error "Falha ao inicializar o Workspace."
+        exit "${HS_EXIT_FAILURE}"
+    fi
+
 }
 
 main "$@"
