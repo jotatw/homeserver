@@ -1,52 +1,213 @@
 # HomeServer
 
-Servidor pessoal baseado em Debian 13.
+> Uma plataforma modular para centralizar, integrar e automatizar serviços digitais em ambientes domésticos.
 
-## Objetivos
+O HomeServer é um projeto open source em desenvolvimento que tem como objetivo construir uma plataforma modular, organizada e reutilizável para administração de servidores Linux.
 
-- Armazenamento de arquivos
-- Docker
-- Containers
-- Git
-- Backup
-- Monitoramento
-- Streaming
+Diferente de uma coleção de scripts independentes, o HomeServer é desenvolvido seguindo princípios de Engenharia de Software, priorizando arquitetura, padronização, testes automatizados e documentação.
 
-## Hardware
+---
 
-MSI MS-AA1511
+# Objetivos
 
-Pentium Dual Core T4500
+O HomeServer foi criado com cinco objetivos principais.
 
-2 GB RAM
+- Automatizar tarefas administrativas.
+- Centralizar serviços e configurações.
+- Disponibilizar APIs reutilizáveis em Bash.
+- Garantir qualidade através de testes automatizados.
+- Facilitar manutenção e evolução do projeto.
 
-320 GB HDD
+---
 
-## Serviços
+# Estado do Projeto
 
-- Portainer
-- Homepage
-- Watchtower
-- Dozzle
-- Uptime Kuma
-- FileBrowser
-- Samba
-- Gitea
-- Jellyfin
+Versão atual
 
-## Estrutura
+```text
+v0.1.0 (Em Desenvolvimento)
+```
 
-docs/
-infra/
-assets/
-scripts/
+Milestone atual
 
-## Roadmap
+```text
+Projeto
+██████████ 100%
 
-Sprint 1 ✅ Debian
+Core
+██████████ 100%
 
-Sprint 2 ✅ Docker
+Test Suite
+████░░░░░░ 40%
 
-Sprint 3 🔄 Homepage
+Framework
+░░░░░░░░░░ 0%
 
-...
+Módulos
+░░░░░░░░░░ 0%
+
+CLI
+░░░░░░░░░░ 0%
+```
+
+---
+
+# Arquitetura
+
+O HomeServer está organizado em camadas independentes.
+
+```text
+HomeServer
+│
+├── Projeto
+│
+├── Core
+│   ├── Foundation
+│   ├── Infrastructure
+│   └── Services
+│
+├── Test Suite
+│
+├── Framework
+│
+├── Módulos
+│
+└── CLI (Futuro)
+```
+
+Cada camada possui uma responsabilidade específica e pode evoluir independentemente.
+
+---
+
+# Estrutura do Projeto
+
+```text
+homeserver-config/
+│
+├── docs/
+├── core/
+├── services/
+├── config/
+├── data/
+├── logs/
+└── backup/
+```
+
+A documentação do projeto encontra-se centralizada na pasta `docs/`.
+
+---
+
+# Roadmap
+
+O desenvolvimento do HomeServer está dividido em quatro grandes fases.
+
+### Milestone 1
+
+- Arquitetura
+- Core
+- Test Suite
+- Documentação
+
+### Milestone 2
+
+- Framework de Serviços
+
+### Milestone 3
+
+- Módulos do HomeServer
+
+### Milestone 4
+
+- CLI e Automação
+
+O planejamento detalhado está disponível em:
+
+```text
+docs/project/ROADMAP.md
+```
+
+---
+
+# Documentação
+
+A documentação está organizada em camadas.
+
+## Projeto
+
+Documentação conceitual.
+
+```text
+docs/project/
+```
+
+- README
+- Vision
+- Roadmap
+- Architecture
+- Contributing
+- Coding Style
+- Testing
+
+---
+
+## Core
+
+Documentação técnica do núcleo.
+
+```text
+docs/core/
+```
+
+- Bootstrap
+- Foundation
+- Infrastructure
+- Services
+- API
+
+---
+
+## Test Suite
+
+Documentação da infraestrutura de testes.
+
+```text
+docs/tests/
+```
+
+- Architecture
+- API
+- Runner
+- Assertions
+- Style Guide
+
+---
+
+# Filosofia
+
+O HomeServer segue alguns princípios fundamentais.
+
+- Responsabilidade única.
+- Arquitetura modular.
+- Baixo acoplamento.
+- Alta reutilização.
+- Código testável.
+- Documentação centralizada.
+- Evolução incremental.
+
+Esses princípios são aplicados tanto ao código quanto à documentação do projeto.
+
+---
+
+# Como Contribuir
+
+As diretrizes para desenvolvimento e contribuição estão disponíveis em:
+
+```text
+docs/project/CONTRIBUTING.md
+```
+
+---
+
+# Autor
+
+Projeto desenvolvido com foco em aprendizado, organização de infraestrutura e construção de uma plataforma modular para administração de servidores Linux.

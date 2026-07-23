@@ -1,220 +1,222 @@
-# HomeServer Core - Testes
+# HomeServer Test Suite
 
-A pasta `tests/` contém todos os testes do HomeServer Core.
+## Objetivo
 
-O objetivo é validar cada biblioteca individualmente e garantir que todas funcionem corretamente quando utilizadas em conjunto.
+A Test Suite é responsável por validar automaticamente todos os módulos do HomeServer.
+
+Seu objetivo é fornecer uma infraestrutura padronizada para criação, execução e manutenção dos testes do projeto.
+
+A Test Suite segue a mesma filosofia arquitetural do HomeServer Core:
+
+- responsabilidade única;
+- reutilização;
+- organização modular;
+- fácil integração com CI/CD.
 
 ---
 
-# Filosofia
+# Arquitetura
 
-Todo componente do HomeServer Core deve possuir testes.
-
-Os testes são desenvolvidos junto com a implementação e fazem parte do processo oficial de desenvolvimento.
-
-Uma funcionalidade só é considerada concluída quando:
-
-- A documentação estiver atualizada.
-- A implementação estiver concluída.
-- Os testes passarem.
-- O Roadmap for atualizado.
+```
+Usuário
+    │
+    ▼
+Suite
+    │
+    ▼
+Bootstrap
+    │
+    ▼
+Core
+    │
+    ▼
+Framework
+    │
+    ▼
+Testes
+```
 
 ---
 
 # Estrutura
 
 ```
-tests/
+core/tests/
 
-├── foundation/
-│   ├── test_bootstrap.sh
-│   ├── test_constants.sh
-│   ├── test_config.sh
-│   ├── test_output.sh
-│   ├── test_validation.sh
-│   └── test_lib.sh
-│
-├── infrastructure/
-│   ├── test_filesystem.sh
-│   ├── test_docker.sh
-│   ├── test_network.sh
-│   ├── test_system.sh
-│   └── test_backup.sh
-│
-├── services/
-│   └── test_service.sh
-│
-├── operations/
-│   ├── control/
-│   ├── query/
-│   ├── protection/
-│   ├── diagnostic/
-│   └── administration/
-│
-├── smoke.sh
-├── run.sh
-└── README.md
+bootstrap.sh
+
+common/
+    runner.sh
+    output.sh
+    assert.sh
+    utils.sh
+
+foundation/
+infrastructure/
+docker/
+network/
+services/
+
+docs/
+
+suite_all.sh
+suite_foundation.sh
+suite_infrastructure.sh
+suite_ci.sh
 ```
 
 ---
 
-# Tipos de Testes
+# Componentes
 
-O HomeServer Core utiliza quatro níveis de testes.
+## bootstrap.sh
 
-## 1. Teste Unitário
+Responsável por inicializar toda a Test Suite.
 
-Valida apenas uma biblioteca.
+### Responsabilidades
 
-Exemplo:
+- localizar diretórios;
+- carregar o HomeServer Core;
+- carregar o framework da Test Suite;
+- disponibilizar variáveis globais.
 
-```
-test_output.sh
-```
+### Não faz
 
-Verifica:
-
-- info()
-- success()
-- warn()
-- error()
+- executar testes;
+- imprimir mensagens;
+- validar resultados.
 
 ---
 
-## 2. Teste de Integração
+## runner.sh
 
-Valida a comunicação entre bibliotecas.
+Responsável pela execução das suítes.
 
-Exemplo:
+### Responsabilidades
+
+- executar testes;
+- controlar execução;
+- contabilizar resultados;
+- retornar código de saída.
+
+### Não faz
+
+- assertions;
+- output;
+- localização de diretórios.
+
+---
+
+## output.sh
+
+Responsável pela apresentação.
+
+Funções previstas
+
+- header
+- section
+- pass
+- fail
+- warning
+- summary
+
+---
+
+## assert.sh
+
+Responsável pelas validações.
+
+Funções previstas
+
+- assert_true
+- assert_false
+- assert_equals
+- assert_not_equals
+
+Especializações futuras
+
+- assert_file_exists
+- assert_directory_exists
+- assert_command_exists
+
+---
+
+## utils.sh
+
+Responsável pelas funções auxiliares.
+
+Exemplos
+
+- create_temp_workspace
+- remove_temp_workspace
+- random_name
+- temporary_file
+
+---
+
+# Fluxo
 
 ```
-bootstrap
+suite_all.sh
 
 ↓
 
-lib
+bootstrap.sh
 
 ↓
 
-output
+core/bootstrap.sh
+
+↓
+
+runner.sh
+
+↓
+
+output.sh
+
+↓
+
+assert.sh
+
+↓
+
+teste
 ```
 
 ---
 
-## 3. Teste Funcional
+# Filosofia
 
-Valida um fluxo completo.
+Cada componente possui uma única responsabilidade.
 
-Exemplo:
+A infraestrutura da Test Suite deve permanecer desacoplada da implementação dos testes.
 
-```
-deploy
+Os testes devem conter apenas a lógica de validação.
 
-↓
-
-service
-
-↓
-
-docker
-
-↓
-
-resultado
-```
+Todo código de infraestrutura deve permanecer centralizado no framework da Test Suite.
 
 ---
 
-## 4. Smoke Test
+# Roadmap
 
-Executa verificações rápidas para confirmar que o Core está operacional.
+## Sprint 1
 
-Exemplo:
-
+- Arquitetura
 - Bootstrap
-- Loader
-- Foundation
 
----
+## Sprint 2
 
-# Como Executar
+- Runner
 
-## Executar um teste específico
+## Sprint 3
 
-```bash
-bash tests/foundation/test_bootstrap.sh
-```
+- Output
 
----
+## Sprint 4
 
-## Executar todos os testes da Foundation
+- Assertions
 
-```bash
-bash tests/run.sh foundation
-```
+## Sprint 5
 
----
-
-## Executar todos os testes
-
-```bash
-bash tests/run.sh
-```
-
----
-
-# Organização
-
-Cada biblioteca possui um arquivo de teste correspondente.
-
-Exemplo:
-
-| Biblioteca | Teste |
-|------------|--------|
-| bootstrap.sh | test_bootstrap.sh |
-| constants.sh | test_constants.sh |
-| docker.sh | test_docker.sh |
-
----
-
-# Padrões
-
-Todo teste deve:
-
-- Ser independente.
-- Não alterar o ambiente permanentemente.
-- Limpar arquivos temporários.
-- Retornar código de saída.
-- Informar claramente sucesso ou falha.
-
----
-
-# Processo de Desenvolvimento
-
-Toda nova funcionalidade segue o fluxo:
-
-```
-Especificação
-
-↓
-
-Implementação
-
-↓
-
-Teste
-
-↓
-
-Revisão
-
-↓
-
-Commit
-```
-
----
-
-# Objetivo
-
-Garantir que o HomeServer Core evolua com segurança, mantendo estabilidade, previsibilidade e facilidade de manutenção.
+- Refatoração dos testes

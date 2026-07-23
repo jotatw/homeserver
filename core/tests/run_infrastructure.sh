@@ -1,10 +1,23 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-cd "${SCRIPT_DIR}/infrastructure"
+source "${SCRIPT_DIR}/common/test_runner.sh"
 
-bash test_filesystem_directories.sh
-bash test_filesystem_files.sh
+echo "========================================"
+echo " HomeServer Test Suite"
+echo " Infrastructure"
+echo "========================================"
+echo
+
+run_test \
+    "Filesystem - Directories" \
+    "${SCRIPT_DIR}/infrastructure/test_filesystem_directories.sh"
+
+run_test \
+    "Filesystem - Files" \
+    "${SCRIPT_DIR}/infrastructure/test_filesystem_files.sh"
+
+show_summary

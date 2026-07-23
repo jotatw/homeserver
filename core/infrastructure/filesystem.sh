@@ -144,3 +144,31 @@ move_file() {
     mv "${source}" "${destination}"
 
 }
+
+# ----------------------------------------------------------
+# Workspace
+# ----------------------------------------------------------
+
+#
+# Inicializa a estrutura do Workspace.
+#
+# Uso:
+#   initialize_workspace
+#
+# Retorno:
+#   0 -> Sucesso
+#   1 -> Erro
+#
+initialize_workspace() {
+
+    local directory
+
+    for directory in "${HS_WORKSPACE_DIRS[@]}"; do
+
+        create_directory "${directory}" || return 1
+
+    done
+
+    return 0
+
+}
