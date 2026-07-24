@@ -1,213 +1,188 @@
 # HomeServer
 
-> Uma plataforma modular para centralizar, integrar e automatizar serviços digitais em ambientes domésticos.
+> Dê uma nova vida ao seu computador antigo.
 
-O HomeServer é um projeto open source em desenvolvimento que tem como objetivo construir uma plataforma modular, organizada e reutilizável para administração de servidores Linux.
+O HomeServer é uma plataforma modular que permite transformar computadores antigos em servidores domésticos leves, organizados e fáceis de manter.
 
-Diferente de uma coleção de scripts independentes, o HomeServer é desenvolvido seguindo princípios de Engenharia de Software, priorizando arquitetura, padronização, testes automatizados e documentação.
-
----
-
-# Objetivos
-
-O HomeServer foi criado com cinco objetivos principais.
-
-- Automatizar tarefas administrativas.
-- Centralizar serviços e configurações.
-- Disponibilizar APIs reutilizáveis em Bash.
-- Garantir qualidade através de testes automatizados.
-- Facilitar manutenção e evolução do projeto.
+Criado para quem deseja reaproveitar hardware modesto, o HomeServer oferece uma base sólida que pode crescer gradualmente através de módulos, permitindo construir apenas o ambiente de que realmente precisa.
 
 ---
 
-# Estado do Projeto
+# Sobre o Projeto
 
-Versão atual
+Muitos computadores antigos acabam esquecidos em um canto da casa. Apesar de não serem mais ideais para tarefas modernas, eles ainda possuem capacidade suficiente para executar diversos serviços úteis.
 
-```text
-v0.1.0 (Em Desenvolvimento)
-```
+O HomeServer nasceu para aproveitar esse potencial.
 
-Milestone atual
+Em vez de exigir hardware moderno ou uma infraestrutura complexa, o projeto oferece uma base simples, leve e organizada para transformar esse equipamento em um servidor doméstico capaz de evoluir conforme as necessidades do usuário.
 
-```text
-Projeto
-██████████ 100%
-
-Core
-██████████ 100%
-
-Test Suite
-████░░░░░░ 40%
-
-Framework
-░░░░░░░░░░ 0%
-
-Módulos
-░░░░░░░░░░ 0%
-
-CLI
-░░░░░░░░░░ 0%
-```
+Nosso objetivo não é competir com grandes plataformas de homelab. Queremos oferecer uma alternativa acessível para quem deseja começar pequeno, aprender durante o processo e expandir apenas quando fizer sentido.
 
 ---
 
-# Arquitetura
+# Público-Alvo
 
-O HomeServer está organizado em camadas independentes.
+## O HomeServer é para você se...
+
+- Você possui um computador antigo parado.
+- Quer aprender sobre servidores domésticos.
+- Procura uma solução simples e organizada.
+- Prefere adicionar funcionalidades apenas quando precisar.
+- Valoriza baixo consumo de recursos.
+
+## Talvez este projeto não seja para você se...
+
+- Precisa de um ambiente corporativo.
+- Procura virtualização avançada.
+- Deseja dezenas de serviços instalados por padrão.
+- Já utiliza uma infraestrutura completa de homelab.
+
+---
+
+## O que queremos construir
+
+Os principais objetivos do HomeServer são:
+
+- Reutilizar hardware antigo.
+- Centralizar serviços domésticos.
+- Simplificar a administração do servidor.
+- Permitir crescimento gradual através de módulos.
+- Manter baixo consumo de recursos.
+- Facilitar manutenção e evolução do sistema.
+
+---
+
+# Estado Atual
+
+O projeto encontra-se em desenvolvimento ativo.
+
+Atualmente o foco está na construção da base da plataforma:
+
+- Arquitetura do projeto.
+- Core.
+- Sistema de testes.
+- Documentação.
+- Planejamento dos módulos.
+
+Após a consolidação dessa base, o desenvolvimento seguirá para os primeiros módulos oficiais.
+
+---
+
+## Nossa Filosofia
+
+O HomeServer acredita que um bom servidor doméstico deve ser:
+
+- Simples de instalar.
+- Fácil de entender.
+- Leve para executar.
+- Modular para crescer.
+- Organizado para evoluir.
+
+Comece pequeno.
+Expanda quando precisar.
+
+---
+
+# Arquitetura Geral
+
+O HomeServer é dividido em componentes independentes, cada um com uma responsabilidade bem definida.
 
 ```text
-HomeServer
-│
-├── Projeto
-│
-├── Core
-│   ├── Foundation
-│   ├── Infrastructure
-│   └── Services
-│
-├── Test Suite
-│
-├── Framework
-│
-├── Módulos
-│
-└── CLI (Futuro)
+                 HomeServer
+
+                      │
+
+                 Core Leve
+
+                      │
+
+        ┌─────────────┼─────────────┐
+
+        ▼             ▼             ▼
+
+     Módulos      Documentação    Testes
 ```
 
-Cada camada possui uma responsabilidade específica e pode evoluir independentemente.
+Essa organização permite que o projeto permaneça simples, organizado e fácil de evoluir.
 
 ---
 
 # Estrutura do Projeto
 
 ```text
-homeserver-config/
-│
-├── docs/
+homeserver/
+
 ├── core/
-├── services/
-├── config/
-├── data/
-├── logs/
-└── backup/
+├── docs/
+├── modules/
+├── tests/
+└── scripts/
 ```
 
-A documentação do projeto encontra-se centralizada na pasta `docs/`.
+Cada diretório possui uma responsabilidade específica, reduzindo acoplamento e facilitando manutenção.
 
 ---
 
 # Roadmap
 
-O desenvolvimento do HomeServer está dividido em quatro grandes fases.
-
-### Milestone 1
-
-- Arquitetura
-- Core
-- Test Suite
-- Documentação
-
-### Milestone 2
-
-- Framework de Serviços
-
-### Milestone 3
-
-- Módulos do HomeServer
-
-### Milestone 4
-
-- CLI e Automação
-
-O planejamento detalhado está disponível em:
+O desenvolvimento do HomeServer segue uma evolução incremental:
 
 ```text
-docs/project/ROADMAP.md
+Fundação
+
+↓
+
+Arquitetura
+
+↓
+
+Sistema de Módulos
+
+↓
+
+Primeiros Módulos Oficiais
+
+↓
+
+Ecossistema HomeServer
 ```
+
+Mais detalhes podem ser encontrados em:
+
+- `ROADMAP.md`
 
 ---
 
 # Documentação
 
-A documentação está organizada em camadas.
+A documentação do HomeServer é organizada em níveis de abstração.
 
-## Projeto
+Os principais documentos são:
 
-Documentação conceitual.
+- `README.md` — Apresentação do projeto.
+- `VISION.md` — Identidade e princípios.
+- `ROADMAP.md` — Evolução planejada.
+- `PROJECT_STATUS.md` — Estado atual do projeto.
+- `CHANGELOG.md` — Histórico de versões.
 
-```text
-docs/project/
-```
-
-- README
-- Vision
-- Roadmap
-- Architecture
-- Contributing
-- Coding Style
-- Testing
+A documentação técnica encontra-se no diretório `docs/`.
 
 ---
 
-## Core
+# Licença
 
-Documentação técnica do núcleo.
-
-```text
-docs/core/
-```
-
-- Bootstrap
-- Foundation
-- Infrastructure
-- Services
-- API
-
----
-
-## Test Suite
-
-Documentação da infraestrutura de testes.
-
-```text
-docs/tests/
-```
-
-- Architecture
-- API
-- Runner
-- Assertions
-- Style Guide
-
----
-
-# Filosofia
-
-O HomeServer segue alguns princípios fundamentais.
-
-- Responsabilidade única.
-- Arquitetura modular.
-- Baixo acoplamento.
-- Alta reutilização.
-- Código testável.
-- Documentação centralizada.
-- Evolução incremental.
-
-Esses princípios são aplicados tanto ao código quanto à documentação do projeto.
-
----
-
-# Como Contribuir
-
-As diretrizes para desenvolvimento e contribuição estão disponíveis em:
-
-```text
-docs/project/CONTRIBUTING.md
-```
+A licença do projeto será definida antes da primeira versão estável (v1.0).
 
 ---
 
 # Autor
 
-Projeto desenvolvido com foco em aprendizado, organização de infraestrutura e construção de uma plataforma modular para administração de servidores Linux.
+Projeto desenvolvido como iniciativa de estudo e desenvolvimento de uma plataforma modular para reutilização de hardware doméstico.
+
+---
+
+O HomeServer ainda está em desenvolvimento.
+
+Estamos construindo uma plataforma simples, modular e acessível para que qualquer pessoa possa transformar hardware modesto em uma infraestrutura digital doméstica.
+
+Se essa também é a sua ideia de um bom servidor, seja bem-vindo.
