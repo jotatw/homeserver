@@ -1,181 +1,188 @@
-# HomeServer Core Roadmap
+# Roadmap
 
-Este documento define o planejamento de desenvolvimento do Core do HomeServer.
-
-O objetivo é acompanhar a evolução do framework de administração e manter uma ordem lógica de implementação.
+> O Roadmap do HomeServer representa a evolução da plataforma ao longo do tempo.
+>
+> Diferente de uma lista de funcionalidades, cada fase representa uma nova capacidade adquirida pelo projeto. Tecnologias e módulos podem mudar, mas a direção permanece a mesma.
 
 ---
 
-# Fases
+# Objetivo
 
-O Core é dividido em cinco módulos principais.
+O HomeServer evolui de forma incremental.
 
-1. Foundation
-2. Infrastructure
-3. Services
-4. Operations
-5. Interface
+Cada etapa fortalece a plataforma antes da próxima, garantindo que novas funcionalidades sejam construídas sobre uma base sólida, simples e organizada.
 
-Cada módulo depende do anterior.
+---
 
+# Evolução da Plataforma
+
+```text
+Fundação
+
+↓
+
+Plataforma
+
+↓
+
+Modularidade
+
+↓
+
+Módulos Oficiais
+
+↓
+
+Ecossistema
+
+↓
+
+Consolidação
 ```
-Interface
-    ▲
-Operations
-    ▲
-Services
-    ▲
-Infrastructure
-    ▲
-Foundation
-```
 
 ---
 
-# Foundation
+# Fase 1 — Fundação
 
-Bibliotecas básicas utilizadas por todo o Core.
+Objetivo
 
-| Biblioteca | Status |
-|------------|--------|
-| output.sh | 🟩 |
-| validation.sh | 🟩 |
-| config.sh | 🟩 |
-| constants.sh | ⬜ |
-| lib.sh | ⬜ |
+Construir uma base sólida para todo o projeto.
 
-Objetivo:
+Principais entregas
 
-Criar a base comum para todas as demais bibliotecas.
+- Arquitetura do projeto
+- Core
+- Sistema de testes
+- Documentação
+- Estrutura de desenvolvimento
 
----
+Resultado esperado
 
-# Infrastructure
-
-Bibliotecas responsáveis pela comunicação com o sistema operacional.
-
-| Biblioteca | Status |
-|------------|--------|
-| filesystem.sh | ⬜ |
-| docker.sh | ⬜ |
-| network.sh | ⬜ |
-| system.sh | ⬜ |
-| backup.sh | ⬜ |
-
-Objetivo:
-
-Centralizar todas as operações de baixo nível.
+Uma base confiável para sustentar toda a evolução futura do HomeServer.
 
 ---
 
-# Services
+# Fase 2 — Plataforma
 
-Camada responsável pelas regras do HomeServer.
+Objetivo
 
-| Biblioteca | Status |
-|------------|--------|
-| service.sh | ⬜ |
+Disponibilizar um HomeServer utilizável.
 
-Objetivo:
+Principais capacidades
 
-Abstrair os serviços da infraestrutura.
+- Homepage
+- Configuração
+- Interface de gerenciamento
+- Atualizações
+- Operação simplificada
 
----
+Resultado esperado
 
-# Operations
-
-Scripts utilizados pelo administrador.
-
-| Script | Status |
-|---------|--------|
-| deploy.sh | ⬜ |
-| install.sh | ⬜ |
-| restart.sh | ⬜ |
-| stop.sh | ⬜ |
-| status.sh | ⬜ |
-| logs.sh | ⬜ |
-| update.sh | ⬜ |
-| backup.sh | ⬜ |
-| restore.sh | ⬜ |
-| doctor.sh | ⬜ |
-
-Objetivo:
-
-Automatizar todas as tarefas administrativas.
+Um sistema funcional, simples de instalar e manter.
 
 ---
 
-# Interface
+# Fase 3 — Modularidade
 
-Ferramentas utilizadas pelo usuário.
+Objetivo
 
-| Ferramenta | Status |
-|------------|--------|
-| hsctl | ⬜ |
-| help | ⬜ |
-| autocomplete | ⬜ |
+Permitir que a plataforma cresça sem aumentar a complexidade do Core.
 
-Objetivo:
+Principais capacidades
 
-Disponibilizar uma interface simples para administração do HomeServer.
+- Sistema de módulos
+- Gerenciamento de módulos
+- Instalação
+- Atualização
+- Remoção
+- Versionamento
 
----
+Resultado esperado
 
-# Ordem de implementação
-
-## Foundation
-
-- output.sh
-- validation.sh
-- config.sh
-- constants.sh
-- lib.sh
-
-## Infrastructure
-
-- filesystem.sh
-- docker.sh
-- network.sh
-- system.sh
-- backup.sh
-
-## Services
-
-- service.sh
-
-## Operations
-
-- deploy.sh
-- install.sh
-- restart.sh
-- stop.sh
-- logs.sh
-- status.sh
-- backup.sh
-- restore.sh
-- update.sh
-- doctor.sh
-
-## Interface
-
-- hsctl
-- help
-- autocomplete
+Uma plataforma expansível e preparada para diferentes necessidades.
 
 ---
 
-# Objetivo da V1
+# Fase 4 — Módulos Oficiais
 
-Ao final da primeira versão do Core será possível:
+Objetivo
 
-- Implantar serviços
-- Atualizar serviços
-- Reiniciar serviços
-- Consultar logs
-- Verificar status
-- Criar backups
-- Restaurar backups
-- Validar a infraestrutura
-- Diagnosticar problemas
+Disponibilizar funcionalidades através de módulos independentes.
 
-Tudo utilizando uma interface padronizada.
+Categorias previstas
+
+- Storage
+- Media
+- Development
+- Network
+- Security
+- Automation
+- Backup
+- Monitoring
+
+Resultado esperado
+
+Cada usuário instala apenas os módulos que realmente necessita.
+
+---
+
+# Fase 5 — Ecossistema
+
+Objetivo
+
+Transformar o HomeServer em uma plataforma de integração doméstica.
+
+Possibilidades
+
+- Integração entre dispositivos
+- Sincronização
+- Compartilhamento
+- Automações
+- Serviços distribuídos
+
+Resultado esperado
+
+Um pequeno ecossistema digital organizado em torno do HomeServer.
+
+---
+
+# Fase 6 — Consolidação
+
+Objetivo
+
+Garantir estabilidade e maturidade da plataforma.
+
+Principais focos
+
+- Documentação
+- Otimizações
+- Comunidade
+- Estabilidade
+- Manutenção de longo prazo
+
+Resultado esperado
+
+Uma plataforma estável, sustentável e preparada para evoluir continuamente.
+
+---
+
+# Filosofia de Evolução
+
+O HomeServer cresce através de capacidades, não de quantidade de funcionalidades.
+
+Primeiro construímos a infraestrutura.
+
+Depois adicionamos recursos que utilizam essa infraestrutura.
+
+Esse modelo mantém o projeto simples, organizado e sustentável ao longo do tempo.
+
+---
+
+# Princípios
+
+- Comece pequeno.
+- Organize bem.
+- Expanda quando precisar.
+- Mantenha o Core leve.
+- Cresça através de módulos.
+- Evolua de forma incremental.
