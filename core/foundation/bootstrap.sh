@@ -13,8 +13,10 @@
 #   - Localizar o diretório do Core
 #   - Definir variáveis globais
 #   - Carregar o Loader
+#   - Controlar a sequência de inicialização
 #
-# Dependências.: Nenhuma
+# Dependências:
+#   - foundation/lib.sh
 #
 # ==========================================================
 
@@ -24,32 +26,27 @@ set -euo pipefail
 # Variáveis Globais
 # ----------------------------------------------------------
 
-export HS_CORE_ROOT=""
+declare -gx HS_CORE_ROOT
 
 # ----------------------------------------------------------
 # Funções Privadas
 # ----------------------------------------------------------
 
 #
-# Descobre o diretório onde o Core está instalado.
+# Descobre o diretório do Core e prepara o ambiente.
 #
-_initialize_core() {
+_prepare_environment() {
 
     HS_CORE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
     export HS_CORE_ROOT
 
-    _load_foundation
-    _load_infrastructure
-    _load_services
-    _load_operations
-
 }
 
 #
-# Carrega o Loader do Core.
+# Carrega o Loader da Foundation.
 #
-_load_core() {
+_load_loader() {
 
     local loader="${HS_CORE_ROOT}/foundation/lib.sh"
 
@@ -63,11 +60,19 @@ _load_core() {
     source "${loader}"
 
 }
-
 # ----------------------------------------------------------
-# Inicialização
+# Ponto de Entrada
 # ----------------------------------------------------------
 
-_initialize_core
+_prepare_environment
 
-_load_core
+_load_loader
+
+#
+# Inicializa o Core
+#
+
+_load_foundation
+_load_infrastructure
+_load_operations
+_load_services
