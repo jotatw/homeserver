@@ -39,6 +39,11 @@ _initialize_core() {
 
     export HS_CORE_ROOT
 
+    _load_foundation
+    _load_infrastructure
+    _load_services
+    _load_operations
+
 }
 
 #
@@ -46,7 +51,7 @@ _initialize_core() {
 #
 _load_core() {
 
-    local loader="${HS_CORE_ROOT}/common/lib.sh"
+    local loader="${HS_CORE_ROOT}/foundation/lib.sh"
 
     if [[ ! -f "${loader}" ]]; then
         echo "Erro: Loader não encontrado."

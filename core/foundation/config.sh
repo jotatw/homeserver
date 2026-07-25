@@ -36,7 +36,7 @@ readonly HS_PROJECT_ROOT="$(dirname "${HS_CORE_ROOT}")"
 # Diretórios do Core
 # ----------------------------------------------------------
 
-readonly HS_CORE_COMMON_DIR="${HS_CORE_ROOT}/common"
+readonly HS_CORE_FOUNDATION_DIR="${HS_CORE_ROOT}/foundation"
 
 readonly HS_CORE_INFRASTRUCTURE_DIR="${HS_CORE_ROOT}/infrastructure"
 
