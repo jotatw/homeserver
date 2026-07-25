@@ -45,10 +45,10 @@ _load_library() {
 #
 _load_foundation() {
 
-    _load_library "${HS_CORE_ROOT}/common/constants.sh"
-    _load_library "${HS_CORE_ROOT}/common/config.sh"
-    _load_library "${HS_CORE_ROOT}/common/output.sh"
-    _load_library "${HS_CORE_ROOT}/common/validation.sh"
+    _load_library "${HS_CORE_ROOT}/foundation/constants.sh"
+    _load_library "${HS_CORE_ROOT}/foundation/config.sh"
+    _load_library "${HS_CORE_ROOT}/foundation/output.sh"
+    _load_library "${HS_CORE_ROOT}/foundation/validation.sh"
 
 }
 
@@ -78,17 +78,3 @@ _load_operations() {
     return 0
 
 }
-# ----------------------------------------------------------
-# Inicialização
-# ----------------------------------------------------------
-
-_initialize_core() {
-
-    _load_foundation
-    _load_infrastructure
-    _load_services
-    _load_operations
-
-}
-
-_initialize_core

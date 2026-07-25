@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-source "../common/test_bootstrap.sh"
+source "../test_bootstrap.sh"
 
 TEST_DIR="/tmp/homeserver-test"
 TEST_FILE="${TEST_DIR}/arquivo.txt"
