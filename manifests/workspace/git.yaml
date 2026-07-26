@@ -1,0 +1,11 @@
+git:
+
+  repositories:
+
+    homeserver-config:
+
+      path: git/homeserver-config
+
+      branch: main
+
+      update: true

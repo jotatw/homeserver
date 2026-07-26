@@ -1,0 +1,15 @@
+domains:
+
+  base:
+
+    internal: home.arpa
+
+  services:
+
+    homepage:
+
+      host: homepage.home.arpa
+
+    gitea:
+
+      host: gitea.home.arpa

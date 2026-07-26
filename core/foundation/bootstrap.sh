@@ -11,7 +11,7 @@
 #
 # Responsabilidades:
 #   - Localizar o diretório do Core
-#   - Definir variáveis globais
+#   - Preparar o ambiente de execução
 #   - Carregar o Loader
 #   - Controlar a sequência de inicialização
 #
@@ -33,7 +33,7 @@ declare -gx HS_CORE_ROOT
 # ----------------------------------------------------------
 
 #
-# Descobre o diretório do Core e prepara o ambiente.
+# Prepara o ambiente de execução do Core.
 #
 _prepare_environment() {
 
@@ -60,18 +60,24 @@ _load_loader() {
     source "${loader}"
 
 }
+
 # ----------------------------------------------------------
 # Ponto de Entrada
 # ----------------------------------------------------------
 
+#
+# 1. Prepara o ambiente
+#
 _prepare_environment
 
+#
+# 2. Carrega o Loader
+#
 _load_loader
 
 #
-# Inicializa o Core
+# 3. Inicializa o Core
 #
-
 _load_foundation
 _load_infrastructure
 _load_operations

@@ -1,0 +1,23 @@
+storage:
+
+  data:
+
+    services: services
+
+    shared: shared
+
+    temporary: temp
+
+  backup:
+
+    daily: daily
+
+    weekly: weekly
+
+    monthly: monthly
+
+  logs:
+
+    services: services
+
+    system: system

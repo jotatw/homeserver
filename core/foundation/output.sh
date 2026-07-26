@@ -17,6 +17,17 @@
 #   - Não utiliza cores (V1)
 #   - Não controla níveis de log
 #
+# API Pública
+#
+#   - info
+#   - success
+#   - warning
+#   - error
+#
+# API Interna
+#
+#   - _print
+#
 # ==========================================================
 
 # ----------------------------------------------------------
@@ -29,7 +40,10 @@
 _print() {
 
     local level="$1"
-    local message="$2"
+
+    shift
+
+    local message="$*"
 
     printf "[%s] %s\n" "${level}" "${message}"
 
@@ -44,7 +58,7 @@ _print() {
 #
 info() {
 
-    _print "${HS_LEVEL_INFO}" "$1"
+    _print "${HS_LEVEL_INFO}" "$*"
 
 }
 
@@ -53,7 +67,7 @@ info() {
 #
 success() {
 
-    _print "${HS_LEVEL_SUCCESS}" "$1"
+    _print "${HS_LEVEL_SUCCESS}" "$*"
 
 }
 
@@ -62,7 +76,7 @@ success() {
 #
 warning() {
 
-    _print "${HS_LEVEL_WARNING}" "$1"
+    _print "${HS_LEVEL_WARNING}" "$*"
 
 }
 
@@ -71,6 +85,5 @@ warning() {
 #
 error() {
 
-    _print "${HS_LEVEL_ERROR}" "$1"
-
+    _print "${HS_LEVEL_ERROR}" "$*"
 }

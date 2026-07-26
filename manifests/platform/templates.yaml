@@ -1,0 +1,17 @@
+templates:
+
+  compose:
+
+    filename: compose.yaml
+
+  metadata:
+
+    filename: metadata.yaml
+
+  environment:
+
+    filename: .env
+
+  readme:
+
+    filename: README.md

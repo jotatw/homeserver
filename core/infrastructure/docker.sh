@@ -1,101 +1,45 @@
 #!/usr/bin/env bash
 
 # ==========================================================
-# Biblioteca Docker
-# Responsável pelas operações Docker Compose.
+# HomeServer Core
+#
+# Arquivo......: docker.sh
+# Módulo.......: Infrastructure
+#
+# Objetivo.....:
+# Fornecer uma API para interação com o Docker Engine.
+#
+# Responsabilidades:
+#   - Verificar disponibilidade do Docker
+#   - Verificar estado do Docker
+#   - Consultar versão do Docker
+#
+# Não Responsabilidades:
+#   - Não executa Docker Compose
+#   - Não inicia containers
+#   - Não conhece serviços
+#
+# API Pública:
+#   - docker_available
+#   - docker_running
+#   - docker_version
+#
 # ==========================================================
 
-#
-# Executa "docker compose up -d".
-#
-compose_up() {
+docker_available() {
 
-    docker compose up -d
+    command -v docker >/dev/null 2>&1
+
 }
 
-#
-# Executa "docker compose down".
-#
-compose_down() {
+docker_running() {
 
-    docker compose down
+    docker info >/dev/null 2>&1
+
 }
 
-#
-# Reinicia um serviço.
-#
-compose_restart() {
+docker_version() {
 
-    docker compose restart
-}
+    docker --version
 
-#
-# Atualiza as imagens.
-#
-compose_pull() {
-
-    docker compose pull
-}
-
-#
-# Exibe o status.
-#
-compose_status() {
-
-    docker compose ps
-}
-
-#
-# Exibe os logs.
-#
-compose_logs() {
-
-    docker compose logs -f
-}
-
-#
-# Valida o compose.
-#
-compose_validate() {
-
-    docker compose config >/dev/null
-}
-#
-# Entra no diretório do serviço.
-#
-enter_service() {
-
-    local service="$1"
-
-    cd "$(compose_path "$service")"
-}
-#
-# Verifica se um serviço está em execução.
-#
-service_running() {
-
-    docker compose ps --status running | grep -q .
-}
-#
-# Aguarda um container iniciar.
-#
-wait_for_service() {
-
-    local timeout="${1:-30}"
-
-    local elapsed=0
-
-    while (( elapsed < timeout )); do
-
-        if service_running; then
-            return 0
-        fi
-
-        sleep 1
-
-        ((elapsed++))
-
-    done
-
-    return 1
 }
