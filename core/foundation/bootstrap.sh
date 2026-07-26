@@ -68,32 +68,14 @@ _load_loader() {
 #
 # 1. Prepara o ambiente
 #
-echo "[BOOT] Preparando ambiente..."
 _prepare_environment
-echo "retorno: $?"
 
-echo "[BOOT] Carregando loader..."
 _load_loader
-echo "retorno: $?"
 
-echo "[BOOT] Carregando Foundation..."
 _load_foundation
-echo "retorno: $?"
-
-echo "[BOOT] Carregando Infrastructure..."
 _load_infrastructure
-echo "retorno: $?"
-
-echo "[BOOT] Carregando Components..."
 _load_components
-echo "retorno: $?"
-
-echo "[BOOT] Carregando Provisioning..."
 _load_provisioning
-echo "retorno: $?"
-
-echo "[BOOT] Carregando Applications..."
 _load_applications
-echo "retorno: $?"
 
 return 0
