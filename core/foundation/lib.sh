@@ -85,9 +85,9 @@ _load_infrastructure() {
 _load_components() {
 
     _load_library "${HS_CORE_COMPONENTS_DIR}/context/context.sh"
+    _load_library "${HS_CORE_COMPONENTS_DIR}/result/result.sh"
 
     return 0
-
 }
 
 #
