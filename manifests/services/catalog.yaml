@@ -1,0 +1,64 @@
+schema:
+  version: "1.0"
+
+catalog:
+
+  homepage:
+
+    id: homepage
+
+    enabled: true
+
+    install: true
+
+    category: dashboard
+
+    profile: default
+
+  gitea:
+
+    id: gitea
+
+    enabled: true
+
+    install: true
+
+    category: development
+
+    profile: default
+
+  filebrowser:
+
+    id: filebrowser
+
+    enabled: true
+
+    install: true
+
+    category: storage
+
+    profile: default
+
+  portainer:
+
+    id: portainer
+
+    enabled: true
+
+    install: true
+
+    category: administration
+
+    profile: complete
+
+  immich:
+
+    id: immich
+
+    enabled: false
+
+    install: false
+
+    category: media
+
+    profile: media

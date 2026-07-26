@@ -10,14 +10,25 @@
 # Fornecer funções de validação reutilizáveis.
 #
 # Responsabilidades:
+#   - Validar comandos
 #   - Validar arquivos
 #   - Validar diretórios
-#   - Validar comandos
 #   - Validar valores
 #
-# Não faz:
+# Não Responsabilidades:
 #   - Não imprime mensagens
 #   - Não encerra scripts
+#   - Não altera estado do sistema
+#
+# API Pública:
+#   - is_command
+#   - is_empty
+#   - is_number
+#
+# Observação:
+# Todas as funções retornam:
+#   0 -> válido
+#   1 -> inválido
 #
 # ==========================================================
 

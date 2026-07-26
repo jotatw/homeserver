@@ -163,7 +163,7 @@ initialize_workspace() {
 
     local directory
 
-    for directory in "${HS_WORKSPACE_DIRS[@]}"; do
+    for directory in "${HS_WORKSPACE_DIRECTORIES[@]}"; do
 
         create_directory "${directory}" || return 1
 

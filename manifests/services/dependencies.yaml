@@ -1,0 +1,21 @@
+dependencies:
+
+  homepage: []
+
+  gitea: []
+
+  filebrowser: []
+
+  portainer: []
+
+  immich:
+
+    - postgres
+
+    - redis
+
+  nextcloud:
+
+    - postgres
+
+    - redis

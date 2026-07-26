@@ -10,6 +10,11 @@
 # Centralizar todas as constantes utilizadas pelo
 # HomeServer Core.
 #
+# Responsabilidades:
+#   - Definir constantes globais
+#   - Padronizar valores compartilhados
+#   - Evitar valores mágicos no código
+#
 # Este arquivo não deve conter funções.
 #
 # ==========================================================
@@ -28,6 +33,15 @@ readonly HS_PROJECT_DESCRIPTION="Simple HomeServer Platform"
 readonly HS_CORE_VERSION="0.1.0"
 
 # ----------------------------------------------------------
+# Status
+# ----------------------------------------------------------
+
+readonly HS_STATUS_OK="OK"
+readonly HS_STATUS_WARNING="WARNING"
+readonly HS_STATUS_ERROR="ERROR"
+readonly HS_STATUS_INFO="INFO"
+
+# ----------------------------------------------------------
 # Exit Codes
 # ----------------------------------------------------------
 
@@ -39,15 +53,6 @@ readonly HS_EXIT_PERMISSION_DENIED=4
 readonly HS_EXIT_CONFIGURATION_ERROR=5
 
 # ----------------------------------------------------------
-# Status
-# ----------------------------------------------------------
-
-readonly HS_STATUS_OK="OK"
-readonly HS_STATUS_WARNING="WARNING"
-readonly HS_STATUS_ERROR="ERROR"
-readonly HS_STATUS_INFO="INFO"
-
-# ----------------------------------------------------------
 # Valores Padrão
 # ----------------------------------------------------------
 
@@ -55,7 +60,7 @@ readonly HS_DEFAULT_TIMEOUT=30
 readonly HS_DEFAULT_RETRIES=3
 
 # ----------------------------------------------------------
-# Mensagens de erro padrão.
+# Níveis de Log
 # ----------------------------------------------------------
 
 readonly HS_LEVEL_INFO="INFO"
