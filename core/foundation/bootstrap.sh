@@ -80,5 +80,6 @@ _load_loader
 #
 _load_foundation
 _load_infrastructure
-_load_operations
-_load_services
+_load_components
+_load_provisioning
+_load_applications
