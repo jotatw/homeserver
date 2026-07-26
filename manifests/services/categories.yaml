@@ -1,0 +1,25 @@
+categories:
+
+  dashboard:
+
+    description: Dashboards e portais
+
+  development:
+
+    description: Desenvolvimento
+
+  storage:
+
+    description: Armazenamento
+
+  administration:
+
+    description: Administração
+
+  media:
+
+    description: Multimídia
+
+  monitoring:
+
+    description: Monitoramento

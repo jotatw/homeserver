@@ -1,0 +1,17 @@
+defaults:
+
+  enabled: true
+
+  startup: automatic
+
+  restart_policy: unless-stopped
+
+  healthcheck: true
+
+  backup: true
+
+  monitoring: true
+
+logging:
+
+  driver: json-file

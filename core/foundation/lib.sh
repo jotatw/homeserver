@@ -7,53 +7,72 @@
 # Módulo.......: Foundation
 #
 # Objetivo.....:
-# Carregar as bibliotecas do HomeServer Core.
+# Carregar os componentes do HomeServer Core.
 #
 # Responsabilidades:
-#   - Carregar Foundation
-#   - Carregar Infrastructure
-#   - Carregar Services
-#   - Carregar Operations
+#   - Carregar componentes da Foundation
+#   - Carregar componentes da Infrastructure
+#   - Carregar componentes da Operations
+#   - Carregar componentes da Services
+#
+# API Pública:
+#   - _load_foundation
+#   - _load_infrastructure
+#   - _load_operations
+#   - _load_services
+#
+# API Interna:
+#   - _load_library
+#
+# Dependências:
+#   - HS_CORE_ROOT
+#   - HS_CORE_INFRASTRUCTURE_DIR
 #
 # ==========================================================
 
 set -euo pipefail
 
 # ----------------------------------------------------------
-# Funções Privadas
+# API Interna
 # ----------------------------------------------------------
 
 #
-# Carrega uma biblioteca.
+# Carrega um componente do Core.
 #
 _load_library() {
 
     local library="$1"
 
     if [[ ! -f "${library}" ]]; then
-        echo "Erro: Biblioteca não encontrada."
+        echo "Erro: Componente não encontrado."
         echo "Arquivo esperado: ${library}"
         exit 1
     fi
 
     # shellcheck source=/dev/null
     source "${library}"
+
 }
 
+# ----------------------------------------------------------
+# API Pública
+# ----------------------------------------------------------
+
 #
-# Carrega o Foundation.
+# Carrega os componentes da Foundation.
 #
 _load_foundation() {
 
     _load_library "${HS_CORE_ROOT}/foundation/constants.sh"
     _load_library "${HS_CORE_ROOT}/foundation/config.sh"
-    _load_library "${HS_CORE_ROOT}/foundation/output.sh"
     _load_library "${HS_CORE_ROOT}/foundation/validation.sh"
+    _load_library "${HS_CORE_ROOT}/foundation/output.sh"
+    _load_library "${HS_CORE_ROOT}/foundation/assert.sh"
 
 }
 
 #
-# Carrega Infrastructure.
+# Carrega os componentes da Infrastructure.
 #
 _load_infrastructure() {
 
@@ -62,18 +81,18 @@ _load_infrastructure() {
 }
 
 #
-# Carrega Services.
+# Carrega os componentes da Operations.
 #
-_load_services() {
+_load_operations() {
 
     return 0
 
 }
 
 #
-# Carrega Operations.
+# Carrega os componentes da Services.
 #
-_load_operations() {
+_load_services() {
 
     return 0
 

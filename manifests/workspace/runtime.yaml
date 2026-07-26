@@ -1,0 +1,17 @@
+runtime:
+
+  cache:
+
+    directory: runtime/cache
+
+  pid:
+
+    directory: runtime/pid
+
+  socket:
+
+    directory: runtime/socket
+
+  temporary:
+
+    directory: runtime/tmp

@@ -1,0 +1,59 @@
+schema:
+  version: "1.0"
+
+pipelines:
+
+  init:
+
+    description: Inicializa um novo workspace.
+
+    enabled: true
+
+    stages:
+
+      - manifest
+      - validator
+      - resolver
+      - planner
+      - executor
+      - report
+
+  validate:
+
+    description: Valida os manifestos.
+
+    enabled: true
+
+    stages:
+
+      - manifest
+      - validator
+      - report
+
+  doctor:
+
+    description: Verifica inconsistências.
+
+    enabled: true
+
+    stages:
+
+      - manifest
+      - validator
+      - planner
+      - report
+
+  repair:
+
+    description: Corrige inconsistências.
+
+    enabled: true
+
+    stages:
+
+      - manifest
+      - validator
+      - resolver
+      - planner
+      - executor
+      - report

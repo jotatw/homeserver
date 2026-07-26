@@ -1,0 +1,21 @@
+permissions:
+
+  directories:
+
+    default: "755"
+
+    private: "700"
+
+  files:
+
+    default: "644"
+
+    executable: "755"
+
+    private: "600"
+
+ownership:
+
+  user: homeserver
+
+  group: docker

@@ -1,0 +1,11 @@
+startup:
+
+  order:
+
+    - homepage
+
+    - gitea
+
+    - filebrowser
+
+    - portainer

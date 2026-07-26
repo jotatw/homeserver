@@ -1,0 +1,29 @@
+defaults:
+
+  timezone: America/Sao_Paulo
+
+  locale: pt_BR.UTF-8
+
+  encoding: UTF-8
+
+docker:
+
+  compose:
+
+    filename: compose.yaml
+
+  restart_policy: unless-stopped
+
+logging:
+
+  level: info
+
+services:
+
+  enabled: true
+
+  startup: automatic
+
+healthcheck:
+
+  enabled: true
