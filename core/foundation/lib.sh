@@ -67,7 +67,6 @@ _load_foundation() {
     _load_library "${HS_CORE_ROOT}/foundation/config.sh"
     _load_library "${HS_CORE_ROOT}/foundation/validation.sh"
     _load_library "${HS_CORE_ROOT}/foundation/output.sh"
-    _load_library "${HS_CORE_ROOT}/foundation/assert.sh"
 
 }
 
@@ -77,6 +76,33 @@ _load_foundation() {
 _load_infrastructure() {
 
     _load_library "${HS_CORE_INFRASTRUCTURE_DIR}/filesystem.sh"
+
+}
+
+#
+# carrega os componentes.
+#
+_load_components() {
+
+    return 0
+
+}
+
+#
+# Carrega os componentes da Provisioning.
+#
+_load_provisioning() {
+
+    return 0
+
+}
+
+#
+# Carrega os componentes da Applications.
+#
+_load_applications() {
+
+    return 0
 
 }
 
