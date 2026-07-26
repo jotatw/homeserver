@@ -86,14 +86,15 @@ context_set() {
 #
 context_get() {
 
-    local key="${1:?missing key}"
+    local key="$1"
 
-    if ! context_exists "${key}"; then
+    if [[ ! -v "__hs_context_storage[$key]" ]]; then
         return "${HS_EXIT_NOT_FOUND}"
     fi
 
-    printf '%s\n' "${__hs_context_storage["${key}"]}"
+    printf '%s\n' "${__hs_context_storage[$key]}"
 
+    return "${HS_EXIT_SUCCESS}"
 }
 
 #
@@ -112,12 +113,15 @@ context_exists() {
 #
 context_remove() {
 
-    local key="${1:?missing key}"
+    local key="$1"
 
-    unset '__hs_context_storage[$key]'
+    if [[ ! -v "__hs_context_storage[$key]" ]]; then
+        return "${HS_EXIT_NOT_FOUND}"
+    fi
+
+    unset "__hs_context_storage[$key]"
 
     return "${HS_EXIT_SUCCESS}"
-
 }
 
 #
