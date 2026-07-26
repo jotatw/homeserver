@@ -20,8 +20,6 @@
 #
 # ==========================================================
 
-set -euo pipefail
-
 # ----------------------------------------------------------
 # Variáveis Globais
 # ----------------------------------------------------------
@@ -37,7 +35,9 @@ declare -gx HS_CORE_ROOT
 #
 _prepare_environment() {
 
-    HS_CORE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    HS_CORE_ROOT="$(
+        cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd
+    )"
 
     export HS_CORE_ROOT
 
@@ -53,7 +53,7 @@ _load_loader() {
     if [[ ! -f "${loader}" ]]; then
         echo "Erro: Loader não encontrado."
         echo "Arquivo esperado: ${loader}"
-        exit 1
+        return 1
     fi
 
     # shellcheck source=/dev/null
@@ -68,18 +68,32 @@ _load_loader() {
 #
 # 1. Prepara o ambiente
 #
+echo "[BOOT] Preparando ambiente..."
 _prepare_environment
+echo "retorno: $?"
 
-#
-# 2. Carrega o Loader
-#
+echo "[BOOT] Carregando loader..."
 _load_loader
+echo "retorno: $?"
 
-#
-# 3. Inicializa o Core
-#
+echo "[BOOT] Carregando Foundation..."
 _load_foundation
+echo "retorno: $?"
+
+echo "[BOOT] Carregando Infrastructure..."
 _load_infrastructure
+echo "retorno: $?"
+
+echo "[BOOT] Carregando Components..."
 _load_components
+echo "retorno: $?"
+
+echo "[BOOT] Carregando Provisioning..."
 _load_provisioning
+echo "retorno: $?"
+
+echo "[BOOT] Carregando Applications..."
 _load_applications
+echo "retorno: $?"
+
+return 0

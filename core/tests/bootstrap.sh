@@ -67,7 +67,7 @@ readonly HS_TEST_DOCS_DIR="${HS_TEST_ROOT}/docs"
 # Core
 # ----------------------------------------------------------
 
-source "${HS_CORE_ROOT}/bootstrap.sh"
+source "${HS_CORE_ROOT}/foundation/bootstrap.sh"
 
 # ----------------------------------------------------------
 # Framework

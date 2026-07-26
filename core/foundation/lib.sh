@@ -46,7 +46,7 @@ _load_library() {
     if [[ ! -f "${library}" ]]; then
         echo "Erro: Componente não encontrado."
         echo "Arquivo esperado: ${library}"
-        exit 1
+        return 1
     fi
 
     # shellcheck source=/dev/null
