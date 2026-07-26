@@ -1,193 +1,78 @@
 #!/usr/bin/env bash
 
-# ==============================================================================
-# HomeServer
-# Componente : Context
-# Módulo     : Runtime Context
+# ==========================================================
+# HomeServer Core
 #
-# Descrição:
-#   Fornece um contexto de execução em memória para o Provisioning Engine.
+# Arquivo......: context.sh
+# Módulo.......: Components
+#
+# Objetivo.....:
+# Armazenar informações temporárias durante a execução
+# do HomeServer Core.
 #
 # Responsabilidades:
-#   - Armazenar informações da execução
+#   - Armazenar pares chave/valor
 #   - Recuperar valores
 #   - Remover valores
-#   - Validar o contexto
+#   - Limpar o contexto
 #
 # Não Responsabilidades:
-#   - Ler manifestos
-#   - Executar operações
 #   - Persistir dados
-# ==============================================================================
+#   - Ler arquivos
+#   - Executar operações
+#
+# API Pública:
+#   - context_create
+#   - context_set
+#   - context_get
+#   - context_exists
+#   - context_remove
+#   - context_clear
+#   - context_keys
+#   - context_count
+#
+# API Interna:
+#   - _context_initialize
+#
+# Dependências:
+#   - foundation/constants.sh
+#
+# ==========================================================
 
-set -Eeuo pipefail
+set -euo pipefail
 
-# ==============================================================================
-# Imports
-# ==============================================================================
+# ----------------------------------------------------------
+# Variáveis
+# ----------------------------------------------------------
 
-# shellcheck source=/dev/null
-source "${HS_FOUNDATION_DIR}/constants.sh"
-source "${HS_FOUNDATION_DIR}/validation.sh"
+declare -gA __hs_context_storage
 
-# ==============================================================================
-# Constants
-# ==============================================================================
+# ----------------------------------------------------------
+# API Interna
+# ----------------------------------------------------------
 
-readonly HS_CONTEXT_NAME="runtime"
+#
+# Inicializa o armazenamento do contexto.
+#
+_context_initialize() {
 
-# ==============================================================================
-# Storage
-# ==============================================================================
+    __hs_context_storage=()
 
-declare -gA HS_RUNTIME_CONTEXT=()
+}
 
-# ==============================================================================
-# Public API
-# ==============================================================================
+# ----------------------------------------------------------
+# API Pública
+# ----------------------------------------------------------
 
-##
-# Initializes the runtime context.
+#
+# Cria um novo contexto de execução.
 #
 context_create() {
 
     _context_initialize
-}
-
-context_clear() {
-
-    _context_initialize
-}
-
-##
-# Destroys the runtime context.
-#
-context_destroy() {
-
-    _context_initialize
 
     return "${HS_EXIT_SUCCESS}"
+
 }
-
-##
-# Stores a value.
-#
-# Arguments:
-#   $1 Key
-#   $2 Value
-#
-context_set() {
-
-    local key="${1:?missing key}"
-    local value="${2:?missing value}"
-
-    _context_validate_key "${key}"
-    _context_validate_value "${value}"
-
-    HS_RUNTIME_CONTEXT["${key}"]="${value}"
-
-    return "${HS_EXIT_SUCCESS}"
-}
-
-##
-# Returns a stored value.
-#
-# Arguments:
-#   $1 Key
-#
-context_get() {
-
-    local key="${1:?missing key}"
-
-    _context_validate_key "${key}"
-
-    if ! context_exists "${key}"; then
-        return "${HS_EXIT_NOT_FOUND}"
-    fi
-
-    printf '%s\n' "${HS_RUNTIME_CONTEXT["${key}"]}"
-}
-
-##
-# Checks whether a key exists.
-#
-# Arguments:
-#   $1 Key
-#
-context_exists() {
-
-    local key="${1:?missing key}"
-
-    _context_validate_key "${key}"
-
-    [[ -v HS_RUNTIME_CONTEXT["${key}"] ]]
-}
-
-##
-# Removes a key.
-#
-context_remove() {
-
-    local key="${1:?missing key}"
-
-    _context_validate_key "${key}"
-
-    unset 'HS_RUNTIME_CONTEXT[$key]'
-
-    return "${HS_EXIT_SUCCESS}"
-}
-
-##
-# Lists all keys.
-#
-context_keys() {
-
-    printf '%s\n' "${!HS_RUNTIME_CONTEXT[@]}"
-}
-
-##
-# Returns the number of stored entries.
-#
-context_count() {
-
-    printf '%d\n' "${#HS_RUNTIME_CONTEXT[@]}"
-}
-
-##
-# Validates the runtime context.
-#
-context_validate() {
-
-    declare -p HS_RUNTIME_CONTEXT >/dev/null
-
-    return "${HS_EXIT_SUCCESS}"
-}
-
-# ==============================================================================
-# Private API
-# ==============================================================================
-
-_context_validate_key() {
-
-    local key="${1}"
-
-    [[ -n "${key}" ]] \
-        || return "${HS_EXIT_INVALID_ARGUMENT}"
-
-    [[ "${key}" =~ ^[a-zA-Z0-9_]+$ ]] \
-        || return "${HS_EXIT_INVALID_ARGUMENT}"
-}
-
-_context_validate_value() {
-
-    local value="${1}"
-
-    [[ -n "${value}" ]] \
-        || return "${HS_EXIT_INVALID_ARGUMENT}"
-}
-
-# ==============================================================================
-# End of File
-# ==============================================================================
 
 return 0
