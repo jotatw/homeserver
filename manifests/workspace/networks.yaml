@@ -1,7 +1,0 @@
-networks:
-
-  homeserver:
-
-    driver: bridge
-
-    internal: false
