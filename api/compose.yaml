@@ -1,0 +1,16 @@
+services:
+  api:
+    build: .
+    container_name: homeserver-api
+
+    ports:
+      - "8000:8000"
+
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+    working_dir: /app
+
+    command: npm run dev
+  
