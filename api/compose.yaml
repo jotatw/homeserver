@@ -1,16 +1,14 @@
 services:
   api:
     build: .
-    container_name: homeserver-api
+
+    working_dir: /workspace/api
+
+    volumes:
+      - ..:/workspace
+      - /workspace/api/node_modules
+
+    command: npm run dev
 
     ports:
       - "8000:8000"
-
-    volumes:
-      - .:/app
-      - /app/node_modules
-
-    working_dir: /app
-
-    command: npm run dev
-  
