@@ -1,105 +1,203 @@
-# API Reference
+# Infrastructure Modules
 
-## Objetivo
+## Visão Geral
 
-Este documento descreve a API pública da Foundation.
+A Infrastructure é composta por módulos independentes, cada um responsável por uma área específica da interação entre o HomeServer e o sistema operacional.
 
-A documentação apresentada aqui representa apenas funcionalidades aprovadas durante a auditoria técnica da Foundation.
-
-Enquanto um módulo estiver em revisão, sua API não será considerada estável e, portanto, não será documentada neste arquivo.
+Cada módulo possui uma API pública pequena, responsabilidades bem definidas e baixo acoplamento.
 
 ---
 
-# Organização
+# Modules
 
-A API é organizada por módulo.
+## Filesystem
 
-Cada seção conterá apenas funções públicas.
+### Objetivo
 
-Funções privadas fazem parte da implementação interna e não são consideradas parte da API da Foundation.
+Realizar operações no sistema de arquivos.
 
----
+### Responsabilidades
 
-# Convenções
+- criar diretórios;
+- remover diretórios;
+- criar arquivos;
+- remover arquivos;
+- copiar arquivos;
+- mover arquivos;
+- alterar permissões;
+- alterar proprietário.
 
-Cada função documentada seguirá o mesmo formato.
+### Não faz
 
-## Nome
+- validações genéricas;
+- gerenciamento de Docker;
+- gerenciamento de serviços.
 
-Nome da função.
+### Dependências
 
-## Objetivo
-
-Descrição resumida da responsabilidade da função.
-
-## Parâmetros
-
-Descrição dos parâmetros aceitos.
-
-## Retorno
-
-Descrição dos códigos de retorno.
-
-## Dependências
-
-Dependências necessárias para utilização da função.
-
-## Exemplo
-
-Exemplo básico de utilização.
+- Foundation
 
 ---
 
-# Bootstrap
+## Environment
 
-> Em revisão.
+### Objetivo
 
-A documentação da API será adicionada após a aprovação do módulo.
+Gerenciar o ambiente de execução do HomeServer.
 
----
+### Responsabilidades
 
-# Loader
+- variáveis de ambiente;
+- detecção do ambiente;
+- configuração da sessão;
+- verificação de requisitos.
 
-> Em revisão.
+### Não faz
 
-A documentação da API será adicionada após a aprovação do módulo.
+- gerenciamento de arquivos;
+- gerenciamento de containers.
 
----
+### Dependências
 
-# Constants
-
-> Em revisão.
-
-A documentação da API será adicionada após a aprovação do módulo.
-
----
-
-# Config
-
-> Em revisão.
-
-A documentação da API será adicionada após a aprovação do módulo.
+- Foundation
 
 ---
 
-# Output
+## Docker
 
-> Em revisão.
+### Objetivo
 
-A documentação da API será adicionada após a aprovação do módulo.
+Fornecer uma interface para gerenciamento de containers Docker.
+
+### Responsabilidades
+
+- imagens;
+- containers;
+- volumes;
+- redes;
+- execução de comandos.
+
+### Não faz
+
+- conhecer aplicações específicas;
+- executar regras de negócio.
+
+### Dependências
+
+- Foundation
+- Environment
 
 ---
 
-# Validation
+## Compose
 
-> Em revisão.
+### Objetivo
 
-A documentação da API será adicionada após a aprovação do módulo.
+Gerenciar aplicações baseadas em Docker Compose.
+
+### Responsabilidades
+
+- iniciar stacks;
+- parar stacks;
+- reiniciar stacks;
+- atualizar stacks;
+- consultar estado.
+
+### Não faz
+
+- instalar aplicações;
+- gerenciar arquivos do projeto.
+
+### Dependências
+
+- Docker
+- Foundation
 
 ---
 
-# Filesystem
+## Services
 
-> Em revisão.
+### Objetivo
 
-A documentação da API será adicionada após a aprovação do módulo.
+Padronizar o ciclo de vida dos serviços do HomeServer.
+
+### Responsabilidades
+
+- instalar;
+- configurar;
+- iniciar;
+- parar;
+- reiniciar;
+- atualizar;
+- remover.
+
+### Não faz
+
+- implementar serviços específicos.
+
+### Dependências
+
+- Compose
+- Docker
+- Foundation
+
+---
+
+## Provisioning
+
+### Objetivo
+
+Automatizar a preparação completa do ambiente.
+
+### Responsabilidades
+
+- inicialização do workspace;
+- instalação de dependências;
+- preparação do sistema;
+- configuração inicial.
+
+### Não faz
+
+- executar aplicações.
+
+### Dependências
+
+- Todos os módulos da Infrastructure.
+
+---
+
+# Dependências
+
+A relação entre os módulos é a seguinte.
+
+```text
+Provisioning
+        │
+        ▼
+Services
+        │
+        ▼
+Compose
+        │
+        ▼
+Docker
+        │
+        ▼
+Environment
+        │
+        ▼
+Filesystem
+        │
+        ▼
+Foundation
+```
+
+Cada módulo depende apenas dos módulos necessários para cumprir sua responsabilidade.
+
+---
+
+# Evolução
+
+Novos módulos somente devem ser adicionados quando representarem uma nova responsabilidade claramente identificável.
+
+Evita-se concentrar múltiplas responsabilidades em um único módulo para preservar a simplicidade e a facilidade de manutenção.

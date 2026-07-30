@@ -7,26 +7,22 @@
 # Módulo.......: Foundation
 #
 # Objetivo.....:
-# Carregar os componentes do HomeServer Core.
+# Responsável pelo carregamento dos módulos que compõem as camadas do HomeServer Core.
 #
 # Responsabilidades:
 #   - Carregar componentes da Foundation
 #   - Carregar componentes da Infrastructure
-#   - Carregar componentes da Operations
-#   - Carregar componentes da Services
 #
 # API Pública:
 #   - _load_foundation
 #   - _load_infrastructure
-#   - _load_operations
-#   - _load_services
 #
 # API Interna:
-#   - _load_library
+#   _load_module
+#   _load_layer
 #
 # Dependências:
 #   - HS_CORE_ROOT
-#   - HS_CORE_INFRASTRUCTURE_DIR
 #
 # ==========================================================
 
@@ -51,6 +47,7 @@ _load_module() {
     }
 
     # shellcheck source=/dev/null
+    # Caminho resolvido dinamicamente em tempo de execução.
     source "${module}"
 }
 
@@ -71,7 +68,7 @@ _load_layer() {
 # ----------------------------------------------------------
 
 #
-# Carrega os componentes da Foundation.
+# Carrega todos os módulos da camada Foundation.
 #
 _load_foundation() {
 

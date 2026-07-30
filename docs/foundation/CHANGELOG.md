@@ -1,32 +1,28 @@
-# Changelog
+# Infrastructure Changelog
 
-Todas as alterações relevantes da Foundation serão registradas neste documento.
+Todas as mudanças relevantes da camada Infrastructure serão registradas neste documento.
 
-Este projeto segue o princípio de registrar apenas alterações aprovadas e incorporadas à base de código.
+O formato segue o princípio de manter um histórico claro das alterações aprovadas.
 
 ---
 
-## [Unreleased]
+# Unreleased
 
-### Documentation
+## Documentação
 
-- Criação da estrutura inicial da documentação da Foundation.
-- Definição da arquitetura da documentação.
-- Inclusão dos documentos:
-  - README.md
-  - ARCHITECTURE.md
-  - STYLE_GUIDE.md
-  - MODULES.md
-  - API.md
-  - TESTING.md
-  - CHANGELOG.md
+- Criação da documentação da Infrastructure.
+- Definição da arquitetura.
+- Definição dos módulos.
+- Definição da API.
+- Definição da estratégia de testes.
 
-### Notes
+---
 
-A Foundation encontra-se em processo de auditoria técnica.
+# Convenções
 
-Durante esta fase:
+Cada alteração deve informar:
 
-- a arquitetura está sendo consolidada;
-- os módulos estão sendo revisados individualmente;
-- a documentação será atualizada conforme cada módulo for aprovado.
+- módulo afetado;
+- descrição da alteração;
+- impacto na API (quando existir);
+- data da aprovação.

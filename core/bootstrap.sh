@@ -36,9 +36,10 @@ _load_loader() {
     }
 
     # shellcheck source=/dev/null
+    # Caminho resolvido dinamicamente em tempo de execução.
     source "${loader}"
 }
-
+# Executa a sequência de inicialização da Foundation.
 _bootstrap() {
 
     _prepare_environment || return 1
