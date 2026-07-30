@@ -19,8 +19,10 @@
 #   - Não valida caminhos
 #   - Não altera arquivos
 #
-# Dependências:
+#Dependências:
+#
 #   - HS_CORE_ROOT
+#   - HS_PROJECT_ROOT
 #
 # ==========================================================
 
@@ -33,11 +35,14 @@
 #
 # Estrutura esperada:
 #
-# project/
-# ├── core/
-# ├── config/
-# ├── data/
-# └── ...
+#project/
+#
+#├── core/
+#├── config/
+#├── data/
+#├── docs/
+#├── logs/
+#└── services/
 #
 # ----------------------------------------------------------
 # Diretórios do Core

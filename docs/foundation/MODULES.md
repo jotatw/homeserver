@@ -1,166 +1,203 @@
+# Infrastructure Modules
+
+## Visão Geral
+
+A Infrastructure é composta por módulos independentes, cada um responsável por uma área específica da interação entre o HomeServer e o sistema operacional.
+
+Cada módulo possui uma API pública pequena, responsabilidades bem definidas e baixo acoplamento.
+
+---
+
 # Modules
 
-## Objetivo
+## Filesystem
 
-Este documento descreve as responsabilidades dos módulos que compõem a Foundation.
+### Objetivo
 
-Cada módulo possui um propósito específico e deve respeitar o princípio da responsabilidade única (Single Responsibility Principle).
+Realizar operações no sistema de arquivos.
 
-A descrição apresentada neste documento representa a responsabilidade funcional de cada módulo, independentemente de sua implementação.
+### Responsabilidades
 
----
+- criar diretórios;
+- remover diretórios;
+- criar arquivos;
+- remover arquivos;
+- copiar arquivos;
+- mover arquivos;
+- alterar permissões;
+- alterar proprietário.
 
-# Bootstrap
+### Não faz
 
-## Objetivo
+- validações genéricas;
+- gerenciamento de Docker;
+- gerenciamento de serviços.
 
-Inicializar a Foundation.
+### Dependências
 
-## Responsabilidades
-
-- Preparar o ambiente de execução.
-- Inicializar as variáveis essenciais do Core.
-- Carregar o Loader.
-- Iniciar o carregamento da Foundation.
-
-## Não é responsabilidade
-
-- Carregar Infrastructure.
-- Carregar Applications.
-- Executar regras de negócio.
-- Configurar serviços.
+- Foundation
 
 ---
 
-# Loader
+## Environment
 
-## Objetivo
+### Objetivo
 
-Carregar os módulos da Foundation e das demais camadas do Core.
+Gerenciar o ambiente de execução do HomeServer.
 
-## Responsabilidades
+### Responsabilidades
 
-- Localizar módulos.
-- Carregar módulos.
-- Organizar a ordem de carregamento das camadas.
+- variáveis de ambiente;
+- detecção do ambiente;
+- configuração da sessão;
+- verificação de requisitos.
 
-## Não é responsabilidade
+### Não faz
 
-- Implementar funcionalidades dos módulos.
-- Executar lógica de negócio.
-- Configurar o ambiente.
+- gerenciamento de arquivos;
+- gerenciamento de containers.
 
----
+### Dependências
 
-# Constants
-
-## Objetivo
-
-Centralizar constantes utilizadas pelo Core.
-
-## Responsabilidades
-
-- Definir valores imutáveis.
-- Disponibilizar constantes compartilhadas.
-
-## Não é responsabilidade
-
-- Executar lógica.
-- Criar configurações.
-- Manipular arquivos.
-- Validar dados.
+- Foundation
 
 ---
 
-# Config
+## Docker
 
-## Objetivo
+### Objetivo
 
-Centralizar configurações do Core.
+Fornecer uma interface para gerenciamento de containers Docker.
 
-## Responsabilidades
+### Responsabilidades
 
-- Definir caminhos.
-- Disponibilizar configurações compartilhadas.
-- Organizar parâmetros utilizados pela Foundation.
+- imagens;
+- containers;
+- volumes;
+- redes;
+- execução de comandos.
 
-## Não é responsabilidade
+### Não faz
 
-- Criar diretórios.
-- Validar configurações.
-- Imprimir mensagens.
+- conhecer aplicações específicas;
+- executar regras de negócio.
 
----
+### Dependências
 
-# Output
-
-## Objetivo
-
-Padronizar a saída de informações.
-
-## Responsabilidades
-
-- Exibir mensagens.
-- Padronizar formatos de saída.
-
-## Não é responsabilidade
-
-- Validar dados.
-- Manipular arquivos.
-- Encerrar a execução do programa.
+- Foundation
+- Environment
 
 ---
 
-# Validation
+## Compose
 
-## Objetivo
+### Objetivo
 
-Fornecer validações reutilizáveis.
+Gerenciar aplicações baseadas em Docker Compose.
 
-## Responsabilidades
+### Responsabilidades
 
-- Validar parâmetros.
-- Validar estados.
-- Validar condições utilizadas pela Foundation.
+- iniciar stacks;
+- parar stacks;
+- reiniciar stacks;
+- atualizar stacks;
+- consultar estado.
 
-## Não é responsabilidade
+### Não faz
 
-- Imprimir mensagens.
-- Criar arquivos.
-- Alterar configurações.
+- instalar aplicações;
+- gerenciar arquivos do projeto.
+
+### Dependências
+
+- Docker
+- Foundation
 
 ---
 
-# Filesystem
+## Services
 
-## Objetivo
+### Objetivo
 
-Disponibilizar operações genéricas sobre arquivos e diretórios.
+Padronizar o ciclo de vida dos serviços do HomeServer.
 
-## Responsabilidades
+### Responsabilidades
 
-- Manipular arquivos.
-- Manipular diretórios.
-- Consultar informações do sistema de arquivos.
+- instalar;
+- configurar;
+- iniciar;
+- parar;
+- reiniciar;
+- atualizar;
+- remover.
 
-## Não é responsabilidade
+### Não faz
 
-- Gerenciar serviços.
-- Conhecer a estrutura do HomeServer.
-- Implementar regras específicas da Infrastructure.
+- implementar serviços específicos.
+
+### Dependências
+
+- Compose
+- Docker
+- Foundation
+
+---
+
+## Provisioning
+
+### Objetivo
+
+Automatizar a preparação completa do ambiente.
+
+### Responsabilidades
+
+- inicialização do workspace;
+- instalação de dependências;
+- preparação do sistema;
+- configuração inicial.
+
+### Não faz
+
+- executar aplicações.
+
+### Dependências
+
+- Todos os módulos da Infrastructure.
+
+---
+
+# Dependências
+
+A relação entre os módulos é a seguinte.
+
+```text
+Provisioning
+        │
+        ▼
+Services
+        │
+        ▼
+Compose
+        │
+        ▼
+Docker
+        │
+        ▼
+Environment
+        │
+        ▼
+Filesystem
+        │
+        ▼
+Foundation
+```
+
+Cada módulo depende apenas dos módulos necessários para cumprir sua responsabilidade.
 
 ---
 
 # Evolução
 
-Novos módulos poderão ser adicionados conforme a Foundation evoluir.
+Novos módulos somente devem ser adicionados quando representarem uma nova responsabilidade claramente identificável.
 
-Cada novo módulo deverá possuir:
-
-- um objetivo claramente definido;
-- responsabilidades bem delimitadas;
-- baixo acoplamento;
-- alta coesão;
-- conformidade com a arquitetura da Foundation.
-
-Módulos existentes não devem acumular responsabilidades que descaracterizem seu propósito original.
+Evita-se concentrar múltiplas responsabilidades em um único módulo para preservar a simplicidade e a facilidade de manutenção.

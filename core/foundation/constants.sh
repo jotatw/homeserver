@@ -33,7 +33,7 @@ readonly HS_PROJECT_DESCRIPTION="Simple HomeServer Platform"
 readonly HS_CORE_VERSION="0.1.0"
 
 # ----------------------------------------------------------
-# Status
+# Status utilizados para representar o resultado de operações.
 # ----------------------------------------------------------
 
 readonly HS_STATUS_OK="OK"
@@ -60,7 +60,7 @@ readonly HS_DEFAULT_TIMEOUT=30
 readonly HS_DEFAULT_RETRIES=3
 
 # ----------------------------------------------------------
-# Níveis de Log
+# Níveis utilizados pelo sistema de logging.
 # ----------------------------------------------------------
 
 readonly HS_LEVEL_INFO="INFO"

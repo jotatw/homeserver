@@ -14,7 +14,7 @@
 #
 # Não faz:
 #   - Não grava logs
-#   - Não utiliza cores (V1)
+#   - Não utiliza cores
 #   - Não controla níveis de log
 #
 # API Pública
