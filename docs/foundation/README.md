@@ -1,59 +1,59 @@
-# Foundation
-
-> Base estrutural do HomeServer Core.
+# HomeServer Infrastructure
 
 ## Visão Geral
 
-A Foundation é biblioteca padrão (Standard Library) do HomeServer Core
+A Infrastructure é a segunda camada do HomeServer Core.
 
-Ela fornece um conjunto de módulos reutilizáveis responsáveis por oferecer funcionalidades básicas para os demais componentes do projeto, estabelecendo uma base consistente para o desenvolvimento das camadas superiores.
+Seu objetivo é fornecer uma interface padronizada entre o HomeServer e o sistema operacional, encapsulando operações de baixo nível em módulos reutilizáveis.
 
-A Foundation não implementa regras de negócio e não possui conhecimento sobre aplicações ou serviços específicos. Seu propósito é disponibilizar recursos genéricos, reutilizáveis e independentes do domínio da aplicação.
-
----
-
-## Objetivos
-
-A Foundation foi projetada com os seguintes objetivos:
-
-- Centralizar funcionalidades comuns utilizadas pelo Core.
-- Promover reutilização de código.
-- Reduzir acoplamento entre módulos.
-- Definir padrões de desenvolvimento.
-- Facilitar manutenção e evolução do projeto.
-- Servir como base para as demais camadas do HomeServer.
+A Infrastructure utiliza a Foundation como base e disponibiliza serviços para as Applications.
 
 ---
 
-## Princípios
+# Objetivos
 
-A Foundation segue alguns princípios fundamentais.
+A Infrastructure existe para:
 
-### Responsabilidade única
-
-Cada módulo possui uma responsabilidade claramente definida.
-
-### Baixo acoplamento
-
-Os módulos devem possuir o menor número possível de dependências entre si.
-
-### Alta coesão
-
-Cada módulo deve conter apenas funcionalidades relacionadas ao seu propósito.
-
-### Reutilização
-
-Sempre que possível, os componentes da Foundation devem ser independentes do HomeServer, permitindo seu reaproveitamento em outros projetos Bash.
-
-### Simplicidade
-
-As implementações devem priorizar clareza e previsibilidade em vez de complexidade.
+- abstrair operações do sistema operacional;
+- centralizar integrações externas;
+- reduzir duplicação de código;
+- fornecer APIs reutilizáveis;
+- manter baixo acoplamento entre aplicações e ambiente.
 
 ---
 
-## Arquitetura
+# Responsabilidades
 
-O HomeServer Core é organizado em camadas.
+A Infrastructure é responsável por executar operações concretas no ambiente.
+
+Exemplos:
+
+- gerenciamento de arquivos;
+- gerenciamento de diretórios;
+- manipulação do ambiente;
+- gerenciamento de containers;
+- gerenciamento de serviços;
+- provisionamento.
+
+---
+
+# Não é responsabilidade da Infrastructure
+
+A Infrastructure não:
+
+- implementa regras de negócio;
+- conhece aplicações específicas;
+- contém constantes globais;
+- realiza validações genéricas;
+- produz interface para o usuário.
+
+Essas responsabilidades pertencem às outras camadas do HomeServer.
+
+---
+
+# Dependências
+
+A Infrastructure depende exclusivamente da Foundation.
 
 ```text
 Applications
@@ -63,57 +63,72 @@ Infrastructure
 Foundation
 ```
 
-Cada camada possui responsabilidades bem definidas.
-
-A Foundation representa a base sobre a qual todas as demais camadas são construídas.
+Ela nunca deve depender diretamente das Applications.
 
 ---
 
-## Estrutura
+# Organização
 
-Atualmente a Foundation é composta pelos seguintes módulos:
+A camada é organizada em módulos independentes.
 
-- Bootstrap
-- Loader
-- Constants
-- Config
-- Output
-- Validation
-- Filesystem
+Cada módulo possui uma única responsabilidade.
 
-A responsabilidade de cada módulo é descrita em [MODULES.md](MODULES.md).
+```text
+core/
+└── infrastructure/
+    ├── filesystem.sh
+    ├── environment.sh
+    ├── docker.sh
+    ├── compose.sh
+    ├── service.sh
+    └── provisioning.sh
+```
 
----
-
-## Documentação
-
-A documentação da Foundation está organizada nos seguintes documentos:
-
-| Documento | Descrição |
-|-----------|-----------|
-| ARCHITECTURE.md | Arquitetura da Foundation |
-| MODULES.md | Responsabilidades dos módulos |
-| STYLE_GUIDE.md | Convenções de desenvolvimento |
-| API.md | Referência da API pública |
-| TESTING.md | Estratégia de testes |
-| CHANGELOG.md | Histórico de alterações |
+Cada módulo expõe apenas uma API pública bem definida.
 
 ---
 
-## Estado Atual
+# Filosofia
 
-A Foundation encontra-se em processo de auditoria técnica.
+A Infrastructure segue os mesmos princípios da Foundation.
 
-Durante essa etapa:
-
-- a arquitetura está sendo consolidada;
-- os módulos estão sendo revisados individualmente;
-- a documentação está sendo construída em paralelo com a implementação.
-
-Funcionalidades, APIs e exemplos de uso serão documentados apenas após a aprovação de cada módulo.
+- responsabilidade única;
+- baixo acoplamento;
+- alta coesão;
+- APIs pequenas;
+- implementação simples;
+- documentação obrigatória;
+- testes independentes.
 
 ---
 
-## Licença
+# Fluxo
 
-A Foundation faz parte do projeto HomeServer e segue a mesma política de licenciamento do projeto principal.
+As Applications nunca executam comandos diretamente.
+
+Fluxo esperado:
+
+```text
+Application
+      │
+      ▼
+Infrastructure
+      │
+      ▼
+Foundation
+      │
+      ▼
+Sistema Operacional
+```
+
+Isso garante que alterações na implementação da Infrastructure não afetem as Applications.
+
+---
+
+# Evolução
+
+Novos módulos devem ser adicionados apenas quando representarem uma nova responsabilidade.
+
+Não é permitido transformar um módulo em um componente genérico que concentre múltiplas responsabilidades.
+
+A evolução da Infrastructure deve preservar sua simplicidade e modularidade.
