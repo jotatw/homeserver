@@ -3,7 +3,7 @@
 # ==========================================================
 # HomeServer Core
 #
-# Arquivo......: lib.sh
+# Arquivo......: loader.sh
 # Módulo.......: Foundation
 #
 # Objetivo.....:
@@ -39,20 +39,6 @@ set -euo pipefail
 #
 # Carrega um componente do Core.
 #
-_load_library() {
-
-    local library="$1"
-
-    if [[ ! -f "${library}" ]]; then
-        echo "Erro: Componente não encontrado."
-        echo "Arquivo esperado: ${library}"
-        return 1
-    fi
-
-    # shellcheck source=/dev/null
-    source "${library}"
-
-}
 
 _load_module() {
 
@@ -103,45 +89,10 @@ _load_infrastructure() {
 
     _load_layer infrastructure
 }
-
-#
-# carrega os componentes.
-#
-_load_components() {
-
-    _load_layer components
-}
-
-#
-# Carrega os componentes da Provisioning.
-#
-_load_provisioning() {
-
-    _load_layer provisioning
-}
-
 #
 # Carrega os componentes da Applications.
 #
 _load_applications() {
 
     _load_layer applications
-}
-
-#
-# Carrega os componentes da Operations.
-#
-_load_operations() {
-
-    return 0
-
-}
-
-#
-# Carrega os componentes da Services.
-#
-_load_services() {
-
-    return 0
-
 }
