@@ -9,9 +9,6 @@
 # Inicializar a Foundation do HomeServer Core.
 # ==========================================================
 
-declare -gx HS_CORE_ROOT
-declare -gx HS_PROJECT_ROOT
-
 _prepare_environment() {
 
     [[ -n "${HS_CORE_ROOT:-}" ]] && return 0
@@ -42,10 +39,13 @@ _load_loader() {
     source "${loader}"
 }
 
-_prepare_environment || return 1
+_bootstrap() {
 
-_load_loader || return 1
+    _prepare_environment || return 1
+    _load_loader || return 1
+    _load_foundation || return 1
+}
 
-_load_foundation || return 1
+_bootstrap || return 1
 
 return 0
