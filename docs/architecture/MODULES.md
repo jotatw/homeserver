@@ -1,157 +1,203 @@
+# Infrastructure Modules
+
+## Visão Geral
+
+A Infrastructure é composta por módulos independentes, cada um responsável por uma área específica da interação entre o HomeServer e o sistema operacional.
+
+Cada módulo possui uma API pública pequena, responsabilidades bem definidas e baixo acoplamento.
+
+---
+
 # Modules
 
-> Os módulos são a principal forma de expansão do HomeServer.
+## Filesystem
 
-Eles permitem adicionar novas funcionalidades sem aumentar a complexidade do Core, mantendo a plataforma leve, organizada e preparada para crescer conforme as necessidades do usuário.
+### Objetivo
 
----
+Realizar operações no sistema de arquivos.
 
-# Objetivo
+### Responsabilidades
 
-O sistema de módulos existe para desacoplar funcionalidades da infraestrutura principal.
+- criar diretórios;
+- remover diretórios;
+- criar arquivos;
+- remover arquivos;
+- copiar arquivos;
+- mover arquivos;
+- alterar permissões;
+- alterar proprietário.
 
-Enquanto o Core fornece os recursos fundamentais da plataforma, os módulos adicionam capacidades específicas de forma independente.
+### Não faz
 
----
+- validações genéricas;
+- gerenciamento de Docker;
+- gerenciamento de serviços.
 
-# Filosofia
+### Dependências
 
-O HomeServer adota uma arquitetura baseada em um núcleo mínimo e módulos opcionais.
-
-Esse modelo permite que cada instalação contenha apenas os recursos necessários.
-
-O Core permanece pequeno.
-
-Os módulos evoluem independentemente.
-
----
-
-# Responsabilidades
-
-Os módulos são responsáveis por implementar funcionalidades voltadas ao usuário.
-
-Exemplos:
-
-- armazenamento;
-- mídia;
-- desenvolvimento;
-- rede;
-- backup;
-- monitoramento;
-- automação.
-
-Nenhuma dessas funcionalidades deve fazer parte do Core.
+- Foundation
 
 ---
 
-# Arquitetura
+## Environment
+
+### Objetivo
+
+Gerenciar o ambiente de execução do HomeServer.
+
+### Responsabilidades
+
+- variáveis de ambiente;
+- detecção do ambiente;
+- configuração da sessão;
+- verificação de requisitos.
+
+### Não faz
+
+- gerenciamento de arquivos;
+- gerenciamento de containers.
+
+### Dependências
+
+- Foundation
+
+---
+
+## Docker
+
+### Objetivo
+
+Fornecer uma interface para gerenciamento de containers Docker.
+
+### Responsabilidades
+
+- imagens;
+- containers;
+- volumes;
+- redes;
+- execução de comandos.
+
+### Não faz
+
+- conhecer aplicações específicas;
+- executar regras de negócio.
+
+### Dependências
+
+- Foundation
+- Environment
+
+---
+
+## Compose
+
+### Objetivo
+
+Gerenciar aplicações baseadas em Docker Compose.
+
+### Responsabilidades
+
+- iniciar stacks;
+- parar stacks;
+- reiniciar stacks;
+- atualizar stacks;
+- consultar estado.
+
+### Não faz
+
+- instalar aplicações;
+- gerenciar arquivos do projeto.
+
+### Dependências
+
+- Docker
+- Foundation
+
+---
+
+## Services
+
+### Objetivo
+
+Padronizar o ciclo de vida dos serviços do HomeServer.
+
+### Responsabilidades
+
+- instalar;
+- configurar;
+- iniciar;
+- parar;
+- reiniciar;
+- atualizar;
+- remover.
+
+### Não faz
+
+- implementar serviços específicos.
+
+### Dependências
+
+- Compose
+- Docker
+- Foundation
+
+---
+
+## Provisioning
+
+### Objetivo
+
+Automatizar a preparação completa do ambiente.
+
+### Responsabilidades
+
+- inicialização do workspace;
+- instalação de dependências;
+- preparação do sistema;
+- configuração inicial.
+
+### Não faz
+
+- executar aplicações.
+
+### Dependências
+
+- Todos os módulos da Infrastructure.
+
+---
+
+# Dependências
+
+A relação entre os módulos é a seguinte.
 
 ```text
-                 HomeServer
-
-                      │
-
-                      ▼
-
-                   Core
-
-                      │
-
-               Module Manager
-
-                      │
-
-        ┌─────────────┼─────────────┐
-
-        ▼             ▼             ▼
-
-   Official      Community    Experimental
+Provisioning
+        │
+        ▼
+Services
+        │
+        ▼
+Compose
+        │
+        ▼
+Docker
+        │
+        ▼
+Environment
+        │
+        ▼
+Filesystem
+        │
+        ▼
+Foundation
 ```
 
----
-
-# Ciclo de Vida
-
-Todo módulo possui um ciclo de vida comum.
-
-```text
-Criar
-
-↓
-
-Instalar
-
-↓
-
-Configurar
-
-↓
-
-Executar
-
-↓
-
-Atualizar
-
-↓
-
-Remover
-```
-
-Esse ciclo será implementado de forma padronizada pela plataforma.
-
----
-
-# Categorias
-
-Os módulos oficiais poderão ser organizados por categoria.
-
-```text
-Storage
-
-Media
-
-Development
-
-Network
-
-Security
-
-Automation
-
-Backup
-
-Monitoring
-```
-
-As categorias existem apenas para organização.
-
-O comportamento dos módulos permanece o mesmo.
-
----
-
-# Relação com o Core
-
-Os módulos dependem do Core para utilizar infraestrutura comum.
-
-O Core nunca depende dos módulos.
-
-Essa separação garante baixo acoplamento e facilita manutenção.
+Cada módulo depende apenas dos módulos necessários para cumprir sua responsabilidade.
 
 ---
 
 # Evolução
 
-Novas funcionalidades devem, sempre que possível, ser implementadas como módulos.
+Novos módulos somente devem ser adicionados quando representarem uma nova responsabilidade claramente identificável.
 
-A inclusão de novos recursos diretamente no Core deve ser tratada como exceção.
-
----
-
-# Documentação Relacionada
-
-- ARCHITECTURE.md
-- CORE.md
-- SERVICES.md
-- docs/developer/modules/
-- docs/reference/
+Evita-se concentrar múltiplas responsabilidades em um único módulo para preservar a simplicidade e a facilidade de manutenção.
