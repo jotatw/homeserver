@@ -1,28 +1,64 @@
 #!/usr/bin/env bash
 
-#
-# Foundation :: Filesystem
-#
-# Funções genéricas para manipulação e consulta do sistema de arquivos.
-#
+########################################
+# Public API
+########################################
 
-file_exists() {
+# Query
+
+hs_fs_file_exists() {
 
     local file="$1"
 
     [[ -f "${file}" ]]
 }
 
-directory_exists() {
+hs_fs_directory_exists() {
 
     local directory="$1"
 
     [[ -d "${directory}" ]]
 }
 
-path_exists() {
+hs_fs_path_exists() {
 
     local path="$1"
 
     [[ -e "${path}" ]]
 }
+
+# Create
+
+hs_fs_create_directory() {
+
+    local directory="$1"
+
+    mkdir -p "${directory}"
+}
+
+hs_fs_create_file() {
+
+    local file="$1"
+
+    touch "${file}"
+}
+
+# Remove
+
+hs_fs_remove_directory() {
+
+    local directory="$1"
+
+    rm -rf "${directory}"
+}
+
+hs_fs_remove_file() {
+
+    local file="$1"
+
+    rm -f "${file}"
+}
+
+########################################
+# Private
+########################################
