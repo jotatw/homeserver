@@ -25,18 +25,24 @@ AUTOMATION_ROOT="${AUTOMATION_ROOT:-/srv/automation/hooks}"
 # Lista os eventos disponíveis.
 #
 automation_events() {
-    ls -1 "${AUTOMATION_ROOT}" 2>/dev/null \
-        | grep -v '^\.' || true
+    local event
+
+    for event in "${AUTOMATION_ROOT}"/*/; do
+        [[ -d "${event}" ]] || continue
+        basename "${event}"
+    done
 }
 
 #
 # Lista os scripts de um evento.
 #
 automation_scripts() {
-    local event="$1"
+    local event="$1" script
 
-    ls -1 "${AUTOMATION_ROOT}/${event}"/*.sh 2>/dev/null \
-        | xargs -n1 basename 2>/dev/null || true
+    for script in "${AUTOMATION_ROOT}/${event}"/*.sh; do
+        [[ -f "${script}" ]] || continue
+        basename "${script}"
+    done
 }
 
 #

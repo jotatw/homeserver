@@ -1,4 +1,6 @@
 # HomeServer — configuração do shellcheck
 # Módulos sourced (.sh sem shebang) são esperados.
-disable=SC2148,SC2034,SC2164,SC2317,SC1091
+# SC2120: funções que aceitam args opcionais chamadas sem eles.
+# SC2010/SC2011: uso de ls|grep/xargs em casos simples e seguros.
+disable=SC2148,SC2034,SC2164,SC2317,SC1091,SC2120,SC2010,SC2011
 source-path=SCRIPTDIR
