@@ -49,7 +49,10 @@ Comandos:
   service enable|disable|start|stop|restart|status|update <serviço>
   status
   user create <nome> [--password=...] [--gitea]
-  user rm <nome> [--remove-folder]
+  user list
+  user info <nome>
+  user password <nome> [--password=...]
+  user rm <nome> [--remove-folder] [--gitea]
 EOF
 }
 
@@ -80,6 +83,13 @@ case "${_command}" in
             cpu)
                 printf '{"percent":%s,"load":"%s"}\n' \
                     "$(get_cpu_percent)" "$(get_load)"
+                ;;
+                        storage)
+                case "${3:-status}" in
+                    status) storage_status_json ;;
+                    init) storage_init ;;
+                    *) echo "Uso: hs system storage status|init" >&2; exit 1 ;;
+                esac
                 ;;
             services)       get_services_status_json; echo ;;
             backup)         printf '{"last":"%s"}\n' "$(get_backup_last)" ;;
@@ -133,6 +143,12 @@ case "${_command}" in
                 ;;
             list)
                 hs_user_list
+                ;;
+            info)
+                hs_user_info "${3:?nome do usuário}"
+                ;;
+            password)
+                hs_user_password "${3:?nome do usuário}" "${@:4}"
                 ;;
             rm)
                 hs_user_rm "${3:?nome do usuário}" "${@:4}"

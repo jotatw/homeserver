@@ -39,3 +39,8 @@ export async function deleteUser(username: string, removeFolder: boolean) {
     await runCore(args);
     return { ok: true };
 }
+
+export async function changeUserPassword(username: string, password: string) {
+    const raw = await runCore(["user", "password", username, `--password=${password}`]);
+    return JSON.parse(raw);
+}
