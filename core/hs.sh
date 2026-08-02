@@ -53,6 +53,10 @@ Comandos:
   user info <nome>
   user password <nome> [--password=...]
   user rm <nome> [--remove-folder] [--gitea]
+  device list|status|usb
+  device mount <tipo> <rótulo> <dispositivo>
+  device unmount <tipo> <rótulo>
+  device eject <dispositivo>
 EOF
 }
 
@@ -157,6 +161,20 @@ case "${_command}" in
                 _usage
                 exit 1
                 ;;
+        esac
+        ;;
+
+    device)
+        _subcommand="${2:-}"
+
+        case "${_subcommand}" in
+            list)    device_list ;;
+            status)  device_status ;;
+            usb)     device_usb ;;
+            mount)   mount_device "${3:?tipo}" "${4:?rótulo}" "${5:?dispositivo}" ;;
+            unmount) unmount_device "${3:?tipo}" "${4:?rótulo}" ;;
+            eject)   eject_device "${3:?dispositivo}" ;;
+            *)       _usage; exit 1 ;;
         esac
         ;;
 
