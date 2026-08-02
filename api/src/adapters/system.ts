@@ -1,14 +1,4 @@
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
-
-const execFileAsync = promisify(execFile);
-
-const CORE = "/workspace/core/hs.sh";
-
-async function runCore(args: string[]): Promise<string> {
-    const { stdout } = await execFileAsync("/bin/bash", [CORE, ...args]);
-    return stdout.trim();
-}
+import { cachedRunCore, runCore } from "../utils/cache.js";
 
 export async function getHostname(): Promise<string> {
     return runCore(["system", "hostname"]);
@@ -34,6 +24,6 @@ export interface SystemStatus {
 }
 
 export async function getSystemStatus(): Promise<SystemStatus> {
-    const raw = await runCore(["system", "status"]);
+    const raw = await cachedRunCore("status", 10000, ["system", "status"]);
     return JSON.parse(raw) as SystemStatus;
 }
