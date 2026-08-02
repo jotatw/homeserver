@@ -1,5 +1,27 @@
 ---
 # Modo Usuário — conteúdo
+- Favoritos:
+
+    - FileBrowser:
+        icon: mdi-folder-open
+        href: http://192.168.1.10:8080
+        description: Arquivos
+
+    - Gitea:
+        icon: sh-gitea
+        href: http://192.168.1.10:3001
+        description: Projetos e repositórios
+
+    - Projetos:
+        icon: mdi-code-tags
+        href: http://192.168.1.10:3001
+        description: Meus projetos
+
+    - Downloads:
+        icon: mdi-download
+        href: http://192.168.1.10:8080
+        description: Downloads
+
 - Arquivos:
 
     - Meus Arquivos:
@@ -95,6 +117,17 @@
 
 # Modo Sistema — manutenção
 - Manutenção:
+
+    - Hoje:
+        icon: mdi-calendar-today
+        widget:
+          type: customapi
+          url: http://api:8000/api/v1/events
+          refreshInterval: 30000
+          display: dynamic-list
+          mappings:
+            name: time
+            label: action
 
     - Serviços:
         icon: mdi-server-network

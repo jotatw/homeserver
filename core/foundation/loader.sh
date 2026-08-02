@@ -94,6 +94,7 @@ _load_infrastructure() {
         services_status.sh \
         users.sh \
         backup.sh \
+        events.sh \
         storage.sh \
         devices.sh \
         mounts.sh \

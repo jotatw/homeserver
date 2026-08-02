@@ -43,3 +43,40 @@
     padding: 4px 8px;
   }
 }
+
+/* HomeServer — navegação (Sprint 2) */
+
+.service-card {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.service-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.service-card a {
+  cursor: pointer;
+}
+
+/* Feedback de clique (toast) */
+.hs-toast {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(2, 6, 23, 0.92);
+  color: #e2e8f0;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  z-index: 2000;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.hs-toast.show {
+  opacity: 1;
+}
