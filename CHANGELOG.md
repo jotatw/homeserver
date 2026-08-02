@@ -1,5 +1,34 @@
 # Changelog
 
+## v1.0.0-rc.1 — Preparação para lançamento
+
+### Limpeza
+
+- Removidos 46 arquivos vazios do versionamento (adapters, plugins, docs de planejamento).
+- Removidos diretórios órfãos (`assets/`, `tools/`, `homepage/`).
+- `.gitignore` corrigido: `config/services.conf` agora é versionado; pastas de runtime ignoradas.
+- Removidos docs duplicados (`docs/DEVELOPMENT.md`, `docs/ROADMAP.md`, `docs/VISION.md`).
+
+### Homepage
+
+- Modos de exibição via `custom.js`: **Simples**, **Admin** e **Manutenção**.
+- Grupos reorganizados: Essenciais, Status, Administração e Sistema.
+- Seletor de modo persistente (localStorage) com MutationObserver.
+
+### Licença e documentação
+
+- Adicionada licença **Apache 2.0** (`LICENSE`).
+- Índice de documentação atualizado (`docs/README.md`).
+- Módulo Portainer com `.env.example`.
+
+### CI/CD
+
+- `core/tests/run_ci.sh` implementado (lint + suíte).
+- `.github/workflows/ci.yml` (shellcheck + testes core + typecheck/build API).
+- `.github/workflows/publish.yml` (imagem Docker da API para GHCR em tags `v*`).
+- `api/package-lock.json` adicionado para builds reprodutíveis.
+- `.shellcheckrc` criado.
+
 ## 2026-08-02 — Homepage como hub + usuários
 
 ### Homepage

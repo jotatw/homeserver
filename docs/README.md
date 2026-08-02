@@ -4,9 +4,7 @@
 
 Bem-vindo à documentação do HomeServer.
 
-O HomeServer é um projeto pessoal desenvolvido com o objetivo de criar uma plataforma doméstica modular para hospedagem e gerenciamento de serviços, utilizando uma arquitetura organizada em camadas.
-
-A documentação está estruturada para acompanhar a evolução do projeto, desde sua arquitetura até a implementação de cada componente.
+O HomeServer é uma plataforma doméstica modular para hospedagem e gerenciamento de serviços, organizada em camadas e preparada para evoluir ao longo do tempo.
 
 ---
 
@@ -18,11 +16,9 @@ A documentação está organizada por assunto.
 
 | Documento | Descrição |
 |-----------|-----------|
-| VISION.md | Objetivos e filosofia do projeto. |
-| ROADMAP.md | Planejamento e evolução do projeto. |
-| ARCHITECTURE.md | Arquitetura geral do HomeServer. |
-
----
+| `project/VISION.md` | Objetivos e filosofia do projeto. |
+| `project/ROADMAP.md` | Planejamento e evolução do projeto. |
+| `ARCHITECTURE.md` | Arquitetura geral do HomeServer. |
 
 ## Core
 
@@ -30,34 +26,21 @@ Documentação das camadas que compõem o núcleo do HomeServer.
 
 | Camada | Descrição |
 |--------|-----------|
-| foundation/ | Biblioteca base do HomeServer Core. |
-| infrastructure/ | Integração com o sistema operacional e serviços. |
-| applications/ | Aplicações construídas sobre a Infrastructure. |
+| `architecture/` | Arquitetura das camadas (Foundation, Infrastructure, Applications). |
+| `foundation/` | Biblioteca base do HomeServer Core. |
+| `architecture/infrastructure/` | Integração com o sistema operacional e serviços. |
 
----
+## Guia do usuário
 
-## Serviços
-
-Documentação específica de cada serviço integrado ao HomeServer.
-
-Exemplos:
-
-- Homepage
-- FileBrowser
-- Gitea
-
----
+| Documento | Descrição |
+|-----------|-----------|
+| `guide/` | Guia passo a passo para transformar um computador antigo em um HomeServer. |
 
 ## Desenvolvimento
 
-Documentação relacionada ao desenvolvimento do projeto.
-
-Inclui:
-
-- padrões de desenvolvimento;
-- convenções;
-- testes;
-- guias técnicos.
+| Documento | Descrição |
+|-----------|-----------|
+| `development/CONTRIBUTING.md` | Padrões e fluxo de desenvolvimento. |
 
 ---
 
@@ -79,9 +62,9 @@ Cada documento possui uma responsabilidade específica, evitando duplicação de
 
 A leitura recomendada para compreender o projeto é:
 
-1. VISION.md
-2. ROADMAP.md
-3. ARCHITECTURE.md
+1. `project/VISION.md`
+2. `project/ROADMAP.md`
+3. `ARCHITECTURE.md`
 4. Foundation
 5. Infrastructure
 6. Applications

@@ -10,7 +10,7 @@ O HomeServer é uma plataforma modular que transforma computadores antigos em se
 - [x] SSH por chave
 - [x] Firewall UFW
 - [x] Docker + Docker Compose
-- [x] Homepage (dashboard em abas + resumo do servidor)
+- [x] Homepage (modos de exibição + resumo do servidor)
 - [x] FileBrowser (pasta própria por usuário)
 - [x] Gitea
 - [x] API (`/api/v1/*`)
@@ -24,19 +24,36 @@ O HomeServer é uma plataforma modular que transforma computadores antigos em se
 
 ## Hardware
 
+O hardware que foi testado e usado para a criação desse projeto:
+
 - MSI MS-AA1511 · Intel Pentium T4500 · 3 GB RAM · 320 GB HDD
+
+### Extra
+
+Para esse projeto foi utilizado um roteador próprio para configurar as portas dos serviços.
 
 ## Serviços
 
 | Serviço    | Porta | Descrição                |
 |------------|-------|--------------------------|
-| Homepage   | 3000  | Dashboard (abas)         |
+| Homepage   | 3000  | Dashboard (modos)        |
 | Gitea      | 3001  | Servidor Git (web)       |
 | Gitea SSH  | 2222  | Servidor Git (SSH)       |
 | FileBrowser| 8080  | Gerenciador de arquivos  |
 | API        | 8000  | API do HomeServer        |
 | Samba      | 445   | Compartilhamento         |
 | Portainer  | 9443  | Módulo opcional          |
+
+## Modos de exibição (Homepage)
+
+A Homepage possui três modos de exibição, selecionáveis no canto superior direito.
+A preferência é salva no navegador (localStorage).
+
+| Modo | O que mostra |
+|------|--------------|
+| **Simples** | Apenas os serviços essenciais (Homepage, FileBrowser, Gitea, API) |
+| **Admin** | Essenciais + Status do servidor + Administração (Portainer, Gitea SSH) |
+| **Manutenção** | Tudo, incluindo serviços em execução, usuários e backup |
 
 ## Estrutura
 
@@ -50,6 +67,7 @@ homeserver/
 ├── config/         # Configuração (services.conf)
 ├── scripts/        # Automações (backup, liga/desliga)
 ├── docs/           # Documentação
+├── .github/        # CI/CD
 └── install.sh      # Instalador
 ```
 
@@ -123,3 +141,7 @@ bash core/hs.sh service start portainer
 
 - `docs/` — arquitetura, decisões e desenvolvimento
 - `CHANGELOG.md` — histórico de versões
+
+## Licença
+
+Distribuído sob a [Apache License 2.0](LICENSE).

@@ -1,0 +1,39 @@
+title: HomeServer
+description: Hub central do servidor doméstico
+language: pt-BR
+
+theme: dark
+color: slate
+
+target: _blank
+headerStyle: boxed
+fullWidth: true
+statusStyle: dot
+showStats: true
+useEqualHeights: true
+
+hideVersion: true
+disableUpdateCheck: true
+disableIndexing: true
+
+quicklaunch:
+  searchDescriptions: true
+  hideVisitURL: true
+  provider: duckduckgo
+
+layout:
+  Essenciais:
+    style: row
+    columns: 4
+  Status:
+    style: row
+    columns: 2
+  Administração:
+    style: row
+    columns: 4
+  Sistema:
+    style: row
+    columns: 4
+  Links:
+    style: row
+    columns: 6
