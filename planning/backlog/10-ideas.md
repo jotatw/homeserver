@@ -1,0 +1,7 @@
+# ideas
+
+## Correções
+
+## Melhorias
+
+## Futuro
