@@ -37,6 +37,17 @@
 readonly HS_STORAGE_ROOT="/srv/storage"
 
 #
+# Resolve o caminho legível do storage (container via /host ou host).
+#
+_storage_root_read() {
+    if [[ -d "/host/srv/storage" ]]; then
+        printf "/host/srv/storage"
+    else
+        printf "/srv/storage"
+    fi
+}
+
+#
 # Lista os diretórios oficiais do storage.
 #
 storage_directories() {
@@ -84,10 +95,13 @@ storage_init() {
 # Verifica se o storage está pronto.
 #
 storage_ready() {
-    [[ -d "${HS_STORAGE_ROOT}/users" ]] \
-        && [[ -d "${HS_STORAGE_ROOT}/shared" ]] \
-        && [[ -d "${HS_STORAGE_ROOT}/media" ]] \
-        && [[ -d "${HS_STORAGE_ROOT}/devices" ]]
+    local root
+    root="$(_storage_root_read)"
+
+    [[ -d "${root}/users" ]] \
+        && [[ -d "${root}/shared" ]] \
+        && [[ -d "${root}/media" ]] \
+        && [[ -d "${root}/devices" ]]
 }
 
 #
@@ -101,13 +115,14 @@ storage_dir_size() {
 # Estado do storage em JSON.
 #
 storage_status_json() {
-    local users shared media documents devices
+    local root users shared media documents devices
+    root="$(_storage_root_read)"
 
-    users=$(storage_dir_size "${HS_STORAGE_ROOT}/users")
-    shared=$(storage_dir_size "${HS_STORAGE_ROOT}/shared")
-    media=$(storage_dir_size "${HS_STORAGE_ROOT}/media")
-    documents=$(storage_dir_size "${HS_STORAGE_ROOT}/documents")
-    devices=$(storage_dir_size "${HS_STORAGE_ROOT}/devices")
+    users=$(storage_dir_size "${root}/users")
+    shared=$(storage_dir_size "${root}/shared")
+    media=$(storage_dir_size "${root}/media")
+    documents=$(storage_dir_size "${root}/documents")
+    devices=$(storage_dir_size "${root}/devices")
 
     printf '{\n'
     printf '  "root": "%s",\n' "${HS_STORAGE_ROOT}"

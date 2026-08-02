@@ -11,6 +11,7 @@ services:
       - /etc/os-release:/etc/os-release:ro
       - /var/run/docker.sock:/var/run/docker.sock
       - /:/host:ro
+      - /srv/storage:/srv/storage:ro
       - /srv/backup:/srv/backup:ro
     command: npm run dev
     ports:
