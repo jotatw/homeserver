@@ -1,5 +1,39 @@
 # Changelog
 
+## 2026-08-02 — MVP + Milestones (v1.0)
+
+### MVP (Sprints 1-5)
+
+- **Storage**: módulo `storage.sh`, estrutura oficial em `/srv/storage`, campo no `/status`.
+- **Users + Adapters**: camada `core/adapters/`; `hs user create/info/password/rm`; `PUT /users/:nome`.
+- **Homepage**: modos **Usuário / Administrador / Sistema** (progressivos); `hideErrors`.
+- **API**: `GET /storage`, `/services`, `POST /backup`, `PUT /users`, `GET /devices`.
+- **Devices**: `devices.sh` + `mounts.sh`; **udev auto-mount** em `/srv/storage/devices/`.
+
+### Milestone 2 — Hardware
+
+- `hardware.sh`: temperatura (hwmon), discos (lsblk + smartctl), rede, USB.
+- `GET /api/v1/hardware`; card "Sensores" na Homepage.
+
+### Milestone 3 — Automation
+
+- `automation.sh` com hooks extensíveis em `/srv/automation/hooks/<evento>/`.
+- Eventos: usb, sdcard, backup, startup, shutdown, users, services.
+- Hooks conectados ao udev, user e service lifecycle.
+
+### Milestone 4 — Scheduler
+
+- `scheduler.sh` com backend systemd timers (`hs-task-<nome>`).
+- `config/scheduler.conf`: backup (03h) e night-off (23h30).
+- `hs scheduler init|list|enable|disable|run`.
+
+### Milestone 5 — Notifications (escopo)
+
+- `notification.sh` + `core/adapters/notification/` (canais plugáveis).
+- `config/notifications.conf` para ativação de canais.
+
+# Changelog
+
 ## 2026-08-02 — Storage por usuário + Wake-on-LAN
 
 ### Storage
