@@ -1,16 +1,23 @@
 services:
   api:
     build: .
-
     working_dir: /workspace/api
-
+    env_file:
+      - .env
     volumes:
       - ..:/workspace
       - /workspace/api/node_modules
       - /etc/hostname:/etc/hostname:ro
       - /etc/os-release:/etc/os-release:ro
-
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /:/host:ro
+      - /srv/backup:/srv/backup:ro
     command: npm run dev
-
     ports:
       - "8000:8000"
+    networks:
+      - homeserver
+
+networks:
+  homeserver:
+    external: true
