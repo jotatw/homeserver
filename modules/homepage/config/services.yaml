@@ -97,6 +97,18 @@
             name: name
             label: status
 
+    - Sensores:
+        icon: mdi-thermometer
+        widget:
+          type: customapi
+          url: http://api:8000/api/v1/hardware
+          refreshInterval: 60000
+          display: dynamic-list
+          mappings:
+            items: temperature
+            name: label
+            label: temp
+
     - Server:
         id: server-status
         icon: mdi-server

@@ -4,6 +4,8 @@ services:
     working_dir: /workspace/api
     env_file:
       - .env
+    cap_add:
+      - SYS_RAWIO
     volumes:
       - ..:/workspace
       - /workspace/api/node_modules
@@ -11,6 +13,8 @@ services:
       - /etc/os-release:/etc/os-release:ro
       - /var/run/docker.sock:/var/run/docker.sock
       - /:/host:ro
+      - /sys:/sys:ro
+      - /dev:/dev:ro
       - /srv/storage:/srv/storage:ro
       - /srv/backup:/srv/backup:ro
     command: npm run dev
