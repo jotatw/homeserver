@@ -28,6 +28,7 @@ Thumbs.db
 config/*
 !config/services.conf
 !config/scheduler.conf
+!config/notifications.conf
 database/
 backup/
 logs/
