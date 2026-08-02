@@ -7,6 +7,8 @@ CORE_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
 source "${CORE_ROOT}/bootstrap.sh"
 
+_load_infrastructure
+
 echo "========================================"
 echo " HomeServer Infrastructure"
 echo " Workspace Test"
@@ -24,7 +26,7 @@ echo
 
 echo "Verificando diretórios..."
 
-for directory in "${HS_WORKSPACE_DIRS[@]}"; do
+for directory in "${HS_WORKSPACE_DIRECTORIES[@]}"; do
 
     if directory_exists "${directory}"; then
         echo "PASS - ${directory}"

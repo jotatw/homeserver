@@ -1,0 +1,33 @@
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+
+    container_name: homepage
+
+    restart: unless-stopped
+
+    security_opt:
+      - no-new-privileges:true
+
+    group_add:
+      - "989"
+
+    environment:
+      TZ: ${TZ}
+      PUID: ${PUID}
+      PGID: ${PGID}
+      HOMEPAGE_ALLOWED_HOSTS: "192.168.0.10:3000"
+
+    ports:
+      - "${HOMEPAGE_PORT}:3000"
+
+    volumes:
+      - ./config:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+    networks:
+      - homeserver
+
+networks:
+  homeserver:
+    external: true

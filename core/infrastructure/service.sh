@@ -39,7 +39,7 @@ service_directory() {
     local service="$1"
 
     printf "%s/%s\n" \
-        "${HS_PROJECT_SERVICES_DIR}" \
+        "${HS_SERVICES_DIR}" \
         "${service}"
 
 }
