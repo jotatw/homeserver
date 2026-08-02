@@ -1,0 +1,15 @@
+---
+- greeting:
+    text_size: xl
+    text: Bem-vindo ao HomeServer
+
+- resources:
+    cpu: true
+    memory: true
+    disk: /host
+
+- datetime:
+    locale: pt-BR
+    format:
+      dateStyle: long
+      timeStyle: short

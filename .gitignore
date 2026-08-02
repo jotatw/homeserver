@@ -6,6 +6,7 @@
 
 # Backups
 *.bak
+*.orig
 
 # Arquivos temporários
 *.tmp
@@ -23,6 +24,11 @@ Thumbs.db
 *.sqlite
 *.sqlite3
 
-# Runtime
-config/
+# Runtime (criados pelo Core em tempo de execução)
+config/*
+!config/services.conf
 database/
+backup/
+logs/
+data/
+services/
