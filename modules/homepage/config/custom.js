@@ -3,12 +3,12 @@
     {
       id: "user",
       label: "Usuário",
-      groups: ["Arquivos", "Projetos", "Downloads", "Mídia"],
+      groups: ["Favoritos", "Arquivos", "Projetos", "Downloads", "Mídia"],
     },
     {
       id: "admin",
       label: "Administrador",
-      groups: ["Arquivos", "Projetos", "Downloads", "Mídia", "Serviços", "Gestão"],
+      groups: ["Favoritos", "Arquivos", "Projetos", "Downloads", "Mídia", "Serviços", "Gestão"],
     },
     {
       id: "system",
@@ -72,12 +72,34 @@
     applyMode(getMode());
   }
 
+  function showToast(message) {
+    let toast = document.getElementById("hs-toast");
+    if (!toast) {
+      toast = document.createElement("div");
+      toast.id = "hs-toast";
+      toast.className = "hs-toast";
+      document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 1200);
+  }
+
+  function attachClickFeedback() {
+    document.querySelectorAll(".service-card a[href]").forEach((a) => {
+      if (a.dataset.hsFeedback) return;
+      a.dataset.hsFeedback = "1";
+      a.addEventListener("click", () => showToast("Abrindo..."));
+    });
+  }
+
   function watch() {
     const target = document.getElementById("__next") || document.body;
 
     const observer = new MutationObserver(() => {
       if (document.querySelectorAll(".services-group .service-group-name").length > 0) {
         applyMode(getMode());
+        attachClickFeedback();
       }
     });
 

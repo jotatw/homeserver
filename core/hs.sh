@@ -16,7 +16,7 @@
 #
 # Comandos:
 #   system hostname|os|kernel|architecture|uptime|info
-#   system memory|disk|cpu|load|services|backup|status
+#   system memory|disk|cpu|load|services|backup|events|status
 #   service list|enable|disable|start|stop|restart|status|update
 #   status
 #   user create <nome> [--password=...] [--gitea]
@@ -44,7 +44,7 @@ Uso: hs <comando> [argumentos...]
 
 Comandos:
   system hostname|os|kernel|architecture|uptime|info
-  system memory|disk|cpu|load|services|backup|status
+  system memory|disk|cpu|load|services|backup|events|status
   service list
   service enable|disable|start|stop|restart|status|update <serviço>
   status
@@ -111,6 +111,7 @@ case "${_command}" in
                 ;;
             status)         system_status_json ;;
             info)           system_info_json ;;
+            events)         events_recent ;;
             *)              _usage; exit 1 ;;
         esac
         ;;
