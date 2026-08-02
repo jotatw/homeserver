@@ -28,9 +28,9 @@ services:
 
     # Volumes
     volumes:
-      - /srv/data:/srv
-      - /srv/data/filebrowser/database:/database
-      - /srv/data/filebrowser/config:/config
+      - /srv/storage:/srv
+      - /srv/services/filebrowser/database:/database
+      - /srv/services/filebrowser/config:/config
 
     # Rede
     networks:

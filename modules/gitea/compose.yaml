@@ -31,7 +31,7 @@ services:
 
     # Dados
     volumes:
-      - /srv/data/gitea:/data
+      - /srv/services/gitea:/data
 
     # Rede
     networks:

@@ -56,6 +56,8 @@
               format: percent
             - field: backup
               label: Backup
+            - field: wol
+              label: Wake-on-LAN
 
 - Administração:
 
@@ -89,10 +91,5 @@
 
     - Usuários:
         icon: mdi-account-group
-        href: http://192.168.1.10:8000/api/v1/users
-        description: Gestão de usuários (API)
-
-    - Backup:
-        icon: mdi-backup-restore
-        href: http://192.168.1.10:8000/api/v1/status
-        description: Último backup e estado
+        href: http://192.168.1.10:8080
+        description: Gerencie usuários e permissões
