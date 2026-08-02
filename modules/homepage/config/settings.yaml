@@ -15,6 +15,7 @@ useEqualHeights: true
 hideVersion: true
 disableUpdateCheck: true
 disableIndexing: true
+hideErrors: true
 
 quicklaunch:
   searchDescriptions: true
@@ -22,16 +23,25 @@ quicklaunch:
   provider: duckduckgo
 
 layout:
-  Essenciais:
+  Arquivos:
     style: row
     columns: 4
-  Status:
+  Projetos:
+    style: row
+    columns: 4
+  Downloads:
+    style: row
+    columns: 4
+  Mídia:
+    style: row
+    columns: 4
+  Serviços:
+    style: row
+    columns: 4
+  Gestão:
     style: row
     columns: 2
-  Administração:
-    style: row
-    columns: 4
-  Sistema:
+  Manutenção:
     style: row
     columns: 4
   Links:

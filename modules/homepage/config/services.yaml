@@ -1,35 +1,101 @@
 ---
-- Essenciais:
+# Modo Usuário — conteúdo
+- Arquivos:
+
+    - Meus Arquivos:
+        icon: mdi-folder
+        href: http://192.168.1.10:8080
+        description: Acesse seus arquivos
+
+- Projetos:
+
+    - Projetos:
+        icon: mdi-code-tags
+        href: http://192.168.1.10:3001
+        description: Projetos e repositórios
+
+- Downloads:
+
+    - Downloads:
+        icon: mdi-download
+        href: http://192.168.1.10:8080
+        description: Área de downloads
+
+- Mídia:
+
+    - Mídia:
+        icon: mdi-movie
+        href: http://192.168.1.10:8080/#/media
+        description: Arquivos de mídia
+
+# Modo Administrador — serviços e gestão
+- Serviços:
 
     - Homepage:
         icon: mdi-home
         href: http://192.168.1.10:3000
-        description: Dashboard do servidor
         server: homeserver
         container: homepage
 
     - FileBrowser:
         icon: mdi-folder-open
         href: http://192.168.1.10:8080
-        description: Gerenciador de arquivos
         server: homeserver
         container: filebrowser
 
     - Gitea:
         icon: sh-gitea
         href: http://192.168.1.10:3001
-        description: Repositórios Git
         server: homeserver
         container: gitea
 
     - API:
-        icon: mdi-code-tags
+        icon: mdi-api
         href: http://192.168.1.10:8000/api/v1/status
-        description: API do HomeServer
         server: homeserver
         container: api-api-1
 
-- Status:
+- Gestão:
+
+    - Usuários:
+        icon: mdi-account-group
+        href: http://192.168.1.10:8080
+        description: Gerencie usuários e permissões
+
+    - Storage:
+        id: storage-status
+        icon: mdi-harddisk
+        widget:
+          type: customapi
+          url: http://api:8000/api/v1/status
+          refreshInterval: 30000
+          mappings:
+            - field: storage.ready
+              label: Pronto
+            - field: storage.users
+              label: Usuários
+              format: size
+            - field: storage.shared
+              label: Compartilhado
+              format: size
+            - field: storage.media
+              label: Mídia
+              format: size
+
+# Modo Sistema — manutenção
+- Manutenção:
+
+    - Serviços:
+        icon: mdi-server-network
+        widget:
+          type: customapi
+          url: http://api:8000/api/v1/status
+          refreshInterval: 30000
+          display: dynamic-list
+          mappings:
+            items: services
+            name: name
+            label: status
 
     - Server:
         id: server-status
@@ -58,38 +124,3 @@
               label: Backup
             - field: wol
               label: Wake-on-LAN
-
-- Administração:
-
-    - Portainer:
-        icon: sh-portainer
-        href: https://192.168.1.10:9443
-        description: Módulo opcional (desativado)
-        server: homeserver
-        container: portainer
-
-    - Gitea SSH:
-        icon: sh-git
-        href: ssh://git@192.168.1.10:2222
-        description: Acesso Git via SSH
-        server: homeserver
-        container: gitea
-
-- Sistema:
-
-    - Serviços:
-        icon: mdi-server-network
-        widget:
-          type: customapi
-          url: http://api:8000/api/v1/status
-          refreshInterval: 30000
-          display: dynamic-list
-          mappings:
-            items: services
-            name: name
-            label: status
-
-    - Usuários:
-        icon: mdi-account-group
-        href: http://192.168.1.10:8080
-        description: Gerencie usuários e permissões
