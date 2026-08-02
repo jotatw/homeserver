@@ -27,6 +27,7 @@ Thumbs.db
 # Runtime (criados pelo Core em tempo de execução)
 config/*
 !config/services.conf
+!config/scheduler.conf
 database/
 backup/
 logs/

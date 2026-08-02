@@ -60,6 +60,8 @@ Comandos:
   hardware status|temp|disks|disk_smart|net|usb
   automation list
   automation run <evento>
+  scheduler init|list
+  scheduler enable|disable|run <tarefa>
 EOF
 }
 
@@ -202,6 +204,19 @@ case "${_command}" in
             list) automation_list ;;
             run)  automation_run "${3:?evento}" ;;
             *)    _usage; exit 1 ;;
+        esac
+        ;;
+
+    scheduler)
+        _subcommand="${2:-}"
+
+        case "${_subcommand}" in
+            init)    scheduler_init ;;
+            list)    scheduler_list ;;
+            enable)  scheduler_enable "${3:?tarefa}" ;;
+            disable) scheduler_disable "${3:?tarefa}" ;;
+            run)     scheduler_run "${3:?tarefa}" ;;
+            *)       _usage; exit 1 ;;
         esac
         ;;
 

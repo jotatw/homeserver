@@ -99,6 +99,7 @@ _load_infrastructure() {
         mounts.sh \
         hardware.sh \
         automation.sh \
+        scheduler.sh \
         system/architecture.sh \
         system/hostname.sh \
         system/kernel.sh \
