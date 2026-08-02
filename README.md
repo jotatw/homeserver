@@ -1,145 +1,306 @@
 # HomeServer
 
-> Dê uma nova vida ao seu computador antigo.
+> Uma plataforma modular para transformar um computador comum em um servidor doméstico simples, organizado e fácil de expandir.
 
-O HomeServer é uma plataforma modular que transforma computadores antigos em servidores domésticos leves, organizados e fáceis de manter.
+O **HomeServer** nasceu com um objetivo simples: dar uma nova vida a computadores antigos.
 
-## Estado atual
+Com o tempo, o projeto evoluiu para uma plataforma capaz de integrar armazenamento, gerenciamento de usuários, serviços e automações em uma única interface, mantendo uma arquitetura modular e preparada para crescer sem perder a simplicidade.
 
-- [x] Debian 13 (Trixie)
-- [x] SSH por chave
-- [x] Firewall UFW
-- [x] Docker + Docker Compose
-- [x] Homepage (modos de exibição + resumo do servidor)
-- [x] FileBrowser (pasta própria por usuário)
-- [x] Gitea
-- [x] API (`/api/v1/*`)
-- [x] Samba
-- [x] Backup diário
-- [x] Agendamento liga/desliga
-- [x] Perfis de usuários (Gitea + FileBrowser + pasta)
-- [ ] Login OIDC na homepage (aguardando release do Homepage)
-- [ ] Módulo Uptime Kuma (futuro)
-- [ ] Módulo Jellyfin (futuro)
+---
 
-## Hardware
+# Filosofia
 
-O hardware que foi testado e usado para a criação desse projeto:
+O HomeServer segue alguns princípios desde o início do projeto:
 
-- MSI MS-AA1511 · Intel Pentium T4500 · 3 GB RAM · 320 GB HDD
+- Simplicidade antes de complexidade.
+- Evolução incremental.
+- Um módulo, uma responsabilidade.
+- Infraestrutura desacoplada dos serviços.
+- Automação sempre que possível.
+- Documentação acompanha o código.
 
-### Extra
+O objetivo não é competir com soluções corporativas, mas oferecer uma plataforma doméstica organizada, intuitiva e fácil de manter.
 
-Para esse projeto foi utilizado um roteador próprio para configurar as portas dos serviços.
+---
 
-## Serviços
+# Recursos implementados
 
-| Serviço    | Porta | Descrição                |
-|------------|-------|--------------------------|
-| Homepage   | 3000  | Dashboard (modos)        |
-| Gitea      | 3001  | Servidor Git (web)       |
-| Gitea SSH  | 2222  | Servidor Git (SSH)       |
-| FileBrowser| 8080  | Gerenciador de arquivos  |
-| API        | 8000  | API do HomeServer        |
-| Samba      | 445   | Compartilhamento         |
-| Portainer  | 9443  | Módulo opcional          |
+Atualmente o HomeServer oferece:
 
-## Modos de exibição (Homepage)
+- Gerenciamento centralizado de armazenamento
+- Homepage com modos de utilização
+- Gerenciamento de usuários
+- API REST
+- FileBrowser integrado
+- Gitea
+- Samba
+- Backup automático
+- Wake-on-LAN
+- Agendamento de inicialização e desligamento
+- CLI administrativa (`hs`)
 
-A Homepage possui três modos de exibição, selecionáveis no canto superior direito.
-A preferência é salva no navegador (localStorage).
+---
 
-| Modo | O que mostra |
-|------|--------------|
-| **Usuário** | Conteúdo (Arquivos, Projetos, Downloads, Mídia) |
-| **Administrador** | Conteúdo + Serviços + Gestão (usuários, storage) |
-| **Sistema** | Tudo + Manutenção (serviços, dispositivos, sensores, servidor) |
+# Próximos módulos
 
-## Estrutura
+Planejados para versões futuras:
 
-```text
-homeserver/
-├── api/            # API Fastify (TypeScript)
-├── core/           # Núcleo (bash): foundation, infrastructure, applications
-│   ├── hs.sh       # CLI do HomeServer
-│   └── tests/      # Suíte de testes
-├── modules/        # Módulos (filebrowser, gitea, homepage, portainer)
-├── config/         # Configuração (services.conf)
-├── scripts/        # Automações (backup, liga/desliga)
-├── docs/           # Documentação
-├── .github/        # CI/CD
-└── install.sh      # Instalador
-```
+- Login OIDC
+- Uptime Kuma
+- Jellyfin
+- Gateway (Reverse Proxy)
+- Integração com dispositivos USB e SD Card
+- Aplicativo para notebook
+- Aplicativo para celular
 
-## Armazenamento
+---
 
-Os dados são organizados em `/srv`, separando arquivos de usuário, dados de
-serviço e configuração:
+# Arquitetura
+
+O HomeServer é organizado em camadas independentes.
 
 ```text
-/srv/
-├── storage/          # Dados de usuário (raiz do FileBrowser)
-│   ├── users/        # Uma pasta por usuário
-│   ├── shared/       # Compartilhamento entre usuários
-│   ├── media/        # Mídia
-│   └── documents/    # Documentos
-├── services/         # Dados dos serviços (gitea, filebrowser)
-├── docker/           # Stacks Docker
-├── git/              # Repositório HomeServer
-├── backup/           # Backups diários
-└── scripts/          # Automações
+HomeServer
+├── core/
+│   ├── foundation/
+│   ├── infrastructure/
+│   ├── adapters/
+│   └── hs.sh
+│
+├── api/
+│
+├── modules/
+│
+├── automation/
+│   └── hooks/
+│
+└── install.sh
 ```
 
-O FileBrowser é montado com a raiz `/srv/storage`. O admin enxerga tudo;
-cada usuário comum vê apenas a própria pasta (`/users/<nome>`).
+## Foundation
 
-## Wake-on-LAN
+Bibliotecas reutilizáveis.
 
-O servidor suporta e mantém o Wake-on-LAN habilitado (via
-`homeserver-wol.service`). Verifique o estado:
+- filesystem
+- validation
+- output
+- config
+- constants
+- registry
 
-```bash
-bash core/hs.sh system wol status
+## Infrastructure
+
+Serviços internos do HomeServer.
+
+- storage
+- users
+- devices
+- mount
+- hardware
+- services
+- backup
+- scheduler
+
+## Adapters
+
+Integração com serviços externos.
+
+Atualmente:
+
+- FileBrowser
+
+Futuramente:
+
+- Telegram
+- Email
+- WhatsApp
+- GitHub
+- Outros módulos
+
+---
+
+# Homepage
+
+A Homepage é o ponto central do sistema.
+
+Ela organiza todos os serviços do HomeServer em três níveis de utilização.
+
+| Modo | Objetivo |
+|------|----------|
+| **Usuário** | Arquivos, projetos e conteúdo pessoal |
+| **Administrador** | Administração dos serviços |
+| **Sistema** | Informações completas do servidor |
+
+O objetivo é que o usuário nunca precise acessar diretamente cada serviço individualmente.
+
+---
+
+# Armazenamento
+
+Toda a estrutura do HomeServer é organizada dentro de `/srv`.
+
+```text
+/srv
+├── storage/
+│   ├── users/
+│   ├── shared/
+│   ├── media/
+│   ├── documents/
+│   └── devices/
+│       ├── usb/
+│       ├── sdcard/
+│       ├── external/
+│       └── temporary/
+│
+├── backup/
+├── docker/
+├── git/
+└── config/
 ```
 
-**Limitação**: a Homepage roda no próprio servidor — quando ele está
-desligado, o painel não é acessível. Para ligar o servidor remotamente,
-use um aplicativo/ferramenta de magic packet em outro dispositivo da rede
-(MAC: `40:61:86:ce:99:fe`), ou o agendamento RTC (23h30/07h00).
+O FileBrowser utiliza `/srv/storage` como raiz.
 
-## Uso
+- Administradores possuem acesso completo.
+- Usuários comuns acessam apenas `/users/<nome>`.
 
-```bash
-# CLI
-bash core/hs.sh system status        # resumo completo do servidor (JSON)
-bash core/hs.sh service list
-bash core/hs.sh service start <serviço>
-bash core/hs.sh user list            # usuários do FileBrowser
+---
 
-# Instalação
-sudo bash install.sh
+# Serviços
 
-# Testes
-bash core/tests/run_all.sh
+| Serviço | Porta |
+|----------|------:|
+| Homepage | 3000 |
+| Gitea | 3001 |
+| Gitea SSH | 2222 |
+| FileBrowser | 8080 |
+| API | 8000 |
+| Samba | 445 |
+| Portainer | 9443 |
+
+> **Planejamento futuro**
+>
+> As portas serão substituídas por um Gateway único, permitindo acesso através de URLs amigáveis como:
+>
+> - `homeserver.local`
+> - `homeserver.local/files`
+> - `homeserver.local/git`
+> - `homeserver.local/api`
+
+---
 
 # API
-cd api && docker compose up -d --build
-curl http://192.168.1.10:8000/api/v1/status
+
+A API é a interface oficial do HomeServer.
+
+| Método | Endpoint |
+|---------|----------|
+| GET | `/api/v1/status` |
+| GET | `/api/v1/storage` |
+| GET | `/api/v1/services` |
+| GET | `/api/v1/users` |
+| GET | `/api/v1/devices` |
+| GET | `/api/v1/hardware` |
+| POST | `/api/v1/users` |
+| PUT | `/api/v1/users/:nome` |
+| DELETE | `/api/v1/users/:nome` |
+| POST | `/api/v1/backup` |
+
+Mais detalhes em `api/README.md`.
+
+---
+
+# Uso
+
+## Instalação
+
+```bash
+sudo bash install.sh
+```
+
+## CLI
+
+```bash
+bash core/hs.sh system status
+
+bash core/hs.sh service list
+
+bash core/hs.sh user list
+```
+
+## Testes
+
+```bash
+bash core/tests/run_all.sh
 ```
 
 ## API
 
-| Método | Rota                  | Descrição                          |
-|--------|-----------------------|------------------------------------|
-| GET    | `/api/v1/status`      | Resumo do servidor (JSON)          |
-| GET    | `/api/v1/storage`     | Estado do storage                  |
-| GET    | `/api/v1/services`    | Serviços + estado                  |
-| GET    | `/api/v1/hardware`    | Sensores, discos, rede, USB        |
-| GET    | `/api/v1/devices`     | Dispositivos montados              |
-| GET    | `/api/v1/users`       | Lista usuários                     |
-| POST   | `/api/v1/users`       | Cria usuário                       |
-| PUT    | `/api/v1/users/:nome` | Altera senha                       |
-| DELETE | `/api/v1/users/:nome` | Remove usuário (`?folder=1`)       |
-| POST   | `/api/v1/backup`      | Dispara backup manual              |
+```bash
+curl http://homeserver.local/api/v1/status
+```
 
-Detalhes em `api/README.md`.
+> Atualmente o acesso ainda pode utilizar o endereço IP do servidor. A adoção de `homeserver.local` faz parte da evolução planejada do projeto.
+
+---
+
+# Hardware utilizado
+
+Projeto desenvolvido e validado em hardware modesto.
+
+- MSI MS-AA1511
+- Intel Pentium T4500
+- 3 GB RAM
+- HDD 320 GB
+
+O objetivo é permitir reutilizar computadores antigos como servidores domésticos.
+
+---
+
+# Roadmap
+
+## v1.1
+
+- Refinamento da Homepage
+- Melhorias de UX
+- Organização do projeto
+
+## v1.2
+
+- Gateway
+- URLs amigáveis
+- Reverse Proxy
+
+## v2.0
+
+- Device Service completo
+- Hardware Service
+- Aplicativo para Notebook
+- Aplicativo para Celular
+
+## Futuro
+
+O objetivo de longo prazo é transformar o HomeServer em um ecossistema pessoal.
+
+Servidor, notebook e celular compartilharão arquivos, usuários, notificações e automações através de uma única plataforma.
+
+---
+
+# Documentação
+
+A documentação completa está organizada em:
+
+```text
+docs/
+├── architecture/
+├── development/
+├── foundation/
+├── services/
+├── modules/
+└── roadmap/
+```
+
+---
+
+# Licença
+
+Este projeto é distribuído sob a licença MIT.
