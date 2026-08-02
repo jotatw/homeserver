@@ -39,6 +39,7 @@ system_status_json() {
         "${disk_t}" "${disk_u}" "${disk_a}" "${disk_p}"
     printf '  "services": %s,\n' "${services}"
     printf '  "backup": "%s",\n' "${backup}"
-    printf '  "wol": "%s"\n' "${wol}"
+    printf '  "wol": "%s",\n' "${wol}"
+    printf '  "storage": %s\n' "$(storage_status_json)"
     printf '}\n'
 }

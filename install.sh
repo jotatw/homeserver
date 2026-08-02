@@ -79,6 +79,10 @@ _create_dirs() {
              /srv/storage/shared \
              /srv/storage/media \
              /srv/storage/documents \
+             /srv/storage/devices/usb \
+             /srv/storage/devices/sdcard \
+             /srv/storage/devices/external \
+             /srv/storage/devices/temporary \
              /srv/services \
              /srv/backup/daily \
              /srv/logs \
