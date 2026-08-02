@@ -129,13 +129,17 @@ curl http://192.168.1.10:8000/api/v1/status
 
 ## API
 
-| Método | Rota                    | Descrição                          |
-|--------|-------------------------|------------------------------------|
-| GET    | `/api/v1/status`        | Resumo do servidor (JSON)          |
-| GET    | `/api/v1/system`        | Hostname                           |
-| GET    | `/api/v1/users`         | Lista usuários do FileBrowser      |
-| POST   | `/api/v1/users`         | Cria usuário (pasta + FileBrowser) |
-| DELETE | `/api/v1/users/:nome`   | Remove usuário (`?folder=1`)       |
+| Método | Rota                       | Descrição                          |
+|--------|----------------------------|------------------------------------|
+| GET    | `/api/v1/status`           | Resumo do servidor (JSON)          |
+| GET    | `/api/v1/system`           | Hostname                           |
+| GET    | `/api/v1/storage`          | Estado do storage                  |
+| GET    | `/api/v1/services`         | Lista de serviços + estado         |
+| GET    | `/api/v1/users`            | Lista usuários do FileBrowser      |
+| POST   | `/api/v1/users`            | Cria usuário (pasta + FileBrowser) |
+| PUT    | `/api/v1/users/:nome`      | Altera senha do usuário            |
+| DELETE | `/api/v1/users/:nome`      | Remove usuário (`?folder=1`)       |
+| POST   | `/api/v1/backup`           | Dispara backup manual              |
 
 Detalhes em `api/README.md`.
 
