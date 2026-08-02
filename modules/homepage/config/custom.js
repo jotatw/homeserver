@@ -1,15 +1,27 @@
 (() => {
   const MODES = [
-    { id: "simple", label: "Simples", hide: ["Status", "Administração", "Sistema"] },
-    { id: "admin", label: "Admin", hide: ["Sistema"] },
-    { id: "maintenance", label: "Manutenção", hide: [] },
+    {
+      id: "user",
+      label: "Usuário",
+      groups: ["Arquivos", "Projetos", "Downloads", "Mídia"],
+    },
+    {
+      id: "admin",
+      label: "Administrador",
+      groups: ["Arquivos", "Projetos", "Downloads", "Mídia", "Serviços", "Gestão"],
+    },
+    {
+      id: "system",
+      label: "Sistema",
+      groups: ["Arquivos", "Projetos", "Downloads", "Mídia", "Serviços", "Gestão", "Manutenção"],
+    },
   ];
 
   const STORAGE_KEY = "hs_mode";
 
   function getMode() {
     const saved = localStorage.getItem(STORAGE_KEY);
-    return MODES.some((m) => m.id === saved) ? saved : "simple";
+    return MODES.some((m) => m.id === saved) ? saved : "user";
   }
 
   function setActiveButton(modeId) {
@@ -22,11 +34,13 @@
     const mode = MODES.find((m) => m.id === modeId) || MODES[0];
     localStorage.setItem(STORAGE_KEY, mode.id);
 
+    const visible = new Set(mode.groups);
+
     document.querySelectorAll(".services-group").forEach((group) => {
       const h2 = group.querySelector(".service-group-name");
       if (!h2) return;
       const name = (h2.textContent || "").trim();
-      group.style.display = mode.hide.includes(name) ? "none" : "";
+      group.style.display = visible.has(name) ? "" : "none";
     });
 
     setActiveButton(mode.id);
@@ -58,7 +72,6 @@
     applyMode(getMode());
   }
 
-  // Observable: aplica o modo sempre que novos grupos surgirem no DOM
   function watch() {
     const target = document.getElementById("__next") || document.body;
 
