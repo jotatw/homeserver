@@ -1,0 +1,4 @@
+# HomeServer — configuração do shellcheck
+# Módulos sourced (.sh sem shebang) são esperados.
+disable=SC2148,SC2034,SC2164
+source-path=SCRIPTDIR

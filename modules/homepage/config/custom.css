@@ -1,0 +1,45 @@
+/* HomeServer — modos de exibição */
+
+.hs-mode-selector {
+  position: fixed;
+  top: 0.9rem;
+  right: 0.9rem;
+  z-index: 1000;
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  background: rgba(2, 6, 23, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 10px;
+  backdrop-filter: blur(6px);
+}
+
+.hs-mode-btn {
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  padding: 5px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.hs-mode-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+}
+
+.hs-mode-btn.active {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+@media (max-width: 640px) {
+  .hs-mode-btn {
+    font-size: 0.65rem;
+    padding: 4px 8px;
+  }
+}
