@@ -98,6 +98,7 @@ _load_infrastructure() {
         devices.sh \
         mounts.sh \
         hardware.sh \
+        automation.sh \
         system/architecture.sh \
         system/hostname.sh \
         system/kernel.sh \

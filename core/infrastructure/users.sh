@@ -87,6 +87,9 @@ hs_user_create() {
         hs_user_create_gitea "${username}" "${password}" "${email}"
     fi
 
+    export HS_USER_NAME="${username}"
+    automation_run users >/dev/null 2>&1 || true
+
     printf '{\n'
     printf '  "username": "%s",\n' "${username}"
     printf '  "scope": "%s",\n' "${scope}"
@@ -223,4 +226,7 @@ hs_user_rm() {
             --username "${username}" >/dev/null 2>&1 || true
         echo "Usuário Gitea removido: ${username}" >&2
     fi
+
+    export HS_USER_NAME="${username}"
+    automation_run users >/dev/null 2>&1 || true
 }

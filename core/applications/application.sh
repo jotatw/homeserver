@@ -65,11 +65,15 @@ _application_execute() {
 
             compose_validate "${service}" || return 1
             compose_up "${service}"
+            export HS_SERVICE_NAME="${service}"
+            automation_run services >/dev/null 2>&1 || true
             ;;
 
         stop)
 
             compose_down "${service}"
+            export HS_SERVICE_NAME="${service}"
+            automation_run services >/dev/null 2>&1 || true
             ;;
 
         restart)

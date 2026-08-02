@@ -58,6 +58,8 @@ Comandos:
   device unmount <tipo> <rótulo>
   device eject <dispositivo>
   hardware status|temp|disks|disk_smart|net|usb
+  automation list
+  automation run <evento>
 EOF
 }
 
@@ -190,6 +192,16 @@ case "${_command}" in
             net)    hw_network_json ;;
             usb)    hw_usb_json ;;
             *)      _usage; exit 1 ;;
+        esac
+        ;;
+
+    automation)
+        _subcommand="${2:-}"
+
+        case "${_subcommand}" in
+            list) automation_list ;;
+            run)  automation_run "${3:?evento}" ;;
+            *)    _usage; exit 1 ;;
         esac
         ;;
 
