@@ -77,19 +77,32 @@ _load_foundation() {
         config.sh \
         output.sh \
         validation.sh \
-        filesystem.sh
+        filesystem.sh \
+        registry.sh
 }
 #
 # Carrega os componentes da Infrastructure.
 #
 _load_infrastructure() {
 
-    _load_layer infrastructure
+    _load_layer infrastructure \
+        filesystem.sh \
+        environment.sh \
+        docker.sh \
+        compose.sh \
+        service.sh \
+        system/architecture.sh \
+        system/hostname.sh \
+        system/kernel.sh \
+        system/os.sh \
+        system/uptime.sh \
+        system/json.sh
 }
 #
 # Carrega os componentes da Applications.
 #
 _load_applications() {
 
-    _load_layer applications
+    _load_layer applications \
+        application.sh
 }

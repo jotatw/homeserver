@@ -1,25 +1,29 @@
 #!/usr/bin/env bash
 
+set -uo pipefail
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "${SCRIPT_DIR}/../.."
+
 source "${SCRIPT_DIR}/bootstrap.sh"
 
 initialize_suite "Foundation"
 
 run_test \
     "Constants" \
-    "${HS_TEST_FOUNDATION_DIR}/test_constants.sh"
+    "${SCRIPT_DIR}/foundation/test_constants.sh"
 
 run_test \
     "Config" \
-    "${HS_TEST_FOUNDATION_DIR}/test_config.sh"
+    "${SCRIPT_DIR}/foundation/test_config.sh"
 
 run_test \
     "Output" \
-    "${HS_TEST_FOUNDATION_DIR}/test_output.sh"
+    "${SCRIPT_DIR}/foundation/test_output.sh"
 
 run_test \
     "Validation" \
-    "${HS_TEST_FOUNDATION_DIR}/test_validation.sh"
+    "${SCRIPT_DIR}/foundation/test_validation.sh"
 
 show_summary
 

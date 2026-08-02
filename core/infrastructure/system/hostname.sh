@@ -1,3 +1,7 @@
 get_hostname() {
-    hostname
+    if [[ -f /etc/hostname ]]; then
+        cat /etc/hostname
+    else
+        hostname
+    fi
 }

@@ -3,17 +3,13 @@ import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
 
-const SYSTEM_SCRIPT =
-    "/workspace/core/domain/system/system.sh";
+const SYSTEM_SCRIPT = "/workspace/core/hs.sh";
 
 export async function getHostname(): Promise<string> {
-    console.log("Script:", SYSTEM_SCRIPT);
-
     const { stdout } = await execFileAsync(
         "/bin/bash",
-        [SYSTEM_SCRIPT, "hostname"]
+        [SYSTEM_SCRIPT, "system", "hostname"]
     );
 
     return stdout.trim();
 }
-

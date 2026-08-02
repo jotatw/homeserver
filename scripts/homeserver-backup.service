@@ -1,0 +1,7 @@
+[Unit]
+Description=HomeServer Backup Diário
+Requires=homeserver-backup.timer
+
+[Service]
+Type=oneshot
+ExecStart=/srv/scripts/backup.sh

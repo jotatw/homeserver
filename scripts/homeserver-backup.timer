@@ -1,0 +1,10 @@
+[Unit]
+Description=Timer de backup diário do HomeServer
+
+[Timer]
+OnCalendar=*-*-* 03:00:00
+Persistent=true
+RandomizedDelaySec=600
+
+[Install]
+WantedBy=timers.target

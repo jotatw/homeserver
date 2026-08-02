@@ -3,21 +3,20 @@
 set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "${SCRIPT_DIR}/../.."
 
-source "${SCRIPT_DIR}/common/test_runner.sh"
+source "${SCRIPT_DIR}/bootstrap.sh"
 
-echo "========================================"
-echo " HomeServer Test Suite"
-echo " Infrastructure"
-echo "========================================"
-echo
+initialize_suite "Infrastructure"
 
 run_test \
-    "Filesystem - Directories" \
+    "Filesystem - Diretórios" \
     "${SCRIPT_DIR}/infrastructure/test_filesystem_directories.sh"
 
 run_test \
-    "Filesystem - Files" \
+    "Filesystem - Arquivos" \
     "${SCRIPT_DIR}/infrastructure/test_filesystem_files.sh"
 
 show_summary
+
+suite_exit_status
