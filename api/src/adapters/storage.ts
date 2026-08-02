@@ -1,16 +1,6 @@
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
-
-const execFileAsync = promisify(execFile);
-
-const CORE = "/workspace/core/hs.sh";
-
-async function runCore(args: string[]): Promise<string> {
-    const { stdout } = await execFileAsync("/bin/bash", [CORE, ...args]);
-    return stdout.trim();
-}
+import { cachedRunCore } from "../utils/cache.js";
 
 export async function getStorageStatus() {
-    const raw = await runCore(["system", "storage", "status"]);
+    const raw = await cachedRunCore("storage", 5000, ["system", "storage", "status"]);
     return JSON.parse(raw);
 }
