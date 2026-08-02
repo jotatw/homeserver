@@ -1,72 +1,39 @@
-# HomeServer Documentation
+# HomeServer — Documentação
 
-## Visão Geral
+Bem-vindo à documentação técnica do HomeServer.
 
-Bem-vindo à documentação do HomeServer.
+> **Docs** explica **como o HomeServer funciona**. Para entender **para onde o
+> projeto está evoluindo**, veja `planning/` (visão, roadmap e product backlog).
 
-O HomeServer é uma plataforma doméstica modular para hospedagem e gerenciamento de serviços, organizada em camadas e preparada para evoluir ao longo do tempo.
+## Estrutura
 
----
-
-# Estrutura da Documentação
-
-A documentação está organizada por assunto.
-
-## Projeto
-
-| Documento | Descrição |
-|-----------|-----------|
-| `project/VISION.md` | Objetivos e filosofia do projeto. |
-| `project/ROADMAP.md` | Planejamento e evolução do projeto. |
-| `ARCHITECTURE.md` | Arquitetura geral do HomeServer. |
-
-## Core
-
-Documentação das camadas que compõem o núcleo do HomeServer.
-
-| Camada | Descrição |
-|--------|-----------|
-| `architecture/` | Arquitetura das camadas (Foundation, Infrastructure, Applications). |
-| `foundation/` | Biblioteca base do HomeServer Core. |
-| `architecture/infrastructure/` | Integração com o sistema operacional e serviços. |
-
-## Guia do usuário
-
-| Documento | Descrição |
-|-----------|-----------|
-| `guide/` | Guia passo a passo para transformar um computador antigo em um HomeServer. |
-
-## Desenvolvimento
-
-| Documento | Descrição |
-|-----------|-----------|
+| Caminho | Conteúdo |
+|---------|----------|
+| `PRINCIPLES.md` | Princípios permanentes do projeto. |
+| `ARCHITECTURE.md` | Arquitetura em camadas (Foundation → Adapters → Infrastructure → Applications). |
+| `architecture/` | Detalhamento das camadas e módulos do Core. |
 | `development/CONTRIBUTING.md` | Padrões e fluxo de desenvolvimento. |
+| `guide/` | Guia passo a passo para montar um HomeServer. |
 
----
+## Planejamento (`planning/`)
 
-# Organização
+| Caminho | Conteúdo |
+|---------|----------|
+| `planning/VISION.md` | Objetivos e filosofia do projeto. |
+| `planning/ROADMAP.md` | Macro-roadmap (fases de evolução). |
+| `planning/roadmap/` | Planos por versão (v1.1, v1.2, v2.0). |
+| `planning/backlog/` | Product backlog numerado por área. |
 
-A documentação segue os mesmos princípios adotados pelo código-fonte:
+## Navegação recomendada
 
-- simplicidade;
-- modularidade;
-- baixo acoplamento;
-- alta coesão;
-- evolução incremental.
+1. `PRINCIPLES.md`
+2. `ARCHITECTURE.md`
+3. `architecture/README.md`
+4. `development/CONTRIBUTING.md`
+5. `guide/README.md`
 
-Cada documento possui uma responsabilidade específica, evitando duplicação de informações.
+## Referência rápida
 
----
-
-# Navegação
-
-A leitura recomendada para compreender o projeto é:
-
-1. `project/VISION.md`
-2. `project/ROADMAP.md`
-3. `ARCHITECTURE.md`
-4. Foundation
-5. Infrastructure
-6. Applications
-
-Essa sequência apresenta primeiro a visão do projeto e, em seguida, detalha sua arquitetura e implementação.
+- **API**: `api/README.md` (endpoints REST) e `docs/architecture/API.md`.
+- **CLI**: `bash core/hs.sh --help` (comandos `system`, `service`, `user`, `device`, `hardware`, `automation`, `scheduler`).
+- **Testes**: `bash core/tests/run_ci.sh`.

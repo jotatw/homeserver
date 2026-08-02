@@ -44,6 +44,19 @@
   }
 }
 
+@media (max-width: 480px) {
+  .hs-mode-selector {
+    top: 0.4rem;
+    right: 0.4rem;
+    gap: 1px;
+    padding: 2px;
+  }
+  .hs-mode-btn {
+    font-size: 0.58rem;
+    padding: 3px 7px;
+  }
+}
+
 /* HomeServer — navegação (Sprint 2) */
 
 .service-card {
