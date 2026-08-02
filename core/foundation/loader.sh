@@ -102,6 +102,7 @@ _load_infrastructure() {
         system/memory.sh \
         system/disk.sh \
         system/cpu.sh \
+        system/wol.sh \
         system/status.sh \
         system/json.sh
 }

@@ -29,9 +29,15 @@ rsync -a --delete \
 status=$((status + $?))
 
 rsync -a --delete \
-    --link-dest="${LATEST}/data/" \
-    /srv/data/ \
-    "${TARGET}/data/" >> "${LOG_FILE}" 2>&1
+    --link-dest="${LATEST}/storage/" \
+    /srv/storage/ \
+    "${TARGET}/storage/" >> "${LOG_FILE}" 2>&1
+status=$((status + $?))
+
+rsync -a --delete \
+    --link-dest="${LATEST}/services/" \
+    /srv/services/ \
+    "${TARGET}/services/" >> "${LOG_FILE}" 2>&1
 status=$((status + $?))
 
 mkdir -p "${TARGET}/system"

@@ -71,6 +71,42 @@ homeserver/
 └── install.sh      # Instalador
 ```
 
+## Armazenamento
+
+Os dados são organizados em `/srv`, separando arquivos de usuário, dados de
+serviço e configuração:
+
+```text
+/srv/
+├── storage/          # Dados de usuário (raiz do FileBrowser)
+│   ├── users/        # Uma pasta por usuário
+│   ├── shared/       # Compartilhamento entre usuários
+│   ├── media/        # Mídia
+│   └── documents/    # Documentos
+├── services/         # Dados dos serviços (gitea, filebrowser)
+├── docker/           # Stacks Docker
+├── git/              # Repositório HomeServer
+├── backup/           # Backups diários
+└── scripts/          # Automações
+```
+
+O FileBrowser é montado com a raiz `/srv/storage`. O admin enxerga tudo;
+cada usuário comum vê apenas a própria pasta (`/users/<nome>`).
+
+## Wake-on-LAN
+
+O servidor suporta e mantém o Wake-on-LAN habilitado (via
+`homeserver-wol.service`). Verifique o estado:
+
+```bash
+bash core/hs.sh system wol status
+```
+
+**Limitação**: a Homepage roda no próprio servidor — quando ele está
+desligado, o painel não é acessível. Para ligar o servidor remotamente,
+use um aplicativo/ferramenta de magic packet em outro dispositivo da rede
+(MAC: `40:61:86:ce:99:fe`), ou o agendamento RTC (23h30/07h00).
+
 ## Uso
 
 ```bash
@@ -119,7 +155,7 @@ curl -X POST http://192.168.0.10:8000/api/v1/users \
   -d '{"username":"maria","gitea":true}'
 ```
 
-Cada usuário ganha `/srv/data/users/<nome>` e acesso restrito a ela no FileBrowser.
+Cada usuário ganha `/srv/storage/users/<nome>` e acesso restrito a ela no FileBrowser.
 
 ## Login (OIDC via Gitea)
 

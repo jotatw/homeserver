@@ -1,5 +1,34 @@
 # Changelog
 
+## 2026-08-02 — Storage por usuário + Wake-on-LAN
+
+### Storage
+
+- Nova estrutura em `/srv`: `storage/{users,shared,media,documents}` + `services/`.
+- Dados de serviço (gitea, filebrowser) movidos para `/srv/services`.
+- Samba e script de backup atualizados para os novos caminhos.
+- `install.sh` e core alinhados (sem referências a `/srv/data`).
+- Limpeza do cruft em `/srv/git`.
+
+### FileBrowser
+
+- Raiz = `/srv/storage`; admin (`joao`) com escopo `/` (acesso total).
+- Cada usuário comum vê apenas `/users/<nome>` (pasta criada automaticamente).
+- Modelo `createUserDir`/`MakeUserDir` nativo aproveitado.
+
+### Homepage
+
+- Grupo "Sistema" refinado (removidos links para JSON cru).
+- Card "Server" agora exibe o estado do Wake-on-LAN.
+
+### Wake-on-LAN
+
+- WoL habilitado e persistido (`homeserver-wol.service`).
+- Core: `hs system wol status|enable`.
+- Campo `wol` em `/api/v1/status`.
+
+# Changelog
+
 ## v1.0.0-rc.1 — Preparação para lançamento
 
 ### Limpeza
