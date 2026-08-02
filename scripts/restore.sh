@@ -47,4 +47,12 @@ if [[ "${RESTORE_SYSTEM:-0}" == "1" && -d "${SOURCE}/system" ]]; then
 fi
 
 echo
+echo "Corrigindo propriedade (backup foi criado como root)..."
+chown -R 1000:1000 /srv/services
+chown -R usuario:usuario /srv/storage
+chown -R usuario:usuario /srv/git
+chown -R usuario:usuario /srv/docker/compose
+
+echo
 echo "Restauração concluída."
+echo "Reinicie os containers: cd /srv/docker/compose/<serviço> && docker compose up -d"
