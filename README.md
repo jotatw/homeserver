@@ -51,9 +51,9 @@ A preferência é salva no navegador (localStorage).
 
 | Modo | O que mostra |
 |------|--------------|
-| **Simples** | Apenas os serviços essenciais (Homepage, FileBrowser, Gitea, API) |
-| **Admin** | Essenciais + Status do servidor + Administração (Portainer, Gitea SSH) |
-| **Manutenção** | Tudo, incluindo serviços em execução, usuários e backup |
+| **Usuário** | Apenas os serviços essenciais (Homepage, FileBrowser, Gitea, API) |
+| **Administrador** | Essenciais + Status do servidor + Administração (Portainer, Gitea SSH) |
+| **Sistema** | Tudo, incluindo serviços em execução, usuários e backup |
 
 ## Estrutura
 
@@ -129,59 +129,17 @@ curl http://192.168.1.10:8000/api/v1/status
 
 ## API
 
-| Método | Rota                       | Descrição                          |
-|--------|----------------------------|------------------------------------|
-| GET    | `/api/v1/status`           | Resumo do servidor (JSON)          |
-| GET    | `/api/v1/system`           | Hostname                           |
-| GET    | `/api/v1/storage`          | Estado do storage                  |
-| GET    | `/api/v1/services`         | Lista de serviços + estado         |
-| GET    | `/api/v1/users`            | Lista usuários do FileBrowser      |
-| POST   | `/api/v1/users`            | Cria usuário (pasta + FileBrowser) |
-| PUT    | `/api/v1/users/:nome`      | Altera senha do usuário            |
-| DELETE | `/api/v1/users/:nome`      | Remove usuário (`?folder=1`)       |
-| POST   | `/api/v1/backup`           | Dispara backup manual              |
+| Método | Rota                  | Descrição                          |
+|--------|-----------------------|------------------------------------|
+| GET    | `/api/v1/status`      | Resumo do servidor (JSON)          |
+| GET    | `/api/v1/storage`     | Estado do storage                  |
+| GET    | `/api/v1/services`    | Serviços + estado                  |
+| GET    | `/api/v1/hardware`    | Sensores, discos, rede, USB        |
+| GET    | `/api/v1/devices`     | Dispositivos montados              |
+| GET    | `/api/v1/users`       | Lista usuários                     |
+| POST   | `/api/v1/users`       | Cria usuário                       |
+| PUT    | `/api/v1/users/:nome` | Altera senha                       |
+| DELETE | `/api/v1/users/:nome` | Remove usuário (`?folder=1`)       |
+| POST   | `/api/v1/backup`      | Dispara backup manual              |
 
 Detalhes em `api/README.md`.
-
-## Usuários
-
-Criar um usuário (pasta própria + FileBrowser + Gitea):
-
-```bash
-bash core/hs.sh user create maria --gitea
-```
-
-Via API:
-
-```bash
-curl -X POST http://192.168.1.10:8000/api/v1/users \
-  -H "Content-Type: application/json" \
-  -d '{"username":"maria","gitea":true}'
-```
-
-Cada usuário ganha `/srv/storage/users/<nome>` e acesso restrito a ela no FileBrowser.
-
-## Login (OIDC via Gitea)
-
-O login OIDC da homepage será habilitado quando a versão do Homepage
-suportar (hoje só na branch `dev`). A configuração já está pronta em
-`modules/homepage/.env.example` e o aplicativo OAuth2 foi criado no Gitea.
-Ao atualizar o Homepage, basta ativar `HOMEPAGE_AUTH_ENABLED=true`.
-
-## Módulos
-
-Os módulos ficam em `modules/` e são ativados via `config/services.conf`:
-
-```bash
-bash core/hs.sh service enable portainer
-bash core/hs.sh service start portainer
-```
-
-## Documentação
-
-- `docs/` — arquitetura, decisões e desenvolvimento
-- `CHANGELOG.md` — histórico de versões
-
-## Licença
-
-Distribuído sob a [Apache License 2.0](LICENSE).
