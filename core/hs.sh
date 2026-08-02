@@ -57,6 +57,7 @@ Comandos:
   device mount <tipo> <rótulo> <dispositivo>
   device unmount <tipo> <rótulo>
   device eject <dispositivo>
+  hardware status|temp|disks|disk_smart|net|usb
 EOF
 }
 
@@ -175,6 +176,20 @@ case "${_command}" in
             unmount) unmount_device "${3:?tipo}" "${4:?rótulo}" ;;
             eject)   eject_device "${3:?dispositivo}" ;;
             *)       _usage; exit 1 ;;
+        esac
+        ;;
+
+    hardware)
+        _subcommand="${2:-}"
+
+        case "${_subcommand}" in
+            status) hw_status_json ;;
+            temp)   hw_temperature_json ;;
+            disks)  hw_disks_json ;;
+            disk_smart) hw_disk_smart_json "${3:-sda}" ;;
+            net)    hw_network_json ;;
+            usb)    hw_usb_json ;;
+            *)      _usage; exit 1 ;;
         esac
         ;;
 

@@ -40,6 +40,7 @@ system_status_json() {
     printf '  "services": %s,\n' "${services}"
     printf '  "backup": "%s",\n' "${backup}"
     printf '  "wol": "%s",\n' "${wol}"
-    printf '  "storage": %s\n' "$(storage_status_json)"
+    printf '  "storage": %s,\n' "$(storage_status_json)"
+    printf '  "hardware": %s\n' "$(hw_status_json)"
     printf '}\n'
 }
