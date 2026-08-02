@@ -26,6 +26,9 @@
 #   - compose_pull
 #   - compose_logs
 #   - compose_validate
+#   - compose_status
+#   - compose_check
+#   - compose_info
 #
 # Dependências:
 #   - service.sh
@@ -67,4 +70,16 @@ compose_logs() {
 
 compose_validate() {
     _compose "$1" config >/dev/null
+}
+
+compose_status() {
+    _compose "$1" ps
+}
+
+compose_check() {
+    _compose "$1" ps --status running >/dev/null
+}
+
+compose_info() {
+    _compose "$1" ps -a
 }

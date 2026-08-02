@@ -1,0 +1,7 @@
+[Unit]
+Description=HomeServer Desligamento Programado
+Requires=homeserver-night-off.timer
+
+[Service]
+Type=oneshot
+ExecStart=/srv/scripts/power-schedule.sh

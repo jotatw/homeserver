@@ -70,6 +70,16 @@ readonly HS_PROJECT_SCRIPTS_DIR="${HS_PROJECT_ROOT}/scripts"
 readonly HS_PROJECT_DOCS_DIR="${HS_PROJECT_ROOT}/docs"
 
 # ----------------------------------------------------------
+# Implantação
+# ----------------------------------------------------------
+#
+# Diretório onde os serviços são implantados e executados
+# via Docker Compose.
+# ----------------------------------------------------------
+
+readonly HS_SERVICES_DIR="/srv/docker/compose"
+
+# ----------------------------------------------------------
 # Workspace
 # ----------------------------------------------------------
 

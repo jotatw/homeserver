@@ -23,9 +23,9 @@ echo "    ${HS_PROJECT_ROOT}"
 
 echo
 
-echo "Common"
+echo "Foundation"
 
-echo "    ${HS_CORE_COMMON_DIR}"
+echo "    ${HS_CORE_FOUNDATION_DIR}"
 
 echo
 
@@ -35,13 +35,7 @@ echo "    ${HS_CORE_INFRASTRUCTURE_DIR}"
 
 echo
 
-echo "Core Services"
-
-echo "    ${HS_CORE_SERVICES_CORE_DIR}"
-
-echo
-
-echo "Project Services"
+echo "Deploy de Serviços"
 
 echo "    ${HS_SERVICES_DIR}"
 
@@ -49,22 +43,22 @@ echo
 
 echo "Config"
 
-echo "    ${HS_CONFIG_DIR}"
+echo "    ${HS_PROJECT_CONFIG_DIR}"
 
 echo
 
 echo "Data"
 
-echo "    ${HS_DATA_DIR}"
+echo "    ${HS_PROJECT_DATA_DIR}"
 
 echo
 
 echo "Logs"
 
-echo "    ${HS_LOGS_DIR}"
+echo "    ${HS_PROJECT_LOGS_DIR}"
 
 echo
 
 echo "Backup"
 
-echo "    ${HS_BACKUP_DIR}"
+echo "    ${HS_PROJECT_BACKUP_DIR}"

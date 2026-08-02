@@ -1,0 +1,27 @@
+services:
+  portainer:
+    image: portainer/portainer-ce:lts
+
+    container_name: portainer
+
+    restart: unless-stopped
+
+    security_opt:
+      - no-new-privileges:true
+
+    ports:
+      - "9443:9443"
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /srv/docker/volumes/portainer:/data
+
+    environment:
+      - TZ=America/Sao_Paulo
+
+    networks:
+      - homeserver
+
+networks:
+  homeserver:
+    external: true

@@ -2,7 +2,8 @@
 
 set -euo pipefail
 
-source "../test_bootstrap.sh"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/../bootstrap.sh"
 
 TEST_DIR="/tmp/homeserver-test"
 TEST_FILE="${TEST_DIR}/arquivo.txt"

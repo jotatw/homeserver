@@ -7,6 +7,8 @@ services:
     volumes:
       - ..:/workspace
       - /workspace/api/node_modules
+      - /etc/hostname:/etc/hostname:ro
+      - /etc/os-release:/etc/os-release:ro
 
     command: npm run dev
 
