@@ -9,3 +9,6 @@
 - HS-104 Storage contadores
 - HS-105 Arquivos
 - HS-106 Dispositivos
+- Sprint 2 (Navegação): hover, feedback de clique, estados
+- Sprint 3 (Dashboard): painel "Hoje" (eventos), favoritos
+- Sprint 6 (Performance): cache TTL na API
