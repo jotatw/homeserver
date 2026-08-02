@@ -12,3 +12,4 @@
 - Sprint 2 (Navegação): hover, feedback de clique, estados
 - Sprint 3 (Dashboard): painel "Hoje" (eventos), favoritos
 - Sprint 6 (Performance): cache TTL na API
+- Sprint 7 (Polimento): documentação reorganizada (docs/ técnico + planning/ evolução), renomeado FOUNDATION.md, responsividade
