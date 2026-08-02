@@ -1,6 +1,42 @@
 # Changelog
 
-## 2026-08-02
+## 2026-08-02 — Homepage como hub + usuários
+
+### Homepage
+
+- Layout em abas: Visão Geral / Serviços / Links.
+- Tema escuro fixo (slate), full width, statusStyle dot, showStats.
+- Card "Server" com resumo em tempo real via `/api/v1/status` (widget Custom API).
+- Widget resources com disco real do host (`/host`).
+- Acesso do container ao docker.sock corrigido (PGID=989).
+- Config canônica em `modules/homepage/config`.
+
+### Core
+
+- Novos comandos: `system memory|disk|cpu|services|backup|status`.
+- Novo módulo de usuários (`core/infrastructure/users.sh`): `user create|list|rm`.
+- Gitea corrigido: `ROOT_URL`/`DOMAIN`/`SSH_DOMAIN` → `192.168.1.10`.
+
+### API
+
+- `/api/v1/status` — resumo completo do servidor (CPU, memória, disco, serviços, backup).
+- `/api/v1/users` — GET/POST/DELETE para gestão de usuários.
+- Container com docker.sock + `docker-cli`, `curl`, `openssl`.
+- API na rede `homeserver`.
+
+### Usuários
+
+- Pasta própria `/srv/data/users/<nome>`.
+- Usuário FileBrowser com escopo restrito à própria pasta.
+- Perfil opcional no Gitea (`--gitea`).
+- Gestão via CLI (`hs user`) e API.
+
+### Login (pendente)
+
+- OIDC configurado e pronto, mas aguardando release do Homepage que
+  inclua autenticação (hoje só na branch `dev`).
+
+## 2026-08-02 — Base do servidor
 
 ### API
 

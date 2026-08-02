@@ -16,13 +16,20 @@ services:
       TZ: ${TZ}
       PUID: ${PUID}
       PGID: ${PGID}
-      HOMEPAGE_ALLOWED_HOSTS: "192.168.1.10:3000"
+      HOMEPAGE_ALLOWED_HOSTS: 192.168.1.10:3000
+      HOMEPAGE_AUTH_ENABLED: ${HOMEPAGE_AUTH_ENABLED:-false}
+      HOMEPAGE_AUTH_SECRET: ${HOMEPAGE_AUTH_SECRET:-}
+      HOMEPAGE_EXTERNAL_URL: ${HOMEPAGE_EXTERNAL_URL:-}
+      HOMEPAGE_OIDC_ISSUER: ${HOMEPAGE_OIDC_ISSUER:-}
+      HOMEPAGE_OIDC_CLIENT_ID: ${HOMEPAGE_OIDC_CLIENT_ID:-}
+      HOMEPAGE_OIDC_CLIENT_SECRET: ${HOMEPAGE_OIDC_CLIENT_SECRET:-}
 
     ports:
-      - "${HOMEPAGE_PORT}:3000"
+      - "3000:3000"
 
     volumes:
       - ./config:/app/config
+      - /:/host:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
     networks:

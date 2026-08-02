@@ -91,11 +91,18 @@ _load_infrastructure() {
         docker.sh \
         compose.sh \
         service.sh \
+        services_status.sh \
+        users.sh \
+        backup.sh \
         system/architecture.sh \
         system/hostname.sh \
         system/kernel.sh \
         system/os.sh \
         system/uptime.sh \
+        system/memory.sh \
+        system/disk.sh \
+        system/cpu.sh \
+        system/status.sh \
         system/json.sh
 }
 #
