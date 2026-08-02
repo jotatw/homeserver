@@ -287,17 +287,25 @@ Servidor, notebook e celular compartilharão arquivos, usuários, notificações
 
 # Documentação
 
-A documentação completa está organizada em:
+A documentação está organizada em duas áreas:
 
 ```text
-docs/
+docs/          → como o HomeServer funciona
+├── PRINCIPLES.md
+├── ARCHITECTURE.md
 ├── architecture/
 ├── development/
-├── foundation/
-├── services/
-├── modules/
-└── roadmap/
+└── guide/
+
+planning/      → para onde o projeto está evoluindo
+├── VISION.md
+├── ROADMAP.md
+├── roadmap/
+└── backlog/
 ```
+
+- **API**: veja `api/README.md`.
+- **CHANGELOG**: veja `CHANGELOG.md`.
 
 ---
 
