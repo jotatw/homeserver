@@ -94,6 +94,7 @@ _load_infrastructure() {
         services_status.sh \
         users.sh \
         backup.sh \
+        storage.sh \
         system/architecture.sh \
         system/hostname.sh \
         system/kernel.sh \
@@ -105,6 +106,14 @@ _load_infrastructure() {
         system/wol.sh \
         system/status.sh \
         system/json.sh
+}
+#
+# Carrega os adaptadores (integrações externas).
+#
+_load_adapters() {
+
+    _load_layer adapters \
+        filebrowser.sh
 }
 #
 # Carrega os componentes da Applications.

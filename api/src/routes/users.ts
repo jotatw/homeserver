@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { createUser, listUsers, deleteUser } from "../adapters/users.js";
+import { createUser, listUsers, deleteUser, changeUserPassword } from "../adapters/users.js";
 
 export async function userRoutes(fastify: FastifyInstance) {
     fastify.get("/api/v1/users", async () => {
@@ -27,6 +27,24 @@ export async function userRoutes(fastify: FastifyInstance) {
             });
 
             return reply.code(201).send(user);
+        } catch (error) {
+            return reply.code(500).send({
+                error: error instanceof Error ? error.message : String(error),
+            });
+        }
+    });
+
+    fastify.put("/api/v1/users/:username", async (request, reply) => {
+        const { username } = request.params as { username: string };
+        const body = request.body as { password?: string };
+
+        if (!body?.password) {
+            return reply.code(400).send({ error: "password é obrigatório" });
+        }
+
+        try {
+            const result = await changeUserPassword(username, body.password);
+            return reply.send(result);
         } catch (error) {
             return reply.code(500).send({
                 error: error instanceof Error ? error.message : String(error),
