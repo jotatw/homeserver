@@ -6,6 +6,13 @@
         icon: mdi-folder
         href: http://192.168.1.10:8080
         description: Acesse seus arquivos
+        widget:
+          type: customapi
+          url: http://api:8000/api/v1/storage
+          refreshInterval: 30000
+          mappings:
+            - field: total_size_human
+              label: Utilizado
 
 - Projetos:
 
@@ -67,20 +74,24 @@
         icon: mdi-harddisk
         widget:
           type: customapi
-          url: http://api:8000/api/v1/status
+          url: http://api:8000/api/v1/storage
           refreshInterval: 30000
           mappings:
-            - field: storage.ready
+            - field: ready
               label: Pronto
-            - field: storage.users
+              remap:
+                - value: true
+                  to: Sim
+                - value: false
+                  to: Não
+            - field: users
               label: Usuários
-              format: size
-            - field: storage.shared
+            - field: shared
               label: Compartilhado
-              format: size
-            - field: storage.media
+            - field: media
               label: Mídia
-              format: size
+            - field: documents
+              label: Documentos
 
 # Modo Sistema — manutenção
 - Manutenção:
@@ -96,6 +107,18 @@
             items: services
             name: name
             label: status
+
+    - Dispositivos:
+        id: devices-preview
+        icon: mdi-usb
+        widget:
+          type: customapi
+          url: http://api:8000/api/v1/devices
+          refreshInterval: 15000
+          display: dynamic-list
+          mappings:
+            name: label
+            label: type
 
     - Sensores:
         icon: mdi-thermometer

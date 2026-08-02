@@ -12,7 +12,7 @@
 # Responsabilidades:
 #   - Criar a estrutura oficial de diretórios
 #   - Manter permissões padrão
-#   - Reportar estado e tamanhos
+#   - Reportar estado, contagens e tamanhos
 #
 # Estrutura oficial:
 #
@@ -34,7 +34,7 @@
 #
 # ==========================================================
 
-readonly HS_STORAGE_ROOT="/srv/storage"
+HS_STORAGE_ROOT="${HS_STORAGE_ROOT:-/srv/storage}"
 
 #
 # Resolve o caminho legível do storage (container via /host ou host).
@@ -112,17 +112,47 @@ storage_dir_size() {
 }
 
 #
-# Estado do storage em JSON.
+# Conta entradas de primeiro nível em um diretório.
+#
+_storage_count() {
+    find "$1" -mindepth 1 -maxdepth 1 2>/dev/null | wc -l
+}
+
+#
+# Formata um tamanho em bytes para texto humano.
+#
+storage_human_size() {
+    local bytes="$1"
+
+    awk -v b="${bytes}" 'BEGIN {
+        if (b >= 1073741824) printf "%.1f GB", b / 1073741824
+        else if (b >= 1048576) printf "%.1f MB", b / 1048576
+        else if (b >= 1024) printf "%.1f KB", b / 1024
+        else printf "%d B", b
+    }'
+}
+
+#
+# Estado do storage em JSON (contagens + tamanhos).
 #
 storage_status_json() {
     local root users shared media documents devices
+    local users_size shared_size media_size documents_size total_size total_human
+
     root="$(_storage_root_read)"
 
-    users=$(storage_dir_size "${root}/users")
-    shared=$(storage_dir_size "${root}/shared")
-    media=$(storage_dir_size "${root}/media")
-    documents=$(storage_dir_size "${root}/documents")
-    devices=$(storage_dir_size "${root}/devices")
+    users=$(_storage_count "${root}/users")
+    shared=$(_storage_count "${root}/shared")
+    media=$(_storage_count "${root}/media")
+    documents=$(_storage_count "${root}/documents")
+    devices=$(find "${root}/devices" -mindepth 2 -maxdepth 2 -type d 2>/dev/null | wc -l)
+
+    users_size=$(storage_dir_size "${root}/users")
+    shared_size=$(storage_dir_size "${root}/shared")
+    media_size=$(storage_dir_size "${root}/media")
+    documents_size=$(storage_dir_size "${root}/documents")
+    total_size=$((users_size + shared_size + media_size + documents_size))
+    total_human="$(storage_human_size "${total_size:-0}")"
 
     printf '{\n'
     printf '  "root": "%s",\n' "${HS_STORAGE_ROOT}"
@@ -131,6 +161,9 @@ storage_status_json() {
     printf '  "shared": %s,\n' "${shared:-0}"
     printf '  "media": %s,\n' "${media:-0}"
     printf '  "documents": %s,\n' "${documents:-0}"
-    printf '  "devices": %s\n' "${devices:-0}"
+    printf '  "devices": %s,\n' "${devices:-0}"
+    printf '  "users_size": %s,\n' "${users_size:-0}"
+    printf '  "total_size": %s,\n' "${total_size:-0}"
+    printf '  "total_size_human": "%s"\n' "${total_human}"
     printf '}\n'
 }
