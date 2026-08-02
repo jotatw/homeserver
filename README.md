@@ -10,13 +10,15 @@ O HomeServer é uma plataforma modular que transforma computadores antigos em se
 - [x] SSH por chave
 - [x] Firewall UFW
 - [x] Docker + Docker Compose
-- [x] Homepage (dashboard)
-- [x] FileBrowser
+- [x] Homepage (dashboard em abas + resumo do servidor)
+- [x] FileBrowser (pasta própria por usuário)
 - [x] Gitea
 - [x] API (`/api/v1/*`)
 - [x] Samba
 - [x] Backup diário
 - [x] Agendamento liga/desliga
+- [x] Perfis de usuários (Gitea + FileBrowser + pasta)
+- [ ] Login OIDC na homepage (aguardando release do Homepage)
 - [ ] Módulo Uptime Kuma (futuro)
 - [ ] Módulo Jellyfin (futuro)
 
@@ -28,7 +30,7 @@ O HomeServer é uma plataforma modular que transforma computadores antigos em se
 
 | Serviço    | Porta | Descrição                |
 |------------|-------|--------------------------|
-| Homepage   | 3000  | Dashboard                |
+| Homepage   | 3000  | Dashboard (abas)         |
 | Gitea      | 3001  | Servidor Git (web)       |
 | Gitea SSH  | 2222  | Servidor Git (SSH)       |
 | FileBrowser| 8080  | Gerenciador de arquivos  |
@@ -55,9 +57,10 @@ homeserver/
 
 ```bash
 # CLI
-bash core/hs.sh system info
+bash core/hs.sh system status        # resumo completo do servidor (JSON)
 bash core/hs.sh service list
 bash core/hs.sh service start <serviço>
+bash core/hs.sh user list            # usuários do FileBrowser
 
 # Instalação
 sudo bash install.sh
@@ -67,8 +70,45 @@ bash core/tests/run_all.sh
 
 # API
 cd api && docker compose up -d --build
-curl http://192.168.0.10:8000/api/v1/system
+curl http://192.168.0.10:8000/api/v1/status
 ```
+
+## API
+
+| Método | Rota                    | Descrição                          |
+|--------|-------------------------|------------------------------------|
+| GET    | `/api/v1/status`        | Resumo do servidor (JSON)          |
+| GET    | `/api/v1/system`        | Hostname                           |
+| GET    | `/api/v1/users`         | Lista usuários do FileBrowser      |
+| POST   | `/api/v1/users`         | Cria usuário (pasta + FileBrowser) |
+| DELETE | `/api/v1/users/:nome`   | Remove usuário (`?folder=1`)       |
+
+Detalhes em `api/README.md`.
+
+## Usuários
+
+Criar um usuário (pasta própria + FileBrowser + Gitea):
+
+```bash
+bash core/hs.sh user create maria --gitea
+```
+
+Via API:
+
+```bash
+curl -X POST http://192.168.0.10:8000/api/v1/users \
+  -H "Content-Type: application/json" \
+  -d '{"username":"maria","gitea":true}'
+```
+
+Cada usuário ganha `/srv/data/users/<nome>` e acesso restrito a ela no FileBrowser.
+
+## Login (OIDC via Gitea)
+
+O login OIDC da homepage será habilitado quando a versão do Homepage
+suportar (hoje só na branch `dev`). A configuração já está pronta em
+`modules/homepage/.env.example` e o aplicativo OAuth2 foi criado no Gitea.
+Ao atualizar o Homepage, basta ativar `HOMEPAGE_AUTH_ENABLED=true`.
 
 ## Módulos
 

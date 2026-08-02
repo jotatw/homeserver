@@ -15,21 +15,12 @@
 #   hs <comando> [argumentos...]
 #
 # Comandos:
-#   system hostname       Hostname do sistema
-#   system os             Sistema operacional
-#   system kernel         Versão do kernel
-#   system architecture   Arquitetura da CPU
-#   system uptime         Tempo de atividade
-#   system info           Informações do sistema (JSON)
-#   service list          Lista serviços (ativos/inativos)
-#   service enable <s>    Ativa um serviço
-#   service disable <s>   Desativa um serviço
-#   service start <s>     Inicia um serviço
-#   service stop <s>      Para um serviço
-#   service restart <s>   Reinicia um serviço
-#   service status <s>    Status de um serviço
-#   service update <s>    Atualiza um serviço
-#   status                Resumo do servidor
+#   system hostname|os|kernel|architecture|uptime|info
+#   system memory|disk|cpu|load|services|backup|status
+#   service list|enable|disable|start|stop|restart|status|update
+#   status
+#   user create <nome> [--password=...] [--gitea]
+#   user rm <nome> [--remove-folder]
 # ==========================================================
 
 set -euo pipefail
@@ -53,9 +44,12 @@ Uso: hs <comando> [argumentos...]
 
 Comandos:
   system hostname|os|kernel|architecture|uptime|info
+  system memory|disk|cpu|load|services|backup|status
   service list
   service enable|disable|start|stop|restart|status|update <serviço>
   status
+  user create <nome> [--password=...] [--gitea]
+  user rm <nome> [--remove-folder]
 EOF
 }
 
@@ -72,6 +66,24 @@ case "${_command}" in
             kernel)         get_kernel ;;
             architecture)   get_architecture ;;
             uptime)         get_uptime ;;
+            load)           get_load ;;
+            memory)
+                printf '{"total":%s,"used":%s,"available":%s,"percent":%s}\n' \
+                    "$(get_memory_total)" "$(get_memory_used)" \
+                    "$(get_memory_available)" "$(get_memory_percent)"
+                ;;
+            disk)
+                printf '{"total":%s,"used":%s,"available":%s,"percent":%s}\n' \
+                    "$(get_disk_total)" "$(get_disk_used)" \
+                    "$(get_disk_available)" "$(get_disk_percent)"
+                ;;
+            cpu)
+                printf '{"percent":%s,"load":"%s"}\n' \
+                    "$(get_cpu_percent)" "$(get_load)"
+                ;;
+            services)       get_services_status_json; echo ;;
+            backup)         printf '{"last":"%s"}\n' "$(get_backup_last)" ;;
+            status)         system_status_json ;;
             info)           system_info_json ;;
             *)              _usage; exit 1 ;;
         esac
@@ -102,6 +114,26 @@ case "${_command}" in
             status)   application_status  "${3:?nome do serviço}" ;;
             update)   application_update  "${3:?nome do serviço}" ;;
             *)        _usage; exit 1 ;;
+        esac
+        ;;
+
+    user)
+        _subcommand="${2:-}"
+
+        case "${_subcommand}" in
+            create)
+                hs_user_create "${3:?nome do usuário}" "${@:4}"
+                ;;
+            list)
+                hs_user_list
+                ;;
+            rm)
+                hs_user_rm "${3:?nome do usuário}" "${@:4}"
+                ;;
+            *)
+                _usage
+                exit 1
+                ;;
         esac
         ;;
 
