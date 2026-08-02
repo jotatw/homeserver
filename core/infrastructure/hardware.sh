@@ -99,7 +99,7 @@ _hw_smart() {
 # Saúde/temperatura do disco via smartctl (JSON).
 #
 hw_disk_smart_json() {
-    local disk="${1:-sda}" raw temp realloc
+    local disk="${1:-sda}" raw temp realloc available
 
     raw="$(_hw_smart -A "/dev/${disk}" 2>/dev/null)"
     temp="$(printf '%s\n' "${raw}" | awk '/Temperature_Celsius/ {print $10}')"
@@ -140,7 +140,7 @@ hw_status_json() {
     printf '  "network": %s,\n' "$(hw_network_json)"
     printf '  "temperature": %s,\n' "$(hw_temperature_json)"
     printf '  "disks": %s,\n' "$(hw_disks_json)"
-    printf '  "disk_smart": %s,\n' "$(hw_disk_smart_json)"
+    printf '  "disk_smart": %s,\n' "$(hw_disk_smart_json "${HS_SMART_DISK:-sda}")"
     printf '  "usb": %s\n' "$(hw_usb_json)"
     printf '}\n'
 }
