@@ -8,7 +8,7 @@
 #
 # Objetivo.....:
 # Gerenciar usuários da plataforma:
-#   - cria pasta própria em /srv/data/users/<nome>
+#   - cria pasta própria em /srv/storage/users/<nome>
 #   - cria usuário FileBrowser com escopo na própria pasta
 #   - opcionalmente cria o usuário no Gitea (perfil OIDC)
 #

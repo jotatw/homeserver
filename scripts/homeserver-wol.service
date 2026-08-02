@@ -1,0 +1,14 @@
+[Unit]
+Description=Enable Wake-on-LAN on boot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/ethtool -s enp7s0 wol g
+ExecStartPost=/bin/touch /srv/scripts/.wol-enabled
+ExecStartPost=/bin/chown usuario:usuario /srv/scripts/.wol-enabled
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

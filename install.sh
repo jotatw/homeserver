@@ -75,9 +75,11 @@ _check_prerequisites() {
 _create_dirs() {
     mkdir -p "${DEPLOY_ROOT}" \
              /srv/docker/volumes \
-             /srv/data/shared \
-             /srv/data/media \
-             /srv/data/documents \
+             /srv/storage/users \
+             /srv/storage/shared \
+             /srv/storage/media \
+             /srv/storage/documents \
+             /srv/services \
              /srv/backup/daily \
              /srv/logs \
              /srv/scripts
@@ -136,7 +138,7 @@ _setup_samba() {
 
 [shared]
    comment = Arquivos Compartilhados
-   path = /srv/data/shared
+   path = /srv/storage/shared
    browseable = yes
    read only = no
    valid users = usuario
@@ -147,7 +149,7 @@ _setup_samba() {
 
 [media]
    comment = Mídia
-   path = /srv/data/media
+   path = /srv/storage/media
    browseable = yes
    read only = no
    valid users = usuario
@@ -158,7 +160,7 @@ _setup_samba() {
 
 [documents]
    comment = Documentos
-   path = /srv/data/documents
+   path = /srv/storage/documents
    browseable = yes
    read only = no
    valid users = usuario

@@ -83,6 +83,13 @@ case "${_command}" in
                 ;;
             services)       get_services_status_json; echo ;;
             backup)         printf '{"last":"%s"}\n' "$(get_backup_last)" ;;
+            wol)
+                case "${3:-status}" in
+                    status) wol_status ;;
+                    enable) wol_enable ;;
+                    *) echo "Uso: hs system wol status|enable" >&2; exit 1 ;;
+                esac
+                ;;
             status)         system_status_json ;;
             info)           system_info_json ;;
             *)              _usage; exit 1 ;;

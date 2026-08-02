@@ -1,7 +1,7 @@
 system_status_json() {
     local hostname os kernel arch uptime load cpu
     local mem_t mem_u mem_a mem_p disk_t disk_u disk_a disk_p
-    local services backup
+    local services backup wol
 
     hostname="$(get_hostname)"
     os="$(get_os)"
@@ -23,6 +23,7 @@ system_status_json() {
 
     services="$(get_services_status_json)"
     backup="$(get_backup_last)"
+    wol="$(wol_status)"
 
     printf '{\n'
     printf '  "hostname": "%s",\n' "${hostname}"
@@ -37,6 +38,7 @@ system_status_json() {
     printf '  "disk": { "total": %s, "used": %s, "available": %s, "percent": %s },\n' \
         "${disk_t}" "${disk_u}" "${disk_a}" "${disk_p}"
     printf '  "services": %s,\n' "${services}"
-    printf '  "backup": "%s"\n' "${backup}"
+    printf '  "backup": "%s",\n' "${backup}"
+    printf '  "wol": "%s"\n' "${wol}"
     printf '}\n'
 }
