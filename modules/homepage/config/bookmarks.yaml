@@ -5,25 +5,31 @@
         - GitHub:
             - abbr: GH
               href: https://github.com/
+              description: Código e repositórios
 
         - Gitea:
             - abbr: GT
               href: http://192.168.0.10:3001
+              description: Git do servidor
 
     - Social:
         - Reddit:
             - abbr: RE
               href: https://reddit.com/
+              description: Comunidades
 
         - YouTube:
             - abbr: YT
               href: https://youtube.com/
+              description: Vídeos
 
     - Servidor:
         - Homepage:
             - abbr: HP
               href: http://192.168.0.10:3000
+              description: Dashboard
 
         - FileBrowser:
             - abbr: FB
               href: http://192.168.0.10:8080
+              description: Arquivos
