@@ -95,6 +95,8 @@ _load_infrastructure() {
         users.sh \
         backup.sh \
         storage.sh \
+        devices.sh \
+        mounts.sh \
         system/architecture.sh \
         system/hostname.sh \
         system/kernel.sh \
