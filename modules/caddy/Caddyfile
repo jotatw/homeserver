@@ -1,4 +1,6 @@
-http://homeserver.local {
+homeserver.local {
+    tls internal
+
     # FileBrowser (remove /files)
     handle_path /files/* {
         reverse_proxy filebrowser:80

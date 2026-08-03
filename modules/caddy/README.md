@@ -55,3 +55,11 @@ apt install avahi-daemon
 # /etc/avahi/avahi-daemon.conf → [server] allow-interfaces=enp7s0
 systemctl restart avahi-daemon
 ```
+
+## HTTPS local
+
+O Caddy usa `tls internal` (certificado auto-assinado). O navegador exibirá
+um aviso de segurança na primeira visita — aceite o certificado para
+prosseguir. Acesso:
+
+- `https://homeserver.local` (HTTP redireciona para HTTPS)
