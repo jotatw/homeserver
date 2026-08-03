@@ -167,24 +167,31 @@ O FileBrowser utiliza `/srv/storage` como raiz.
 
 # Serviços
 
-| Serviço | Porta |
-|----------|------:|
-| Homepage | 3000 |
-| Gitea | 3001 |
-| Gitea SSH | 2222 |
-| FileBrowser | 8080 |
-| API | 8000 |
-| Samba | 445 |
-| Portainer | 9443 |
+| Serviço | Porta | Acesso unificado |
+|----------|------:|------------------|
+| Homepage | 3000 | `homeserver.local/` |
+| Gitea | 3001 | `homeserver.local/git` |
+| Gitea SSH | 2222 | `git@homeserver.local:2222` |
+| FileBrowser | 8080 | `homeserver.local/files` |
+| API | 8000 | `homeserver.local/api/v1` |
+| Samba | 445 | via rede |
+| Portainer | 9443 | módulo opcional |
 
-> **Planejamento futuro**
->
-> As portas serão substituídas por um Gateway único, permitindo acesso através de URLs amigáveis como:
->
-> - `homeserver.local`
-> - `homeserver.local/files`
-> - `homeserver.local/git`
-> - `homeserver.local/api`
+## Acesso unificado
+
+Todos os serviços são acessíveis por um **único ponto de entrada**:
+`http://homeserver.local` (resolvido via mDNS/Avahi na rede local).
+
+- `/` → Homepage
+- `/files` → FileBrowser
+- `/git` → Gitea
+- `/api/v1` → API
+
+O usuário nunca precisa conhecer portas ou endereços IP. O proxy (Caddy) é o
+módulo `modules/caddy/`.
+
+> **Autonomia local**: o HomeServer é totalmente utilizável dentro da rede
+> local, sem depender de serviços em nuvem.
 
 ---
 

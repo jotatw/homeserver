@@ -4,29 +4,29 @@
 
     - FileBrowser:
         icon: mdi-folder-open
-        href: http://192.168.0.10:8080
+        href: /files/
         description: Arquivos
 
     - Gitea:
         icon: sh-gitea
-        href: http://192.168.0.10:3001
+        href: /git/
         description: Projetos e repositórios
 
     - Projetos:
         icon: mdi-code-tags
-        href: http://192.168.0.10:3001
+        href: /git/
         description: Meus projetos
 
     - Downloads:
         icon: mdi-download
-        href: http://192.168.0.10:8080
+        href: /files/
         description: Downloads
 
 - Arquivos:
 
     - Meus Arquivos:
         icon: mdi-folder
-        href: http://192.168.0.10:8080
+        href: /files/
         description: Acesse seus arquivos
         widget:
           type: customapi
@@ -40,21 +40,21 @@
 
     - Projetos:
         icon: mdi-code-tags
-        href: http://192.168.0.10:3001
+        href: /git/
         description: Projetos e repositórios
 
 - Downloads:
 
     - Downloads:
         icon: mdi-download
-        href: http://192.168.0.10:8080
+        href: /files/
         description: Área de downloads
 
 - Mídia:
 
     - Mídia:
         icon: mdi-movie
-        href: http://192.168.0.10:8080/#/media
+        href: /files/#/media
         description: Arquivos de mídia
 
 # Modo Administrador — serviços e gestão
@@ -62,25 +62,25 @@
 
     - Homepage:
         icon: mdi-home
-        href: http://192.168.0.10:3000
+        href: /
         server: homeserver
         container: homepage
 
     - FileBrowser:
         icon: mdi-folder-open
-        href: http://192.168.0.10:8080
+        href: /files/
         server: homeserver
         container: filebrowser
 
     - Gitea:
         icon: sh-gitea
-        href: http://192.168.0.10:3001
+        href: /git/
         server: homeserver
         container: gitea
 
     - API:
         icon: mdi-api
-        href: http://192.168.0.10:8000/api/v1/status
+        href: /api/v1/status
         server: homeserver
         container: api-api-1
 
@@ -88,7 +88,7 @@
 
     - Usuários:
         icon: mdi-account-group
-        href: http://192.168.0.10:8080
+        href: /files/
         description: Gerencie usuários e permissões
 
     - Storage:
