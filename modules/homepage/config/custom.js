@@ -123,7 +123,7 @@
 (() => {
   if (document.getElementById("hs-power-btn")) return;
 
-  const BASE = window.location.origin;
+  const BASE = "http://192.168.1.10:8000";
 
   function powerFetch(url, opts) {
     return fetch(url, {
