@@ -1,4 +1,5 @@
 import Fastify from "fastify";
+import cors from "@fastify/cors";
 import { systemRoutes } from "./routes/system.js";
 import { userRoutes } from "./routes/users.js";
 import { storageRoutes } from "./routes/storage.js";
@@ -11,6 +12,11 @@ import { backupRoutes } from "./routes/backup.js";
 
 const app = Fastify({
     logger: true
+});
+
+await app.register(cors, {
+    origin: ["http://192.168.1.10:3000", /\.192\.168\.0\.10(:30)?$/],
+    methods: ["GET", "PUT", "POST", "DELETE", "OPTIONS"],
 });
 
 await app.register(systemRoutes);
