@@ -13,3 +13,11 @@
 - Sprint 3 (Dashboard): painel "Hoje" (eventos), favoritos
 - Sprint 6 (Performance): cache TTL na API
 - Sprint 7 (Polimento): documentação reorganizada (docs/ técnico + planning/ evolução), renomeado FOUNDATION.md, responsividade
+
+## v1.1 (Sprint 2-7)
+- Sprint 2 (Navegação): hover, feedback de clique, estados
+- Sprint 3 (Dashboard): painel "Hoje" (eventos), favoritos
+- Sprint 6 (Performance): cache TTL na API
+- Sprint 7 (Polimento): documentação reorganizada, renomeado FOUNDATION.md, responsividade
+- Agendamento liga/desliga (CORS, botão ⚡, Persistent=false)
+- CHANGELOG [1.1], tag v1.1.0, release
