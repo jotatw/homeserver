@@ -29,3 +29,4 @@
 - FileBrowser baseURL=/files, Gitea ROOT_URL=/git
 - Homepage com hrefs relativos
 - UFW 80/443
+- Validação em desktop e mobile (mDNS homeserver.local)

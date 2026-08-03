@@ -180,7 +180,8 @@ O FileBrowser utiliza `/srv/storage` como raiz.
 ## Acesso unificado
 
 Todos os serviços são acessíveis por um **único ponto de entrada**:
-`http://homeserver.local` (resolvido via mDNS/Avahi na rede local).
+`https://homeserver.local` (resolvido via mDNS/Avahi na rede local; HTTP
+redireciona para HTTPS — certificado auto-assinado).
 
 - `/` → Homepage
 - `/files` → FileBrowser
