@@ -44,3 +44,14 @@ docker compose pull && docker compose up -d
 ## Backup
 
 Backup do volume `caddy_data` (certificados/estado).
+
+## mDNS (Avahi)
+
+Para `homeserver.local` resolver na LAN, o host precisa do Avahi restrito à
+interface de rede local:
+
+```bash
+apt install avahi-daemon
+# /etc/avahi/avahi-daemon.conf → [server] allow-interfaces=enp7s0
+systemctl restart avahi-daemon
+```
