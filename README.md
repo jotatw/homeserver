@@ -186,6 +186,7 @@ redireciona para HTTPS — certificado auto-assinado).
 - `/` → Homepage
 - `/files` → FileBrowser
 - `/git` → Gitea
+- `/app` → HomeServer App (administração)
 - `/api/v1` → API
 
 O usuário nunca precisa conhecer portas ou endereços IP. O proxy (Caddy) é o
