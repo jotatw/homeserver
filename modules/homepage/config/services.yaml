@@ -165,6 +165,21 @@
             name: label
             label: temp
 
+    - Agendamento:
+        id: power-schedule
+        icon: mdi-power-settings
+        widget:
+          type: customapi
+          url: http://api:8000/api/v1/power
+          refreshInterval: 30000
+          mappings:
+            - field: shutdown
+              label: Desliga
+            - field: wake
+              label: Liga
+            - field: enabled
+              label: Ativo
+
     - Server:
         id: server-status
         icon: mdi-server

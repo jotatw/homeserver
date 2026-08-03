@@ -5,6 +5,7 @@ import { storageRoutes } from "./routes/storage.js";
 import { servicesRoutes } from "./routes/services.js";
 import { devicesRoutes } from "./routes/devices.js";
 import { eventsRoutes } from "./routes/events.js";
+import { powerRoutes } from "./routes/power.js";
 import { hardwareRoutes } from "./routes/hardware.js";
 import { backupRoutes } from "./routes/backup.js";
 
@@ -18,6 +19,7 @@ await app.register(storageRoutes);
 await app.register(servicesRoutes);
 await app.register(devicesRoutes);
 await app.register(eventsRoutes);
+await app.register(powerRoutes);
 await app.register(hardwareRoutes);
 await app.register(backupRoutes);
 

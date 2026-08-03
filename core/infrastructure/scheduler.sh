@@ -25,6 +25,17 @@
 readonly HS_SCHEDULER_CONF="${HS_PROJECT_ROOT}/config/scheduler.conf"
 
 #
+# sudo apenas quando não-root.
+#
+_sdo() {
+    if [[ "$(id -u)" -eq 0 ]]; then
+        "$@"
+    else
+        sudo "$@"
+    fi
+}
+
+#
 # Lista as tarefas definidas (ignora comentários/vazios).
 #
 scheduler_tasks() {
@@ -48,7 +59,7 @@ scheduler_init() {
     while IFS='|' read -r name schedule command; do
         [[ -n "${name}" ]] || continue
 
-        sudo tee "/etc/systemd/system/hs-task-${name}.service" >/dev/null <<EOF
+        _sdo tee "/etc/systemd/system/hs-task-${name}.service" >/dev/null <<EOF
 [Unit]
 Description=HomeServer Task: ${name}
 
@@ -57,7 +68,7 @@ Type=oneshot
 ExecStart=/bin/bash -c '${command}'
 EOF
 
-        sudo tee "/etc/systemd/system/hs-task-${name}.timer" >/dev/null <<EOF
+        _sdo tee "/etc/systemd/system/hs-task-${name}.timer" >/dev/null <<EOF
 [Unit]
 Description=HomeServer Timer: ${name}
 
@@ -70,7 +81,7 @@ WantedBy=timers.target
 EOF
     done < <(scheduler_tasks)
 
-    sudo systemctl daemon-reload
+    _sdo systemctl daemon-reload
 }
 
 #
@@ -96,19 +107,19 @@ scheduler_list() {
 # Ativa uma tarefa.
 #
 scheduler_enable() {
-    sudo systemctl enable --now "hs-task-$1.timer"
+    _sdo systemctl enable --now "hs-task-$1.timer"
 }
 
 #
 # Desativa uma tarefa.
 #
 scheduler_disable() {
-    sudo systemctl disable --now "hs-task-$1.timer" 2>/dev/null || true
+    _sdo systemctl disable --now "hs-task-$1.timer" 2>/dev/null || true
 }
 
 #
 # Executa uma tarefa imediatamente.
 #
 scheduler_run() {
-    sudo systemctl start "hs-task-$1.service"
+    _sdo systemctl start "hs-task-$1.service"
 }
