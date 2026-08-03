@@ -54,10 +54,11 @@ scheduler_task_enabled() {
 # Gera os units systemd a partir do config (idempotente).
 #
 scheduler_init() {
-    local line name schedule command
+    local line name schedule command persistent
 
-    while IFS='|' read -r name schedule command; do
+    while IFS='|' read -r name schedule command persistent; do
         [[ -n "${name}" ]] || continue
+        [[ -n "${persistent}" ]] || persistent="true"
 
         _sdo tee "/etc/systemd/system/hs-task-${name}.service" >/dev/null <<EOF
 [Unit]
@@ -74,7 +75,7 @@ Description=HomeServer Timer: ${name}
 
 [Timer]
 OnCalendar=${schedule}
-Persistent=true
+Persistent=${persistent}
 
 [Install]
 WantedBy=timers.target
@@ -88,10 +89,11 @@ EOF
 # Lista as tarefas com estado.
 #
 scheduler_list() {
-    local line name schedule command state
+    local line name schedule command persistent state
 
-    while IFS='|' read -r name schedule command; do
+    while IFS='|' read -r name schedule command persistent; do
         [[ -n "${name}" ]] || continue
+        [[ -n "${persistent}" ]] || persistent="true"
 
         if scheduler_task_enabled "${name}"; then
             state="[ATIVO]"
@@ -99,7 +101,7 @@ scheduler_list() {
             state="[inativo]"
         fi
 
-        printf "  %-9s %-12s %-24s %s\n" "${state}" "${name}" "${schedule}" "${command}"
+        printf "  %-9s %-12s %-22s %-6s %s\n" "${state}" "${name}" "${schedule}" "pers=${persistent}" "${command}"
     done < <(scheduler_tasks)
 }
 

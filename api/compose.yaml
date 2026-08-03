@@ -17,6 +17,7 @@ services:
       - /dev:/dev:ro
       - /srv/storage:/srv/storage:ro
       - /srv/backup:/srv/backup:ro
+    restart: unless-stopped
     command: npm run dev
     ports:
       - "8000:8000"

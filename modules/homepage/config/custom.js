@@ -121,8 +121,6 @@
  * Power Schedule Editor
  * ────────────────────────── */
 (() => {
-  if (document.getElementById("hs-power-btn")) return;
-
   const BASE = "http://192.168.0.10:8000";
 
   function powerFetch(url, opts) {
@@ -131,14 +129,6 @@
       headers: { "Content-Type": "application/json", ...opts?.headers },
     }).then((r) => r.json());
   }
-
-  /* Botão ⚡ no seletor de modo */
-  const btn = document.createElement("button");
-  btn.id = "hs-power-btn";
-  btn.className = "hs-mode-btn";
-  btn.textContent = "⚡";
-  btn.title = "Agendamento liga/desliga";
-  document.querySelector(".hs-mode-selector")?.appendChild(btn);
 
   /* Overlay modal */
   const overlay = document.createElement("div");
@@ -163,14 +153,30 @@
     </div>`;
   document.body.appendChild(overlay);
 
-  /* Eventos */
-  btn.addEventListener("click", () => {
+  function openPower() {
     powerFetch(BASE + "/api/v1/power").then((d) => {
       document.getElementById("hs-power-shutdown").value = d.shutdown || "23:30";
       document.getElementById("hs-power-wake").value = d.wake || "07:00";
     });
     overlay.style.display = "flex";
-  });
+  }
+
+  /* Botão ⚡ — criado quando o seletor de modos existir */
+  function ensurePowerButton() {
+    if (document.getElementById("hs-power-btn")) return;
+    const selector = document.querySelector(".hs-mode-selector");
+    if (!selector) return;
+
+    const btn = document.createElement("button");
+    btn.id = "hs-power-btn";
+    btn.className = "hs-mode-btn";
+    btn.textContent = "⚡";
+    btn.title = "Agendamento liga/desliga";
+    btn.addEventListener("click", openPower);
+    selector.appendChild(btn);
+  }
+
+  /* Eventos do modal */
   document.getElementById("hs-power-close").addEventListener("click", () => {
     overlay.style.display = "none";
   });
@@ -205,4 +211,17 @@
       })
       .catch((e) => { msg.textContent = "Erro: " + e.message; });
   });
+
+  /* Cria o botão quando o seletor de modos estiver pronto */
+  function boot() {
+    ensurePowerButton();
+    setTimeout(ensurePowerButton, 500);
+    setTimeout(ensurePowerButton, 2000);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
 })();
