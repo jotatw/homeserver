@@ -9,6 +9,7 @@ import { eventsRoutes } from "./routes/events.js";
 import { powerRoutes } from "./routes/power.js";
 import { hardwareRoutes } from "./routes/hardware.js";
 import { backupRoutes } from "./routes/backup.js";
+import { appRoutes } from "./routes/app.js";
 
 const app = Fastify({
     logger: true
@@ -35,6 +36,7 @@ await app.register(eventsRoutes);
 await app.register(powerRoutes);
 await app.register(hardwareRoutes);
 await app.register(backupRoutes);
+await app.register(appRoutes);
 
 await app.listen({
     host: "0.0.0.0",
