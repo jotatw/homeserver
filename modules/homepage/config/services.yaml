@@ -91,6 +91,11 @@
         href: /files/
         description: Gerencie usuários e permissões
 
+    - App:
+        icon: mdi-monitor-dashboard
+        href: /app
+        description: Administração (HomeServer App)
+
     - Storage:
         id: storage-status
         icon: mdi-harddisk
