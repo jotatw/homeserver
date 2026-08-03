@@ -3,24 +3,31 @@
 Todas as mudanças notáveis no HomeServer são documentadas neste arquivo.
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
-## [Unreleased] — v1.1
+## [1.1] — 2026-08-03
 
 ### Fixed
 
 - **Storage**: card exibia `NaN` (causa: `format: size` do customapi para números). Corrigido com contagens da API e `format: number`.
 - **Bookmarks**: erro `URL constructor: undefined` (causa: bookmarks sem `description` disparam `new URL(href)`). Adicionadas descriptions.
 - **Links/ícones**: revisão completa de hrefs e ícones.
+- **Agendamento liga/desliga**: CORS na API (preflight 404), botão ⚡ com timing correto, `Persistent=false` no timer `night-off` (evita catch-up) e `restart: unless-stopped` no container da API.
 
 ### Changed
 
+- **Navegação**: hover, feedback de clique e responsividade.
 - Card **Storage** com contadores fixos (Usuários, Compartilhado, Mídia, Documentos).
 - Card **Meus Arquivos** mostra espaço utilizado.
 - Card **Dispositivos** (preview) no modo Sistema.
+- **Documentação**: reorganizada em `docs/` (técnica) e `planning/` (evolução).
 
 ### Added
 
-- `planning/` com roadmap (v1.1, v1.2, v2.0) e product backlog numerado.
-- API `storage_status_json` com contagens e `total_size_human`.
+- **Painel "Hoje"**: `GET /api/v1/events` (backup, dispositivo, boot) + card no modo Sistema.
+- **Favoritos**: grupo de acesso rápido configurável.
+- **Agendamento na Homepage**: `GET/PUT /api/v1/power` + modal ⚡ para configurar horários.
+- **Cache TTL** na API (status ~10s; chamadas repetidas ~160x mais rápidas).
+- **Planejamento**: `planning/vision.md`, `planning/strategy.md`, `planning/roadmap/`, `planning/backlog/`.
+- **PRINCIPLES.md**: regras de maturidade e definição oficial de Módulo.
 
 ## [1.0] — 2026-08-02
 

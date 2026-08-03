@@ -203,6 +203,9 @@ A API é a interface oficial do HomeServer.
 | POST | `/api/v1/users` |
 | PUT | `/api/v1/users/:nome` |
 | DELETE | `/api/v1/users/:nome` |
+| GET | `/api/v1/events` |
+| GET | `/api/v1/power` |
+| PUT | `/api/v1/power` |
 | POST | `/api/v1/backup` |
 
 Mais detalhes em `api/README.md`.

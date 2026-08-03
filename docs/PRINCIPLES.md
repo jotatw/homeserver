@@ -62,6 +62,37 @@ núcleo.
 A falha de um módulo não pode derrubar a plataforma. O Core permanece
 funcional e o estado do módulo indisponível é apenas reportado.
 
+## 11. Maturidade antes de novas funcionalidades.
+
+Nenhuma nova funcionalidade entra antes que a anterior esteja realmente
+utilizável. Uma versão só é entregue quando o que ela promete funciona de fato.
+
+## 12. Melhorias perceptíveis.
+
+Cada nova versão deve entregar melhorias perceptíveis ao usuário. Se o
+usuário não percebe a diferença ao abrir a Homepage, a versão não está pronta.
+
+## 13. Estabilidade sobre quantidade.
+
+Arquitetura estável é mais importante que quantidade de funcionalidades.
+Mudanças estruturais são evitadas após a consolidação da arquitetura.
+
+---
+
+## Definição de Módulo
+
+> Um módulo é qualquer componente que possa ser **instalado, atualizado ou
+> removido sem alterar a Foundation nem a Infrastructure** do HomeServer.
+
+| Item | É módulo? |
+|------|-----------|
+| Homepage, FileBrowser, Gitea, Jellyfin, Caddy | ✅ módulo |
+| Telegram, GitHub, Discord | ❌ adaptador |
+| Storage, Users, Devices | ❌ Infrastructure |
+
+Esta definição diferencia os **módulos de produto** (`modules/`) das camadas
+do Core (`core/foundation`, `core/infrastructure`, `core/adapters`).
+
 ---
 
 > Estes princípios orientam todas as decisões de arquitetura do HomeServer.
