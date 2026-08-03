@@ -62,6 +62,8 @@ Comandos:
   automation run <evento>
   scheduler init|list
   scheduler enable|disable|run <tarefa>
+  power status|enable|disable
+  power set <desliga HH:MM> <liga HH:MM>
 EOF
 }
 
@@ -217,6 +219,18 @@ case "${_command}" in
             enable)  scheduler_enable "${3:?tarefa}" ;;
             disable) scheduler_disable "${3:?tarefa}" ;;
             run)     scheduler_run "${3:?tarefa}" ;;
+            *)       _usage; exit 1 ;;
+        esac
+        ;;
+
+    power)
+        _subcommand="${2:-}"
+
+        case "${_subcommand}" in
+            status)  power_status_json ;;
+            enable)  power_enable ;;
+            disable) power_disable ;;
+            set)     power_set "${3:?desliga HH:MM}" "${4:?liga HH:MM}" ;;
             *)       _usage; exit 1 ;;
         esac
         ;;
