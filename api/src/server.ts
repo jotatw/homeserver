@@ -15,7 +15,12 @@ const app = Fastify({
 });
 
 await app.register(cors, {
-    origin: ["http://192.168.1.10:3000", /\.192\.168\.0\.10(:30)?$/],
+    origin: [
+        "http://192.168.1.10:3000",
+        "http://homeserver.local",
+        "http://homeserver.local:80",
+        /\.192\.168\.0\.10(:30)?$/,
+    ],
     methods: ["GET", "PUT", "POST", "DELETE", "OPTIONS"],
 });
 

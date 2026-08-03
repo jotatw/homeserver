@@ -21,3 +21,11 @@
 - Sprint 7 (Polimento): documentação reorganizada, renomeado FOUNDATION.md, responsividade
 - Agendamento liga/desliga (CORS, botão ⚡, Persistent=false)
 - CHANGELOG [1.1], tag v1.1.0, release
+
+## v1.2 Unified Access
+- mDNS/Avahi (homeserver.local)
+- Módulo Caddy (modules/caddy/)
+- Rotas path-based: /files, /git, /api/v1
+- FileBrowser baseURL=/files, Gitea ROOT_URL=/git
+- Homepage com hrefs relativos
+- UFW 80/443

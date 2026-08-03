@@ -121,7 +121,10 @@
  * Power Schedule Editor
  * ────────────────────────── */
 (() => {
-  const BASE = "http://192.168.1.10:8000";
+  const BASE =
+    window.location.hostname === "homeserver.local"
+      ? ""
+      : "http://192.168.1.10:8000";
 
   function powerFetch(url, opts) {
     return fetch(url, {

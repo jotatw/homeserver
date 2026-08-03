@@ -1,0 +1,21 @@
+http://homeserver.local {
+    # FileBrowser (remove /files)
+    handle_path /files/* {
+        reverse_proxy filebrowser:80
+    }
+
+    # Gitea (remove /git)
+    handle_path /git/* {
+        reverse_proxy gitea:3000
+    }
+
+    # API do HomeServer (preserva /api/v1)
+    handle /api/v1* {
+        reverse_proxy api:8000
+    }
+
+    # Homepage (padrão)
+    handle {
+        reverse_proxy homepage:3000
+    }
+}
