@@ -19,6 +19,8 @@ await app.register(cors, {
         "http://192.168.0.10:3000",
         "http://homeserver.local",
         "http://homeserver.local:80",
+        "https://homeserver.local",
+        "https://homeserver.local:443",
         /\.192\.168\.0\.10(:30)?$/,
     ],
     methods: ["GET", "PUT", "POST", "DELETE", "OPTIONS"],

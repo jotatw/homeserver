@@ -3,8 +3,23 @@
 Todas as mudanças notáveis no HomeServer são documentadas neste arquivo.
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
-## [1.1] — 2026-08-03
+## [1.2] — 2026-08-03
 
+### Added
+
+- **Unified Access**: módulo Caddy (reverse proxy) com um único ponto de
+  entrada `homeserver.local`.
+- **mDNS/Avahi**: `homeserver.local` resolve na LAN (validado em desktop e mobile).
+- Rotas path-based: `/` (Homepage), `/files` (FileBrowser), `/git` (Gitea),
+  `/api/v1` (API).
+- FileBrowser com `baseURL=/files` e Gitea com `ROOT_URL=/git`.
+- Homepage com hrefs relativos; API com CORS para `homeserver.local`.
+
+### Changed
+
+- O usuário não precisa mais conhecer portas ou endereços IP.
+
+## [1.1] — 2026-08-03
 ### Fixed
 
 - **Storage**: card exibia `NaN` (causa: `format: size` do customapi para números). Corrigido com contagens da API e `format: number`.
