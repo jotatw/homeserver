@@ -30,3 +30,9 @@
 - Homepage com hrefs relativos
 - UFW 80/443
 - Validação em desktop e mobile (mDNS homeserver.local)
+
+## v2.0 Ecossistema (início)
+- HomeServer App (app/ servido pela API em /app)
+- Rota /app no Caddy (homeserver.local/app)
+- Views: Dashboard, Storage, Usuários, Serviços, Dispositivos
+- Link na Homepage (modo Administrador)
