@@ -229,6 +229,40 @@ Mais detalhes em `api/README.md`.
 sudo bash install.sh
 ```
 
+## Releases e atualização automática
+
+O projeto é versionado por **tags git** (`vX.Y.Z`). Cada implementação é
+lançada como uma release publicada no GitHub e no Gitea.
+
+O HomeServer tem um sistema de **auto-update** integrado ao CLI:
+
+```bash
+# Versão atual instalada
+bash core/hs.sh version
+
+# Verifica se há release mais recente disponível
+bash core/hs.sh update check
+# => {"current":"v1.3.0","latest":"v1.3.0","update":no}
+
+# Aplica a atualização para a release mais recente
+bash core/hs.sh update apply
+```
+
+O `update apply`:
+
+1. Faz backup do estado atual (tag `pre-update-<versão>`).
+2. Atualiza o código via `git pull --ff-only origin main`.
+3. Reimplanta os módulos (`install.sh`) quando necessário.
+
+Para atualizar **sem reimplantar** módulos:
+
+```bash
+bash core/hs.sh update apply --no-redeploy
+```
+
+> O servidor acompanha a branch `main`, que contém todas as releases.
+> As tags servem de marcador de release e ponto de rollback.
+
 ## CLI
 
 ```bash
@@ -237,6 +271,10 @@ bash core/hs.sh system status
 bash core/hs.sh service list
 
 bash core/hs.sh user list
+
+bash core/hs.sh version
+
+bash core/hs.sh update check
 ```
 
 ## Testes
