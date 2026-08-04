@@ -158,5 +158,12 @@ document.querySelectorAll("nav button").forEach((b) => {
   });
   header.appendChild(sair);
 
+  // Exibe a versão instalada no header
+  try {
+    const v = await api("/api/v1/version");
+    const badge = el("span", { id: "ver-badge" }, "v" + v.version);
+    header.insertBefore(badge, sair);
+  } catch (_) {}
+
   show("dashboard");
 })();
