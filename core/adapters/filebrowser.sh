@@ -111,3 +111,28 @@ filebrowser_update_password() {
         -H "Content-Type: application/json" \
         -d "{\"what\":\"user\",\"which\":[\"password\"],\"current_password\":\"${FILEBROWSER_ADMIN_PASS}\",\"data\":{\"id\":${id},\"password\":\"${password}\"}}" >/dev/null
 }
+
+#
+# Verifica as credenciais de um usuário comum no FileBrowser.
+#
+# Uso:
+#   filebrowser_verify_user <username> <password>
+#
+# Retorno:
+#   0 -> Credenciais válidas
+#   1 -> Inválidas / falha
+#
+filebrowser_verify_user() {
+    local username="$1"
+    local password="$2"
+
+    [[ -n "${username}" && -n "${password}" ]] || return 1
+
+    local status
+    status="$(curl -sS -m 10 -o /dev/null -w "%{http_code}" \
+        -X POST "${FILEBROWSER_URL}/api/login" \
+        -H "Content-Type: application/json" \
+        -d "{\"username\":\"${username}\",\"password\":\"${password}\"}")" 2>/dev/null
+
+    [[ "${status}" == "200" ]]
+}
