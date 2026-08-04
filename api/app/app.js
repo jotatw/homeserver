@@ -1,5 +1,3 @@
-const API = "";
-
 const views = {
   dashboard: renderDashboard,
   storage: renderStorage,
@@ -7,12 +5,6 @@ const views = {
   services: renderServices,
   devices: renderDevices,
 };
-
-async function api(path) {
-  const r = await fetch(API + path);
-  if (!r.ok) throw new Error("HTTP " + r.status);
-  return r.json();
-}
 
 function el(tag, attrs = {}, ...children) {
   const e = document.createElement(tag);
@@ -152,4 +144,19 @@ document.querySelectorAll("nav button").forEach((b) => {
   b.addEventListener("click", () => show(b.dataset.view));
 });
 
-show("dashboard");
+(async function init() {
+  if (!(await auth.check())) {
+    window.location.href = "/app/login.html";
+    return;
+  }
+
+  const header = document.querySelector("header");
+  const sair = el("button", { id: "btn-sair" }, "Sair");
+  sair.addEventListener("click", async () => {
+    await auth.logout();
+    window.location.href = "/app/login.html";
+  });
+  header.appendChild(sair);
+
+  show("dashboard");
+})();

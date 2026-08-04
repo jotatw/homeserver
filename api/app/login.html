@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — HomeServer</title>
+  <link rel="stylesheet" href="/app/style.css">
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: #0f172a;
+    }
+    .login-box {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 2rem;
+      width: 320px;
+    }
+    .login-box h1 { margin: 0 0 0.25rem; font-size: 1.3rem; }
+    .login-box p { color: #94a3b8; font-size: 0.9rem; margin: 0 0 1.5rem; }
+    .login-box label { display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.3rem; }
+    .login-box input {
+      width: 100%;
+      padding: 0.6rem 0.8rem;
+      margin-bottom: 1rem;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      color: #e2e8f0;
+      font-size: 0.95rem;
+    }
+    .login-box button {
+      width: 100%;
+      padding: 0.65rem;
+      background: #2563eb;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+    .login-box button:hover { background: #1d4ed8; }
+    .error { color: #f87171; font-size: 0.85rem; margin: 0.5rem 0; min-height: 1rem; }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h1>HomeServer</h1>
+    <p>Entre para acessar o painel</p>
+    <div class="error" id="error"></div>
+    <form id="login-form">
+      <label for="username">Usuário</label>
+      <input id="username" name="username" autocomplete="username" autofocus required>
+      <label for="password">Senha</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required>
+      <button type="submit">Entrar</button>
+    </form>
+  </div>
+  <script src="/app/auth.js"></script>
+  <script>
+    (async function () {
+      if (await auth.check()) {
+        window.location.href = "/app";
+        return;
+      }
+    })();
+
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const err = document.getElementById("error");
+      err.textContent = "";
+      try {
+        await auth.login(
+          document.getElementById("username").value,
+          document.getElementById("password").value,
+        );
+        window.location.href = "/app";
+      } catch (ex) {
+        err.textContent = ex.message;
+      }
+    });
+  </script>
+</body>
+</html>
