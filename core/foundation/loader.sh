@@ -102,6 +102,7 @@ _load_infrastructure() {
         automation.sh \
         scheduler.sh \
         power.sh \
+        update.sh \
         system/architecture.sh \
         system/hostname.sh \
         system/kernel.sh \
