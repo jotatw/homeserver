@@ -230,3 +230,20 @@ hs_user_rm() {
     export HS_USER_NAME="${username}"
     automation_run users >/dev/null 2>&1 || true
 }
+
+#
+# Verifica as credenciais de um usuário (senha válida no FileBrowser).
+#
+# Uso:
+#   hs_user_verify <nome> <senha>
+#
+# Retorno:
+#   0 -> Credenciais válidas
+#   1 -> Inválidas
+#
+hs_user_verify() {
+    local username="${1:?nome do usuário}"
+    local password="${2:?senha}"
+
+    filebrowser_verify_user "${username}" "${password}"
+}
