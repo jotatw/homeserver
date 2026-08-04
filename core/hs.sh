@@ -53,6 +53,7 @@ Comandos:
   user info <nome>
   user password <nome> [--password=...]
   user verify <nome> <senha>
+  user is-admin <nome>
   user rm <nome> [--remove-folder] [--gitea]
   device list|status|usb
   device mount <tipo> <rótulo> <dispositivo>
@@ -166,6 +167,10 @@ case "${_command}" in
             verify)
                 hs_user_verify "${3:?nome do usuário}" "${4:?senha}"
                 ;;
+            is-admin)
+                hs_user_is_admin "${3:?nome do usuário}"
+                ;;
+
 
             rm)
                 hs_user_rm "${3:?nome do usuário}" "${@:4}"
