@@ -1,5 +1,8 @@
-/* HomeServer — modos de exibição */
+/* ==========================================================
+   HomeServer — v1.4.1 Layout
+   ========================================================== */
 
+/* Modos de exibição */
 .hs-mode-selector {
   position: fixed;
   top: 0.9rem;
@@ -37,28 +40,7 @@
   color: #ffffff;
 }
 
-@media (max-width: 640px) {
-  .hs-mode-btn {
-    font-size: 0.65rem;
-    padding: 4px 8px;
-  }
-}
-
-@media (max-width: 480px) {
-  .hs-mode-selector {
-    top: 0.4rem;
-    right: 0.4rem;
-    gap: 1px;
-    padding: 2px;
-  }
-  .hs-mode-btn {
-    font-size: 0.58rem;
-    padding: 3px 7px;
-  }
-}
-
-/* HomeServer — navegação (Sprint 2) */
-
+/* Navegação */
 .service-card {
   transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
@@ -92,4 +74,96 @@
 
 .hs-toast.show {
   opacity: 1;
+}
+
+/* ==========================================================
+   v1.4.1 — Layout compacto
+   ========================================================== */
+
+/* Header mais baixo */
+.header-bar {
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+}
+
+.widget-container {
+  margin: 0 !important;
+}
+
+/* Reduz altura dos cards */
+.services-group .service-card,
+.group-card,
+[class*="group"] [class*="card"] {
+  min-height: 0 !important;
+}
+
+/* Espaçamento entre grupos: maior; dentro dos cards: menor */
+main [class*="section"],
+.services-group,
+.section-wrapper,
+[class*="group"] {
+  margin-bottom: 1.5rem !important;
+}
+
+/* Rodapé */
+.hs-footer {
+  margin-top: 2.5rem;
+  padding: 1rem 1.5rem 1.5rem;
+  text-align: center;
+  color: #64748b;
+  font-size: 0.75rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.hs-footer .hs-footer-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.hs-footer .hs-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+.hs-footer .hs-dot.ok {
+  background: #22c55e;
+}
+
+.hs-footer .hs-dot.warn {
+  background: #eab308;
+}
+
+.hs-footer .hs-dot.err {
+  background: #ef4444;
+}
+
+/* Responsivo */
+@media (max-width: 640px) {
+  .hs-mode-btn {
+    font-size: 0.65rem;
+    padding: 4px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hs-mode-selector {
+    top: 0.4rem;
+    right: 0.4rem;
+    gap: 1px;
+    padding: 2px;
+  }
+  .hs-mode-btn {
+    font-size: 0.58rem;
+    padding: 3px 7px;
+  }
+  .hs-footer {
+    padding: 0.75rem 1rem 1rem;
+  }
 }
