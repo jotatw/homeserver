@@ -15,6 +15,9 @@ if [[ "${today_epoch}" -gt "${now}" ]]; then
 fi
 
 log "Agendando religamento para $(date -d "@${wake_epoch}" '+%F %T')"
-log "Desligando o servidor"
+log "Suspendendo o servidor (S3)"
 
-/usr/sbin/rtcwake -m off -t "${wake_epoch}"
+# Usa suspend (S3) em vez de desligar (S5): o RTC deste hardware
+# não gera IRQ de alarme para acordar do poweroff, mas funciona
+# do suspend-to-RAM. O rtcwake exibe o wake time em UTC.
+/usr/sbin/rtcwake -m mem -t "${wake_epoch}"
