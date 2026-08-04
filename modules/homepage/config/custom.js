@@ -3,17 +3,17 @@
     {
       id: "user",
       label: "Usuário",
-      groups: ["Favoritos", "Arquivos", "Projetos", "Downloads", "Mídia"],
+      groups: ["Meu espaço", "Aplicações"],
     },
     {
       id: "admin",
       label: "Administrador",
-      groups: ["Favoritos", "Arquivos", "Projetos", "Downloads", "Mídia", "Serviços", "Gestão"],
+      groups: ["Meu espaço", "Aplicações", "Administração"],
     },
     {
       id: "system",
       label: "Sistema",
-      groups: ["Arquivos", "Projetos", "Downloads", "Mídia", "Serviços", "Gestão", "Manutenção"],
+      groups: ["Meu espaço", "Aplicações", "Administração", "Sistema"],
     },
   ];
 

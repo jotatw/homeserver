@@ -3,24 +3,32 @@
 Todas as mudanças notáveis no HomeServer são documentadas neste arquivo.
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
+## [1.4.0] — 2026-08-04
+
+### Added
+
+- **Roadmap de UX oficial** (`planning/roadmap/v1.4-ux.md`): Homepage como
+  portal de entrada; critérios para novos cards; design principles.
+- Homepage reorganizada em 4 grupos: **Meu espaço**, **Aplicações**,
+  **Administração** e **Sistema**.
+- Modos atualizados: Usuário (Meu espaço + Aplicações), Administrador
+  (+ Administração), Sistema (+ Sistema).
+- Removidos os grupos "Favoritos" e "Links" (redundância/conteúdo quebrado).
+
+### Changed
+
+- Widgets técnicos (storage, events, status, devices, hardware, power) movidos
+  exclusivamente para o grupo **Sistema** — eliminada a redundância de
+  CPU/Memória/Rede nos cards de aplicações.
+- Cards de aplicações agora exibem apenas status (● Online/Offline).
+
+## [1.3] — 2026-08-04
+
 ### Added
 
 - **Auto-update**: `hs version`, `hs update check` e `hs update apply`
   (pull fast-forward + backup via tag `pre-update-*` + reimplante opcional).
 - `update.sh` registrado no core; comandos expostos no CLI `hs`.
-
-### Fixed
-
-- **Religamento automático**: `power-schedule.sh` agora usa `rtcwake -m mem`
-  (suspend-to-RAM) em vez de `-m off` (poweroff). O RTC deste hardware não
-  gera IRQ de alarme para acordar do S5, mas funciona do S3.
-  Obs.: o rtcwake exibe o wake time em UTC (+3h local); o epoch está correto.
-
-## [1.3] — 2026-08-04
-
-
-### Added
-
 - **Autenticação**: login/logout/sessão com token (TTL 24h) na API.
 - Validação de credenciais via FileBrowser (fonte de verdade de usuários).
 - Proteção de rotas: admin (users, power, hardware, backup) e login (storage,
@@ -31,10 +39,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
 ### Fixed
 
+- **Religamento automático**: `power-schedule.sh` agora usa `rtcwake -m mem`
+  (suspend-to-RAM) em vez de `-m off` (poweroff). O RTC deste hardware não
+  gera IRQ de alarme para acordar do S5, mas funciona do S3.
+  Obs.: o rtcwake exibe o wake time em UTC (+3h local); o epoch está correto.
 - `hs_user_is_admin` não dependia mais de python3 (indisponível no container).
 
 ## [1.2] — 2026-08-03
-
 
 ### Added
 
