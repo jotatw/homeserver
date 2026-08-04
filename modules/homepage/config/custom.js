@@ -50,6 +50,32 @@
     });
 
     setActiveButton(mode.id);
+    highlightApp();
+  }
+
+  // Destaque do HomeServer App como ação principal (v1.4.3)
+  function highlightApp() {
+    document.querySelectorAll(".service-card").forEach((card) => {
+      const nameEl = card.querySelector(".service-card-name, .name, [class*='name']");
+      const text = card.textContent || "";
+      const isApp = /HomeServer App/i.test(text);
+      card.classList.toggle("hs-app-cta", isApp);
+    });
+  }
+
+  // Atalho "Abrir App" no seletor de modos — reduz cliques (v1.4.3)
+  function buildAppShortcut() {
+    if (document.getElementById("hs-app-shortcut")) return;
+    const selector = document.querySelector(".hs-mode-selector");
+    if (!selector) return;
+
+    const link = document.createElement("a");
+    link.id = "hs-app-shortcut";
+    link.className = "hs-mode-btn hs-app-shortcut";
+    link.href = "/app";
+    link.textContent = "Abrir App";
+    link.title = "Administração — HomeServer App";
+    selector.appendChild(link);
   }
 
   function buildSelector() {
@@ -75,6 +101,7 @@
 
   function init() {
     buildSelector();
+    buildAppShortcut();
     applyMode(getMode());
     buildFooter();
   }
@@ -155,6 +182,7 @@
 
     const observer = new MutationObserver(() => {
       if (document.querySelectorAll(".services-group .service-group-name").length > 0) {
+        buildAppShortcut();
         applyMode(getMode());
         attachClickFeedback();
       }
