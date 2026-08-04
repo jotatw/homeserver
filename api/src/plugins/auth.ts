@@ -10,6 +10,8 @@ declare module "fastify" {
     }
 }
 
+const SERVICE_TOKEN = process.env.HS_SERVICE_TOKEN || "";
+
 export function extractToken(request: FastifyRequest): string | null {
     const header = request.headers.authorization;
 
@@ -43,6 +45,12 @@ export async function requireAuth(request: FastifyRequest, reply: FastifyReply) 
         return reply.code(401).send({ error: "Autenticação necessária." });
     }
 
+    // Token de serviço (usado por integrações internas, ex: homepage)
+    if (SERVICE_TOKEN && token === SERVICE_TOKEN) {
+        request.user = { username: "service" };
+        return;
+    }
+
     const session = getSession(token);
 
     if (!session) {
@@ -59,6 +67,11 @@ export async function requireAdmin(request: FastifyRequest, reply: FastifyReply)
 
     if (!user) {
         return reply.code(401).send({ error: "Autenticação necessária." });
+    }
+
+    // O token de serviço não é admin: rotas admin exigem usuário real.
+    if (user.username === "service") {
+        return reply.code(403).send({ error: "Acesso restrito a administradores." });
     }
 
     const admin = await isAdmin(user.username);
