@@ -1,7 +1,7 @@
 ---
 - greeting:
-    text_size: xl
-    text: Bem-vindo ao HomeServer
+    text_size: sm
+    text: HomeServer
 
 - resources:
     cpu: true
@@ -11,5 +11,5 @@
 - datetime:
     locale: pt-BR
     format:
-      dateStyle: long
+      dateStyle: short
       timeStyle: short

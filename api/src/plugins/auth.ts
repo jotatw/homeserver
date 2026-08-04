@@ -27,6 +27,10 @@ function isPublicPath(url: string): boolean {
         return true;
     }
 
+    if (url === "/api/v1/version") {
+        return true;
+    }
+
     if (url === "/app" || url.startsWith("/app/")) {
         return true;
     }
