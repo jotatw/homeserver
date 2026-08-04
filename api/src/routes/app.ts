@@ -15,6 +15,8 @@ export async function appRoutes(fastify: FastifyInstance) {
     };
 
     fastify.get("/app", serve("index.html", "text/html"));
+    fastify.get("/app/login.html", serve("login.html", "text/html"));
     fastify.get("/app/app.js", serve("app.js", "application/javascript"));
+    fastify.get("/app/auth.js", serve("auth.js", "application/javascript"));
     fastify.get("/app/style.css", serve("style.css", "text/css"));
 }
