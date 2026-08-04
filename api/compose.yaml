@@ -4,6 +4,8 @@ services:
     working_dir: /workspace/api
     env_file:
       - .env
+    environment:
+      - GIT_SSH_COMMAND=ssh -i /root/.ssh/id_ed25519 -o User=git -o StrictHostKeyChecking=accept-new
     cap_add:
       - SYS_RAWIO
     volumes:
@@ -17,6 +19,7 @@ services:
       - /dev:/dev:ro
       - /srv/storage:/srv/storage:ro
       - /srv/backup:/srv/backup:ro
+      - /home/joao/.ssh/id_ed25519:/root/.ssh/id_ed25519:ro
     restart: unless-stopped
     command: npm run dev
     ports:
