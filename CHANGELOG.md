@@ -3,7 +3,24 @@
 Todas as mudanças notáveis no HomeServer são documentadas neste arquivo.
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
+## [1.3] — 2026-08-04
+
+### Added
+
+- **Autenticação**: login/logout/sessão com token (TTL 24h) na API.
+- Validação de credenciais via FileBrowser (fonte de verdade de usuários).
+- Proteção de rotas: admin (users, power, hardware, backup) e login (storage,
+  services, devices, events, system).
+- HomeServer App com página de login e redirecionamento automático.
+- Token de serviço (`HS_SERVICE_TOKEN`) para integrações internas (homepage).
+- `hs user verify` e `hs user is-admin` no CLI.
+
+### Fixed
+
+- `hs_user_is_admin` não dependia mais de python3 (indisponível no container).
+
 ## [1.2] — 2026-08-03
+
 
 ### Added
 
