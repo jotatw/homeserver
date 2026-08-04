@@ -3,7 +3,21 @@
 Todas as mudanças notáveis no HomeServer são documentadas neste arquivo.
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
+### Added
+
+- **Auto-update**: `hs version`, `hs update check` e `hs update apply`
+  (pull fast-forward + backup via tag `pre-update-*` + reimplante opcional).
+- `update.sh` registrado no core; comandos expostos no CLI `hs`.
+
+### Fixed
+
+- **Religamento automático**: `power-schedule.sh` agora usa `rtcwake -m mem`
+  (suspend-to-RAM) em vez de `-m off` (poweroff). O RTC deste hardware não
+  gera IRQ de alarme para acordar do S5, mas funciona do S3.
+  Obs.: o rtcwake exibe o wake time em UTC (+3h local); o epoch está correto.
+
 ## [1.3] — 2026-08-04
+
 
 ### Added
 

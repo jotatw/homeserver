@@ -66,6 +66,8 @@ Comandos:
   scheduler enable|disable|run <tarefa>
   power status|enable|disable
   power set <desliga HH:MM> <liga HH:MM>
+  version
+  update check|apply [--no-redeploy]
 EOF
 }
 
@@ -242,6 +244,20 @@ case "${_command}" in
             disable) power_disable ;;
             set)     power_set "${3:?desliga HH:MM}" "${4:?liga HH:MM}" ;;
             *)       _usage; exit 1 ;;
+        esac
+        ;;
+
+    version)
+        hs_version
+        ;;
+
+    update)
+        _subcommand="${2:-}"
+
+        case "${_subcommand}" in
+            check)  hs_update_check ;;
+            apply)  hs_update_apply "${@:3}" ;;
+            *)      echo "Uso: hs update check|apply [--no-redeploy]" >&2; exit 1 ;;
         esac
         ;;
 
