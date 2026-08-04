@@ -105,6 +105,68 @@ main [class*="section"],
   margin-bottom: 1.5rem !important;
 }
 
+/* ==========================================================
+   v1.4.2 — Hierarquia visual
+   ========================================================== */
+
+/* Grupo principal (Meu espaço): cards maiores, título em destaque */
+.hs-group-primary .service-group-name {
+  font-size: 1.15rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.01em !important;
+  margin-bottom: 0.9rem !important;
+}
+
+.hs-group-primary .service-card {
+  border-radius: 12px !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25) !important;
+}
+
+.hs-group-primary .service-card .text-lg {
+  font-size: 1.05rem !important;
+  font-weight: 600 !important;
+}
+
+.hs-group-primary .service-card .text-sm {
+  font-size: 0.82rem !important;
+}
+
+/* Grupo secundário (Aplicações, Administração): padrão */
+.hs-group-secondary .service-group-name {
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.06em !important;
+  color: #94a3b8 !important;
+}
+
+/* Grupo terciário (Sistema): compacto, técnico */
+.hs-group-tertiary .service-group-name {
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.08em !important;
+  color: #64748b !important;
+}
+
+.hs-group-tertiary .service-card {
+  border-radius: 8px !important;
+  font-size: 0.85rem !important;
+}
+
+/* Estados dos dots (online / atenção / indisponível) */
+.status-indicator .status-green {
+  color: #22c55e !important;
+}
+
+.status-indicator .status-yellow {
+  color: #eab308 !important;
+}
+
+.status-indicator .status-red {
+  color: #ef4444 !important;
+}
+
 /* Rodapé */
 .hs-footer {
   margin-top: 2.5rem;

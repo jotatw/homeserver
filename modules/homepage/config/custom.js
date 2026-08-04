@@ -41,6 +41,12 @@
       if (!h2) return;
       const name = (h2.textContent || "").trim();
       group.style.display = visible.has(name) ? "" : "none";
+
+      // Hierarquia visual por grupo (v1.4.2)
+      group.classList.remove("hs-group-primary", "hs-group-secondary", "hs-group-tertiary");
+      if (name === "Meu espaço") group.classList.add("hs-group-primary");
+      else if (name === "Aplicações" || name === "Administração") group.classList.add("hs-group-secondary");
+      else group.classList.add("hs-group-tertiary");
     });
 
     setActiveButton(mode.id);
