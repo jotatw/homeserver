@@ -85,9 +85,9 @@ hs_update_check() {
         latest="$(git -C "${HS_PROJECT_ROOT}" rev-parse --short "${HS_REMOTE}/main" 2>/dev/null || echo "${current}")"
     fi
 
-    local update=no
+    local update=false
     if [[ -n "${latest}" && "${latest}" != "${current}" ]]; then
-        update=yes
+        update=true
     fi
 
     printf '{"current":"%s","latest":"%s","update":%s}\n' \
