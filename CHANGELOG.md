@@ -3,6 +3,21 @@
 Todas as mudanças notáveis no HomeServer são documentadas neste arquivo.
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
+## [1.4.1] — 2026-08-04
+
+### Added
+
+- **Header compacto**: greeting pequeno, recursos e data/hora em linha única.
+- **Rodapé** da Homepage: versão do HomeServer, data e "Servidor online".
+- `GET /api/v1/version` agora é público (apenas string de versão), usado
+  pelo rodapé sem expor token.
+
+### Changed
+
+- Espaçamento da Homepage: menos altura nos cards, mais espaço entre grupos.
+- `custom.css` e `custom.js` reorganizados por versão (v1.4.1).
+- Rota `version` movida de `updateRoutes` para `systemRoutes`.
+
 ## [1.4.0] — 2026-08-04
 
 ### Added

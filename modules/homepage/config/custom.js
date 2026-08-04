@@ -70,6 +70,57 @@
   function init() {
     buildSelector();
     applyMode(getMode());
+    buildFooter();
+  }
+
+  function buildFooter() {
+    if (document.getElementById("hs-footer")) return;
+
+    const footer = document.createElement("footer");
+    footer.id = "hs-footer";
+    footer.className = "hs-footer";
+
+    const line = document.createElement("div");
+    line.className = "hs-footer-line";
+
+    const versionSpan = document.createElement("span");
+    versionSpan.id = "hs-footer-version";
+    versionSpan.textContent = "HomeServer";
+
+    const statusSpan = document.createElement("span");
+    statusSpan.id = "hs-footer-status";
+    statusSpan.textContent = "Verificando...";
+
+    line.appendChild(versionSpan);
+    line.appendChild(statusSpan);
+    footer.appendChild(line);
+
+    const main = document.querySelector("main") || document.body;
+    main.appendChild(footer);
+
+    const BASE =
+      window.location.hostname === "homeserver.local"
+        ? ""
+        : "http://192.168.0.10:8000";
+
+    Promise.all([
+      fetch(BASE + "/api/v1/version").then((r) => r.json()).catch(() => null),
+      fetch(BASE + "/api/v1/status").then((r) => r.json()).catch(() => null),
+    ]).then(([v, s]) => {
+      if (v) versionSpan.textContent = "HomeServer " + v.version;
+      if (s) {
+        const ok = s.services && s.services.every((x) => x.status === "running");
+        const dot = document.createElement("span");
+        dot.className = "hs-dot " + (ok ? "ok" : "warn");
+        statusSpan.textContent = "";
+        statusSpan.appendChild(dot);
+        statusSpan.appendChild(
+          document.createTextNode(ok ? "Sistema saudável" : "Verificar serviços")
+        );
+      } else {
+        statusSpan.textContent = "Sistema indisponível";
+      }
+    });
   }
 
   function showToast(message) {
