@@ -23,27 +23,15 @@ quicklaunch:
   provider: duckduckgo
 
 layout:
-  Arquivos:
+  Meu espaço:
     style: row
     columns: 4
-  Projetos:
+  Aplicações:
     style: row
     columns: 4
-  Downloads:
+  Administração:
     style: row
     columns: 4
-  Mídia:
+  Sistema:
     style: row
     columns: 4
-  Serviços:
-    style: row
-    columns: 4
-  Gestão:
-    style: row
-    columns: 2
-  Manutenção:
-    style: row
-    columns: 4
-  Links:
-    style: row
-    columns: 6

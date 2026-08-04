@@ -1,16 +1,16 @@
 ---
-# Modo Usuário — conteúdo
-- Favoritos:
+# HomeServer v1.4 — Homepage como portal
+#
+# Grupos: Meu espaço · Aplicações · Administração · Sistema
+# Widgets técnicos ficam apenas em Sistema (sem redundância).
 
-    - FileBrowser:
-        icon: mdi-folder-open
+# Modo Usuário e Administrador — tarefas do usuário
+- Meu espaço:
+
+    - Arquivos:
+        icon: mdi-folder
         href: /files/
-        description: Arquivos
-
-    - Gitea:
-        icon: sh-gitea
-        href: /git/
-        description: Projetos e repositórios
+        description: Acesse seus arquivos
 
     - Projetos:
         icon: mdi-code-tags
@@ -20,45 +20,15 @@
     - Downloads:
         icon: mdi-download
         href: /files/
-        description: Downloads
-
-- Arquivos:
-
-    - Meus Arquivos:
-        icon: mdi-folder
-        href: /files/
-        description: Acesse seus arquivos
-        widget:
-          type: customapi
-          url: http://api:8000/api/v1/storage
-          refreshInterval: 30000
-          mappings:
-            - field: total_size_human
-              label: Utilizado
-
-- Projetos:
-
-    - Projetos:
-        icon: mdi-code-tags
-        href: /git/
-        description: Projetos e repositórios
-
-- Downloads:
-
-    - Downloads:
-        icon: mdi-download
-        href: /files/
         description: Área de downloads
-
-- Mídia:
 
     - Mídia:
         icon: mdi-movie
         href: /files/#/media
         description: Arquivos de mídia
 
-# Modo Administrador — serviços e gestão
-- Serviços:
+# Aplicações — destinos do usuário (apenas status)
+- Aplicações:
 
     - Homepage:
         icon: mdi-home
@@ -78,30 +48,89 @@
         server: homeserver
         container: gitea
 
-    - API:
-        icon: mdi-api
-        href: /api/v1/status
+    - HomeServer App:
+        icon: mdi-monitor-dashboard
+        href: /app
         server: homeserver
         container: api-api-1
+        description: Administração da plataforma
 
-- Gestão:
+# Modo Administrador — gestão
+- Administração:
 
     - Usuários:
         icon: mdi-account-group
-        href: /files/
-        description: Gerencie usuários e permissões
-
-    - App:
-        icon: mdi-monitor-dashboard
         href: /app
-        description: Administração (HomeServer App)
+        description: Gerencie usuários e permissões
 
     - Storage:
         id: storage-status
         icon: mdi-harddisk
+        href: /files/
+        description: Armazenamento
+
+    - Backups:
+        icon: mdi-backup-restore
+        href: /app
+        description: Cópias de segurança
+
+    - Agendamentos:
+        id: power-schedule
+        icon: mdi-power-settings
+        description: Liga e desliga automático
+
+# Modo Sistema — diagnóstico técnico
+- Sistema:
+
+    - Serviços:
+        icon: mdi-server-network
+        widget:
+          type: customapi
+          url: http://api:8000/api/v1/status
+          headers:
+            Authorization: Bearer f45136cd97a35d901fdd370595077d5586125612b0a402b5
+          refreshInterval: 30000
+          display: dynamic-list
+          mappings:
+            items: services
+            name: name
+            label: status
+
+    - Sensores:
+        icon: mdi-thermometer
+        widget:
+          type: customapi
+          url: http://api:8000/api/v1/hardware
+          headers:
+            Authorization: Bearer f45136cd97a35d901fdd370595077d5586125612b0a402b5
+          refreshInterval: 60000
+          display: dynamic-list
+          mappings:
+            items: temperature
+            name: label
+            label: temp
+
+    - Dispositivos:
+        id: devices-preview
+        icon: mdi-usb
+        widget:
+          type: customapi
+          url: http://api:8000/api/v1/devices
+          headers:
+            Authorization: Bearer f45136cd97a35d901fdd370595077d5586125612b0a402b5
+          refreshInterval: 15000
+          display: dynamic-list
+          mappings:
+            name: label
+            label: type
+
+    - Armazenamento:
+        icon: mdi-harddisk
         widget:
           type: customapi
           url: http://api:8000/api/v1/storage
+          headers:
+            Authorization: Bearer f45136cd97a35d901fdd370595077d5586125612b0a402b5
           refreshInterval: 30000
           mappings:
             - field: ready
@@ -119,78 +148,30 @@
               label: Mídia
             - field: documents
               label: Documentos
+            - field: total_size_human
+              label: Utilizado
 
-# Modo Sistema — manutenção
-- Manutenção:
-
-    - Hoje:
+    - Eventos:
         icon: mdi-calendar-today
         widget:
           type: customapi
           url: http://api:8000/api/v1/events
+          headers:
+            Authorization: Bearer f45136cd97a35d901fdd370595077d5586125612b0a402b5
           refreshInterval: 30000
           display: dynamic-list
           mappings:
             name: time
             label: action
 
-    - Serviços:
-        icon: mdi-server-network
-        widget:
-          type: customapi
-          url: http://api:8000/api/v1/status
-          refreshInterval: 30000
-          display: dynamic-list
-          mappings:
-            items: services
-            name: name
-            label: status
-
-    - Dispositivos:
-        id: devices-preview
-        icon: mdi-usb
-        widget:
-          type: customapi
-          url: http://api:8000/api/v1/devices
-          refreshInterval: 15000
-          display: dynamic-list
-          mappings:
-            name: label
-            label: type
-
-    - Sensores:
-        icon: mdi-thermometer
-        widget:
-          type: customapi
-          url: http://api:8000/api/v1/hardware
-          refreshInterval: 60000
-          display: dynamic-list
-          mappings:
-            items: temperature
-            name: label
-            label: temp
-
-    - Agendamento:
-        id: power-schedule
-        icon: mdi-power-settings
-        widget:
-          type: customapi
-          url: http://api:8000/api/v1/power
-          refreshInterval: 30000
-          mappings:
-            - field: shutdown
-              label: Desliga
-            - field: wake
-              label: Liga
-            - field: enabled
-              label: Ativo
-
-    - Server:
+    - Servidor:
         id: server-status
         icon: mdi-server
         widget:
           type: customapi
           url: http://api:8000/api/v1/status
+          headers:
+            Authorization: Bearer f45136cd97a35d901fdd370595077d5586125612b0a402b5
           refreshInterval: 30000
           mappings:
             - field: hostname
