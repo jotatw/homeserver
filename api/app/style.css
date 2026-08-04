@@ -80,6 +80,28 @@ main { padding: 1.5rem; max-width: 1000px; margin: 0 auto; }
 
 .empty { color: #94a3b8; text-align: center; padding: 3rem 0; }
 
+#btn-sair {
+  margin-left: auto;
+  background: rgba(248, 113, 113, 0.12);
+  color: #f87171;
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  padding: 0.4rem 0.9rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+#ver-badge {
+  background: #1e293b;
+  border: 1px solid #334155;
+  color: #94a3b8;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  margin-left: auto;
+  margin-right: 0.6rem;
+}
+
 @media (max-width: 640px) {
   header { flex-direction: column; align-items: flex-start; gap: 0.6rem; }
   main { padding: 1rem; }
