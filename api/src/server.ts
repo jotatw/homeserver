@@ -12,6 +12,7 @@ import { hardwareRoutes } from "./routes/hardware.js";
 import { backupRoutes } from "./routes/backup.js";
 import { appRoutes } from "./routes/app.js";
 import { authRoutes } from "./routes/auth.js";
+import { updateRoutes } from "./routes/update.js";
 
 const app = Fastify({
     logger: true
@@ -32,6 +33,7 @@ await app.register(cors, {
 app.addHook("preHandler", requireAuth);
 
 await app.register(authRoutes);
+await app.register(updateRoutes);
 await app.register(systemRoutes);
 await app.register(userRoutes);
 await app.register(storageRoutes);
