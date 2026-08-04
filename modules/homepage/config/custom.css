@@ -40,6 +40,32 @@
   color: #ffffff;
 }
 
+/* Atalho "Abrir App" (v1.4.3) — destaque no seletor de modos */
+.hs-mode-btn.hs-app-shortcut {
+  background: rgba(37, 99, 235, 0.18);
+  border: 1px solid rgba(37, 99, 235, 0.5);
+  color: #93c5fd;
+  font-weight: 600;
+  text-decoration: none;
+  margin-left: 4px;
+  padding: 5px 14px;
+}
+
+.hs-mode-btn.hs-app-shortcut:hover {
+  background: rgba(37, 99, 235, 0.35);
+  color: #dbeafe;
+}
+
+/* Card do HomeServer App como ação principal (v1.4.3) */
+.service-card.hs-app-cta {
+  border: 1px solid rgba(37, 99, 235, 0.55) !important;
+  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.25), 0 4px 18px rgba(37, 99, 235, 0.15) !important;
+}
+
+.service-card.hs-app-cta:hover {
+  box-shadow: 0 8px 28px rgba(37, 99, 235, 0.3) !important;
+}
+
 /* Navegação */
 .service-card {
   transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;

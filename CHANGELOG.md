@@ -3,7 +3,25 @@
 Todas as mudanças notáveis no HomeServer são documentadas neste arquivo.
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
+## [1.4.3] — 2026-08-04
+
+### Added
+
+- **App como destaque**: card do HomeServer App com destaque visual
+  (borda azul, sombra) no grupo Aplicações.
+- **Atalho "Abrir App**" no seletor de modos — reduz cliques
+  para acessar a administração via App.
+
+### Changed
+
+- `custom.js`: `highlightApp()` adiciona classe `.hs-app-cta` ao
+  card do App; `buildAppShortcut()` adiciona atalho "Abrir App"
+  no seletor de modos (link direto `/app`).
+- `custom.css`: `.hs-app-cta` (borda azul, sombra) + `.hs-app-shortcut`
+  (botão destacado no seletor de modos).
+
 ## [1.4.2] — 2026-08-04
+
 
 ### Added
 
