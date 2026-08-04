@@ -1,7 +1,10 @@
 import type { FastifyInstance } from "fastify";
 import { getPower, setPower } from "../adapters/power.js";
+import { requireAdmin } from "../plugins/auth.js";
 
 export async function powerRoutes(fastify: FastifyInstance) {
+    fastify.addHook("preHandler", requireAdmin);
+
     fastify.get("/api/v1/power", async () => {
         return getPower();
     });

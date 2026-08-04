@@ -247,3 +247,24 @@ hs_user_verify() {
 
     filebrowser_verify_user "${username}" "${password}"
 }
+
+#
+# Verifica se um usuário é administrador (no FileBrowser).
+#
+# Uso:
+#   hs_user_is_admin <nome>
+#
+# Retorno:
+#   0 -> é admin
+#   1 -> não é admin / não encontrado
+#
+hs_user_is_admin() {
+    local username="${1:?nome do usuário}"
+
+    local entry
+    entry="$(filebrowser_list_users | grep -oE "\"username\":\"${username}\",[^}]*" | head -1)"
+
+    [[ -n "${entry}" ]] || return 1
+
+    printf '%s' "${entry}" | grep -qE '"admin":true'
+}

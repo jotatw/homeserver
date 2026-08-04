@@ -1,7 +1,10 @@
 import type { FastifyInstance } from "fastify";
 import { createUser, listUsers, deleteUser, changeUserPassword } from "../adapters/users.js";
+import { requireAdmin } from "../plugins/auth.js";
 
 export async function userRoutes(fastify: FastifyInstance) {
+    fastify.addHook("preHandler", requireAdmin);
+
     fastify.get("/api/v1/users", async () => {
         return listUsers();
     });
