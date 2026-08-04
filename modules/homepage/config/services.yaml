@@ -2,30 +2,31 @@
 # HomeServer v1.4 — Homepage como portal
 #
 # Grupos: Meu espaço · Aplicações · Administração · Sistema
-# Widgets técnicos ficam apenas em Sistema (sem redundância).
+# Cards como ações: título = tarefa, descrição = o que fazer.
+# Widgets técnicos ficam apenas em Sistema.
 
-# Modo Usuário e Administrador — tarefas do usuário
+# Meu espaço — tarefas do usuário (cards principais, destacados)
 - Meu espaço:
 
     - Arquivos:
         icon: mdi-folder
         href: /files/
-        description: Acesse seus arquivos
+        description: Gerenciar arquivos
 
     - Projetos:
         icon: mdi-code-tags
         href: /git/
-        description: Meus projetos
+        description: Abrir Gitea
 
     - Downloads:
         icon: mdi-download
         href: /files/
-        description: Área de downloads
+        description: Receber arquivos
 
     - Mídia:
         icon: mdi-movie
         href: /files/#/media
-        description: Arquivos de mídia
+        description: Assistir e ouvir
 
 # Aplicações — destinos do usuário (apenas status)
 - Aplicações:
@@ -53,21 +54,21 @@
         href: /app
         server: homeserver
         container: api-api-1
-        description: Administração da plataforma
+        description: Abrir o App
 
-# Modo Administrador — gestão
+# Administração — gestão (modo Administrador)
 - Administração:
 
     - Usuários:
         icon: mdi-account-group
         href: /app
-        description: Gerencie usuários e permissões
+        description: Gerenciar pessoas
 
     - Storage:
         id: storage-status
         icon: mdi-harddisk
         href: /files/
-        description: Armazenamento
+        description: Ver armazenamento
 
     - Backups:
         icon: mdi-backup-restore
@@ -79,7 +80,7 @@
         icon: mdi-power-settings
         description: Liga e desliga automático
 
-# Modo Sistema — diagnóstico técnico
+# Sistema — diagnóstico técnico (modo Sistema)
 - Sistema:
 
     - Serviços:

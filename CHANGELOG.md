@@ -3,6 +3,23 @@
 Todas as mudanças notáveis no HomeServer são documentadas neste arquivo.
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
+## [1.4.2] — 2026-08-04
+
+### Added
+
+- **Hierarquia visual** na Homepage: grupos com classes de destaque —
+  Meu espaço (principal), Aplicações/Administração (secundário),
+  Sistema (terciário/compacto).
+- **Cards como ações**: descrições orientadas à tarefa ("Gerenciar arquivos",
+  "Abrir Gitea", "Assistir e ouvir", etc.) — o software vira detalhe.
+- Estados de status (online/atenção/indisponível) com cores distintas.
+
+### Changed
+
+- `custom.js`: aplica classes de hierarquia por grupo ao trocar de modo.
+- `custom.css`: v1.4.2 — tamanhos e pesos de fonte por hierarquia; cards
+  principais com mais destaque; grupo Sistema compacto.
+
 ## [1.4.1] — 2026-08-04
 
 ### Added
