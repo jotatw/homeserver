@@ -10,7 +10,14 @@ interface LoginBody {
 }
 
 export async function authRoutes(fastify: FastifyInstance) {
-    fastify.post("/api/v1/auth/login", async (request, reply) => {
+    fastify.post("/api/v1/auth/login", {
+        config: {
+            rateLimit: {
+                max: 5,
+                timeWindow: "1 minute",
+            },
+        },
+    }, async (request, reply) => {
         const body = request.body as LoginBody;
 
         if (!body?.username || !body?.password) {
