@@ -3,6 +3,22 @@
 Todas as mudanças notáveis no HomeServer são documentadas neste arquivo.
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
+## [1.4.4] — 2026-08-04
+
+### Added
+
+- **Polimento no HomeServer App**:
+  - Loader com spinner ao carregar cada view.
+  - Estados vazios amigáveis (📭) e mensagens de erro (⚠️) por view.
+  - Animação `fade-in` na renderização do dashboard.
+- Homepage: grupo "Links" (bookmarks) desativado — não expõe mais
+  conteúdo quebrado.
+
+### Changed
+
+- `api/app/app.js`: helpers `loader()`, `emptyMsg()`, `errorMsg()`.
+- `api/app/style.css`: v1.4.4 — loader, fade-in, estados vazios/erro.
+
 ## [1.4.3] — 2026-08-04
 
 ### Added

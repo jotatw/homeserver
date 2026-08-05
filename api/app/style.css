@@ -102,6 +102,56 @@ main { padding: 1.5rem; max-width: 1000px; margin: 0 auto; }
   margin-right: 0.6rem;
 }
 
+/* ==========================================================
+   v1.4.4 — Polimento (loader, estados vazios, animações)
+   ========================================================== */
+
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+.loader-bar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid #2a3a55;
+  border-top-color: #409fff;
+  animation: hs-spin 0.6s linear infinite;
+}
+
+@keyframes hs-spin {
+  to { transform: rotate(1turn); }
+}
+
+@keyframes hs-fade-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: hs-fade-in 0.35s ease forwards;
+  opacity: 0;
+}
+
+.empty {
+  color: #94a3b8;
+  text-align: center;
+  padding: 2.5rem 0;
+}
+
+.empty .empty-icon {
+  font-size: 1.3rem;
+  vertical-align: middle;
+  margin-right: 0.4rem;
+}
+
+.empty.error-msg {
+  color: #f87171;
+}
+
 @media (max-width: 640px) {
   header { flex-direction: column; align-items: flex-start; gap: 0.6rem; }
   main { padding: 1rem; }
