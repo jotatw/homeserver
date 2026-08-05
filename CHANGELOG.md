@@ -3,109 +3,45 @@
 Todas as mudanças notáveis no HomeServer são documentadas neste arquivo.
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
-## [1.5.0-rc.7] — 2026-08-05
+## [1.5.0] — 2026-08-05
 
 ### Added
 
-- **Testes de integração (v1.5 Sprint 6)**:
-  - `scripts/smoke-test.sh` — CLI, Homepage, API (version, login, storage,
-    users, status).
-  - `scripts/test-cli.sh` — hs version, update check, user verify/is-admin.
-  - `scripts/test-api.sh` — contrato ok/data, auth, proteção por escopo.
-  - `scripts/run-integration.sh` — runner das três suítes.
-  - `core/tests/run_ci.sh` agora inclui a integração.
-
-## [1.5.0-rc.6] — 2026-08-05
-
-### Added
-
-- **ADR (v1.5 Sprint 5)**: `docs/architecture/adr/` com 6 decisões:
-  0001 autenticação, 0002 auto-update, 0003 religamento S3, 0004 nomenclatura,
-  0005 resposta da API, 0006 architecture freeze.
-
-### Changed
-
-- README: recursos atualizados (auth, security headers, rate limit, auto-update);
-  exemplo de `update check` corrigido (`update:false`).
-- `docs/architecture/README.md`: organização da infra atualizada e referência
-  aos ADRs.
-
-## [1.5.0-rc.5] — 2026-08-05
+- **Code Review** (Sprint 1):
+  - Nomenclatura padronizada por camada (Foundation `hs_*`, Infrastructure
+    `modulo_*`, Adapters `filebrowser_*`); funções órfãs migradas para `hs_fs_*`.
+  - API padronizada `{ok,data}` / `{ok,error}` via `utils/respond.ts`.
+  - `planning/dependencies.md` — registro de versões.
+  - `planning/quality/review-checklist.md` — Quality Gate.
+- **Segurança** (Sprint 2):
+  - Security headers (Helmet) + rate limit (global 300/min, login 5/min).
+  - `docs/security/`: threat-model, security-assumptions, audit-v1.5.
+- **Consistência** (Sprint 3):
+  - CONTRIBUTING com nomenclatura oficial e formato de logs.
+- **Performance** (Sprint 4):
+  - Baseline em `planning/health/v1.5.md` (Homepage ~10ms, API ~3.5ms).
+- **Arquitetura** (Sprint 5):
+  - ADRs 0001-0006 em `docs/architecture/adr/`.
+  - `planning/architecture-freeze.md` e `planning/v2-readiness.md`.
+- **Testes** (Sprint 6):
+  - `scripts/smoke-test.sh` (7), `scripts/test-cli.sh` (6),
+    `scripts/test-api.sh` (13), `scripts/run-integration.sh`.
+  - `run_ci.sh` inclui shellcheck + suite + integração.
 
 ### Fixed
 
-- **Religamento automático (S3)**: o servidor acordava imediatamente ao
-  entrar em suspend porque os dispositivos USB (USB0, US15, US12) e a NIC
-  geravam wake imediato.
-  - `power-schedule.sh` agora desabilita wakes (NIC `wol d` + USB em
-    `/proc/acpi/wakeup`) antes de suspender e restaura após o resume.
-  - Validado: suspend de 90s religou pelo RTC em ~91s.
+- **Religamento automático**: o servidor acordava imediatamente ao entrar
+  em S3 por wakes USB/NIC. `power-schedule.sh` agora desabilita wakes antes
+  de suspender e restaura após o resume. Validado: suspend 90s → resume ~91s.
+- Runners de teste incluíam apenas parte dos testes (agora 9/9 na suite).
+- API sem security headers e sem rate limit no login.
+- `example-log.sh` (hooks) com formato de log divergente.
+- README com exemplo de `update check` desatualizado.
 
-## [1.5.0-rc.4] — 2026-08-05
+### Quality Gate
 
-### Added
-
-- **Performance (v1.5 Sprint 4)**: baseline medida em
-  `planning/health/v1.5.md`.
-  - Homepage TTFB ~10ms · API (cache) ~3.5ms · `hs version` 43ms ·
-    `hs status` 202ms · boot 1min 6.6s.
-  - Metas de referência registradas (Homepage <1s, API <100ms, CLI <300ms).
-
-## [1.5.0-rc.3] — 2026-08-05
-
-### Changed
-
-- **Consistência (v1.5 Sprint 3)**:
-  - `CONTRIBUTING.md`: nomenclatura oficial por camada (Foundation `hs_*`,
-    Infrastructure `modulo_*`, Adapters `filebrowser_*`, CLI `hs <cmd> <sub>`)
-    e formato padrão de logs `[DATA] MENSAGEM`.
-  - Logs: `example-log.sh` (hooks) padronizado para `[DATA]` (era `[hooks]`).
-  - Template de hook-log em `templates/hook-log.sh`.
-
-## [1.5.0-rc.2] — 2026-08-05
-
-### Added
-
-- **Segurança (v1.5 Sprint 2)**:
-  - `@fastify/helmet` — security headers globais (CSP, X-Frame-Options,
-    nosniff, HSTS).
-  - `@fastify/rate-limit` — global 300 req/min + **login 5 req/min** (anti
-    brute-force).
-  - `docs/security/` — `threat-model.md`, `security-assumptions.md`,
-    `audit-v1.5.md`.
-
-### Fixed
-
-- API sem security headers e sem rate limit no login (achados do audit).
-
-## [1.5.0-rc.1] — 2026-08-05
-
-### Changed
-
-- **API padronizada (v1.5 Sprint 1)**: todas as rotas agora respondem
-  `{"ok":true,"data":{}}` ou `{"ok":false,"error":"..."}` via
-  `api/src/utils/respond.ts` (`sendOk`/`sendError`).
-  - Rotas: system, status, version, storage, services, devices, events,
-    hardware, power, backup, users, auth (login/logout/session), update.
-  - Validação presente em todas as rotas (mesmo nas sem parâmetros).
-- **Consumidores atualizados para o novo contrato**:
-  - App (`auth.js`): login lê `body.data.token`; `api()` retorna `body.data`.
-  - Homepage (`custom.js`): footer lê `v.data.version`; power modal extrai `.data`.
-  - Homepage (`services.yaml`): widgets customapi usam `data.*` nos mappings.
-- `api/src/utils/respond.ts` adicionado.
-- **Nomenclatura (v1.5 Sprint 1)**: eliminadas as funções órfãs sem prefixo.
-  - `directory_exists/create_directory/file_exists/path_exists/remove_*`
-    → `hs_fs_*` (Foundation).
-  - `copy_file`/`move_file` → `hs_fs_copy_file`/`hs_fs_move_file`
-    (adicionadas à Foundation).
-  - Removida duplicata `infrastructure/filesystem.sh`.
-  - `environment.sh` e `service.sh` passam a usar `hs_fs_*`.
-  - Testes atualizados para `hs_fs_*`.
-
-### Fixed
-
-- Runners de teste agora incluem todos os testes existentes:
-  Foundation (6) e Infrastructure (3) — 9/9 PASS.
+- Architecture ✅ · Security ✅ · Consistency ✅ · Performance ✅ ·
+  Documentation ✅ · Testing ✅ · Release ✅
 
 ## [1.4.5] — 2026-08-04
 
