@@ -58,7 +58,7 @@ async function renderDashboard() {
   const v = document.getElementById("view");
   v.innerHTML = "";
 
-  const grid = el("div", { class: "grid" });
+  const grid = el("div", { class: "grid fade-in" });
   grid.appendChild(card("Hostname", status.hostname));
   grid.appendChild(card("Sistema", status.os));
   grid.appendChild(card("Uptime", status.uptime));
@@ -97,6 +97,12 @@ async function renderUsers() {
   const users = await api("/api/v1/users");
   const v = document.getElementById("view");
   v.innerHTML = "";
+
+  if (!users || users.length === 0) {
+    v.appendChild(emptyMsg("Nenhum usuário encontrado."));
+    return;
+  }
+
   v.appendChild(table(
     ["Usuário", "Escopo", "Admin"],
     users.map((u) => [u.username, u.scope, u.perm.admin ? "Sim" : "Não"]),
@@ -107,6 +113,12 @@ async function renderServices() {
   const services = await api("/api/v1/services");
   const v = document.getElementById("view");
   v.innerHTML = "";
+
+  if (!services || services.length === 0) {
+    v.appendChild(emptyMsg("Nenhum serviço em execução."));
+    return;
+  }
+
   v.appendChild(table(
     ["Serviço", "Status"],
     services.map((s) => [s.name, s.status]),
@@ -117,26 +129,42 @@ async function renderDevices() {
   const devices = await api("/api/v1/devices");
   const v = document.getElementById("view");
   v.innerHTML = "";
-  if (!devices.length) {
-    v.appendChild(el("p", { class: "empty" }, "Nenhum dispositivo conectado."));
+
+  if (!devices || devices.length === 0) {
+    v.appendChild(emptyMsg("Nenhum dispositivo conectado."));
     return;
   }
+
   v.appendChild(table(
     ["Rótulo", "Tipo", "Tamanho"],
     devices.map((d) => [d.label, d.type, human(d.size)]),
   ));
 }
 
+function loader() {
+  return el("div", { class: "loader" },
+    el("div", { class: "loader-bar" }, "Carregando..."));
+}
+
+function emptyMsg(msg) {
+  return el("p", { class: "empty" }, el("span", { class: "empty-icon" }, "📭"), " ", msg);
+}
+
+function errorMsg(msg) {
+  return el("p", { class: "empty error-msg" }, el("span", { class: "empty-icon" }, "⚠️"), " ", msg);
+}
+
 async function show(view) {
   document.querySelectorAll("nav button").forEach((b) =>
     b.classList.toggle("active", b.dataset.view === view));
   const v = document.getElementById("view");
-  v.innerHTML = "Carregando...";
+  v.innerHTML = "";
+  v.appendChild(loader());
   try {
     await views[view]();
   } catch (e) {
     v.innerHTML = "";
-    v.appendChild(el("p", { class: "empty" }, "Erro ao carregar: " + e.message));
+    v.appendChild(errorMsg(e.message));
   }
 }
 
