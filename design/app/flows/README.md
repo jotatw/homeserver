@@ -72,7 +72,7 @@ Levantado da API (`api/src/plugins/auth.ts`, `api/src/routes/*`):
 | # | Fluxo | Arquivo | Status |
 |---|---|---|---|
 | 1 | **Autenticação** — login/sessão/logout/expiração | `auth.md` | Draft v1 |
-| 2 | **Navegação por role** — como o App monta as telas | `navigation.md` | pendente |
+| 2 | **Navegação por role** — montagem sidebar/bottom-nav + 401/403 | `navigation.md` | Draft v1 |
 | 3 | **Meu espaço** — dashboard (status + atalhos) | `dashboard.md` | pendente |
 | 4 | **Aplicações** — listar/abrir apps | `apps.md` | pendente |
 | 5 | **Armazenamento** — status de disco (ver gap §6) | `storage.md` | pendente |
@@ -93,5 +93,6 @@ Levantado da API (`api/src/plugins/auth.ts`, `api/src/routes/*`):
 
 - [x] Levantar API real e montar matriz de permissões
 - [x] Fluxo 1: autenticação
-- [ ] Fluxos 2-8 (montar um por vez, validando com o usuário)
+- [x] Fluxo 2: navegação por role
+- [ ] Fluxos 3-8 (montar um por vez, validando com o usuário)
 - [ ] Atualizar wireframes conforme descobertas (G1, G2)
