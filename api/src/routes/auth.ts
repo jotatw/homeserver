@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { verifyCredentials } from "../adapters/auth.js";
 import { createSession, destroySession, getSession } from "../sessions.js";
 import { extractToken } from "../plugins/auth.js";
+import { sendOk, sendError } from "../utils/respond.js";
 
 interface LoginBody {
     username: string;
@@ -13,20 +14,18 @@ export async function authRoutes(fastify: FastifyInstance) {
         const body = request.body as LoginBody;
 
         if (!body?.username || !body?.password) {
-            return reply
-                .code(400)
-                .send({ error: "username e password são obrigatórios." });
+            return sendError(reply, 400, "username e password são obrigatórios.");
         }
 
         const result = await verifyCredentials(body.username, body.password);
 
         if (!result.ok) {
-            return reply.code(401).send({ error: result.message });
+            return sendError(reply, 401, result.message || "Usuário ou senha inválidos.");
         }
 
         const token = createSession(result.username!);
 
-        return reply.code(200).send({
+        return sendOk(reply, {
             token,
             username: result.username,
         });
@@ -39,23 +38,23 @@ export async function authRoutes(fastify: FastifyInstance) {
             destroySession(token);
         }
 
-        return reply.code(200).send({ ok: true });
+        return sendOk(reply, { loggedOut: true });
     });
 
     fastify.get("/api/v1/auth/session", async (request, reply) => {
         const token = extractToken(request);
 
         if (!token) {
-            return reply.code(401).send({ error: "Autenticação necessária." });
+            return sendError(reply, 401, "Autenticação necessária.");
         }
 
         const session = getSession(token);
 
         if (!session) {
-            return reply.code(401).send({ error: "Sessão inválida ou expirada." });
+            return sendError(reply, 401, "Sessão inválida ou expirada.");
         }
 
-        return reply.code(200).send({
+        return sendOk(reply, {
             username: session.username,
         });
     });

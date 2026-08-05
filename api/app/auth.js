@@ -7,11 +7,11 @@ const auth = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
     });
-    const data = await r.json();
-    if (!r.ok) throw new Error(data.error || "Erro ao autenticar.");
-    this.token = data.token;
-    localStorage.setItem("hs_token", data.token);
-    return data;
+    const body = await r.json();
+    if (!r.ok) throw new Error(body.error || "Erro ao autenticar.");
+    this.token = body.data.token;
+    localStorage.setItem("hs_token", body.data.token);
+    return body.data;
   },
 
   async logout() {
@@ -49,6 +49,7 @@ async function api(path) {
     window.location.href = "/app/login.html";
     throw new Error("Sessão expirada.");
   }
-  if (!r.ok) throw new Error("HTTP " + r.status);
-  return r.json();
+  const body = await r.json();
+  if (!r.ok) throw new Error(body.error || "HTTP " + r.status);
+  return body.data;
 }

@@ -140,9 +140,10 @@
       fetch(BASE + "/api/v1/version").then((r) => r.json()).catch(() => null),
       fetch(BASE + "/api/v1/status").then((r) => r.json()).catch(() => null),
     ]).then(([v, s]) => {
-      if (v) versionSpan.textContent = "HomeServer " + v.version;
-      if (s) {
-        const ok = s.services && s.services.every((x) => x.status === "running");
+      if (v) versionSpan.textContent = "HomeServer " + (v.data ? v.data.version : "?");
+      if (s && s.data) {
+        const st = s.data;
+        const ok = st.services && st.services.every((x) => x.status === "running");
         const dot = document.createElement("span");
         dot.className = "hs-dot " + (ok ? "ok" : "warn");
         statusSpan.textContent = "";
@@ -151,7 +152,7 @@
           document.createTextNode(ok ? "Sistema saudável" : "Verificar serviços")
         );
       } else {
-        statusSpan.textContent = "Sistema indisponível";
+        statusSpan.textContent = "Servidor online";
       }
     });
   }
@@ -215,7 +216,7 @@
     return fetch(url, {
       ...opts,
       headers: { "Content-Type": "application/json", ...opts?.headers },
-    }).then((r) => r.json());
+    }).then((r) => r.json()).then((b) => (b && b.data ? b.data : b));
   }
 
   /* Overlay modal */

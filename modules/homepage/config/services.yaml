@@ -93,7 +93,7 @@
           refreshInterval: 30000
           display: dynamic-list
           mappings:
-            items: services
+            items: data.services
             name: name
             label: status
 
@@ -107,7 +107,7 @@
           refreshInterval: 60000
           display: dynamic-list
           mappings:
-            items: temperature
+            items: data.temperature
             name: label
             label: temp
 
@@ -134,22 +134,22 @@
             Authorization: Bearer f45136cd97a35d901fdd370595077d5586125612b0a402b5
           refreshInterval: 30000
           mappings:
-            - field: ready
+            - field: data.ready
               label: Pronto
               remap:
                 - value: true
                   to: Sim
                 - value: false
                   to: Não
-            - field: users
+            - field: data.users
               label: Usuários
-            - field: shared
+            - field: data.shared
               label: Compartilhado
-            - field: media
+            - field: data.media
               label: Mídia
-            - field: documents
+            - field: data.documents
               label: Documentos
-            - field: total_size_human
+            - field: data.total_size_human
               label: Utilizado
 
     - Eventos:
@@ -175,22 +175,22 @@
             Authorization: Bearer f45136cd97a35d901fdd370595077d5586125612b0a402b5
           refreshInterval: 30000
           mappings:
-            - field: hostname
+            - field: data.hostname
               label: Hostname
-            - field: os
+            - field: data.os
               label: Sistema
-            - field: uptime
+            - field: data.uptime
               label: Uptime
-            - field: cpu.percent
+            - field: data.cpu.percent
               label: CPU
               format: percent
-            - field: memory.percent
+            - field: data.memory.percent
               label: Memória
               format: percent
-            - field: disk.percent
+            - field: data.disk.percent
               label: Disco
               format: percent
-            - field: backup
+            - field: data.backup
               label: Backup
-            - field: wol
+            - field: data.wol
               label: Wake-on-LAN
