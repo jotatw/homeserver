@@ -76,15 +76,35 @@ Cada módulo possui uma única responsabilidade.
 ```text
 core/
 └── infrastructure/
-    ├── filesystem.sh
     ├── environment.sh
     ├── docker.sh
     ├── compose.sh
     ├── service.sh
-    └── provisioning.sh
+    ├── storage.sh
+    ├── users.sh
+    ├── devices.sh
+    ├── hardware.sh
+    ├── backup.sh
+    ├── scheduler.sh
+    ├── power.sh
+    └── update.sh
 ```
 
-Cada módulo expõe apenas uma API pública bem definida.
+Cada módulo expõe apenas uma API pública bem definida (prefixo do módulo).
+
+---
+
+# Decisões de Arquitetura (ADR)
+
+Decisões importantes são registradas em `adr/`:
+
+```text
+docs/
+└── architecture/
+    └── adr/
+```
+
+Ver [ADR README](adr/README.md).
 
 ---
 

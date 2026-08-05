@@ -28,16 +28,19 @@ O objetivo não é competir com soluções corporativas, mas oferecer uma plataf
 Atualmente o HomeServer oferece:
 
 - Gerenciamento centralizado de armazenamento
-- Homepage com modos de utilização
+- Homepage com modos de utilização (Usuário / Administrador / Sistema)
 - Gerenciamento de usuários
-- API REST
+- API REST (respostas padronizadas `ok/data`)
+- Autenticação com token (TTL 24h) e proteção de rotas por escopo
 - FileBrowser integrado
 - Gitea
 - Samba
 - Backup automático
 - Wake-on-LAN
-- Agendamento de inicialização e desligamento
+- Agendamento de inicialização e desligamento (religamento via suspend S3)
 - CLI administrativa (`hs`)
+- Auto-update por releases (`hs update check|apply`)
+- Security headers e rate limit na API
 
 ---
 
@@ -242,7 +245,7 @@ bash core/hs.sh version
 
 # Verifica se há release mais recente disponível
 bash core/hs.sh update check
-# => {"current":"v1.3.0","latest":"v1.3.0","update":no}
+# => {"current":"v1.5.0","latest":"v1.5.0","update":false}
 
 # Aplica a atualização para a release mais recente
 bash core/hs.sh update apply
