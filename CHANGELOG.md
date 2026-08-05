@@ -3,6 +3,22 @@
 Todas as mudanças notáveis no HomeServer são documentadas neste arquivo.
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
+## [1.5.0-rc.2] — 2026-08-05
+
+### Added
+
+- **Segurança (v1.5 Sprint 2)**:
+  - `@fastify/helmet` — security headers globais (CSP, X-Frame-Options,
+    nosniff, HSTS).
+  - `@fastify/rate-limit` — global 300 req/min + **login 5 req/min** (anti
+    brute-force).
+  - `docs/security/` — `threat-model.md`, `security-assumptions.md`,
+    `audit-v1.5.md`.
+
+### Fixed
+
+- API sem security headers e sem rate limit no login (achados do audit).
+
 ## [1.5.0-rc.1] — 2026-08-05
 
 ### Changed
