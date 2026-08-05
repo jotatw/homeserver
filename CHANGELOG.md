@@ -3,6 +3,18 @@
 Todas as mudanças notáveis no HomeServer são documentadas neste arquivo.
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
+## [1.5.0-rc.7] — 2026-08-05
+
+### Added
+
+- **Testes de integração (v1.5 Sprint 6)**:
+  - `scripts/smoke-test.sh` — CLI, Homepage, API (version, login, storage,
+    users, status).
+  - `scripts/test-cli.sh` — hs version, update check, user verify/is-admin.
+  - `scripts/test-api.sh` — contrato ok/data, auth, proteção por escopo.
+  - `scripts/run-integration.sh` — runner das três suítes.
+  - `core/tests/run_ci.sh` agora inclui a integração.
+
 ## [1.5.0-rc.6] — 2026-08-05
 
 ### Added
