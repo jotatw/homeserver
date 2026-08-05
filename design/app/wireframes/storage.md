@@ -3,6 +3,11 @@
 > App: HomeServer (v2.0) · Tela: "Arquivos" (subset de Meu espaço)
 > Refs: `../references.md` §1 (file managers self-hosted, Immich como referência de fluidez); §3 (offline-first com sync)
 > Telas alvo: mobile (480px) e desktop (1280px).
+>
+> ⚠️ **Gap real (v1.5)**: a API hoje só expõe `GET /storage(+/status)` → uso de disco.
+> Não há listagem/navegação/upload de arquivos (ver `../flows/README.md` §6 G1).
+> Este wireframe descreve a visão alvo; será marcado como **não implementável nesta versão**
+> até a API expor navegação de FS, OU fica como especificação do filebrowser nativo da v2.0+.
 
 ## Objetivo
 
