@@ -34,3 +34,7 @@ backup/
 logs/
 data/
 services/
+
+# Node
+node_modules/
+
