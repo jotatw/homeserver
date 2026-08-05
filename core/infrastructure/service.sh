@@ -49,7 +49,7 @@ service_directory() {
 #
 service_exists() {
 
-    directory_exists "$(service_directory "$1")"
+    hs_fs_directory_exists "$(service_directory "$1")"
 
 }
 

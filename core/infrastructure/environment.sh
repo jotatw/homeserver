@@ -42,7 +42,7 @@ initialize_workspace() {
 
     for directory in "${HS_WORKSPACE_DIRECTORIES[@]}"; do
 
-        create_directory "${directory}" || return 1
+        hs_fs_create_directory "${directory}" || return 1
 
     done
 
@@ -59,7 +59,7 @@ workspace_exists() {
 
     for directory in "${HS_WORKSPACE_DIRECTORIES[@]}"; do
 
-        directory_exists "${directory}" || return 1
+        hs_fs_directory_exists "${directory}" || return 1
 
     done
 
