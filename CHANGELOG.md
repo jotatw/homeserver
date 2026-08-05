@@ -3,6 +3,24 @@
 Todas as mudanças notáveis no HomeServer são documentadas neste arquivo.
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
+## [1.5.0-rc.1] — 2026-08-05
+
+### Changed
+
+- **Nomenclatura (v1.5 Sprint 1)**: eliminadas as funções órfãs sem prefixo.
+  - `directory_exists/create_directory/file_exists/path_exists/remove_*`
+    → `hs_fs_*` (Foundation).
+  - `copy_file`/`move_file` → `hs_fs_copy_file`/`hs_fs_move_file`
+    (adicionadas à Foundation).
+  - Removida duplicata `infrastructure/filesystem.sh`.
+  - `environment.sh` e `service.sh` passam a usar `hs_fs_*`.
+  - Testes atualizados para `hs_fs_*`.
+
+### Fixed
+
+- Runners de teste agora incluem todos os testes existentes:
+  Foundation (6) e Infrastructure (3) — 9/9 PASS.
+
 ## [1.4.5] — 2026-08-04
 
 ### Added

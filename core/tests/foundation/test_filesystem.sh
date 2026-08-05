@@ -1,27 +1,30 @@
 #!/usr/bin/env bash
 
-source core/bootstrap.sh
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CORE_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+
+source "${CORE_ROOT}/bootstrap.sh"
 
 main() {
 
     info "=== Testando filesystem ==="
 
-    if directory_exists "/tmp"; then
-        success "directory_exists()"
+    if hs_fs_directory_exists "/tmp"; then
+        success "hs_fs_directory_exists()"
     else
-        error "directory_exists()"
+        error "hs_fs_directory_exists()"
     fi
 
-    if file_exists "/etc/passwd"; then
-        success "file_exists()"
+    if hs_fs_file_exists "/etc/passwd"; then
+        success "hs_fs_file_exists()"
     else
-        error "file_exists()"
+        error "hs_fs_file_exists()"
     fi
 
-    if path_exists "/etc"; then
-        success "path_exists()"
+    if hs_fs_path_exists "/etc"; then
+        success "hs_fs_path_exists()"
     else
-        error "path_exists()"
+        error "hs_fs_path_exists()"
     fi
 }
 

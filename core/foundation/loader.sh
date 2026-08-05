@@ -86,7 +86,6 @@ _load_foundation() {
 _load_infrastructure() {
 
     _load_layer infrastructure \
-        filesystem.sh \
         environment.sh \
         docker.sh \
         compose.sh \

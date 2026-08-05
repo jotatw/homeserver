@@ -15,7 +15,7 @@ echo
 
 echo "Criando diretório..."
 
-if create_directory "${TEST_DIR}"; then
+if hs_fs_create_directory "${TEST_DIR}"; then
     echo "PASS"
 else
     echo "FAIL"
@@ -25,7 +25,7 @@ echo
 
 echo "Verificando diretório..."
 
-if directory_exists "${TEST_DIR}"; then
+if hs_fs_directory_exists "${TEST_DIR}"; then
     echo "PASS"
 else
     echo "FAIL"
@@ -35,7 +35,7 @@ echo
 
 echo "Removendo diretório..."
 
-if remove_directory "${TEST_DIR}"; then
+if hs_fs_remove_directory "${TEST_DIR}"; then
     echo "PASS"
 else
     echo "FAIL"
@@ -45,7 +45,7 @@ echo
 
 echo "Verificando remoção..."
 
-if ! directory_exists "${TEST_DIR}"; then
+if ! hs_fs_directory_exists "${TEST_DIR}"; then
     echo "PASS"
 else
     echo "FAIL"
