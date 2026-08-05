@@ -3,6 +3,17 @@
 Todas as mudanças notáveis no HomeServer são documentadas neste arquivo.
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
+## [1.5.0-rc.3] — 2026-08-05
+
+### Changed
+
+- **Consistência (v1.5 Sprint 3)**:
+  - `CONTRIBUTING.md`: nomenclatura oficial por camada (Foundation `hs_*`,
+    Infrastructure `modulo_*`, Adapters `filebrowser_*`, CLI `hs <cmd> <sub>`)
+    e formato padrão de logs `[DATA] MENSAGEM`.
+  - Logs: `example-log.sh` (hooks) padronizado para `[DATA]` (era `[hooks]`).
+  - Template de hook-log em `templates/hook-log.sh`.
+
 ## [1.5.0-rc.2] — 2026-08-05
 
 ### Added

@@ -72,20 +72,31 @@ Todos os arquivos da Foundation devem seguir a mesma organização.
 
 # Convenções
 
+## Nomenclatura por camada (v1.5)
+
+Cada camada usa um prefixo próprio, comunicando sua responsabilidade.
+
+| Camada | Prefixo | Exemplos |
+|--------|---------|----------|
+| Foundation | `hs_*` | `hs_fs_*`, `hs_cfg_*`, `hs_val_*`, `hs_out_*`, `hs_const_*`, `hs_registry_*` |
+| Infrastructure | prefixo do módulo | `storage_*`, `users_*`, `devices_*`, `hardware_*`, `backup_*`, `scheduler_*`, `power_*`, `compose_*`, `service_*` |
+| Adapters | `filebrowser_*` | `filebrowser_login`, `filebrowser_create_user` |
+| CLI | `hs <comando> <subcomando>` | `hs user create`, `hs system status` |
+
 ## Funções públicas
 
-Todas devem utilizar o prefixo correspondente ao módulo.
+Todas devem utilizar o prefixo correspondente à camada/módulo.
 
 Exemplos:
 
 ```text
 hs_fs_create_directory
 
-hs_storage_init
+storage_init
 
-hs_user_create
+users_create
 
-hs_service_start
+filebrowser_create_user
 ```
 
 ---
@@ -101,6 +112,31 @@ _hs_storage_validate
 
 _hs_fs_create
 ```
+
+---
+
+## Logs (formato padrão)
+
+Todos os logs seguem o mesmo formato:
+
+```text
+[DATA] MENSAGEM
+```
+
+Exemplo:
+
+```text
+[2026-08-05 09:45:43] HomeServer startup
+[2026-08-05 03:00:12] Iniciando backup em /srv/backup/daily/2026-08-05
+```
+
+Helper padrão:
+
+```bash
+log() { echo "[$(date '+%F %T')] $*" >> "${LOG_FILE}"; }
+```
+
+Os logs residem em `/var/log/homeserver-*.log`.
 
 ---
 
