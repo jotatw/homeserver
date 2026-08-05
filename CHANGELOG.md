@@ -3,6 +3,17 @@
 Todas as mudanças notáveis no HomeServer são documentadas neste arquivo.
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
+## [1.5.0-rc.5] — 2026-08-05
+
+### Fixed
+
+- **Religamento automático (S3)**: o servidor acordava imediatamente ao
+  entrar em suspend porque os dispositivos USB (USB0, US15, US12) e a NIC
+  geravam wake imediato.
+  - `power-schedule.sh` agora desabilita wakes (NIC `wol d` + USB em
+    `/proc/acpi/wakeup`) antes de suspender e restaura após o resume.
+  - Validado: suspend de 90s religou pelo RTC em ~91s.
+
 ## [1.5.0-rc.4] — 2026-08-05
 
 ### Added
