@@ -78,7 +78,7 @@ Levantado da API (`api/src/plugins/auth.ts`, `api/src/routes/*`):
 | 5 | **Armazenamento** — Fase 1: uso de disco / Fase 2: filebrowser (G1) | `storage.md` | Draft v1 |
 | 6 | **Sistema** — monitoramento + agenda (admin) | `system.md` | Draft v1 |
 | 7 | **Admin** — users, backup, update, power (síncrono) | `admin.md` | Draft v1 |
-| 8 | **Erros globais** — 401/403/offline/retry | `errors.md` | pendente |
+| 8 | **Erros globais** — central de erros, offline, retry | `errors.md` | Draft v1 |
 
 ## 6. Gaps descobertos (design vs sistema real)
 
@@ -99,5 +99,5 @@ Levantado da API (`api/src/plugins/auth.ts`, `api/src/routes/*`):
 - [x] Fluxo 5: Armazenamento (Fase 1 implementável)
 - [x] Fluxo 6: Sistema
 - [x] Fluxo 7: Admin
-- [ ] Fluxo 8: Erros globais
+- [x] Fluxo 8: Erros globais
 - [ ] Atualizar wireframes conforme descobertas (G1, G2)
