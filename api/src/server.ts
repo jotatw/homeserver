@@ -1,5 +1,7 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
+import helmet from "@fastify/helmet";
+import rateLimit from "@fastify/rate-limit";
 import { requireAuth } from "./plugins/auth.js";
 import { systemRoutes } from "./routes/system.js";
 import { userRoutes } from "./routes/users.js";
@@ -16,6 +18,16 @@ import { updateRoutes } from "./routes/update.js";
 
 const app = Fastify({
     logger: true
+});
+
+await app.register(helmet, {
+    global: true,
+});
+
+// Rate limit global: 300 req/min por IP (homepage faz polling de widgets).
+await app.register(rateLimit, {
+    max: 300,
+    timeWindow: "1 minute",
 });
 
 await app.register(cors, {
