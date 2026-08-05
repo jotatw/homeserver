@@ -3,6 +3,20 @@
 Todas as mudanças notáveis no HomeServer são documentadas neste arquivo.
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
+## [1.4.5] — 2026-08-04
+
+### Added
+
+- **Design System** (`docs/design/`): base visual compartilhada entre
+  Homepage e HomeServer App.
+  - `principles.md` — princípios de design funcional.
+  - `colors.md` — paleta (neutros, ação, estados).
+  - `typography.md` — escala e pesos por papel.
+  - `spacing.md` — tokens de espaçamento e dimensões de cards.
+  - `icons.md` — ícones por conceito e indicadores de estado.
+  - `components.md` — cards de ação/serviço/técnico, modos, botões,
+    estados de carregamento/vazio/erro, rodapé.
+
 ## [1.4.4] — 2026-08-04
 
 ### Added
