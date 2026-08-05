@@ -3,6 +3,16 @@
 Todas as mudanças notáveis no HomeServer são documentadas neste arquivo.
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
+## [1.5.0-rc.4] — 2026-08-05
+
+### Added
+
+- **Performance (v1.5 Sprint 4)**: baseline medida em
+  `planning/health/v1.5.md`.
+  - Homepage TTFB ~10ms · API (cache) ~3.5ms · `hs version` 43ms ·
+    `hs status` 202ms · boot 1min 6.6s.
+  - Metas de referência registradas (Homepage <1s, API <100ms, CLI <300ms).
+
 ## [1.5.0-rc.3] — 2026-08-05
 
 ### Changed
