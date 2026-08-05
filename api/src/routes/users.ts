@@ -1,12 +1,17 @@
 import type { FastifyInstance } from "fastify";
 import { createUser, listUsers, deleteUser, changeUserPassword } from "../adapters/users.js";
+import { sendOk, sendError } from "../utils/respond.js";
 import { requireAdmin } from "../plugins/auth.js";
 
 export async function userRoutes(fastify: FastifyInstance) {
     fastify.addHook("preHandler", requireAdmin);
 
-    fastify.get("/api/v1/users", async () => {
-        return listUsers();
+    fastify.get("/api/v1/users", async (_req, reply) => {
+        try {
+            return sendOk(reply, await listUsers());
+        } catch (error) {
+            return sendError(reply, 500, error instanceof Error ? error.message : String(error));
+        }
     });
 
     fastify.post("/api/v1/users", async (request, reply) => {
@@ -18,7 +23,7 @@ export async function userRoutes(fastify: FastifyInstance) {
         };
 
         if (!body?.username) {
-            return reply.code(400).send({ error: "username é obrigatório" });
+            return sendError(reply, 400, "username é obrigatório");
         }
 
         try {
@@ -29,11 +34,9 @@ export async function userRoutes(fastify: FastifyInstance) {
                 gitea: body.gitea,
             });
 
-            return reply.code(201).send(user);
+            return sendOk(reply, user, 201);
         } catch (error) {
-            return reply.code(500).send({
-                error: error instanceof Error ? error.message : String(error),
-            });
+            return sendError(reply, 500, error instanceof Error ? error.message : String(error));
         }
     });
 
@@ -42,16 +45,14 @@ export async function userRoutes(fastify: FastifyInstance) {
         const body = request.body as { password?: string };
 
         if (!body?.password) {
-            return reply.code(400).send({ error: "password é obrigatório" });
+            return sendError(reply, 400, "password é obrigatório");
         }
 
         try {
             const result = await changeUserPassword(username, body.password);
-            return reply.send(result);
+            return sendOk(reply, result);
         } catch (error) {
-            return reply.code(500).send({
-                error: error instanceof Error ? error.message : String(error),
-            });
+            return sendError(reply, 500, error instanceof Error ? error.message : String(error));
         }
     });
 
@@ -62,11 +63,9 @@ export async function userRoutes(fastify: FastifyInstance) {
 
         try {
             await deleteUser(username, removeFolder);
-            return { ok: true };
+            return sendOk(reply, { deleted: username });
         } catch (error) {
-            return reply.code(500).send({
-                error: error instanceof Error ? error.message : String(error),
-            });
+            return sendError(reply, 500, error instanceof Error ? error.message : String(error));
         }
     });
 }

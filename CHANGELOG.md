@@ -7,6 +7,17 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
 ### Changed
 
+- **API padronizada (v1.5 Sprint 1)**: todas as rotas agora respondem
+  `{"ok":true,"data":{}}` ou `{"ok":false,"error":"..."}` via
+  `api/src/utils/respond.ts` (`sendOk`/`sendError`).
+  - Rotas: system, status, version, storage, services, devices, events,
+    hardware, power, backup, users, auth (login/logout/session), update.
+  - Validação presente em todas as rotas (mesmo nas sem parâmetros).
+- **Consumidores atualizados para o novo contrato**:
+  - App (`auth.js`): login lê `body.data.token`; `api()` retorna `body.data`.
+  - Homepage (`custom.js`): footer lê `v.data.version`; power modal extrai `.data`.
+  - Homepage (`services.yaml`): widgets customapi usam `data.*` nos mappings.
+- `api/src/utils/respond.ts` adicionado.
 - **Nomenclatura (v1.5 Sprint 1)**: eliminadas as funções órfãs sem prefixo.
   - `directory_exists/create_directory/file_exists/path_exists/remove_*`
     → `hs_fs_*` (Foundation).
