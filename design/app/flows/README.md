@@ -76,7 +76,7 @@ Levantado da API (`api/src/plugins/auth.ts`, `api/src/routes/*`):
 | 3 | **Meu espaço** — dashboard (status + atalhos) | `dashboard.md` | Draft v1 |
 | 4 | **Aplicações** — listar/abrir apps | `apps.md` | Draft v1 |
 | 5 | **Armazenamento** — Fase 1: uso de disco / Fase 2: filebrowser (G1) | `storage.md` | Draft v1 |
-| 6 | **Sistema** — monitoramento + agenda | `system.md` | pendente |
+| 6 | **Sistema** — monitoramento + agenda (admin) | `system.md` | Draft v1 |
 | 7 | **Admin** — users, power, backup, update | `admin.md` | pendente |
 | 8 | **Erros globais** — 401/403/offline/retry | `errors.md` | pendente |
 
@@ -97,5 +97,6 @@ Levantado da API (`api/src/plugins/auth.ts`, `api/src/routes/*`):
 - [x] Fluxo 3: Meu espaço (dashboard)
 - [x] Fluxo 4: Aplicações
 - [x] Fluxo 5: Armazenamento (Fase 1 implementável)
-- [ ] Fluxos 6-8 (montar um por vez, validando com o usuário)
+- [x] Fluxo 6: Sistema
+- [ ] Fluxos 7-8 (montar um por vez, validando com o usuário)
 - [ ] Atualizar wireframes conforme descobertas (G1, G2)
