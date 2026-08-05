@@ -3,6 +3,21 @@
 Todas as mudanças notáveis no HomeServer são documentadas neste arquivo.
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
+## [1.5.0-rc.6] — 2026-08-05
+
+### Added
+
+- **ADR (v1.5 Sprint 5)**: `docs/architecture/adr/` com 6 decisões:
+  0001 autenticação, 0002 auto-update, 0003 religamento S3, 0004 nomenclatura,
+  0005 resposta da API, 0006 architecture freeze.
+
+### Changed
+
+- README: recursos atualizados (auth, security headers, rate limit, auto-update);
+  exemplo de `update check` corrigido (`update:false`).
+- `docs/architecture/README.md`: organização da infra atualizada e referência
+  aos ADRs.
+
 ## [1.5.0-rc.5] — 2026-08-05
 
 ### Fixed
