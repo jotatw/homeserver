@@ -16,11 +16,11 @@ echo " Filesystem - Arquivos"
 echo "========================================"
 echo
 
-create_directory "${TEST_DIR}"
+hs_fs_create_directory "${TEST_DIR}"
 
 echo "Criando arquivo..."
 
-if create_file "${TEST_FILE}"; then
+if hs_fs_create_file "${TEST_FILE}"; then
     echo "PASS"
 else
     echo "FAIL"
@@ -30,7 +30,7 @@ echo
 
 echo "Verificando arquivo..."
 
-if file_exists "${TEST_FILE}"; then
+if hs_fs_file_exists "${TEST_FILE}"; then
     echo "PASS"
 else
     echo "FAIL"
@@ -40,7 +40,7 @@ echo
 
 echo "Copiando arquivo..."
 
-if copy_file "${TEST_FILE}" "${COPY_FILE}"; then
+if hs_fs_copy_file "${TEST_FILE}" "${COPY_FILE}"; then
     echo "PASS"
 else
     echo "FAIL"
@@ -50,7 +50,7 @@ echo
 
 echo "Movendo arquivo..."
 
-if move_file "${COPY_FILE}" "${MOVE_FILE}"; then
+if hs_fs_move_file "${COPY_FILE}" "${MOVE_FILE}"; then
     echo "PASS"
 else
     echo "FAIL"
@@ -60,8 +60,8 @@ echo
 
 echo "Removendo arquivos..."
 
-remove_file "${TEST_FILE}"
-remove_file "${MOVE_FILE}"
-remove_directory "${TEST_DIR}"
+hs_fs_remove_file "${TEST_FILE}"
+hs_fs_remove_file "${MOVE_FILE}"
+hs_fs_remove_directory "${TEST_DIR}"
 
 echo "PASS"

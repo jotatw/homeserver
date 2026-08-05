@@ -25,6 +25,14 @@ run_test \
     "Validation" \
     "${SCRIPT_DIR}/foundation/test_validation.sh"
 
+run_test \
+    "Filesystem" \
+    "${SCRIPT_DIR}/foundation/test_filesystem.sh"
+
+run_test \
+    "Loader" \
+    "${SCRIPT_DIR}/foundation/test_loader.sh"
+
 show_summary
 
 suite_exit_status

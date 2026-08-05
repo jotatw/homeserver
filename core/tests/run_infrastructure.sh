@@ -17,6 +17,10 @@ run_test \
     "Filesystem - Arquivos" \
     "${SCRIPT_DIR}/infrastructure/test_filesystem_files.sh"
 
+run_test \
+    "Workspace" \
+    "${SCRIPT_DIR}/infrastructure/test_initialize_workspace.sh"
+
 show_summary
 
 suite_exit_status

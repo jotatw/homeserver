@@ -28,7 +28,7 @@ echo "Verificando diretórios..."
 
 for directory in "${HS_WORKSPACE_DIRECTORIES[@]}"; do
 
-    if directory_exists "${directory}"; then
+    if hs_fs_directory_exists "${directory}"; then
         echo "PASS - ${directory}"
     else
         echo "FAIL - ${directory}"
