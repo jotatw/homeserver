@@ -5,6 +5,17 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
 ## [2.0.0] — em desenvolvimento
 
+### Sprint 3 — Storage Experience
+
+#### Added
+
+- **Armazenamento (Fase 1)**: tela completa seguindo `design/app/flows/storage.md`.
+  - Disco principal: % + barra + usado/disponível/total (via `/status.disk`).
+  - Dados: raiz de armazenamento, total e estado (via `/storage`).
+  - Pastas por usuário: usuários, compartilhado, mídia, documentos, dispositivos.
+  - Dispositivos conectados (via `/devices`) com tipo.
+  - CTA honesto para o FileBrowser (gap G1 — API não navega arquivos nesta versão).
+
 ### Sprint 2 — Workspace
 
 #### Added
