@@ -41,6 +41,9 @@ Atualmente o HomeServer oferece:
 - CLI administrativa (`hs`)
 - Auto-update por releases (`hs update check|apply`)
 - Security headers e rate limit na API
+- Testes de integração (`smoke-test.sh`, `test-cli.sh`, `test-api.sh`, `run-integration.sh`)
+- ADRs (`docs/architecture/adr/`) e Architecture Freeze
+- Design System (`docs/design/`) e App Design da v2.0 (`design/app/`)
 
 ---
 
@@ -124,15 +127,16 @@ Futuramente:
 
 # Homepage
 
-A Homepage é o ponto central do sistema.
+A Homepage é o ponto central do sistema (v1.4 — portal orientado às tarefas).
 
-Ela organiza todos os serviços do HomeServer em três níveis de utilização.
+Ela organiza os serviços em quatro grupos:
 
-| Modo | Objetivo |
-|------|----------|
-| **Usuário** | Arquivos, projetos e conteúdo pessoal |
-| **Administrador** | Administração dos serviços |
-| **Sistema** | Informações completas do servidor |
+| Grupo | Objetivo |
+|-------|----------|
+| **Meu espaço** | Arquivos, projetos, downloads e mídia |
+| **Aplicações** | Serviços com status (Homepage, FileBrowser, Gitea, App) |
+| **Administração** | Gestão para administradores |
+| **Sistema** | Informações técnicas do servidor |
 
 O objetivo é que o usuário nunca precise acessar diretamente cada serviço individualmente.
 
@@ -311,24 +315,25 @@ O objetivo é permitir reutilizar computadores antigos como servidores doméstic
 
 # Roadmap
 
-## v1.1
+## Lançado
 
-- Refinamento da Homepage
-- Melhorias de UX
-- Organização do projeto
+| Versão | Conteúdo |
+|--------|----------|
+| **v1.1** | Homepage refinada, melhorias de UX, organização do projeto |
+| **v1.2** | Gateway, URLs amigáveis, reverse proxy (Caddy, `homeserver.local`) |
+| **v1.3** | Autenticação com token, proteção de rotas, App com login, auto-update, fix religamento S3 |
+| **v1.4** | UX: Homepage como portal (4 grupos), cards como ações, Design System |
+| **v1.5** | Stable Foundation: code review, segurança, ADRs, testes de integração, Quality Gate |
 
-## v1.2
+## v2.0 — HomeServer App
 
-- Gateway
-- URLs amigáveis
-- Reverse Proxy
+O App unificado (web + mobile) está em fase de **design** na branch `app-design`
+(`design/app/`): referências, wireframes, fluxos por role, tokens e componentes.
 
-## v2.0
-
-- Device Service completo
-- Hardware Service
-- Aplicativo para Notebook
-- Aplicativo para Celular
+- Design system do App (tokens `--hs-*`, dark/light)
+- 6 telas: Login, Meu espaço, Aplicações, Armazenamento, Sistema, Administração
+- Navegação por role (sidebar desktop / bottom nav mobile)
+- Aplicativo para notebook e celular
 
 ## Futuro
 
@@ -346,18 +351,24 @@ A documentação está organizada em duas áreas:
 docs/          → como o HomeServer funciona
 ├── PRINCIPLES.md
 ├── ARCHITECTURE.md
-├── architecture/
+├── architecture/    (camadas, ADRs)
+├── design/          (Design System v1.4)
 ├── development/
-└── guide/
+├── foundation/
+├── guide/
+└── security/        (threat model, auditoria v1.5)
 
 planning/      → para onde o projeto está evoluindo
-├── VISION.md
-├── ROADMAP.md
-├── roadmap/
-└── backlog/
+├── vision.md
+├── strategy.md
+├── roadmap/         (planos por versão)
+├── quality/         (Quality Gate, review checklist)
+├── health/          (baselines de performance)
+└── backlog/         (product backlog por área)
 ```
 
 - **API**: veja `api/README.md`.
+- **App Design (v2.0)**: veja `design/app/` na branch `app-design`.
 - **CHANGELOG**: veja `CHANGELOG.md`.
 
 ---
