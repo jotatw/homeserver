@@ -334,6 +334,60 @@ input:focus-visible {
   color: var(--hs-text-faint);
 }
 
+/* ---------- Apps toolbar (busca + filtros) ---------- */
+
+.apps-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hs-space-2);
+  margin-bottom: var(--hs-space-4);
+}
+
+.search-field {
+  height: var(--hs-touch);
+  padding: 0 var(--hs-space-3);
+  background: var(--hs-surface);
+  border: 1px solid var(--hs-border);
+  border-radius: var(--hs-radius-md);
+  color: var(--hs-text);
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.search-field:focus {
+  border-color: var(--hs-border-strong);
+  box-shadow: var(--hs-shadow-focus);
+  outline: none;
+}
+
+.chips {
+  display: flex;
+  gap: var(--hs-space-2);
+  flex-wrap: wrap;
+}
+
+.chip {
+  height: var(--hs-touch-compact);
+  padding: 0 var(--hs-space-3);
+  border-radius: var(--hs-radius-full);
+  border: 1px solid var(--hs-border);
+  background: var(--hs-surface);
+  color: var(--hs-text-muted);
+  font-size: 0.85rem;
+  transition: background var(--hs-motion-fast), color var(--hs-motion-fast);
+}
+
+.chip:hover {
+  background: var(--hs-surface-hover);
+}
+
+.chip.active {
+  background: var(--hs-primary-soft);
+  border-color: var(--hs-primary);
+  color: var(--hs-primary);
+  font-weight: 600;
+}
+
 /* ---------- Feed ---------- */
 
 .feed {

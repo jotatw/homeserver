@@ -5,6 +5,17 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
 ## [2.0.0] — em desenvolvimento
 
+### Sprint 4 — Services Experience
+
+#### Added
+
+- **Aplicações** aprimorada seguindo `design/app/flows/apps.md`:
+  - **Busca** (campo com filtro em tempo real por título/nome).
+  - **Chips de filtro**: Todos · Ativos · Offline.
+  - Ordenação: ativos primeiro.
+  - Card com status (cor + ponto + texto) e abertura do serviço em nova aba.
+  - Estado vazio com ação "Limpar busca".
+
 ### Sprint 3 — Storage Experience
 
 #### Added

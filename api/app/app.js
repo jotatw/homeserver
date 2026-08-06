@@ -244,29 +244,79 @@ async function renderApps() {
   v.innerHTML = "";
 
   v.appendChild(el("h3", { class: "section" }, "Aplicações"));
-  const grid = el("div", { class: "grid" });
 
-  const list = services.slice().sort((a, b) => (a.status === "running" ? -1 : 1) - (b.status === "running" ? -1 : 1));
-  if (!list.length) {
-    v.appendChild(el("p", { class: "empty" }, "Nenhum serviço reportando."));
-    return;
+  const state = { query: "", filter: "all" };
+
+  // Toolbar: busca + filtros
+  const toolbar = el("div", { class: "apps-toolbar" });
+  const search = el("input", {
+    class: "search-field",
+    type: "search",
+    placeholder: "Buscar aplicação…",
+    "aria-label": "Buscar aplicação",
+  });
+  toolbar.appendChild(search);
+
+  const chips = el("div", { class: "chips" });
+  [["all", "Todos"], ["running", "🟢 Ativos"], ["down", "🔴 Offline"]].forEach(([key, label]) => {
+    const chip = el("button", { class: "chip" + (key === "all" ? " active" : ""), "data-filter": key }, label);
+    chip.addEventListener("click", () => {
+      state.filter = key;
+      chips.querySelectorAll(".chip").forEach((c) => c.classList.toggle("active", c.dataset.filter === key));
+      renderGrid();
+    });
+    chips.appendChild(chip);
+  });
+  toolbar.appendChild(chips);
+  v.appendChild(toolbar);
+
+  const grid = el("div", { class: "grid", id: "apps-grid" });
+  v.appendChild(grid);
+
+  function matches(s, meta) {
+    const q = state.query.toLowerCase();
+    if (state.filter === "running" && s.status !== "running") return false;
+    if (state.filter === "down" && s.status === "running") return false;
+    if (!q) return true;
+    return (meta.title + " " + s.name).toLowerCase().includes(q);
   }
 
-  list.forEach((s) => {
-    const meta = APP_MAP[s.name] || { title: s.name, host: "", icon: "📄" };
-    const up = s.status === "running";
-    const card = el("div", { class: "app-card" },
-      el("span", { class: "ic" }, meta.icon),
-      el("span", { class: "status-dot " + (up ? "ok" : "danger") }),
-      el("span", { class: "app-name" }, meta.title),
-      el("span", { class: "app-host" }, up ? "● Ativo" : "✕ Offline"));
-    if (meta.host && up) {
-      card.addEventListener("click", () => window.open(meta.host, "_blank"));
-      card.style.cursor = "pointer";
+  function renderGrid() {
+    grid.innerHTML = "";
+    const list = services
+      .filter((s) => matches(s, APP_MAP[s.name] || { title: s.name, host: "", icon: "📄" }))
+      .sort((a, b) => (a.status === "running" ? -1 : 1) - (b.status === "running" ? -1 : 1));
+
+    if (!list.length) {
+      grid.appendChild(el("p", { class: "empty" },
+        "Nenhuma aplicação encontrada para \"" + state.query + "\"",
+        el("br", {}),
+        el("button", { class: "btn btn-secondary", style: "margin-top:var(--hs-space-2)" }, "Limpar busca")));
+      return;
     }
-    grid.appendChild(card);
+
+    list.forEach((s) => {
+      const meta = APP_MAP[s.name] || { title: s.name, host: "", icon: "📄" };
+      const up = s.status === "running";
+      const card = el("div", { class: "app-card" },
+        el("span", { class: "ic" }, meta.icon),
+        el("span", { class: "status-dot " + (up ? "ok" : "danger") }),
+        el("span", { class: "app-name" }, meta.title),
+        el("span", { class: "app-host" }, up ? "● Ativo" : "✕ Offline"));
+      if (meta.host && up) {
+        card.addEventListener("click", () => window.open(meta.host, "_blank"));
+        card.style.cursor = "pointer";
+      }
+      grid.appendChild(card);
+    });
+  }
+
+  search.addEventListener("input", () => {
+    state.query = search.value.trim();
+    renderGrid();
   });
-  v.appendChild(grid);
+
+  renderGrid();
 }
 
 /* ---------- Armazenamento (Fase 1: painel de uso) ---------- */
