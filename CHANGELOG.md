@@ -5,6 +5,23 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
 ## [2.0.0-rc.1] — em candidata
 
+### Fixed (acceptance tests)
+
+- **Tema/sair inacessíveis** no desktop: sidebar sem scroll escondia os botões
+  em telas baixas → `overflow-y: auto` + **event delegation global** (funciona
+  mesmo se um render falhar).
+- **Bottom nav mobile quebrada**: o CSS esperava `<nav>` interno, mas o HTML usa
+  `<nav class="bottomnav">` → `display: flex` nunca aplicava (itens inacessíveis).
+  Corrigido com `display: flex` no container real.
+- **Mobile**: drawer `＋` (bottom sheet) com perfil, tema e sair (design
+  navigation.md) — acesso completo no mobile.
+- **Aplicações**: app-card com ellipsis no nome (sem quebrar caixas) + hover com
+  elevação.
+- **Armazenamento**: seção dispositivos sempre visível (vazia → "nenhum");
+  botão desmontar com loading e erro real.
+- **Cache**: `Cache-Control: no-cache` nos estáticos do App (browser não
+  cacheia versão antiga durante o desenvolvimento).
+
 ### Release Process (permanente)
 
 - `planning/release/`: release-process, definition-of-ready-for-release,
