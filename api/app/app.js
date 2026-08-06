@@ -63,13 +63,16 @@ function userNav() {
 /* ---------- Tema (dark/light) ---------- */
 
 function applyTheme(theme) {
-  document.documentElement.dataset.theme = theme;
-  localStorage.setItem("hs_theme", theme);
+  document.documentElement.setAttribute("data-theme", theme);
+  try {
+    localStorage.setItem("hs_theme", theme);
+  } catch (_) {}
 }
 
 function toggleTheme() {
-  const cur = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+  const cur = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
   applyTheme(cur);
+  toast(cur === "light" ? "Tema claro ativado." : "Tema escuro ativado.", "info");
 }
 
 /* ---------- Build da navegação (sidebar + bottom nav) ---------- */
@@ -395,37 +398,45 @@ async function renderStorage() {
       el("span", { class: "app-host" }, String(value)))));
   v.appendChild(fgrid);
 
-  // 4. Dispositivos conectados
+  // 4. Dispositivos conectados (sempre visível)
+  v.appendChild(el("h3", { class: "section" }, "Dispositivos conectados"));
+  const feed = el("div", { class: "feed" });
   if (devices && devices.length) {
-    v.appendChild(el("h3", { class: "section" }, "Dispositivos conectados"));
-    const feed = el("div", { class: "feed" });
     devices.forEach((d) => {
       const row = el("div", { class: "feed-item" },
         el("span", {}, "🔌"),
-        el("span", {}, d.label),
+        el("span", { class: "app-name", style: "overflow:hidden;text-overflow:ellipsis;white-space:nowrap" }, d.label),
         el("span", { class: "feed-time" }, (d.type || "").toUpperCase()));
       if (auth.isAdmin()) {
         const act = el("span", { class: "device-actions" },
-          el("button", { class: "btn btn-secondary", style: "height:var(--hs-touch-compact)" }, "Desmontar"));
+          el("button", { class: "btn btn-secondary", "data-label": d.label, style: "height:var(--hs-touch-compact)" }, "Desmontar"));
         act.addEventListener("click", async () => {
+          const btn = act.querySelector("button");
+          if (btn.disabled) return;
+          btn.disabled = true;
+          btn.textContent = "…";
           try {
             await apiOrFail("/api/v1/devices/unmount", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ type: d.type, label: d.label }),
             });
-            toast("Dispositivo desmontado.", "success");
+            toast("Dispositivo desmontado: " + d.label, "success");
             renderStorage();
-          } catch (_) {}
+          } catch (err) {
+            toast(err.message || "Falha ao desmontar.", "error");
+            btn.disabled = false;
+            btn.textContent = "Desmontar";
+          }
         });
         row.appendChild(act);
       }
       feed.appendChild(row);
     });
-    v.appendChild(feed);
-  } else if (auth.isAdmin()) {
-    v.appendChild(el("p", { class: "empty" }, "Nenhum dispositivo conectado."));
+  } else {
+    feed.appendChild(el("div", { class: "feed-item" }, "Nenhum dispositivo conectado."));
   }
+  v.appendChild(feed);
 
   if (auth.isAdmin()) {
     const mountBtn = el("button", { class: "btn btn-secondary", style: "margin-top:var(--hs-space-2)" }, "🔌 Montar dispositivo");
