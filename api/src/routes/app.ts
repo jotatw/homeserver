@@ -8,6 +8,9 @@ const MIME: Record<string, string> = {
     ".html": "text/html",
     ".js": "application/javascript",
     ".css": "text/css",
+    ".json": "application/manifest+json",
+    ".png": "image/png",
+    ".svg": "image/svg+xml",
 };
 
 export async function appRoutes(fastify: FastifyInstance) {
