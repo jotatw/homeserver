@@ -92,6 +92,33 @@ function buildNav() {
       el("span", { class: "ic" }, n.icon), el("span", {}, n.title));
     bottom.appendChild(m);
   });
+
+  // Overflow: abre o drawer com perfil, tema e sair (design navigation.md).
+  const plus = el("button", { class: "nav-item", id: "bottom-plus", "aria-label": "Mais opções" },
+    el("span", { class: "ic" }, "＋"),
+    el("span", {}, "Mais"));
+  plus.addEventListener("click", openOverflowSheet);
+  bottom.appendChild(plus);
+}
+
+function openOverflowSheet() {
+  let sheet = document.getElementById("overflow-sheet");
+  if (!sheet) {
+    sheet = el("dialog", { id: "overflow-sheet", class: "sheet" },
+      el("div", { class: "sheet-handle" }),
+      el("div", { class: "sheet-item" },
+        el("span", { class: "ic" }, "👤"),
+        el("span", { class: "app-name", id: "sheet-user" })),
+      el("button", { class: "sheet-item", id: "sheet-theme" },
+        el("span", { class: "ic" }, "🌗"), el("span", {}, "Tema")),
+      el("button", { class: "sheet-item sheet-danger", id: "sheet-sair" },
+        el("span", { class: "ic" }, "⏻"), el("span", {}, "Sair")));
+    document.body.appendChild(sheet);
+  }
+
+  document.getElementById("sheet-user").textContent =
+    auth.user ? auth.user.username + (auth.isAdmin() ? " · Admin" : "") : "";
+  sheet.showModal();
 }
 
 function highlightNav() {
@@ -761,6 +788,22 @@ function showCreatedToken(data) {
 
 window.addEventListener("hashchange", router);
 
+// Delegation global: tema e sair funcionam mesmo se um render falhar no init.
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest("button");
+  if (!btn) return;
+
+  if (btn.id === "btn-theme" || btn.id === "btn-theme-mobile" || btn.id === "sheet-theme") {
+    toggleTheme();
+    const sheet = document.getElementById("overflow-sheet");
+    if (sheet && sheet.open) sheet.close();
+  } else if (btn.id === "btn-sair" || btn.id === "sheet-sair") {
+    auth.logout().then(() => {
+      window.location.href = "/app/login.html";
+    });
+  }
+});
+
 async function init() {
   applyTheme(localStorage.getItem("hs_theme") || "dark");
 
@@ -773,13 +816,6 @@ async function init() {
   buildNav();
   renderUser();
   router();
-
-  document.getElementById("btn-sair").addEventListener("click", async () => {
-    await auth.logout();
-    window.location.href = "/app/login.html";
-  });
-  document.getElementById("btn-theme").addEventListener("click", toggleTheme);
-  document.getElementById("btn-theme-mobile").addEventListener("click", toggleTheme);
 
   // Refresh ao focar a aba (se estiver no dashboard com polling).
   document.addEventListener("visibilitychange", () => {
