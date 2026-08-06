@@ -369,11 +369,38 @@ async function renderStorage() {
   if (devices && devices.length) {
     v.appendChild(el("h3", { class: "section" }, "Dispositivos conectados"));
     const feed = el("div", { class: "feed" });
-    devices.forEach((d) => feed.appendChild(el("div", { class: "feed-item" },
-      el("span", {}, "🔌"),
-      el("span", {}, d.label),
-      el("span", { class: "feed-time" }, (d.type || "").toUpperCase()))));
+    devices.forEach((d) => {
+      const row = el("div", { class: "feed-item" },
+        el("span", {}, "🔌"),
+        el("span", {}, d.label),
+        el("span", { class: "feed-time" }, (d.type || "").toUpperCase()));
+      if (auth.isAdmin()) {
+        const act = el("span", { class: "device-actions" },
+          el("button", { class: "btn btn-secondary", style: "height:var(--hs-touch-compact)" }, "Desmontar"));
+        act.addEventListener("click", async () => {
+          try {
+            await apiOrFail("/api/v1/devices/unmount", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ type: d.type, label: d.label }),
+            });
+            toast("Dispositivo desmontado.", "success");
+            renderStorage();
+          } catch (_) {}
+        });
+        row.appendChild(act);
+      }
+      feed.appendChild(row);
+    });
     v.appendChild(feed);
+  } else if (auth.isAdmin()) {
+    v.appendChild(el("p", { class: "empty" }, "Nenhum dispositivo conectado."));
+  }
+
+  if (auth.isAdmin()) {
+    const mountBtn = el("button", { class: "btn btn-secondary", style: "margin-top:var(--hs-space-2)" }, "🔌 Montar dispositivo");
+    mountBtn.addEventListener("click", () => openMountDialog());
+    v.appendChild(mountBtn);
   }
 
   // 5. CTA honesto (gap G1: a API não navega arquivos)
@@ -514,6 +541,57 @@ function openPowerDialog(power) {
 
 function badge(text, kind) {
   return el("span", { class: "badge " + kind }, text);
+}
+
+/* ---------- Dialog: montar dispositivo (admin) ---------- */
+
+function openMountDialog() {
+  let dialog = document.getElementById("mount-dialog");
+  if (!dialog) {
+    dialog = el("dialog", { id: "mount-dialog" },
+      el("form", { method: "dialog", id: "mount-form" },
+        el("h3", { style: "margin-bottom:var(--hs-space-4)" }, "Montar dispositivo"),
+        el("div", { class: "field" },
+          el("label", { for: "md-type" }, "Tipo"),
+          el("input", { id: "md-type", placeholder: "usb / sdcard / external", required: true })),
+        el("div", { class: "field" },
+          el("label", { for: "md-label" }, "Rótulo"),
+          el("input", { id: "md-label", placeholder: "ex.: meudispositivo", required: true })),
+        el("div", { class: "field" },
+          el("label", { for: "md-device" }, "Dispositivo"),
+          el("input", { id: "md-device", placeholder: "ex.: sdb1", required: true })),
+        el("p", { class: "power-hint" }, "Monte em /srv/storage/devices/<tipo>/<rótulo>."),
+        el("div", { class: "dialog-actions" },
+          el("button", { type: "button", class: "btn btn-secondary", id: "md-cancel" }, "Cancelar"),
+          el("button", { type: "submit", class: "btn btn-primary" }, "Montar"))));
+    document.body.appendChild(dialog);
+
+    dialog.querySelector("#md-cancel").addEventListener("click", () => dialog.close());
+    dialog.querySelector("#mount-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const type = document.getElementById("md-type").value.trim();
+      const label = document.getElementById("md-label").value.trim();
+      const device = document.getElementById("md-device").value.trim();
+      const saveBtn = dialog.querySelector('button[type="submit"]');
+      saveBtn.disabled = true;
+      saveBtn.textContent = "Montando…";
+      try {
+        await apiOrFail("/api/v1/devices/mount", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type, label, device }),
+        });
+        toast("Dispositivo montado.", "success");
+        dialog.close();
+        renderStorage();
+      } catch (_) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Montar";
+      }
+    });
+  }
+
+  dialog.showModal();
 }
 
 /* ---------- Administração (admin) ---------- */
