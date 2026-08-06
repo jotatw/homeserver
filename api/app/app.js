@@ -280,30 +280,65 @@ async function renderStorage() {
   const v = document.getElementById("view");
   v.innerHTML = "";
 
-  v.appendChild(el("h3", { class: "section" }, "Armazenamento"));
+  // 1. Disco principal
   const disk = status.disk || {};
+  v.appendChild(el("h3", { class: "section" }, "Disco principal"));
   const grid = el("div", { class: "grid" });
   grid.appendChild(statCard("Disco", (disk.percent ?? 0) + "%", disk.percent ?? 0));
   grid.appendChild(statCard("Usado", human(disk.used || 0), 0));
   grid.appendChild(statCard("Disponível", human(disk.available || 0), 0));
-  grid.appendChild(statCard("Total", st.total_size_human || "—", 0));
+  grid.appendChild(statCard("Total", human(disk.total || 0), 0));
   v.appendChild(grid);
 
-  v.appendChild(el("h3", { class: "section" }, "Pastas"));
-  const p = el("p", { class: "empty" }, "Não há navegação de arquivos nesta versão.");
-  v.appendChild(p);
+  // 2. Raiz de dados
+  v.appendChild(el("h3", { class: "section" }, "Dados"));
+  const dados = el("div", { class: "feed" });
+  dados.appendChild(feedRow("📁", "Raiz de dados", st.root || "—"));
+  dados.appendChild(feedRow("💾", "Total armazenado", st.total_size_human || "—"));
+  dados.appendChild(feedRow("●", "Pronto", st.ready ? "Sim" : "Não"));
+  v.appendChild(dados);
 
+  // 3. Pastas por usuário
+  v.appendChild(el("h3", { class: "section" }, "Pastas"));
+  const folders = [
+    ["👤", "Usuários", st.users ?? 0],
+    ["🤝", "Compartilhado", st.shared ?? 0],
+    ["🎞️", "Mídia", st.media ?? 0],
+    ["📄", "Documentos", st.documents ?? 0],
+    ["🔌", "Dispositivos", st.devices ?? 0],
+  ];
+  const fgrid = el("div", { class: "grid" });
+  folders.forEach(([icon, label, value]) =>
+    fgrid.appendChild(el("div", { class: "app-card" },
+      el("span", {}, icon),
+      el("span", { class: "app-name" }, label),
+      el("span", { class: "app-host" }, String(value)))));
+  v.appendChild(fgrid);
+
+  // 4. Dispositivos conectados
   if (devices && devices.length) {
     v.appendChild(el("h3", { class: "section" }, "Dispositivos conectados"));
     const feed = el("div", { class: "feed" });
     devices.forEach((d) => feed.appendChild(el("div", { class: "feed-item" },
-      el("span", {}, "🔌"), el("span", {}, d.label),
-      el("span", { class: "feed-time" }, d.mountpoint || ""))));
+      el("span", {}, "🔌"),
+      el("span", {}, d.label),
+      el("span", { class: "feed-time" }, (d.type || "").toUpperCase()))));
     v.appendChild(feed);
   }
 
-  v.appendChild(el("p", { class: "empty" },
+  // 5. CTA honesto (gap G1: a API não navega arquivos)
+  v.appendChild(el("div", { class: "empty", style: "padding-top: var(--hs-space-8)" },
+    el("span", { class: "empty-icon" }, "📭"),
+    "Navegação de arquivos não está disponível nesta versão.",
+    el("br", {}),
     el("a", { href: "/files/", target: "_blank" }, "Ir para o FileBrowser →")));
+}
+
+function feedRow(icon, label, value) {
+  return el("div", { class: "feed-item" },
+    el("span", {}, icon),
+    el("span", { class: "app-name" }, label),
+    el("span", { class: "feed-time" }, value));
 }
 
 /* ---------- Sistema ---------- */
