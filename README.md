@@ -230,11 +230,22 @@ Mais detalhes em `api/README.md`.
 
 # Uso
 
-## Instalação
+## Instalação rápida
+
+> Para iniciantes: siga o [`QUICKSTART.md`](QUICKSTART.md) (~10 minutos, sem programação).
+> Detalhes e flags: [`docs/INSTALLATION.md`](docs/INSTALLATION.md).
 
 ```bash
+git clone https://github.com/usuario/homeserver.git
+cd homeserver
 sudo bash install.sh
 ```
+
+O instalador é um **assistente**: detecta sua rede, pergunta o usuário
+principal, gera as senhas e configura tudo. Ao final, executa um **Health
+Check** automático e mostra o endereço de acesso.
+
+> Primeiro acesso e configuração inicial: [`docs/FIRST_BOOT.md`](docs/FIRST_BOOT.md).
 
 ## Releases e atualização automática
 
