@@ -743,3 +743,18 @@ dialog::backdrop {
     gap: var(--hs-space-3);
   }
 }
+
+/* ---------- Token de API ---------- */
+
+.token-code {
+  display: block;
+  font-family: var(--hs-font-mono);
+  background: var(--hs-bg);
+  border: 1px solid var(--hs-border);
+  border-radius: var(--hs-radius-md);
+  padding: var(--hs-space-3);
+  margin: var(--hs-space-3) 0;
+  font-size: 0.85rem;
+  word-break: break-all;
+  user-select: all;
+}

@@ -5,6 +5,21 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
 ## [2.0.0] — em desenvolvimento
 
+### Sprint 7 — Integrations
+
+#### Added
+
+- **API Tokens** para integrações externas (gap do `admin.md` resolvido):
+  - `GET /api/v1/tokens` — lista tokens (nome, prefixo, criado em, último uso).
+  - `POST /api/v1/tokens` `{name}` — cria token `hs_token_*` (retornado 1x).
+  - `DELETE /api/v1/tokens/:id` — revoga (invalida na hora).
+  - Tokens autenticam como integração (leitura, **não-admin** → 403 em rotas admin).
+  - Persistência em `api/data/tokens.json` (não versionado); **apenas SHA-256**
+    do token é armazenado (vazamento do arquivo não expõe tokens).
+  - **App — Administração**: seção Tokens de API (listar, criar com exibição
+    única do token, revogar com confirmação).
+- Testes: 7 casos em `test-api.sh` (29 total).
+
 ### Sprint 6 — Devices
 
 #### Added

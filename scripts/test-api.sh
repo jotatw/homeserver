@@ -106,6 +106,41 @@ assert isinstance(u['admin'], bool), 'admin deve ser bool'
     [[ "${CODE}" == "400" ]]
     report "POST /devices/eject sem body -> 400" $?
 
+    # 6c. tokens de API (admin)
+    BODY=$(curl -sf -m 5 "${API}/api/v1/tokens" -H "${AUTH}" 2>/dev/null)
+    echo "${BODY}" | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['ok'] is True and 'data' in d" >/dev/null 2>&1
+    report "GET /tokens (admin) -> {ok,data}" $?
+
+    CODE=$(curl -s -o /dev/null -w "%{http_code}" -m 5 -X POST "${API}/api/v1/tokens" -H "${AUTH}" -H "Content-Type: application/json" -d '{}')
+    [[ "${CODE}" == "400" ]]
+    report "POST /tokens sem name -> 400" $?
+
+    TKBODY=$(curl -sf -m 5 -X POST "${API}/api/v1/tokens" -H "${AUTH}" -H "Content-Type: application/json" -d '{"name":"test-ci"}' 2>/dev/null)
+    TKTOKEN=$(echo "${TKBODY}" | python3 -c "import json,sys; print(json.load(sys.stdin)['data'].get('token',''))" 2>/dev/null)
+    TKID=$(echo "${TKBODY}" | python3 -c "import json,sys; print(json.load(sys.stdin)['data'].get('id',''))" 2>/dev/null)
+    [[ -n "${TKTOKEN}" && "${TKTOKEN}" == hs_token_* ]]
+    report "POST /tokens -> cria token hs_token_*" $?
+
+    # token de API autentica (leitura, não-admin)
+    CODE=$(curl -s -o /dev/null -w "%{http_code}" -m 5 "${API}/api/v1/status" -H "Authorization: Bearer ${TKTOKEN}")
+    [[ "${CODE}" == "200" ]]
+    report "GET /status com token de API -> 200 (integração)" $?
+
+    # token de API não acessa rota admin (403)
+    CODE=$(curl -s -o /dev/null -w "%{http_code}" -m 5 "${API}/api/v1/users" -H "Authorization: Bearer ${TKTOKEN}")
+    [[ "${CODE}" == "403" ]]
+    report "GET /users com token de API -> 403 (não-admin)" $?
+
+    # revoga e invalida
+    if [[ -n "${TKID}" ]]; then
+        CODE=$(curl -s -o /dev/null -w "%{http_code}" -m 5 -X DELETE "${API}/api/v1/tokens/${TKID}" -H "${AUTH}")
+        [[ "${CODE}" == "200" ]]
+        report "DELETE /tokens/:id -> revoga" $?
+        CODE=$(curl -s -o /dev/null -w "%{http_code}" -m 5 "${API}/api/v1/status" -H "Authorization: Bearer ${TKTOKEN}")
+        [[ "${CODE}" == "401" ]]
+        report "GET /status com token revogado -> 401" $?
+    fi
+
     # 7. session retorna user {username, admin} + expiresIn
     BODY=$(curl -sf -m 5 "${API}/api/v1/auth/session" -H "${AUTH}" 2>/dev/null)
     echo "${BODY}" | python3 -c "
