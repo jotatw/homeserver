@@ -66,6 +66,7 @@ a {
   padding: var(--hs-space-3);
   gap: var(--hs-space-1);
   z-index: 20;
+  overflow-y: auto;
 }
 
 .sidebar .brand {
@@ -261,6 +262,13 @@ input:focus-visible {
   border-radius: var(--hs-radius-lg);
   padding: var(--hs-space-3);
   box-shadow: var(--hs-shadow-sm);
+  transition: background var(--hs-motion-fast), box-shadow var(--hs-motion-fast),
+    transform var(--hs-motion-fast);
+}
+
+.stat-card:hover {
+  background: var(--hs-surface-hover);
+  box-shadow: var(--hs-shadow-md);
 }
 
 .stat-card .stat-label {
@@ -782,6 +790,52 @@ dialog::backdrop {
   .topbar {
     padding: 0 var(--hs-space-2);
   }
+}
+
+/* ---------- Overflow sheet (mobile) ---------- */
+
+.sheet {
+  width: 100%;
+  max-width: none;
+  margin: auto 0 0;
+  border-radius: var(--hs-radius-xl) var(--hs-radius-xl) 0 0;
+  border-bottom: none;
+  padding: var(--hs-space-2) var(--hs-space-4) calc(var(--hs-space-6) + env(safe-area-inset-bottom));
+  animation: sheet-up var(--hs-motion-slow) cubic-bezier(0.3, 0, 0, 1);
+}
+
+.sheet-handle {
+  width: 40px;
+  height: 4px;
+  border-radius: var(--hs-radius-full);
+  background: var(--hs-border-strong);
+  margin: var(--hs-space-1) auto var(--hs-space-4);
+}
+
+.sheet-item {
+  display: flex;
+  align-items: center;
+  gap: var(--hs-space-3);
+  width: 100%;
+  height: var(--hs-touch);
+  padding: 0 var(--hs-space-2);
+  border-radius: var(--hs-radius-md);
+  color: var(--hs-text);
+  font-size: 0.95rem;
+  text-align: left;
+}
+
+.sheet-item:hover {
+  background: var(--hs-surface-hover);
+}
+
+.sheet-item.sheet-danger {
+  color: var(--hs-color-danger);
+}
+
+@keyframes sheet-up {
+  from { transform: translateY(40px); opacity: 0.6; }
+  to   { transform: translateY(0); opacity: 1; }
 }
 
 /* ---------- Token de API ---------- */
