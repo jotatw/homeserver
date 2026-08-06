@@ -5,6 +5,20 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
 ## [2.0.0] — em desenvolvimento
 
+### Sprint 6 — Devices
+
+#### Added
+
+- **Device Service** (API + App):
+  - `POST /api/v1/devices/mount` (type, label, device) — monta no host.
+  - `POST /api/v1/devices/unmount` (type, label) — desmonta.
+  - `POST /api/v1/devices/eject` (device) — ejeta.
+  - Ações de hardware rodam no **host via nsenter** (sudo/systemd existem lá —
+    padrão do backup); admin-only; validação de body (400).
+  - **App — Armazenamento**: seção de dispositivos com ação **Desmontar** (admin)
+    e dialog **Montar dispositivo** (tipo/rótulo/dispositivo).
+- Testes: 3 casos de validação em `test-api.sh` (22 total).
+
 ### Sprint 5 — System Experience
 
 #### Added

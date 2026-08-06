@@ -418,6 +418,16 @@ input:focus-visible {
   white-space: nowrap;
 }
 
+.device-actions {
+  margin-left: var(--hs-space-2);
+  display: inline-flex;
+}
+
+.device-actions .btn {
+  height: var(--hs-touch-compact);
+  font-size: 0.8rem;
+}
+
 /* ---------- Sections ---------- */
 
 .section {
