@@ -121,7 +121,17 @@ function renderUser() {
 
 /* ---------- Router ---------- */
 
+let dashboardTimer = null;
+
+function clearDashboardPolling() {
+  if (dashboardTimer) {
+    clearInterval(dashboardTimer);
+    dashboardTimer = null;
+  }
+}
+
 async function router() {
+  clearDashboardPolling();
   const route = currentRoute();
   highlightNav();
   setTitle();
@@ -151,39 +161,17 @@ async function router() {
 /* ---------- Dashboard (Meu espaço) ---------- */
 
 async function renderDashboard() {
-  const [status, events] = await Promise.all([
-    api("/api/v1/status"),
-    api("/api/v1/events"),
-  ]);
   const v = document.getElementById("view");
   v.innerHTML = "";
 
-  // Banner de status
-  const services = status.services || [];
-  const up = services.filter((s) => s.status === "running").length;
-  let bannerClass = "ok", bannerText = `Servidor OK · ${up} apps em execução`;
-  if (services.length > 0 && up < services.length) {
-    bannerClass = "warn";
-    bannerText = `${services.length - up} de ${services.length} serviços com problema`;
-  } else if (services.length === 0) {
-    bannerClass = "danger";
-    bannerText = "Nenhum serviço reportando";
-  }
-  v.appendChild(el("div", { class: "banner " + bannerClass }, "●", bannerText));
+  // Estrutura com ids (banner, stats, ações, feed) — polling atualiza os valores.
+  v.appendChild(el("div", { class: "banner", id: "db-banner" }, "●", "Carregando…"));
 
-  // Stat cards
-  const disk = status.disk || {};
-  const mem = status.memory || {};
-  const cpu = status.cpu || {};
   v.appendChild(el("h3", { class: "section" }, "Servidor"));
-  const grid = el("div", { class: "grid" });
-  grid.appendChild(statCard("CPU", (cpu.percent ?? 0) + "%", cpu.percent ?? 0));
-  grid.appendChild(statCard("Memória", (mem.percent ?? 0) + "%", mem.percent ?? 0));
-  grid.appendChild(statCard("Disco", (disk.percent ?? 0) + "%", disk.percent ?? 0));
-  grid.appendChild(statCard("Uptime", status.uptime || "—", 0));
+  const grid = el("div", { class: "grid", id: "db-stats" });
+  ["cpu", "mem", "disk", "uptime"].forEach((k) => grid.appendChild(el("div", { class: "stat-card skeleton" })));
   v.appendChild(grid);
 
-  // Acesso rápido (ActionCards)
   v.appendChild(el("h3", { class: "section" }, "Acesso rápido"));
   const actions = el("div", { class: "grid" });
   actions.appendChild(actionCard("📁", "Arquivos", "/files/"));
@@ -191,19 +179,61 @@ async function renderDashboard() {
   actions.appendChild(actionCard("📊", "Sistema", "#/system"));
   v.appendChild(actions);
 
-  // Feed de atividades
   v.appendChild(el("h3", { class: "section" }, "Atividades"));
-  if (events && events.length) {
-    const feed = el("div", { class: "feed" });
-    events.slice(0, 8).forEach((ev) => {
-      const icon = { backup: "💾", device: "🔌", system: "⚙️", power: "🔋" }[ev.type] || "📄";
-      feed.appendChild(el("div", { class: "feed-item" },
-        el("span", {}, icon), el("span", {}, ev.action || ev.type),
-        el("span", { class: "feed-time" }, ev.time ? timeAgo(ev.time) : "")));
-    });
-    v.appendChild(feed);
-  } else {
-    v.appendChild(el("p", { class: "empty" }, "Sem atividades registradas."));
+  v.appendChild(el("div", { class: "feed", id: "db-feed" }));
+
+  await refreshDashboard();
+  dashboardTimer = setInterval(refreshDashboard, 30000);
+}
+
+async function refreshDashboard() {
+  try {
+    const [status, events] = await Promise.all([
+      api("/api/v1/status"),
+      api("/api/v1/events"),
+    ]);
+
+    // Banner de status
+    const banner = document.getElementById("db-banner");
+    const services = status.services || [];
+    const up = services.filter((s) => s.status === "running").length;
+    let bannerClass = "ok", bannerText = `Servidor OK · ${up} apps em execução`;
+    if (services.length > 0 && up < services.length) {
+      bannerClass = "warn";
+      bannerText = `${services.length - up} de ${services.length} serviços com problema`;
+    } else if (services.length === 0) {
+      bannerClass = "danger";
+      bannerText = "Nenhum serviço reportando";
+    }
+    banner.className = "banner " + bannerClass;
+    banner.textContent = "● " + bannerText;
+
+    // Stat cards
+    const disk = status.disk || {};
+    const mem = status.memory || {};
+    const cpu = status.cpu || {};
+    const stats = document.getElementById("db-stats");
+    stats.innerHTML = "";
+    stats.appendChild(statCard("CPU", (cpu.percent ?? 0) + "%", cpu.percent ?? 0));
+    stats.appendChild(statCard("Memória", (mem.percent ?? 0) + "%", mem.percent ?? 0));
+    stats.appendChild(statCard("Disco", (disk.percent ?? 0) + "%", disk.percent ?? 0));
+    stats.appendChild(statCard("Uptime", status.uptime || "—", 0));
+
+    // Feed de atividades
+    const feed = document.getElementById("db-feed");
+    feed.innerHTML = "";
+    if (events && events.length) {
+      events.slice(0, 8).forEach((ev) => {
+        const icon = { backup: "💾", device: "🔌", system: "⚙️", power: "🔋" }[ev.type] || "📄";
+        feed.appendChild(el("div", { class: "feed-item" },
+          el("span", {}, icon), el("span", {}, ev.action || ev.type),
+          el("span", { class: "feed-time" }, ev.time ? timeAgo(ev.time) : "")));
+      });
+    } else {
+      feed.appendChild(el("div", { class: "feed-item" }, "Sem atividades registradas."));
+    }
+  } catch (_) {
+    // api() já trata 401 (logout). Erros de rede ficam silenciosos no polling.
   }
 }
 
@@ -739,6 +769,13 @@ async function init() {
   });
   document.getElementById("btn-theme").addEventListener("click", toggleTheme);
   document.getElementById("btn-theme-mobile").addEventListener("click", toggleTheme);
+
+  // Refresh ao focar a aba (se estiver no dashboard com polling).
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && dashboardTimer) {
+      refreshDashboard();
+    }
+  });
 }
 
 init();
