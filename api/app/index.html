@@ -1,23 +1,37 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0f172a">
   <title>HomeServer App</title>
+  <link rel="stylesheet" href="/app/theme.css">
   <link rel="stylesheet" href="/app/style.css">
 </head>
 <body>
-  <header>
-    <div class="brand">HomeServer</div>
-    <nav>
-      <button data-view="dashboard" class="active">Dashboard</button>
-      <button data-view="storage">Storage</button>
-      <button data-view="users">Usuários</button>
-      <button data-view="services">Serviços</button>
-      <button data-view="devices">Dispositivos</button>
-    </nav>
-  </header>
-  <main id="view">Carregando...</main>
+  <div class="app-shell" id="app" hidden>
+    <aside class="sidebar">
+      <div class="brand"><span class="dot"></span> HomeServer</div>
+      <nav id="sidebar-nav"></nav>
+      <div class="spacer"></div>
+      <button class="nav-item" id="btn-theme">🌗 Tema</button>
+      <button class="nav-item" id="btn-sair">⏻ Sair</button>
+    </aside>
+
+    <main class="app-main">
+      <header class="topbar">
+        <h1 id="topbar-title"></h1>
+        <div class="topbar-actions">
+          <button class="nav-item" id="btn-theme-mobile" aria-label="Alternar tema">🌗</button>
+          <div class="avatar" id="topbar-user"></div>
+        </div>
+      </header>
+      <div id="toast-region"></div>
+      <div id="view"></div>
+    </main>
+
+    <nav class="bottomnav" id="bottom-nav" aria-label="Principal"></nav>
+  </div>
   <script src="/app/auth.js"></script>
   <script src="/app/app.js"></script>
 </body>
