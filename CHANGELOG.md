@@ -5,6 +5,17 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
 ## [2.0.0] — em desenvolvimento
 
+### Sprint 5 — System Experience
+
+#### Added
+
+- **Sistema** aprimorada seguindo `design/app/flows/system.md` (seções por role):
+  - Gauges: CPU/Mem/Disco (barra por faixa de cor) + Uptime.
+  - Checks de serviço com badges (estilo status page).
+  - **Admin**: Energia — agenda liga/desliga (`/power`) com **dialog de edição**
+    (inputs HH:MM + ativar/desativar, `PUT /power`, com confirmação por toast).
+  - **Admin**: Rede (IP) e Temperatura (`/hardware`) com **alerta ≥80°C**.
+
 ### Sprint 4 — Services Experience
 
 #### Added
