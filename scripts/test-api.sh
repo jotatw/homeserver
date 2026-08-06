@@ -93,6 +93,19 @@ assert isinstance(u['admin'], bool), 'admin deve ser bool'
     echo "${BODY}" | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['ok'] is True and 'data' in d" >/dev/null 2>&1
     report "GET /users (admin) -> {ok,data}" $?
 
+    # 6b. devices admin: validação de body (400 sem campos)
+    CODE=$(curl -s -o /dev/null -w "%{http_code}" -m 5 -X POST "${API}/api/v1/devices/mount" -H "${AUTH}" -H "Content-Type: application/json" -d '{}')
+    [[ "${CODE}" == "400" ]]
+    report "POST /devices/mount sem body -> 400" $?
+
+    CODE=$(curl -s -o /dev/null -w "%{http_code}" -m 5 -X POST "${API}/api/v1/devices/unmount" -H "${AUTH}" -H "Content-Type: application/json" -d '{}')
+    [[ "${CODE}" == "400" ]]
+    report "POST /devices/unmount sem body -> 400" $?
+
+    CODE=$(curl -s -o /dev/null -w "%{http_code}" -m 5 -X POST "${API}/api/v1/devices/eject" -H "${AUTH}" -H "Content-Type: application/json" -d '{}')
+    [[ "${CODE}" == "400" ]]
+    report "POST /devices/eject sem body -> 400" $?
+
     # 7. session retorna user {username, admin} + expiresIn
     BODY=$(curl -sf -m 5 "${API}/api/v1/auth/session" -H "${AUTH}" 2>/dev/null)
     echo "${BODY}" | python3 -c "
