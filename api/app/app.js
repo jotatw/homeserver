@@ -597,28 +597,123 @@ function openMountDialog() {
 /* ---------- Administração (admin) ---------- */
 
 async function renderAdmin() {
-  const users = await api("/api/v1/users");
+  const [users, tokens] = await Promise.all([
+    api("/api/v1/users"),
+    api("/api/v1/tokens"),
+  ]);
   const v = document.getElementById("view");
   v.innerHTML = "";
 
+  // Usuários
   v.appendChild(el("h3", { class: "section" }, "Usuários"));
-  if (!users || !users.length) {
+  if (users && users.length) {
+    const t = el("table", { class: "table" });
+    const head = el("tr");
+    ["Usuário", "Admin"].forEach((c) => head.appendChild(el("th", {}, c)));
+    t.appendChild(el("thead", {}, head));
+    const body = el("tbody");
+    users.forEach((u) => {
+      const tr = el("tr");
+      tr.appendChild(el("td", {}, u.username || u.id));
+      tr.appendChild(el("td", {}, u.perm && u.perm.admin ? "⭐ Admin" : "padrão"));
+      body.appendChild(tr);
+    });
+    t.appendChild(body);
+    v.appendChild(t);
+  } else {
     v.appendChild(el("p", { class: "empty" }, "Nenhum usuário encontrado."));
-    return;
   }
-  const t = el("table", { class: "table" });
-  const head = el("tr");
-  ["Usuário", "Admin"].forEach((c) => head.appendChild(el("th", {}, c)));
-  t.appendChild(el("thead", {}, head));
-  const body = el("tbody");
-  users.forEach((u) => {
-    const tr = el("tr");
-    tr.appendChild(el("td", {}, u.username || u.id));
-    tr.appendChild(el("td", {}, u.perm && u.perm.admin ? "⭐ Admin" : "padrão"));
-    body.appendChild(tr);
-  });
-  t.appendChild(body);
-  v.appendChild(t);
+
+  // Tokens de API
+  v.appendChild(el("h3", { class: "section" }, "Tokens de API"));
+  const tfeed = el("div", { class: "feed" });
+  if (tokens && tokens.length) {
+    tokens.forEach((tk) => {
+      const row = el("div", { class: "feed-item" },
+        el("span", {}, "🔑"),
+        el("span", { class: "app-name" }, tk.name),
+        el("span", { class: "app-host" },
+          tk.prefix + "… · " + (tk.lastUsedAt ? "usado" : "novo")));
+      const rev = el("button", { class: "btn btn-secondary", style: "height:var(--hs-touch-compact)" }, "Revogar");
+      rev.addEventListener("click", async () => {
+        if (!confirm("Revogar o token \"" + tk.name + "\"?")) return;
+        try {
+          await apiOrFail("/api/v1/tokens/" + tk.id, { method: "DELETE" });
+          toast("Token revogado.", "success");
+          renderAdmin();
+        } catch (_) {}
+      });
+      row.appendChild(rev);
+      tfeed.appendChild(row);
+    });
+  } else {
+    tfeed.appendChild(el("div", { class: "feed-item" }, "Nenhum token criado."));
+  }
+  v.appendChild(tfeed);
+
+  const createBtn = el("button", { class: "btn btn-secondary", style: "margin-top:var(--hs-space-2)" }, "🔑 Criar token");
+  createBtn.addEventListener("click", () => openTokenDialog());
+  v.appendChild(createBtn);
+}
+
+/* ---------- Dialog: criar token de API (admin) ---------- */
+
+function openTokenDialog() {
+  let dialog = document.getElementById("token-dialog");
+  if (!dialog) {
+    dialog = el("dialog", { id: "token-dialog" },
+      el("form", { method: "dialog", id: "token-form" },
+        el("h3", { style: "margin-bottom:var(--hs-space-4)" }, "Criar token de API"),
+        el("div", { class: "field" },
+          el("label", { for: "tk-name" }, "Nome"),
+          el("input", { id: "tk-name", placeholder: "ex.: homepage-widget", required: true })),
+        el("p", { class: "power-hint" }, "Use como Authorization: Bearer <token>. O token é exibido uma única vez."),
+        el("div", { class: "dialog-actions" },
+          el("button", { type: "button", class: "btn btn-secondary", id: "tk-cancel" }, "Cancelar"),
+          el("button", { type: "submit", class: "btn btn-primary" }, "Criar"))));
+    document.body.appendChild(dialog);
+
+    dialog.querySelector("#tk-cancel").addEventListener("click", () => dialog.close());
+    dialog.querySelector("#token-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("tk-name").value.trim();
+      const saveBtn = dialog.querySelector('button[type="submit"]');
+      saveBtn.disabled = true;
+      saveBtn.textContent = "Criando…";
+      try {
+        const data = await apiOrFail("/api/v1/tokens", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name }),
+        });
+        dialog.close();
+        showCreatedToken(data);
+        renderAdmin();
+      } catch (_) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Criar";
+      }
+    });
+  }
+
+  document.getElementById("tk-name").value = "";
+  dialog.showModal();
+}
+
+function showCreatedToken(data) {
+  let dialog = document.getElementById("token-created");
+  if (!dialog) {
+    dialog = el("dialog", { id: "token-created" },
+      el("h3", { style: "margin-bottom:var(--hs-space-3)" }, "Token criado"),
+      el("p", { class: "power-hint" }, "Copie agora — não será exibido novamente."),
+      el("code", { class: "token-code", id: "token-value" }),
+      el("div", { class: "dialog-actions" },
+        el("button", { type: "button", class: "btn btn-primary", id: "tk-done" }, "Entendido")));
+    document.body.appendChild(dialog);
+    dialog.querySelector("#tk-done").addEventListener("click", () => dialog.close());
+  }
+  document.getElementById("token-value").textContent = data.token;
+  dialog.showModal();
 }
 
 /* ---------- Init ---------- */

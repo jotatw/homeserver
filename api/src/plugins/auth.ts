@@ -1,5 +1,6 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { getSession } from "../sessions.js";
+import { findApiToken } from "../tokens.js";
 
 declare module "fastify" {
     interface FastifyRequest {
@@ -58,7 +59,7 @@ function fail(status: number, error: string): Outcome {
 }
 
 /** Resolve o token e popula `request.user`. */
-function authenticate(request: FastifyRequest): Outcome {
+async function authenticate(request: FastifyRequest): Promise<Outcome> {
     if (isPublicPath(request.url)) {
         return { ok: true };
     }
@@ -73,6 +74,19 @@ function authenticate(request: FastifyRequest): Outcome {
     if (SERVICE_TOKEN && token === SERVICE_TOKEN) {
         request.user = {
             username: "service",
+            admin: false,
+            authenticated: true,
+            role: "user",
+        };
+        return { ok: true };
+    }
+
+    // Token de API (integrações externas). Não é admin.
+    const apiToken = await findApiToken(token);
+
+    if (apiToken) {
+        request.user = {
+            username: "token",
             admin: false,
             authenticated: true,
             role: "user",
@@ -128,11 +142,11 @@ function replyWith(outcome: Outcome, reply: FastifyReply) {
 }
 
 export async function requireAuth(request: FastifyRequest, reply: FastifyReply) {
-    return replyWith(authenticate(request), reply);
+    return replyWith(await authenticate(request), reply);
 }
 
 export async function requireAdmin(request: FastifyRequest, reply: FastifyReply) {
-    const auth = authenticate(request);
+    const auth = await authenticate(request);
 
     if (!auth.ok) {
         return replyWith(auth, reply);
