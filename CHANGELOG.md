@@ -3,7 +3,35 @@
 Todas as mudanças notáveis no HomeServer são documentadas neste arquivo.
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
-## [1.5.0] — 2026-08-05
+## [2.0.0] — em desenvolvimento
+
+### Sprint 1 — Identity & Authentication
+
+#### Added
+
+- **Sessão com role**: `POST /auth/login` e `GET /auth/session` retornam
+  `data.user = {username, admin}` + `data.expiresIn` (segundos). A role é
+  resolvida **uma única vez no login** — sem `is-admin` por request.
+- **Sessão longa**: TTL **30 dias deslizante** (expira se ficar 30 dias sem
+  uso; cada request válido renova). Sessão em memória (Map token→Session).
+- **`authenticate()`/`authorize()`** separados no plugin de auth;
+  `request.user = {username, admin, authenticated, role}`.
+- **Validação de body** nas rotas de autenticação (pipeline da v1.5).
+- **Testes**: `scripts/test-session.sh` (unitário: expiração, sliding, role,
+  tokenVersion) — 12 casos; `scripts/test-api.sh` ampliado para 19 casos.
+- **ADR-0007** — Identity & Authentication (identidade pertence ao HomeServer;
+  App nunca interage com FileBrowser/Gitea).
+- `docs/architecture/API.md` e `api/README.md`: seção Authentication Flow
+  (login e requisição autenticada) + novo contrato de auth.
+
+#### Changed
+
+- Rate limit do login: 5 → 20/min (proteção mantida; acomoda a suíte de testes).
+
+#### Fixed
+
+- Sessão antiga (TTL 24h) não carregava a role — App não sabia se era admin.
+
 
 ### Added
 
