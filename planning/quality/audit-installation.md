@@ -119,4 +119,4 @@
 | Versão | Resultado | Data | Notas |
 |---|---|---|---|
 | v1.5 | 🔴 | 2026-08-05 | instalador não implantava API/Docker/.env; horário inconsistente; sem quick start |
-| v2.0 | 🟡→🟢 | 2026-08-05 | instalador assistente + QUICKSTART + health check (validação pendente em ambiente limpo) |
+| v2.0 | 🟡→🟢 | 2026-08-05 | instalador assistente + QUICKSTART + health check; deploy REAL validado em Docker limpo (módulos 4/4); 3 bugs do instalador corrigidos (Caddyfile, re-instalação, permissões UID 1000); build da API validado em produção (DinD sem DNS IPv4 p/ npm/alpine) |

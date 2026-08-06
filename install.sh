@@ -75,7 +75,7 @@ _detect_os() {
 }
 
 _detect_network() {
-    local cidr ip pfx a b c d
+    local cidr ip pfx a b c
     cidr="$(ip -o -4 addr show scope global 2>/dev/null | awk '{print $4; exit}')"
     ip="$(ip -o -4 addr show scope global 2>/dev/null | awk '{split($4,a,"/"); print a[1]; exit}')"
     HS_IP="${ip:-127.0.0.1}"
@@ -168,6 +168,21 @@ _create_dirs() {
     success "Estrutura /srv criada."
 }
 
+_prepare_service_dirs() {
+    # Diretórios de dados montados pelos serviços (containers rodam como UID 1000).
+    mkdir -p \
+        /srv/services/filebrowser/database \
+        /srv/services/filebrowser/config \
+        /srv/services/filebrowser/backups \
+        /srv/services/gitea
+
+    if [[ -n "${HS_USER:-}" && "${HS_USER}" != "root" ]]; then
+        chown -R "${HS_USER}:${HS_USER}" /srv/services 2>/dev/null || true
+        chown -R "${HS_USER}:${HS_USER}" /srv/storage 2>/dev/null || true
+    fi
+    success "Diretórios de dados dos serviços preparados."
+}
+
 # ---- API .env ----------------------------------------------
 
 _ask_api_password() {
@@ -237,24 +252,22 @@ _deploy_module() {
 
     [[ -d "${src}" ]] || { warning "Módulo '${module}' não encontrado."; return 1; }
 
+    # Recria o destino limpo (suporta re-instalação sobre estado antigo)
+    _run rm -rf "${dst}"
     mkdir -p "${dst}"
     compose_file="$(ls "${src}"/compose.y*ml 2>/dev/null | head -n 1 || true)"
     if [[ -z "${compose_file}" ]]; then
         warning "Módulo '${module}' não possui compose."; return 1
     fi
 
-    _run cp "${compose_file}" "${dst}/"
+    # Copia todo o conteúdo do módulo (compose, Caddyfile, config/, etc.)
+    _run cp -r "${src}/." "${dst}/"
 
     if [[ -f "${src}/.env" && -s "${src}/.env" ]]; then
         _run cp "${src}/.env" "${dst}/.env"
     elif [[ -f "${src}/.env.example" ]]; then
         _run cp "${src}/.env.example" "${dst}/.env"
         warning "Módulo '${module}': .env a partir do exemplo — revise os valores."
-    fi
-
-    if [[ -d "${src}/config" ]]; then
-        _run mkdir -p "${dst}/config"
-        _run cp -r "${src}/config/." "${dst}/config/"
     fi
 
     _run docker compose --project-directory "${dst}" -f "${dst}/$(basename "${compose_file}")" up -d
@@ -470,6 +483,7 @@ main() {
 
     _step 1 8 "Criando diretórios"
     _create_dirs
+    _prepare_service_dirs
 
     _step 2 8 "Gerando api/.env"
     _setup_api_env

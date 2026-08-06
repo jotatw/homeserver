@@ -247,6 +247,20 @@ Check** automático e mostra o endereço de acesso.
 
 > Primeiro acesso e configuração inicial: [`docs/FIRST_BOOT.md`](docs/FIRST_BOOT.md).
 
+### Validação da instalação
+
+O instalador foi **testado de verdade** em ambiente Docker limpo (Debian 12):
+
+- ✅ Módulos oficiais (filebrowser, gitea, homepage, caddy) implantados e ativos
+- ✅ Diretórios de dados com permissões corretas (UID 1000 dos containers)
+- ✅ Health Check operacional (`scripts/health-check.sh`)
+- ✅ Re-instalação sobre estado anterior (deploy idempotente)
+
+> ⚠️ **Nota**: o build da **API** (`docker compose -f api/compose.yaml up -d --build`)
+> foi validado no servidor de produção. Em ambientes sem saída para os
+> repositórios npm/alpine, o build pode falhar — verifique a conectividade
+> (`registry.npmjs.org` e `dl-cdn.alpinelinux.org`) antes de instalar.
+
 ## Releases e atualização automática
 
 O projeto é versionado por **tags git** (`vX.Y.Z`). Cada implementação é
