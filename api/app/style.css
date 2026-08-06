@@ -191,13 +191,9 @@ input:focus-visible {
   z-index: 20;
 }
 
-.bottomnav nav {
-  display: flex;
-  height: 100%;
-}
-
 .bottomnav .nav-item {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -205,14 +201,29 @@ input:focus-visible {
   gap: 2px;
   font-size: 0.7rem;
   color: var(--hs-text-muted);
+  padding: var(--hs-space-1) 0;
+}
+
+.bottomnav .nav-item:active {
+  background: var(--hs-surface-active);
 }
 
 .bottomnav .nav-item .ic {
   font-size: 1.15rem;
+  line-height: 1;
 }
 
 .bottomnav .nav-item.active {
   color: var(--hs-primary);
+}
+
+.bottomnav .nav-item span:last-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  padding: 0 var(--hs-space-1);
 }
 
 /* ---------- Status banner ---------- */
@@ -310,13 +321,15 @@ input:focus-visible {
   gap: var(--hs-space-2);
   cursor: pointer;
   box-shadow: var(--hs-shadow-sm);
-  transition: background var(--hs-motion-fast), box-shadow var(--hs-motion-fast);
+  transition: background var(--hs-motion-fast), box-shadow var(--hs-motion-fast),
+    transform var(--hs-motion-fast);
   min-width: 0;
 }
 
 .app-card:hover {
   background: var(--hs-surface-hover);
   box-shadow: var(--hs-shadow-md);
+  transform: translateY(-2px);
 }
 
 .app-card .ic {
@@ -741,7 +754,7 @@ dialog::backdrop {
     display: none;
   }
   .bottomnav {
-    display: block;
+    display: flex;
   }
   .topbar {
     display: flex;
