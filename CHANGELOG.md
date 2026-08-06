@@ -3,7 +3,39 @@
 Todas as mudanças notáveis no HomeServer são documentadas neste arquivo.
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
-## [2.0.0] — em desenvolvimento
+## [2.0.0-rc.1] — em candidata
+
+### Release Process (permanente)
+
+- `planning/release/`: release-process, definition-of-ready-for-release,
+  v2.0-checklist, release-notes.
+- `planning/support/support-policy.md`: política de suporte por versão.
+
+### PWA instalável
+
+- `manifest.json` (standalone, ícones 192/512, theme_color), ícones PNG,
+  service worker mínimo (fetch pass-through — base para offline na v2.1).
+- App e login registram manifest + SW.
+
+### Polling (Meu espaço)
+
+- Dashboard atualiza a cada 30s + refresh ao focar a aba (sem polling
+  duplicado; timer limpo ao navegar).
+
+### Contrato App ↔ API
+
+- `api/README.md`: seção "App ↔ API" — mapa views→endpoints, cache (10s)
+  vs polling (30s), regra de comunicação exclusiva via API oficial.
+
+### Known Issues
+
+- **Navegação de arquivos não disponível** no App (a API não expõe
+  listagem/upload — gap G1; use o FileBrowser em `/files/`).
+- **Iniciar/parar serviços pelo App** não disponível (gap G3 — sem endpoint).
+- **Histórico de métricas** (gráficos 24h/7d) não disponível (gap G5).
+- **Offline completo** do App (service worker com cache) fica para a v2.1.
+
+### Sprints 0-7 (histórico)
 
 ### Sprint 7 — Integrations
 

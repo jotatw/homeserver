@@ -174,10 +174,31 @@ O arquivo `api/.env` (não versionado) define:
 | `HS_SERVICE_TOKEN` | Token de serviço para integrações internas (homepage) |
 | `HS_SESSION_TTL_MS` | *(opcional)* TTL da sessão em ms (default 30 dias) — usado em testes |
 
+## App ↔ API (contrato)
+
+> **Toda comunicação entre o App e o HomeServer ocorre exclusivamente através
+> da API oficial.** O App é apenas mais um cliente.
+
+| View do App | Endpoints |
+|---|---|
+| Login | `POST /auth/login` |
+| Boot (sessão) | `GET /auth/session` |
+| Meu espaço (dashboard) | `GET /status` + `GET /events` (polling 30s + foco) |
+| Aplicações | `GET /services` |
+| Armazenamento | `GET /storage` + `GET /status` + `GET /devices` |
+| Sistema | `GET /status` · admin: `GET /power` + `GET /hardware` |
+| Administração | `GET /users` + `GET/POST/DELETE /tokens` |
+
+- **Cache**: a API usa cache TTL ~10s nos endpoints de leitura (reduz
+  subprocessos do core). O App usa polling de 30s no dashboard.
+- **Autenticação**: Bearer token de sessão (usuário) ou token de API
+  (integração). Service token para a homepage.
+
 ## Rede e segurança
 
 - A API participa da rede `homeserver` (Docker), acessível por nome (`http://api:8000`).
 - **CORS** habilitado para a origem da Homepage.
-- **Helmet** (security headers) + **rate limit** (global 300/min, login 5/min).
+- **Helmet** (security headers) + **rate limit** (global 300/min, login 20/min).
 - A API só aceita requisições da rede local (UFW).
-- Tokens de API para integrações externas: no backlog (`Integrations`).
+- **Tokens de API** para integrações externas: `GET/POST/DELETE /api/v1/tokens`
+  (admin) — ver Sprint 7.
