@@ -394,24 +394,126 @@ function feedRow(icon, label, value) {
 /* ---------- Sistema ---------- */
 
 async function renderSystem() {
-  const status = await api("/api/v1/status");
+  const [status] = await Promise.all([api("/api/v1/status")]);
   const v = document.getElementById("view");
   v.innerHTML = "";
 
+  // Gauges (todos)
   v.appendChild(el("h3", { class: "section" }, "Servidor"));
   const grid = el("div", { class: "grid" });
   grid.appendChild(statCard("CPU", (status.cpu.percent ?? 0) + "%", status.cpu.percent ?? 0));
   grid.appendChild(statCard("Memória", (status.memory.percent ?? 0) + "%", status.memory.percent ?? 0));
   grid.appendChild(statCard("Disco", (status.disk.percent ?? 0) + "%", status.disk.percent ?? 0));
+  grid.appendChild(statCard("Uptime", status.uptime || "—", 0));
   v.appendChild(grid);
 
+  // Checks de serviço (todos) — estilo status page
   v.appendChild(el("h3", { class: "section" }, "Checks"));
-  const feed = el("div", { class: "feed" });
-  (status.services || []).forEach((s) => feed.appendChild(el("div", { class: "feed-item" },
+  const checks = el("div", { class: "feed" });
+  (status.services || []).forEach((s) => checks.appendChild(el("div", { class: "feed-item" },
     el("span", { class: "status-dot " + (s.status === "running" ? "ok" : "danger") }),
     el("span", {}, s.name),
-    el("span", { class: "feed-time" }, s.status === "running" ? "● Ativo" : "✕ Offline"))));
-  v.appendChild(feed);
+    el("span", { class: "feed-time" }, badge(s.status === "running" ? "● Ativo" : "✕ Offline",
+      s.status === "running" ? "ok" : "danger")))));
+  v.appendChild(checks);
+
+  // Admin: energia + hardware
+  if (auth.isAdmin()) {
+    const [power, hardware] = await Promise.all([
+      api("/api/v1/power"),
+      api("/api/v1/hardware"),
+    ]);
+
+    // Energia
+    v.appendChild(el("h3", { class: "section" }, "Energia"));
+    const pwr = el("div", { class: "feed" });
+    pwr.appendChild(feedRow("⏰", "Desliga às", power.shutdown || "—"));
+    pwr.appendChild(feedRow("🔔", "Liga às", power.wake || "—"));
+    pwr.appendChild(feedRow("⚡", "Agendado", power.enabled ? "Sim" : "Não"));
+    v.appendChild(pwr);
+    const editBtn = el("button", { class: "btn btn-secondary", style: "margin-top:var(--hs-space-2)" }, "✏️ Editar agenda");
+    editBtn.addEventListener("click", () => openPowerDialog(power));
+    v.appendChild(editBtn);
+
+    // Rede
+    if (hardware.network) {
+      v.appendChild(el("h3", { class: "section" }, "Rede"));
+      const net = el("div", { class: "feed" });
+      net.appendChild(feedRow("🌐", "IP", hardware.network.ip || "—"));
+      v.appendChild(net);
+    }
+
+    // Temperatura (alerta ≥80°C)
+    if (hardware.temperature && hardware.temperature.length) {
+      v.appendChild(el("h3", { class: "section" }, "Temperatura"));
+      const tgrid = el("div", { class: "grid" });
+      hardware.temperature.forEach((t) => {
+        const hot = t.temp >= 80;
+        tgrid.appendChild(el("div", { class: "app-card", style: hot ? "border-color:var(--hs-color-danger)" : "" },
+          el("span", { class: "status-dot " + (hot ? "danger" : "ok") }),
+          el("span", { class: "app-name" }, (t.label || t.chip) + (hot ? " ⚠" : "")),
+          el("span", { class: "app-host" }, t.temp + "°C")));
+      });
+      v.appendChild(tgrid);
+    }
+  }
+}
+
+/* ---------- Dialog: agenda de energia (admin) ---------- */
+
+function openPowerDialog(power) {
+  let dialog = document.getElementById("power-dialog");
+  if (!dialog) {
+    dialog = el("dialog", { id: "power-dialog" },
+      el("form", { method: "dialog", id: "power-form" },
+        el("h3", { style: "margin-bottom:var(--hs-space-4)" }, "Agenda de energia"),
+        el("div", { class: "field" },
+          el("label", { for: "pw-shutdown" }, "Desligar (HH:MM)"),
+          el("input", { id: "pw-shutdown", type: "time", required: true })),
+        el("div", { class: "field" },
+          el("label", { for: "pw-wake" }, "Ligar (HH:MM)"),
+          el("input", { id: "pw-wake", type: "time", required: true })),
+        el("label", { class: "check-row" },
+          el("input", { id: "pw-enabled", type: "checkbox" }), " Agendado"),
+        el("p", { class: "power-hint" }, "O servidor desligará e religará automaticamente."),
+        el("div", { class: "dialog-actions" },
+          el("button", { type: "button", class: "btn btn-secondary", id: "pw-cancel" }, "Cancelar"),
+          el("button", { type: "submit", class: "btn btn-primary" }, "Salvar"))));
+    document.body.appendChild(dialog);
+
+    dialog.querySelector("#pw-cancel").addEventListener("click", () => dialog.close());
+    dialog.querySelector("#power-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const shutdown = document.getElementById("pw-shutdown").value;
+      const wake = document.getElementById("pw-wake").value;
+      const enabled = document.getElementById("pw-enabled").checked;
+      const saveBtn = dialog.querySelector('button[type="submit"]');
+      saveBtn.disabled = true;
+      saveBtn.textContent = "Salvando…";
+      try {
+        await apiOrFail("/api/v1/power", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ shutdown, wake, enabled }),
+        });
+        toast("Agenda de energia salva.", "success");
+        dialog.close();
+        renderSystem();
+      } catch (_) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Salvar";
+      }
+    });
+  }
+
+  document.getElementById("pw-shutdown").value = power.shutdown || "22:00";
+  document.getElementById("pw-wake").value = power.wake || "07:00";
+  document.getElementById("pw-enabled").checked = power.enabled !== false;
+  dialog.showModal();
+}
+
+function badge(text, kind) {
+  return el("span", { class: "badge " + kind }, text);
 }
 
 /* ---------- Administração (admin) ---------- */

@@ -635,6 +635,65 @@ input:focus-visible {
   border: 1px solid var(--hs-border);
 }
 
+/* ---------- Dialog ---------- */
+
+dialog {
+  background: var(--hs-surface-raised);
+  color: var(--hs-text);
+  border: 1px solid var(--hs-border);
+  border-radius: var(--hs-radius-xl);
+  box-shadow: var(--hs-shadow-lg);
+  padding: var(--hs-space-6);
+  width: min(90vw, 440px);
+  font-family: var(--hs-font-sans);
+}
+
+dialog::backdrop {
+  background: var(--hs-overlay);
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--hs-space-2);
+  margin-top: var(--hs-space-6);
+}
+
+.dialog-actions .btn-primary {
+  width: auto;
+}
+
+.power-hint {
+  color: var(--hs-text-muted);
+  font-size: 0.8rem;
+  margin-top: var(--hs-space-3);
+}
+
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: var(--hs-space-2);
+  font-size: 0.9rem;
+  margin-top: var(--hs-space-2);
+}
+
+/* ---------- Badges (status pill) ---------- */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: var(--hs-radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge.ok    { background: var(--hs-color-ok-soft);    color: var(--hs-color-ok); }
+.badge.warn  { background: var(--hs-color-warn-soft);  color: var(--hs-color-warn); }
+.badge.danger{ background: var(--hs-color-danger-soft); color: var(--hs-color-danger); }
+.badge.info  { background: var(--hs-color-info-soft);  color: var(--hs-color-info); }
+
 /* ---------- Responsivo ---------- */
 
 @media (min-width: 1024px) {
