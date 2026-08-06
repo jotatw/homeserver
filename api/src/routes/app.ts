@@ -17,7 +17,10 @@ export async function appRoutes(fastify: FastifyInstance) {
     const serve = (file: string) => async (_req: unknown, reply: any) => {
         try {
             const content = await fs.readFile(path.join(APP_DIR, file));
-            reply.type(MIME[path.extname(file)] ?? "application/octet-stream").send(content);
+            reply
+                .type(MIME[path.extname(file)] ?? "application/octet-stream")
+                .header("Cache-Control", "no-cache")
+                .send(content);
         } catch {
             reply.code(404).send("Not found");
         }
