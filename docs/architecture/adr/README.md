@@ -10,6 +10,7 @@
 | [ADR-0004](0004-nomenclatura.md) | Nomenclatura por camada | Aceito | v1.5.0 |
 | [ADR-0005](0005-api-response.md) | Padronização da resposta da API | Aceito | v1.5.0 |
 | [ADR-0006](0006-architecture-freeze.md) | Architecture Freeze | Aceito | v1.5.0 |
+| [ADR-0007](0007-identity-authentication.md) | Identity & Authentication | Aceito | v2.0.0 |
 
 ## Regras
 

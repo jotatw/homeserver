@@ -13,6 +13,82 @@ O container monta o repositório em `/workspace` e consome o CLI do core
 (`/workspace/core/hs.sh`). Endpoints de leitura usam cache TTL para reduzir
 chamadas ao core.
 
+## Autenticação
+
+> Toda a identidade pertence ao HomeServer. O App/consumidor interage
+> apenas com a API — nunca diretamente com FileBrowser, Gitea ou outros
+> serviços (ver ADR-0007).
+
+### Authentication Flow
+
+Dois fluxos distintos: **login** (obter a sessão) e **requisição
+autenticada** (usar a sessão).
+
+**Login**
+
+```text
+App → POST /api/v1/auth/login
+            → verify()            (hs user verify — via core/adapter)
+            → isAdmin()           (uma única vez, no login)
+            → createSession()     (token + role)
+            → Token
+```
+
+**Requisição autenticada**
+
+```text
+App → GET /api/v1/...  (Authorization: Bearer <token>)
+            → authenticate()      (resolve a sessão → request.user)
+            → authorize()         (role/permissão — hoje: admin)
+            → Controller
+```
+
+### Sessão
+
+- TTL **30 dias deslizante**: expira se ficar 30 dias sem uso; cada request
+  válido renova. Adequado para LAN (sem logout por inatividade curta).
+- Armazenada **em memória** na API (cai em restart; persistência no backlog).
+- `tokenVersion`: reservado para revogação futura (troca de senha).
+- Logout explícito via `POST /auth/logout` destrói a sessão.
+
+### Endpoints de autenticação
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| POST | `/api/v1/auth/login` | Login (rate limit 5/min) → token + usuário |
+| GET | `/api/v1/auth/session` | Sessão atual (usuário + role + expiração) |
+| POST | `/api/v1/auth/logout` | Destrói a sessão |
+
+**`POST /api/v1/auth/login`**
+
+```json
+{
+  "ok": true,
+  "data": {
+    "token": "hex...",
+    "user": { "username": "usuario", "admin": true },
+    "expiresIn": 2592000
+  }
+}
+```
+
+- `expiresIn` em segundos (válido a partir do último uso — sliding).
+- Erro de credenciais → `401` com mensagem neutra (sem revelar se o usuário existe).
+
+**`GET /api/v1/auth/session`**
+
+```json
+{
+  "ok": true,
+  "data": {
+    "user": { "username": "usuario", "admin": true },
+    "expiresIn": 2592000
+  }
+}
+```
+
+- Base para montar a navegação do App (role `admin` decide a aba Administração).
+
 ## Endpoints
 
 | Método | Rota | Descrição |
@@ -24,29 +100,18 @@ chamadas ao core.
 | GET | `/api/v1/hardware` | Sensores, discos, rede, USB |
 | GET | `/api/v1/devices` | Dispositivos montados |
 | GET | `/api/v1/events` | Eventos recentes (backup, dispositivo, boot) |
-| GET | `/api/v1/users` | Lista usuários |
-| POST | `/api/v1/users` | Cria usuário |
-| PUT | `/api/v1/users/:nome` | Altera senha |
-| DELETE | `/api/v1/users/:nome` | Remove usuário (`?folder=1`) |
-| GET | `/api/v1/power` | Agendamento liga/desliga |
-| PUT | `/api/v1/power` | Define horários (`enabled: true`) ou desativa |
-| POST | `/api/v1/backup` | Dispara backup manual |
-
----
-
-### `GET /api/v1/system`
-
-Hostname do servidor.
-
-```json
-{ "hostname": "homeserver" }
-```
+| GET | `/api/v1/users` | Lista usuários (admin) |
+| POST | `/api/v1/users` | Cria usuário (admin) |
+| PUT | `/api/v1/users/:nome` | Altera senha (admin) |
+| DELETE | `/api/v1/users/:nome` | Remove usuário (admin, `?folder=1`) |
+| GET | `/api/v1/power` | Agendamento liga/desliga (admin) |
+| PUT | `/api/v1/power` | Define horários (admin) |
+| POST | `/api/v1/backup` | Dispara backup manual (admin) |
 
 ### `GET /api/v1/status`
 
 Resumo completo do servidor (hostname, OS, kernel, uptime, CPU, memória,
-disco, serviços, backup, WoL, storage e hardware). Tamanhos em bytes;
-percentuais de 0 a 100. Cache ~10s.
+disco, serviços, backup). Tamanhos em bytes; percentuais de 0 a 100. Cache ~10s.
 
 ### `GET /api/v1/storage`
 
@@ -69,27 +134,15 @@ Estado do storage com contagens por diretório.
 
 ### `GET /api/v1/services`
 
-Lista de serviços ativos com estado (via `enabled_services` do core).
+Lista de serviços ativos com estado.
 
 ### `GET /api/v1/hardware`
 
-Sensores de temperatura (hwmon), discos (lsblk + smartctl), rede (hostname/IP)
-e USB (lsusb).
-
-### `GET /api/v1/devices`
-
-Dispositivos montados em `/srv/storage/devices/<tipo>/<rótulo>`.
+Sensores de temperatura, discos, rede e USB.
 
 ### `GET /api/v1/events`
 
-Eventos recentes lidos dos logs do sistema:
-
-```json
-[
-  { "time": "2026-08-02 18:17:15", "type": "device", "action": "Dispositivo conectado" },
-  { "time": "2026-08-02 18:50:40", "type": "system", "action": "Servidor iniciado" }
-]
-```
+Eventos recentes lidos dos logs do sistema.
 
 ### `GET/POST/PUT/DELETE /api/v1/users`
 
@@ -99,14 +152,8 @@ Eventos recentes lidos dos logs do sistema:
 
 ### `GET/PUT /api/v1/power`
 
-Agendamento de ligar/desligar automático.
-
-```json
-{ "shutdown": "23:30", "wake": "07:00", "enabled": true }
-```
-
-- `PUT` com `{ "shutdown": "22:00", "wake": "08:00", "enabled": true }` ativa.
-- `PUT` com `{ "enabled": false }` desativa o agendamento.
+Agendamento de ligar/desligar automático (ex.: `{ "shutdown": "22:00", "wake": "07:00", "enabled": true }`).
+`{ "enabled": false }` desativa o agendamento.
 
 ### `POST /api/v1/backup`
 
@@ -124,9 +171,13 @@ O arquivo `api/.env` (não versionado) define:
 | `FILEBROWSER_ADMIN_USER` | Admin do FileBrowser |
 | `FILEBROWSER_ADMIN_PASS` | Senha do admin do FileBrowser |
 | `HS_HOST_IP` | IP do host (para o hardware service) |
+| `HS_SERVICE_TOKEN` | Token de serviço para integrações internas (homepage) |
+| `HS_SESSION_TTL_MS` | *(opcional)* TTL da sessão em ms (default 30 dias) — usado em testes |
 
 ## Rede e segurança
 
 - A API participa da rede `homeserver` (Docker), acessível por nome (`http://api:8000`).
 - **CORS** habilitado para a origem da Homepage.
-- A API só aceita requisições da rede local (UFW). Autenticação por API key está planejada.
+- **Helmet** (security headers) + **rate limit** (global 300/min, login 5/min).
+- A API só aceita requisições da rede local (UFW).
+- Tokens de API para integrações externas: no backlog (`Integrations`).

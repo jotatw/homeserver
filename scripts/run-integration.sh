@@ -37,6 +37,7 @@ run() {
 
 run "Smoke"     "${SCRIPT_DIR}/smoke-test.sh"
 run "CLI"       "${SCRIPT_DIR}/test-cli.sh"
+run "Session"   "${SCRIPT_DIR}/test-session.sh"
 run "API"       "${SCRIPT_DIR}/test-api.sh"
 
 echo
