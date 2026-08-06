@@ -18,8 +18,11 @@ jobs:
       - name: Lint shell scripts
         run: find core -name "*.sh" -exec shellcheck -S warning {} +
 
-      - name: Run test suite
-        run: bash core/tests/run_ci.sh
+      # Unit tests (Foundation + Infrastructure) — sem servidor.
+      # A integração (Smoke/CLI/Session/API) roda em pós-deploy via
+      # core/tests/run_ci.sh (precisa do servidor real).
+      - name: Run unit test suite
+        run: bash core/tests/run_all.sh
 
   api:
     name: API (TypeScript)
@@ -44,3 +47,6 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Session unit tests
+        run: npm run test:session
