@@ -5,6 +5,29 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
 ## [2.0.0] — em desenvolvimento
 
+### Sprint 2 — Workspace
+
+#### Added
+
+- **Design tokens aplicados** no App (`api/app/theme.css`): `--hs-*` com tema
+  escuro (padrão) e claro, derivados de `design/app/tokens/`.
+- **Login** (`/app/login.html` + `login.js`): nova tela no padrão do wireframe,
+  integrada ao novo contrato (`data.user` + `expiresIn`).
+- **Sessão e role no boot**: `GET /auth/session` carrega `username`/`admin`;
+  a navegação é montada por role (user: 4 áreas · admin: + Administração).
+- **Navegação por role** (`app.js`): sidebar (desktop ≥1024px) + bottom nav
+  (mobile) com o 5º slot de overflow; roteamento por hash (`#/...`).
+- **Dashboard "Meu espaço"**: banner de status (cores + texto), stat cards
+  (CPU/Mem/Disco/Uptime com barras), atalhos e feed de atividades (`/events`).
+- **Views** básicas de Aplicações (grid com status no card), Armazenamento
+  (painel de uso + dispositivos) e Sistema (gauges + checks).
+- **`routes/app.ts`**: serve estáticos de `api/app/` de forma genérica e
+  segura (sem path traversal); novos arquivos (`theme.css`, `login.js`).
+
+#### Changed
+
+- `api/app/*` reescrito seguindo `design/app/` (wireframes, flows, tokens, components).
+
 ### Sprint 1 — Identity & Authentication
 
 #### Added

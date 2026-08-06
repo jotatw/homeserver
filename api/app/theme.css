@@ -1,0 +1,114 @@
+/* ============================================================
+ * HomeServer App — Design Tokens (v2.0)
+ * Fonte: design/app/tokens/ (dark padrão, light completo)
+ * ============================================================ */
+
+:root,
+[data-theme="dark"] {
+  /* Neutros — fundos e superfícies */
+  --hs-bg: #0f172a;
+  --hs-surface: #1e293b;
+  --hs-surface-raised: #263449;
+  --hs-surface-hover: #334155;
+  --hs-surface-active: #475569;
+  --hs-overlay: rgba(2, 6, 23, 0.6);
+  --hs-border: #334155;
+  --hs-border-strong: #475569;
+
+  /* Texto */
+  --hs-text: #e2e8f0;
+  --hs-text-muted: #94a3b8;
+  --hs-text-faint: #64748b;
+  --hs-text-inverse: #0f172a;
+
+  /* Ação (primária) */
+  --hs-primary: #2563eb;
+  --hs-primary-hover: #3b82f6;
+  --hs-primary-active: #1d4ed8;
+  --hs-primary-soft: rgba(37, 99, 235, 0.18);
+  --hs-primary-focus: #93c5fd;
+  --hs-on-primary: #ffffff;
+
+  /* Estado (status) */
+  --hs-color-ok: #22c55e;
+  --hs-color-ok-soft: rgba(34, 197, 94, 0.16);
+  --hs-color-warn: #eab308;
+  --hs-color-warn-soft: rgba(234, 179, 8, 0.16);
+  --hs-color-danger: #ef4444;
+  --hs-color-danger-soft: rgba(239, 68, 68, 0.16);
+  --hs-color-info: #38bdf8;
+  --hs-color-info-soft: rgba(56, 189, 248, 0.16);
+
+  /* Elevação */
+  --hs-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --hs-shadow-md: 0 2px 8px rgba(0, 0, 0, 0.35);
+  --hs-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --hs-shadow-focus: 0 0 0 3px var(--hs-primary-focus);
+}
+
+[data-theme="light"] {
+  --hs-bg: #f8fafc;
+  --hs-surface: #ffffff;
+  --hs-surface-raised: #ffffff;
+  --hs-surface-hover: #f1f5f9;
+  --hs-surface-active: #e2e8f0;
+  --hs-overlay: rgba(15, 23, 42, 0.45);
+  --hs-border: #e2e8f0;
+  --hs-border-strong: #94a3b8;
+
+  --hs-text: #0f172a;
+  --hs-text-muted: #475569;
+  --hs-text-faint: #64748b;
+  --hs-text-inverse: #0f172a;
+
+  --hs-primary: #2563eb;
+  --hs-primary-hover: #1d4ed8;
+  --hs-primary-active: #1e40af;
+  --hs-primary-soft: rgba(37, 99, 235, 0.1);
+  --hs-primary-focus: #2563eb;
+  --hs-on-primary: #ffffff;
+
+  --hs-color-ok: #22c55e;
+  --hs-color-ok-soft: rgba(34, 197, 94, 0.14);
+  --hs-color-warn: #eab308;
+  --hs-color-warn-soft: rgba(234, 179, 8, 0.14);
+  --hs-color-danger: #ef4444;
+  --hs-color-danger-soft: rgba(239, 68, 68, 0.14);
+  --hs-color-info: #38bdf8;
+  --hs-color-info-soft: rgba(56, 189, 248, 0.14);
+
+  --hs-shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.1);
+  --hs-shadow-md: 0 4px 12px rgba(15, 23, 42, 0.12);
+  --hs-shadow-lg: 0 10px 30px rgba(15, 23, 42, 0.18);
+  --hs-shadow-focus: 0 0 0 3px var(--hs-primary-focus);
+}
+
+/* Tipografia e espaçamento (herança v1.4) */
+:root {
+  --hs-font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --hs-font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+
+  --hs-space-1: 0.25rem;
+  --hs-space-2: 0.5rem;
+  --hs-space-3: 0.75rem;
+  --hs-space-4: 1rem;
+  --hs-space-6: 1.5rem;
+  --hs-space-8: 2rem;
+
+  --hs-touch: 3rem;
+  --hs-touch-compact: 2.5rem;
+  --hs-sidebar-w: 15rem;
+  --hs-bottomnav-h: 3.5rem;
+  --hs-topbar-h: 3.5rem;
+  --hs-max-content: 72rem;
+
+  --hs-radius-sm: 0.25rem;
+  --hs-radius-md: 0.5rem;
+  --hs-radius-lg: 0.625rem;
+  --hs-radius-xl: 0.75rem;
+  --hs-radius-full: 9999px;
+
+  --hs-motion-fast: 120ms;
+  --hs-motion-base: 200ms;
+  --hs-motion-slow: 300ms;
+}
