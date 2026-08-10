@@ -6,167 +6,83 @@
 
 Definir como o HomeServer App organiza e apresenta suas áreas em diferentes plataformas e perfis de usuário.
 
-A navegação deve permitir que uma pessoa encontre rapidamente as tarefas mais comuns sem transformar o App em um painel excessivamente complexo.
+A navegação deve permitir encontrar rapidamente as tarefas comuns sem transformar o App em um painel excessivamente complexo.
 
-Mobile e desktop compartilham a mesma arquitetura funcional, mas podem apresentar a navegação de maneiras diferentes.
+Mobile e desktop compartilham a mesma arquitetura funcional. A apresentação pode mudar conforme o espaço disponível.
 
 ---
 
 ## 2. Princípios
 
-1. **Tarefas antes de tecnologia** — a navegação deve destacar o que o usuário pode fazer, não os detalhes internos do servidor.
-2. **Mobile como prioridade de uso** — a navegação mobile deve ser confortável para toque e limitar as opções de primeiro nível.
-3. **Desktop como adaptação** — a área disponível permite expor mais opções simultaneamente.
-4. **Uma única arquitetura funcional** — mobile e desktop não devem criar conjuntos diferentes de funcionalidades.
-5. **Hierarquia curta** — evitar menus profundos e cadeias de navegação difíceis de memorizar.
-6. **Administração separada** — funções técnicas e administrativas não devem competir com as tarefas cotidianas.
-7. **Permissões reais** — a interface reflete as permissões do usuário, mas a API continua sendo a autoridade de autorização.
-8. **Consistência** — a mesma função deve manter nome, significado e comportamento entre plataformas.
+1. **Tarefas antes de tecnologia** — destacar o que o usuário pode fazer, não os detalhes internos do servidor.
+2. **Mobile como prioridade de uso** — navegação confortável para toque e com poucas opções visíveis simultaneamente.
+3. **Desktop como adaptação** — aproveitar o espaço para manter a navegação lateral acessível.
+4. **Uma única arquitetura funcional** — mobile e desktop não criam conjuntos diferentes de funcionalidades.
+5. **Hierarquia curta** — evitar menus profundos.
+6. **Administração separada** — funções técnicas não competem com tarefas cotidianas.
+7. **Permissões reais** — o frontend reflete permissões, mas a API continua sendo a autoridade.
+8. **Consistência** — a mesma função mantém nome, significado e comportamento entre plataformas.
+9. **Navegação recolhível** — priorizar o conteúdo quando a largura disponível for pequena.
+10. **Sem navegação artificial** — não adicionar um padrão apenas por ser comum.
 
 ---
 
-## 3. Mapa funcional inicial
+## 3. Decisão de arquitetura
+
+A direção atual é utilizar uma **sidebar colapsável como modelo principal de navegação**, em vez de adotar uma bottom navigation persistente.
+
+A mesma ideia será adaptada às plataformas:
+
+```text
+Desktop expandido
+┌──────────────┬──────────────────────────┐
+│ Sidebar      │ Conteúdo                 │
+└──────────────┴──────────────────────────┘
+
+Desktop recolhido
+┌────┬─────────────────────────────────────┐
+│ ▣  │ Conteúdo                            │
+│ ▣  │                                     │
+│ ▣  │                                     │
+└────┴─────────────────────────────────────┘
+
+Mobile
+┌──────────────────────────────────────────┐
+│ ☰  HomeServer                            │
+├──────────────────────────────────────────┤
+│                                          │
+│ Conteúdo                                 │
+│                                          │
+└──────────────────────────────────────────┘
+```
+
+No mobile, a sidebar funciona como **drawer lateral** acionado pelo cabeçalho. No desktop, permanece lateral e pode ser expandida ou recolhida.
+
+A bottom navigation deixa de ser requisito do design. Poderá ser reconsiderada futuramente caso o uso real demonstre vantagem clara.
+
+---
+
+## 4. Mapa funcional inicial
 
 ```text
 HomeServer
 │
 ├── Início
-│
 ├── Arquivos
-│
 ├── Aplicações
-│
 ├── Impressão
-│
-├── Sistema
-│
-├── Administração
-│
-└── Sobre
-```
-
-Essa é a arquitetura funcional inicial. A posição de cada item pode mudar entre mobile e desktop sem alterar as áreas disponíveis.
-
----
-
-## 4. Perfis
-
-### 4.1 Usuário comum
-
-O usuário comum deve encontrar principalmente tarefas cotidianas:
-
-```text
-Início
-Arquivos
-Aplicações
-Impressão
-Mais
-└── Sobre
-```
-
-`Sistema` e `Administração` não aparecem como destinos principais para esse perfil.
-
-Isso não significa que o usuário comum não possa receber informações de estado quando elas forem relevantes para uma tarefa. Por exemplo, o status de uma impressora pode aparecer na tela de impressão.
-
-### 4.2 Administrador
-
-O administrador possui acesso às funções de gerenciamento:
-
-```text
-Início
-Arquivos
-Aplicações
-Impressão
-Mais
 ├── Sistema
 ├── Administração
 └── Sobre
 ```
 
-A navegação mobile não precisa transformar todas essas áreas em abas principais. `Mais` funciona como agrupador das funções menos frequentes.
+A posição e a apresentação podem mudar entre plataformas sem alterar as áreas disponíveis.
 
 ---
 
-## 5. Mobile
+## 5. Perfis
 
-### 5.1 Estrutura
-
-A navegação mobile deve priorizar uma barra inferior persistente para as áreas mais frequentes.
-
-Modelo inicial:
-
-```text
-┌──────────────────────────────┐
-│                              │
-│          Conteúdo            │
-│                              │
-│                              │
-├──────────────────────────────┤
-│ Início │ Arquivos │ Apps │ Mais │
-└──────────────────────────────┘
-```
-
-A quantidade definitiva de itens da barra inferior ainda será validada durante os wireframes. Não devemos preencher a barra apenas para ocupar espaço.
-
-### 5.2 `Mais`
-
-`Mais` concentra funções menos frequentes ou administrativas.
-
-Para usuário comum:
-
-```text
-Mais
-├── Sobre
-└── outras opções futuras
-```
-
-Para administrador:
-
-```text
-Mais
-├── Sistema
-├── Administração
-└── Sobre
-```
-
-### 5.3 Regras mobile
-
-- A navegação inferior permanece acessível nas telas principais.
-- A área de conteúdo não deve ficar escondida atrás da barra inferior.
-- Cada item precisa ter área de toque confortável.
-- O estado ativo deve ser perceptível sem depender somente de cor.
-- Não usar menus horizontais extensos como mecanismo principal de navegação.
-- Subáreas devem usar navegação contextual quando necessário.
-- Ações destrutivas ou administrativas não devem ficar misturadas às ações frequentes.
-
----
-
-## 6. Desktop
-
-No desktop, a navegação pode usar uma sidebar persistente.
-
-Modelo inicial:
-
-```text
-┌──────────────┬──────────────────────────────────┐
-│ HomeServer   │                                  │
-│              │              Conteúdo            │
-│ PRINCIPAL    │                                  │
-│  Início      │                                  │
-│  Arquivos    │                                  │
-│  Aplicações  │                                  │
-│  Impressão   │                                  │
-│              │                                  │
-│ ADMINISTRAÇÃO│                                  │
-│  Sistema     │                                  │
-│  Admin       │                                  │
-│              │                                  │
-│ OUTROS       │                                  │
-│  Sobre       │                                  │
-└──────────────┴──────────────────────────────────┘
-```
-
-### 6.1 Usuário comum
+### 5.1 Usuário comum
 
 ```text
 PRINCIPAL
@@ -179,7 +95,11 @@ OUTROS
   Sobre
 ```
 
-### 6.2 Administrador
+`Sistema` e `Administração` não aparecem como destinos principais para esse perfil.
+
+Informações de estado podem aparecer quando forem relevantes para uma tarefa, como o status da impressora na tela de impressão.
+
+### 5.2 Administrador
 
 ```text
 PRINCIPAL
@@ -196,17 +116,147 @@ OUTROS
   Sobre
 ```
 
-### 6.3 Sidebar recolhida
+---
 
-Futuramente pode existir uma versão recolhida da sidebar, desde que os ícones tenham significado claro e exista identificação acessível dos itens.
+## 6. Mobile
 
-Isso é uma melhoria futura, não um requisito da primeira implementação.
+### 6.1 Modelo
+
+O mobile utilizará uma sidebar/drawer lateral acionada pelo cabeçalho.
+
+Fechado:
+
+```text
+┌──────────────────────────────┐
+│ ☰  HomeServer                │
+├──────────────────────────────┤
+│                              │
+│          Conteúdo            │
+│                              │
+└──────────────────────────────┘
+```
+
+Aberto:
+
+```text
+┌──────────────────────┐
+│ HomeServer       ×   │
+│                      │
+│ PRINCIPAL            │
+│  Início              │
+│  Arquivos            │
+│  Aplicações          │
+│  Impressão           │
+│                      │
+│ ADMINISTRAÇÃO        │
+│  Sistema             │
+│  Administração       │
+│                      │
+│ OUTROS               │
+│  Sobre               │
+└──────────────────────┘
+```
+
+O drawer ocupa somente a parte necessária da tela e pode ser fechado pelo controle ou tocando fora dele.
+
+### 6.2 Regras
+
+- Cabeçalho acessível durante a navegação principal.
+- Botão de abertura com área de toque confortável.
+- Grupos claramente identificados.
+- Item atual claramente identificado.
+- Abertura do menu sem perda da posição da página.
+- Conteúdo não fica permanentemente reduzido pela navegação.
+- Sobreposição discreta sobre o conteúdo.
+- Uso confortável com uma mão.
+- Sem bottom navigation por convenção.
+- Subáreas usam navegação contextual quando necessário.
+- Ações destrutivas ou administrativas não ficam misturadas às ações frequentes.
+
+### 6.3 Por que não usar bottom navigation agora
+
+A bottom navigation foi considerada, mas não será adotada inicialmente porque:
+
+- o HomeServer possui poucas áreas principais, porém algumas são administrativas;
+- a frequência das funções ainda não justifica reservar espaço permanente na tela;
+- uma sidebar/drawer mantém o mesmo modelo conceitual entre mobile e desktop;
+- evita duplicar mecanismos de navegação;
+- preserva espaço vertical para arquivos, formulários, impressão e outras tarefas.
+
+A decisão poderá ser revista após observar o uso real.
 
 ---
 
-## 7. Rotas
+## 7. Desktop
 
-A arquitetura deve manter rotas simples e previsíveis.
+O desktop utilizará uma **sidebar colapsável**.
+
+### 7.1 Expandida
+
+```text
+┌──────────────┬──────────────────────────────────┐
+│ HomeServer   │                                  │
+│              │              Conteúdo            │
+│ PRINCIPAL    │                                  │
+│  Início      │                                  │
+│  Arquivos    │                                  │
+│  Aplicações  │                                  │
+│  Impressão   │                                  │
+│              │                                  │
+│ ADMINISTRAÇÃO│                                  │
+│  Sistema     │                                  │
+│  Administração│                                 │
+│              │                                  │
+│ OUTROS       │                                  │
+│  Sobre       │                                  │
+└──────────────┴──────────────────────────────────┘
+```
+
+### 7.2 Recolhida
+
+```text
+┌────┬───────────────────────────────────────────┐
+│ ☰  │                                           │
+│ 🏠 │                  Conteúdo                 │
+│ 📁 │                                           │
+│ 📦 │                                           │
+│ 🖨️ │                                           │
+│ ⚙️ │                                           │
+└────┴───────────────────────────────────────────┘
+```
+
+Na versão recolhida, cada item precisa de ícone inequívoco e identificação acessível. O usuário não deve depender exclusivamente da memória para interpretar ícones.
+
+### 7.3 Comportamento
+
+- Sidebar expandível e recolhível pelo usuário.
+- Estado da sidebar pode ser preservado entre navegações.
+- Conteúdo aproveita a largura liberada quando recolhida.
+- Em telas intermediárias, o comportamento pode se aproximar do drawer mobile quando a sidebar expandida não couber confortavelmente.
+
+---
+
+## 8. Relação entre plataformas
+
+```text
+                    HomeServer
+                        │
+             ┌──────────┴──────────┐
+             │                     │
+          Mobile                Desktop
+             │                     │
+        Drawer lateral      Sidebar colapsável
+             │                     │
+             └──────────┬──────────┘
+                        │
+                mesmas áreas e rotas
+```
+
+A diferença está na apresentação e no espaço disponível, não na existência de funcionalidades diferentes.
+
+---
+
+## 9. Rotas
 
 Modelo conceitual:
 
@@ -220,13 +270,11 @@ Modelo conceitual:
 └── /about
 ```
 
-Os nomes técnicos das rotas podem ser ajustados durante a implementação para preservar compatibilidade com a aplicação existente.
-
-A mudança visual da navegação não deve exigir mudanças desnecessárias na API.
+Os nomes técnicos podem ser ajustados durante a implementação para preservar compatibilidade com a aplicação existente. A mudança visual da navegação não deve exigir alterações desnecessárias na API.
 
 ---
 
-## 8. Estado da navegação
+## 10. Estado da navegação
 
 A navegação deve representar claramente:
 
@@ -239,8 +287,6 @@ A navegação deve representar claramente:
 
 ### Acesso negado
 
-Quando uma rota existir, mas o perfil não tiver permissão:
-
 ```text
 Acesso restrito
 
@@ -248,8 +294,6 @@ Você não possui permissão para acessar esta área.
 
 [Voltar]
 ```
-
-Não devemos simplesmente esconder toda possibilidade de erro como se a rota não existisse.
 
 ### Página inexistente
 
@@ -261,22 +305,22 @@ Página não encontrada
 
 ---
 
-## 9. Navegação contextual
+## 11. Navegação contextual
 
 Nem toda função precisa virar uma rota principal.
 
 Exemplos:
 
-- detalhes de uma aplicação podem abrir dentro de `Aplicações`;
-- detalhes de uma impressora podem permanecer em `Impressão`;
-- montagem/desmontagem de dispositivo pode ocorrer em `Armazenamento`;
-- edição de usuário pode ocorrer em `Administração`.
+- detalhes de uma aplicação dentro de `Aplicações`;
+- detalhes de uma impressora dentro de `Impressão`;
+- montagem/desmontagem de dispositivo dentro de `Armazenamento`;
+- edição de usuário dentro de `Administração`.
 
 Isso evita aumentar artificialmente a navegação principal.
 
 ---
 
-## 10. Relação com perfis
+## 12. Relação com perfis
 
 A navegação deve ser derivada das permissões reais.
 
@@ -295,10 +339,11 @@ O frontend pode ocultar itens que não são relevantes para o perfil, mas isso �
 
 ---
 
-## 11. O que não entra agora
+## 13. O que não entra agora
 
 Não serão implementados nesta etapa:
 
+- bottom navigation persistente;
 - múltiplos níveis de menu;
 - navegação configurável pelo usuário;
 - favoritos complexos;
@@ -308,18 +353,19 @@ Não serão implementados nesta etapa:
 - navegação exclusiva para mobile;
 - perfis além de comum e administrador.
 
-Esses recursos podem ser considerados posteriormente se houver necessidade real.
+A bottom navigation pode ser reconsiderada futuramente caso o uso real demonstre vantagem clara.
 
 ---
 
-## 12. Critérios de aprovação
+## 14. Critérios de aprovação
 
 A navegação será considerada definida quando:
 
-- [ ] fluxo mobile estiver aprovado;
-- [ ] fluxo desktop estiver aprovado;
+- [ ] modelo de drawer mobile estiver aprovado;
+- [ ] modelo de sidebar desktop estiver aprovado;
+- [ ] comportamento da sidebar recolhida estiver aprovado;
 - [ ] itens principais estiverem definidos;
-- [ ] conteúdo de `Mais` estiver definido;
+- [ ] grupos de navegação estiverem definidos;
 - [ ] diferenças entre usuário comum e administrador estiverem documentadas;
 - [ ] rotas existentes forem mapeadas;
 - [ ] estados de acesso negado e página inexistente estiverem definidos;
@@ -328,7 +374,7 @@ A navegação será considerada definida quando:
 
 ---
 
-## 13. Próxima etapa
+## 15. Próxima etapa
 
 Depois desta arquitetura, a próxima etapa é definir os **design tokens**: cores, tipografia, espaçamento, bordas, superfícies, sombras, ícones e estados.
 
