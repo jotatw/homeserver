@@ -61,7 +61,7 @@ Validações:
 
 - Sem impressora/offline → botão desabilitado (banner 🔴).
 - Sem conteúdo → mensagem clara.
-- Arquivo > 5 MB → confirmação antes de enviar (o backend também rejeita).
+- Arquivo > 20 MB → confirmação antes de enviar (o backend também rejeita).
 - Sucesso/erro por toast.
 
 > O **status exibido é o conhecido pelo CUPS** (idle/printing/disabled,

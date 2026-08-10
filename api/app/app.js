@@ -1086,7 +1086,7 @@ async function submitPrint() {
       if (!file) {
         throw new Error("Escolha um arquivo para imprimir.");
       }
-      if (file.size > 5 * 1024 * 1024) {
+      if (file.size > 20 * 1024 * 1024) {
         const mb = (file.size / 1024 / 1024).toFixed(1);
         if (!confirm("Arquivo com " + mb + " MB.\nO arquivo é grande e pode demorar para ser processado.\nDeseja continuar?")) {
           submitBtn.disabled = false;

@@ -9,7 +9,7 @@ const RUNNER_IMAGE = "debian:bookworm-slim";
 const CONTAINER_DATA = path.join("/workspace", "api", "data");
 const HOST_DATA = "/srv/git/homeserver/api/data";
 
-const MAX_FILE_BYTES = 5 * 1024 * 1024; // 5 MB (arquivo decodificado)
+const MAX_FILE_BYTES = 20 * 1024 * 1024; // 20 MB (arquivo decodificado)
 
 /**
  * Impressão via CUPS do HOST.
@@ -198,7 +198,7 @@ export async function printContent(
         const data = Buffer.from(content.file.data, "base64");
 
         if (data.byteLength > MAX_FILE_BYTES) {
-            throw new Error("Arquivo excede o limite de 5 MB.");
+            throw new Error("Arquivo excede o limite de 20 MB.");
         }
 
         fileName = safe;

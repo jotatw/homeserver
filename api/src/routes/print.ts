@@ -39,8 +39,8 @@ export async function printRoutes(fastify: FastifyInstance) {
         }
     });
 
-    // bodyLimit: 10 MB — arquivos são enviados em base64 (5 MB -> ~6,7 MB).
-    fastify.post("/api/v1/print", { bodyLimit: 10 * 1024 * 1024 }, async (request, reply) => {
+    // bodyLimit: 30 MB — arquivos são enviados em base64 (20 MB -> ~26,7 MB).
+    fastify.post("/api/v1/print", { bodyLimit: 30 * 1024 * 1024 }, async (request, reply) => {
         const body = request.body as PrintBody | null;
 
         const hasText = isNonEmptyString(body?.text);
@@ -72,7 +72,7 @@ export async function printRoutes(fastify: FastifyInstance) {
             const message = error instanceof Error ? error.message : String(error);
 
             // Arquivo acima do limite permitido é um erro de entrada (400).
-            if (message.includes("limite de 5 MB")) {
+            if (message.includes("limite de 20 MB")) {
                 return sendError(reply, 400, message);
             }
 
