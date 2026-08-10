@@ -9,89 +9,93 @@ cd ~/homeserver
 bash scripts/health-check.sh
 ```
 
-Esperado — todos os itens com ✔:
+O resultado esperado é que os componentes essenciais apareçam como `PASS` e o resumo indique que o HomeServer está operacional.
 
-```
-== HomeServer Health Check ==
-  ✔ docker
-  ✔ docker daemon
-  ✔ homepage       http://localhost:3000/
-  ✔ api            http://localhost:8000/api/v1/version
-  ✔ filebrowser    http://localhost:8080/
-  ✔ gitea          http://localhost:3001/
-  ✔ hs version     v1.5.0
-
-== Resumo ==
-  PASS : 7
-  FAIL : 0
-
-  HomeServer operacional.
-```
-
-Se algo falhar, vá para a seção [Solução de problemas](#soluções-de-problemas).
+Se algo falhar, consulte a seção [Solução de problemas](#solução-de-problemas).
 
 ## 2. Acesse pelo navegador
 
-Abra `https://<IP_DO_SERVIDOR>/` (use o IP mostrado na instalação).
+Abra:
+
+```text
+https://<IP_DO_SERVIDOR>/
+```
+
+Use o endereço informado pelo instalador.
 
 | URL | O que é |
 |---|---|
-| `/` | Homepage — portal com aplicações e atalhos |
-| `/app` | HomeServer App — painel de administração (login) |
-| `/files/` | FileBrowser — seus arquivos |
-| `/git/` | Gitea — seus repositórios |
-| `/api/v1/status` | API (resposta JSON `{ok:true,...}`) |
+| `/` | Homepage — portal principal |
+| `/app` | HomeServer App — painel de administração |
+| `/files/` | FileBrowser — gerenciamento de arquivos |
+| `/git/` | Gitea — repositórios Git |
+| `/api/v1/status` | API — endpoint de status |
 
-> O navegador pode mostrar aviso de certificado auto-assinado. É esperado em
-> rede local; prossiga normalmente.
+> O Caddy fornece o acesso HTTPS local. Como o certificado é interno à instalação, o navegador pode apresentar um aviso na primeira visita.
 
-## 3. Primeiras configurações
+## 3. Primeiro acesso ao App
 
-### Criar o usuário administrador do App
+O usuário principal é definido durante a instalação. Não é necessário assumir um nome específico.
+
+Para verificar os usuários existentes pelo CLI:
 
 ```bash
-cd ~/homeserver
-sudo bash core/hs.sh user create usuario --password=SuaSenha
-sudo bash core/hs.sh user is-admin usuario   # deve retornar 0
+sudo bash core/hs.sh user list
 ```
 
-> Use o mesmo nome de usuário que você informou na instalação (padrão: `usuario`).
-
-### Configurar o FileBrowser
-
-As credenciais do FileBrowser foram definidas na instalação
-(prompt ou geradas em `--non-interactive`). No primeiro acesso a `/files/`,
-use esse usuário/senha.
-
-## 4. Comandos úteis do CLI
+Se precisar criar ou administrar um usuário:
 
 ```bash
-sudo bash core/hs.sh version          # versão atual
-sudo bash core/hs.sh system status    # status do servidor
-sudo bash core/hs.sh service list     # serviços e estados
-sudo bash core/hs.sh user list        # usuários
-sudo bash core/hs.sh update check     # há atualização?
-sudo bash core/hs.sh update apply     # aplica atualização
+sudo bash core/hs.sh user create <usuario> --password=<senha>
+sudo bash core/hs.sh user is-admin <usuario>
 ```
 
-## 5. Atualizações
+O HomeServer App utiliza a API para autenticação e gerenciamento. O App não acessa o FileBrowser diretamente.
 
-O HomeServer é atualizado por releases:
+## 4. Verifique os serviços
 
 ```bash
+sudo bash core/hs.sh system status
+sudo bash core/hs.sh service list
+```
+
+Também é possível verificar os containers diretamente:
+
+```bash
+docker ps
+```
+
+## 5. Comandos úteis do CLI
+
+```bash
+sudo bash core/hs.sh version
+sudo bash core/hs.sh system status
+sudo bash core/hs.sh service list
+sudo bash core/hs.sh user list
 sudo bash core/hs.sh update check
+```
+
+Para aplicar uma atualização:
+
+```bash
 sudo bash core/hs.sh update apply
 ```
 
-O `update apply` faz backup do estado atual, puxa o código da release mais
-recente e reimplanta. O servidor acompanha a branch `main`.
+## 6. Atualizações
 
-## Soluções de problemas
+O HomeServer é distribuído por releases. O comando `update check` verifica a disponibilidade de uma versão mais recente e `update apply` executa o fluxo de atualização previsto pelo projeto.
 
-| Sintoma | Causa provável | Solução |
-|---|---|---|
-| Homepage não abre | Caddy/porta 3000 parado | `docker ps` · `docker compose -f /srv/docker/compose/caddy/compose.yaml up -d` |
-| API não responde | `api/.env` ausente ou build falhou | `cd api && docker compose up -d --build` |
-| Acesso bloqueado | Firewall com rede errada | `sudo ufw status` · verifique se a rede detectada confere |
-| FileBrowser recusa login | Senha errada | Reconfigure via `hs user` ou instale novamente |
-| `hs: command not found` | Core não inicializado | `sudo bash core/hs.sh version` (use o caminho completo) |
+Antes de uma atualização importante, mantenha uma cópia do backup disponível.
+
+## Solução de problemas
+
+| Sintoma | Verificação inicial |
+|---|---|
+| Homepage não abre | `docker ps` e `docker logs caddy` |
+| API não responde | `docker ps` e `docker logs api` |
+| Acesso bloqueado | `sudo ufw status` e verifique a rede detectada durante a instalação |
+| FileBrowser recusa login | Verifique o usuário e a senha configurados durante a instalação |
+| `hs` não é encontrado | Use `sudo bash core/hs.sh ...` a partir do diretório do projeto |
+| Serviço em reinício contínuo | `docker ps` e `docker logs <container>` |
+
+Para um diagnóstico mais completo, consulte `docs/INSTALLATION.md`, `docs/FAQ.md` e `QUESTIONS.md`.
