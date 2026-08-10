@@ -5,6 +5,18 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
 ## [1.6.0] — em desenvolvimento
 
+### Tela de Impressão (configurações + arquivos)
+
+- **Tela dedicada** `#/print` (Admin) com configurações de impressão:
+  - impressora (lista do CUPS), cor (colorida/PB), papel (A4/A5/Letter/Legal),
+    orientação (retrato/paisagem), intervalo de páginas.
+  - conteúdo por **texto** ou **upload de arquivo** (PDF/TXT/PNG/JPG, base64).
+- API `POST /print` ampliada: `file`, `color`, `media`, `pages`, `orientation`.
+- Navegação: item **Impressão** na sidebar (desktop) e no menu ＋ (mobile);
+  ação "Imprimir" do Meu espaço abre a tela.
+- Docs `PRINTING.md` atualizadas (config, uso e API).
+- Validado: texto+mono/A5/landscape e arquivo base64; 400 sem conteúdo.
+
 ### Impressão
 
 - **Impressão via CUPS** do host:

@@ -51,6 +51,7 @@ const NAV = [
   { route: "storage", title: "Armazenamento", icon: "📁", minRole: "user", desktop: true, mobile: true },
   { route: "system", title: "Sistema", icon: "📊", minRole: "user", desktop: true, mobile: true },
   { route: "admin", title: "Administração", icon: "⚙️", minRole: "admin", desktop: true, mobile: true },
+  { route: "print", title: "Impressão", icon: "🖨️", minRole: "admin", desktop: true, mobile: false },
 ];
 
 const roleRank = { user: 1, admin: 2 };
@@ -109,6 +110,8 @@ function openOverflowSheet() {
       el("div", { class: "sheet-item" },
         el("span", { class: "ic" }, "👤"),
         el("span", { class: "app-name", id: "sheet-user" })),
+      el("button", { class: "sheet-item", id: "sheet-print" },
+        el("span", { class: "ic" }, "🖨️"), el("span", {}, "Impressão")),
       el("button", { class: "sheet-item", id: "sheet-theme" },
         el("span", { class: "ic" }, "🌗"), el("span", {}, "Tema")),
       el("button", { class: "sheet-item sheet-danger", id: "sheet-sair" },
@@ -178,6 +181,7 @@ async function router() {
     storage: renderStorage,
     system: renderSystem,
     admin: renderAdmin,
+    print: renderPrint,
   };
 
   try {
@@ -208,12 +212,7 @@ async function renderDashboard() {
   actions.appendChild(actionCard("📦", "Aplicações", "#/apps"));
   actions.appendChild(actionCard("📊", "Sistema", "#/system"));
   if (auth.isAdmin()) {
-    const printCard = el("div", { class: "app-card" },
-      el("span", { class: "ic" }, "🖨️"),
-      el("span", { class: "app-name" }, "Imprimir"),
-      el("span", {}, "→"));
-    printCard.addEventListener("click", openPrintDialog);
-    actions.appendChild(printCard);
+    actions.appendChild(actionCard("🖨️", "Imprimir", "#/print"));
   }
   v.appendChild(actions);
 
@@ -856,52 +855,128 @@ function showCreatedToken(data) {
   dialog.showModal();
 }
 
-/* ---------- Dialog: imprimir (admin) ---------- */
+/* ---------- Tela: Impressão (admin) ---------- */
 
-function openPrintDialog() {
-  let dialog = document.getElementById("print-dialog");
-  if (!dialog) {
-    dialog = el("dialog", { id: "print-dialog" },
-      el("form", { method: "dialog", id: "print-form" },
-        el("h3", { style: "margin-bottom:var(--hs-space-4)" }, "Imprimir"),
-        el("div", { class: "field" },
-          el("label", { for: "pr-text" }, "Texto"),
-          el("textarea", {
-            id: "pr-text", class: "print-textarea",
-            rows: 6, placeholder: "Digite o texto a imprimir…",
-            required: true })),
-        el("p", { class: "power-hint" }, "Enviado para a impressora configurada (Canon MG3110)."),
-        el("div", { class: "dialog-actions" },
-          el("button", { type: "button", class: "btn btn-secondary", id: "pr-cancel" }, "Cancelar"),
-          el("button", { type: "submit", class: "btn btn-primary" }, "Imprimir"))));
-    document.body.appendChild(dialog);
+async function renderPrint() {
+  const v = document.getElementById("view");
+  v.innerHTML = "";
 
-    dialog.querySelector("#pr-cancel").addEventListener("click", () => dialog.close());
-    dialog.querySelector("#print-form").addEventListener("submit", async (e) => {
-      e.preventDefault();
+  v.appendChild(el("h3", { class: "section" }, "Impressão"));
+
+  // Lista impressoras
+  let printers = [];
+  try {
+    const data = await api("/api/v1/print");
+    printers = data.printers || [];
+  } catch (_) {}
+
+  // Configurações
+  v.appendChild(el("h4", { class: "section", style: "margin-bottom:var(--hs-space-2)" }, "Configurações"));
+  const cfg = el("div", { class: "grid print-config" });
+
+  const selPrinter = el("select", { id: "pr-printer", class: "select-field" });
+  (printers.length ? printers : ["MG3110"]).forEach((p) =>
+    selPrinter.appendChild(el("option", { value: p }, p)));
+  cfg.appendChild(field("Impressora", selPrinter));
+
+  const selColor = el("select", { id: "pr-color", class: "select-field" },
+    el("option", { value: "color" }, "Colorida"),
+    el("option", { value: "mono" }, "Preto e branco"));
+  cfg.appendChild(field("Cor", selColor));
+
+  const selMedia = el("select", { id: "pr-media", class: "select-field" },
+    el("option", { value: "A4" }, "A4"),
+    el("option", { value: "A5" }, "A5"),
+    el("option", { value: "Letter" }, "Letter"),
+    el("option", { value: "Legal" }, "Legal"));
+  cfg.appendChild(field("Papel", selMedia));
+
+  const selOrient = el("select", { id: "pr-orient", class: "select-field" },
+    el("option", { value: "portrait" }, "Retrato"),
+    el("option", { value: "landscape" }, "Paisagem"));
+  cfg.appendChild(field("Orientação", selOrient));
+
+  const inPages = el("input", { id: "pr-pages", class: "select-field", placeholder: "ex.: 1-3" });
+  cfg.appendChild(field("Páginas (opcional)", inPages));
+
+  v.appendChild(cfg);
+
+  // Conteúdo: texto OU arquivo
+  v.appendChild(el("h4", { class: "section", style: "margin:var(--hs-space-6) 0 var(--hs-space-2)" }, "Conteúdo"));
+  const ta = el("textarea", {
+    id: "pr-text", class: "print-textarea", rows: 6,
+    placeholder: "Digite o texto a imprimir…",
+  });
+  v.appendChild(ta);
+
+  const fileRow = el("div", { class: "file-row" },
+    el("label", { class: "btn btn-secondary", style: "cursor:pointer" },
+      "📎 Escolher arquivo",
+      el("input", { id: "pr-file", type: "file", accept: ".pdf,.txt,.png,.jpg,.jpeg", style: "display:none" })),
+    el("span", { class: "power-hint", id: "pr-filename" }, "ou envie um arquivo (PDF, texto, imagem)"));
+  v.appendChild(fileRow);
+
+  document.getElementById("pr-file").addEventListener("change", () => {
+    const f = document.getElementById("pr-file").files[0];
+    document.getElementById("pr-filename").textContent = f ? "Arquivo: " + f.name : "ou envie um arquivo";
+  });
+
+  const btn = el("button", { class: "btn btn-primary", id: "pr-submit", style: "margin-top:var(--hs-space-6)" }, "🖨️ Imprimir");
+  btn.addEventListener("click", async () => {
+    btn.disabled = true;
+    btn.textContent = "Imprimindo…";
+    try {
+      const body = {
+        printer: document.getElementById("pr-printer").value,
+        color: document.getElementById("pr-color").value,
+        media: document.getElementById("pr-media").value,
+        orientation: document.getElementById("pr-orient").value,
+        pages: document.getElementById("pr-pages").value.trim() || undefined,
+      };
+      const file = document.getElementById("pr-file").files[0];
       const text = document.getElementById("pr-text").value;
-      const btn = dialog.querySelector('button[type="submit"]');
-      btn.disabled = true;
-      btn.textContent = "Imprimindo…";
-      try {
-        await apiOrFail("/api/v1/print", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text }),
-        });
-        toast("Enviado para a impressora.", "success");
-        dialog.close();
-      } catch (err) {
-        toast(err.message || "Falha ao imprimir.", "error");
-      } finally {
-        btn.disabled = false;
-        btn.textContent = "Imprimir";
-      }
-    });
-  }
 
-  document.getElementById("pr-text").value = "";
-  dialog.showModal();
+      if (file) {
+        body.file = {
+          name: file.name,
+          data: await fileToBase64(file),
+        };
+      } else if (text.trim()) {
+        body.text = text;
+      } else {
+        throw new Error("Digite um texto ou escolha um arquivo.");
+      }
+
+      await apiOrFail("/api/v1/print", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      toast("Enviado para a impressora.", "success");
+    } catch (err) {
+      toast(err.message || "Falha ao imprimir.", "error");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "🖨️ Imprimir";
+    }
+  });
+  v.appendChild(btn);
+}
+
+function field(labelText, control) {
+  const wrap = el("div", { class: "print-field" },
+    el("label", { class: "print-label" }, labelText));
+  wrap.appendChild(control);
+  return wrap;
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).split(",")[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
 /* ---------- Init ---------- */
@@ -921,6 +996,10 @@ document.addEventListener("click", (e) => {
     auth.logout().then(() => {
       window.location.href = "/app/login.html";
     });
+  } else if (btn.id === "sheet-print") {
+    const sheet = document.getElementById("overflow-sheet");
+    if (sheet && sheet.open) sheet.close();
+    window.location.hash = "#/print";
   }
 });
 

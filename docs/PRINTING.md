@@ -44,30 +44,55 @@ echo "teste" | lp -d MG3110
 
 ## 3. Uso no App
 
-- No **Meu espaço**, a ação **🖨️ Imprimir** (admin) abre um diálogo:
-  digite o texto → **Imprimir**.
-- O texto é enviado à impressora configurada (`MG3110`).
+- A tela **🖨️ Impressão** (Admin) reúne tudo:
+  - **Configurações**: impressora, cor (colorida/PB), papel (A4/A5/Letter/Legal),
+    orientação (retrato/paisagem) e intervalo de páginas (ex.: `1-3`).
+  - **Conteúdo**: texto livre **ou** envio de arquivo (PDF, TXT, PNG, JPG).
+  - Botão **Imprimir**.
+- Acesso rápido: no **Meu espaço**, a ação **🖨️ Imprimir** abre a tela.
+- No mobile, a tela fica no menu **＋** → Impressão.
 
 ## 4. API
 
 | Método | Rota | Descrição |
 |--------|------|-----------|
 | GET | `/api/v1/print` | Lista impressoras do CUPS (admin) |
-| POST | `/api/v1/print` | Imprime texto (admin) |
+| POST | `/api/v1/print` | Imprime texto ou arquivo (admin) |
 
 `POST /api/v1/print`:
 
 ```json
-{ "text": "Olá, HomeServer!" }
+{
+  "text": "Olá, HomeServer!",
+  "printer": "MG3110",
+  "color": "mono",
+  "media": "A4",
+  "pages": "1-3",
+  "orientation": "portrait"
+}
 ```
+
+Ou com arquivo (base64):
 
 ```json
-{ "ok": true, "data": { "ok": true } }
+{
+  "file": { "name": "nota.pdf", "data": "<base64>" },
+  "color": "color",
+  "media": "A4"
+}
 ```
 
-- `text` (obrigatório) — conteúdo a imprimir.
-- `printer` (opcional) — nome da impressora (padrão `MG3110`).
-- A impressão roda no host via nsenter (o container da API não acessa o CUPS).
+| Campo | Descrição |
+|---|---|
+| `text` | Texto a imprimir (obrigatório se não houver `file`) |
+| `file` | `{name, data(base64)}` — arquivo a imprimir |
+| `printer` | Nome da impressora (padrão `MG3110`) |
+| `color` | `color` (padrão) ou `mono` |
+| `media` | Papel: `A4` (padrão), `A5`, `Letter`, `Legal` |
+| `pages` | Intervalo de páginas (ex.: `1-3`) |
+| `orientation` | `portrait` (padrão) ou `landscape` |
+
+- Executado no host via nsenter (o container da API não acessa o CUPS).
 
 ## 5. Problemas comuns
 
