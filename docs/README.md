@@ -2,43 +2,52 @@
 
 Bem-vindo à documentação técnica do HomeServer.
 
-> **Docs** explica **como o HomeServer funciona**. Para entender **para onde o
-> projeto está evoluindo**, veja `planning/` (visão, roadmap e product backlog).
+> **Docs** explica **como o HomeServer funciona**. Para entender **para onde o projeto está evoluindo**, veja `planning/`.
 
 ## Estrutura
 
 | Caminho | Conteúdo |
 |---------|----------|
 | `PRINCIPLES.md` | Princípios permanentes do projeto. |
-| `ARCHITECTURE.md` | Arquitetura em camadas (Foundation → Adapters → Infrastructure → Applications). |
-| `architecture/` | Detalhamento das camadas e módulos do Core + ADRs. |
-| `design/` | Design System (princípios, cores, tipografia, spacing, ícones, componentes). |
-| `security/` | Threat model, premissas de segurança e auditoria. |
-| `development/CONTRIBUTING.md` | Padrões e fluxo de desenvolvimento. |
-| `guide/` | Guia passo a passo para montar um HomeServer. |
+| `ARCHITECTURE.md` | Arquitetura geral em camadas. |
+| `architecture/` | Detalhamento do Core, Infrastructure e decisões arquiteturais. |
+| `design/` | Design System e especificações da aplicação. |
+| `security/` | Threat model, premissas e auditorias de segurança. |
+| `guide/` | Guia conceitual e histórico para montar e evoluir um HomeServer. |
+| `INSTALLATION.md` | Instalação operacional detalhada. |
+| `FIRST_BOOT.md` | Validação e primeiros passos após a instalação. |
+| `FAQ.md` | Dúvidas e problemas frequentes. |
 
 ## Planejamento (`planning/`)
 
 | Caminho | Conteúdo |
 |---------|----------|
 | `planning/vision.md` | Objetivos e filosofia do projeto. |
-| `planning/strategy.md` | Estratégia de evolução (ordem de crescimento). |
-| `planning/roadmap/` | Planos por versão (v1.1, v1.2, v1.4-ux, v1.5, v2.0). |
-| `planning/quality/` | Quality Gate e review checklist. |
-| `planning/health/` | Baselines de performance por versão. |
-| `planning/backlog/` | Product backlog numerado por área. |
+| `planning/strategy.md` | Estratégia de evolução. |
+| `planning/roadmap/` | Roadmaps por versão. |
+| `planning/quality/` | Quality Gate e checklists de revisão. |
+| `planning/health/` | Baselines de desempenho e saúde. |
+| `planning/backlog/` | Product backlog por área. |
 
 ## Navegação recomendada
 
-1. `PRINCIPLES.md`
-2. `ARCHITECTURE.md`
-3. `architecture/README.md`
-4. `development/CONTRIBUTING.md`
-5. `guide/README.md`
-6. `design/` (Design System) e `design/app/` (App v2.0, branch `app-design`)
+Para quem está chegando ao projeto:
+
+1. `README.md` — visão geral
+2. `QUICKSTART.md` — instalação rápida
+3. `INSTALLATION.md` — instalação detalhada
+4. `FIRST_BOOT.md` — validação pós-instalação
+5. `FAQ.md` / `QUESTIONS.md` — dúvidas comuns
+6. `PRINCIPLES.md` — princípios arquiteturais
+7. `ARCHITECTURE.md` — arquitetura geral
+8. `architecture/` — detalhes técnicos
+9. `design/` — Design System e App
 
 ## Referência rápida
 
-- **API**: `api/README.md` (endpoints REST) e `docs/architecture/API.md`.
-- **CLI**: `bash core/hs.sh --help` (comandos `system`, `service`, `user`, `device`, `hardware`, `automation`, `scheduler`).
+- **API**: `api/README.md` — contrato e endpoints da API.
+- **CLI**: `bash core/hs.sh --help`.
 - **Testes**: `bash core/tests/run_ci.sh`.
+- **Instalação**: `sudo bash install.sh`.
+
+> Documentos históricos permanecem identificados como históricos quando seus valores representam um ambiente ou estado específico de uma versão anterior.
