@@ -1,0 +1,307 @@
+/* ============================================================
+ * HomeServer App — Responsive UI v2
+ * Ajustes de layout para desktop, tablet e mobile.
+ * Carregado depois de style.css para preservar os componentes existentes.
+ * ============================================================ */
+
+/* ---------- Área de conteúdo ---------- */
+
+#view {
+  width: min(100%, 1440px);
+  margin: 0 auto;
+}
+
+#view > .section:first-child {
+  margin-top: 0;
+}
+
+.grid {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+/* ---------- Desktop ---------- */
+
+@media (min-width: 1024px) {
+  .app-main {
+    padding: var(--hs-space-5) var(--hs-space-6) var(--hs-space-6);
+  }
+
+  .topbar {
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+}
+
+/* ---------- Tablet ---------- */
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .app-main {
+    padding: var(--hs-space-4) var(--hs-space-5)
+      calc(var(--hs-bottomnav-h) + var(--hs-space-6));
+  }
+
+  .grid {
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  }
+}
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 767px) {
+  .app-main {
+    width: 100%;
+    margin-left: 0;
+    padding: var(--hs-space-3) var(--hs-space-3)
+      calc(var(--hs-bottomnav-h) + env(safe-area-inset-bottom) + var(--hs-space-4));
+  }
+
+  .topbar {
+    height: 56px;
+    padding: 0 var(--hs-space-3);
+    gap: var(--hs-space-2);
+  }
+
+  .topbar h1 {
+    font-size: 1rem;
+  }
+
+  .topbar .topbar-actions {
+    min-width: 0;
+  }
+
+  .topbar .nav-item {
+    width: var(--hs-touch-compact);
+    height: var(--hs-touch-compact);
+    padding: 0;
+  }
+
+  .avatar {
+    min-width: 0;
+    max-width: 130px;
+  }
+
+  #view {
+    width: 100%;
+  }
+
+  #view > .section:first-child {
+    margin-top: 0;
+  }
+
+  .section {
+    margin-top: var(--hs-space-5);
+    margin-bottom: var(--hs-space-2);
+    font-size: 1rem;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--hs-space-2);
+  }
+
+  .stat-card {
+    padding: var(--hs-space-3);
+  }
+
+  .stat-card .stat-value {
+    font-size: 1.1rem;
+  }
+
+  .app-card {
+    min-height: 52px;
+    padding: var(--hs-space-3);
+  }
+
+  .app-card .app-host {
+    display: none;
+  }
+
+  .feed-item {
+    min-width: 0;
+    padding: var(--hs-space-3);
+    gap: var(--hs-space-2);
+  }
+
+  .feed-item > .app-name,
+  .feed-item > span:not(.feed-time):not(.device-actions) {
+    min-width: 0;
+  }
+
+  .feed-item .feed-time {
+    flex-shrink: 0;
+  }
+
+  .device-actions {
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  .device-actions .btn {
+    padding: 0 var(--hs-space-2);
+  }
+
+  .banner {
+    padding: var(--hs-space-3);
+    margin-bottom: var(--hs-space-3);
+  }
+
+  .search-field {
+    font-size: 1rem;
+  }
+
+  .chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+
+  .chips::-webkit-scrollbar {
+    display: none;
+  }
+
+  .chip {
+    flex: 0 0 auto;
+  }
+
+  .table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .table th,
+  .table td {
+    padding: var(--hs-space-2);
+  }
+
+  /* Formulários e impressão */
+
+  .print-card {
+    padding: var(--hs-space-3);
+    margin-bottom: var(--hs-space-3);
+  }
+
+  .print-prow {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .print-config {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--hs-space-2);
+  }
+
+  .print-config > :first-child {
+    grid-column: 1 / -1;
+  }
+
+  .radio-row {
+    gap: var(--hs-space-4);
+  }
+
+  .print-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .print-actions .btn,
+  .print-actions .btn-primary {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .print-preview,
+  .print-pdf {
+    max-height: 55vh;
+  }
+
+  .print-pdf {
+    height: 55vh;
+  }
+
+  .file-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .file-row .btn {
+    width: 100%;
+  }
+
+  /* Diálogos ocupam quase toda a tela, sem perder margem de segurança. */
+
+  dialog {
+    width: calc(100vw - 24px);
+    max-width: 440px;
+    max-height: calc(100vh - 24px);
+    padding: var(--hs-space-4);
+  }
+
+  .dialog-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .dialog-actions .btn,
+  .dialog-actions .btn-primary {
+    width: 100%;
+  }
+
+  /* Navegação inferior */
+
+  .bottomnav {
+    height: calc(var(--hs-bottomnav-h) + env(safe-area-inset-bottom));
+  }
+
+  .bottomnav .nav-item {
+    min-width: 0;
+    padding: var(--hs-space-1) 2px;
+  }
+
+  .bottomnav .nav-item .ic {
+    font-size: 1.05rem;
+  }
+
+  .bottomnav .nav-item span:last-child {
+    font-size: 0.68rem;
+  }
+}
+
+/* ---------- Telefones pequenos ---------- */
+
+@media (max-width: 380px) {
+  .app-main {
+    padding-left: var(--hs-space-2);
+    padding-right: var(--hs-space-2);
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .print-config {
+    grid-template-columns: 1fr;
+  }
+
+  .print-config > :first-child {
+    grid-column: auto;
+  }
+
+  .avatar {
+    max-width: 100px;
+  }
+}
+
+/* ---------- Acessibilidade: reduzir movimento ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
