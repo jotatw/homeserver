@@ -179,7 +179,7 @@ Impressão via CUPS do host (admin). Ver `docs/PRINTING.md`.
   { "text": "Olá, HomeServer!" }
   ```
   `file` (base64), `printer`, `color`, `media`, `pages`, `orientation` opcionais.
-  Arquivos acima de 5 MB → `400`. `bodyLimit` da rota: 10 MB (base64).
+  Arquivos acima de 20 MB → `400`. `bodyLimit` da rota: 30 MB (base64).
 
 ---
 
