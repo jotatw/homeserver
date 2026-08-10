@@ -8,19 +8,19 @@ Este documento funciona como um mapa de perguntas. As respostas detalhadas ficam
 
 ## 1. Sobre o projeto
 
-- [O que é o HomeServer?](docs/FAQ.md#sobre-o-projeto)
-- [Para quem ele foi criado?](docs/FAQ.md#sobre-o-projeto)
-- [Preciso saber programar para usar?](docs/FAQ.md#sobre-o-projeto)
-- [O HomeServer depende da internet?](docs/FAQ.md#sobre-o-projeto)
-- [Posso usar o projeto como base para outro servidor?](docs/FAQ.md#sobre-o-projeto)
+- [O que é o HomeServer?](docs/FAQ.md#1-sobre-o-projeto)
+- [Para quem ele foi criado?](docs/FAQ.md#1-sobre-o-projeto)
+- [Preciso saber programar para usar?](docs/FAQ.md#1-sobre-o-projeto)
+- [O HomeServer depende da internet?](docs/FAQ.md#1-sobre-o-projeto)
+- [Posso usar o projeto como base para outro servidor?](docs/FAQ.md#1-sobre-o-projeto)
 
 ## 2. Antes da instalação
 
-- [Qual hardware é necessário?](docs/FAQ.md#instalação)
-- [Qual sistema operacional é suportado?](docs/FAQ.md#instalação)
-- [Preciso instalar Docker manualmente?](docs/FAQ.md#instalação)
-- [O instalador altera o quê no sistema?](docs/FAQ.md#instalação)
-- [A instalação apaga meus dados?](docs/FAQ.md#instalação)
+- [Qual hardware é necessário?](docs/FAQ.md#3-instalação)
+- [Qual sistema operacional é suportado?](docs/FAQ.md#3-instalação)
+- [Preciso instalar Docker manualmente?](docs/FAQ.md#3-instalação)
+- [O instalador altera o quê no sistema?](docs/FAQ.md#3-instalação)
+- [A instalação apaga meus dados?](docs/FAQ.md#3-instalação)
 
 Guia principal: [`QUICKSTART.md`](QUICKSTART.md)
 
@@ -28,70 +28,70 @@ Guia detalhado: [`docs/INSTALLATION.md`](docs/INSTALLATION.md)
 
 ## 3. Primeiro uso
 
-- [Como acesso o servidor depois da instalação?](docs/FAQ.md#primeiro-uso)
-- [O que é a Homepage?](docs/FAQ.md#primeiro-uso)
-- [O que é o HomeServer App?](docs/FAQ.md#app)
-- [Como crio usuários?](docs/FAQ.md#primeiro-uso)
-- [Como verifico se o servidor está funcionando?](docs/FAQ.md#primeiro-uso)
+- [Como acesso o servidor depois da instalação?](docs/FAQ.md#4-primeiro-uso)
+- [O que é a Homepage?](docs/FAQ.md#9-app)
+- [O que é o HomeServer App?](docs/FAQ.md#9-app)
+- [Como crio usuários?](docs/FAQ.md#4-primeiro-uso)
+- [Como verifico se o servidor está funcionando?](docs/FAQ.md#4-primeiro-uso)
 
 Guia: [`docs/FIRST_BOOT.md`](docs/FIRST_BOOT.md)
 
 ## 4. Acesso e rede
 
-- [Por que usar `homeserver.local`?](docs/FAQ.md#serviços)
-- [Posso acessar pelo IP?](docs/FAQ.md#serviços)
-- [O que faz o Caddy?](docs/FAQ.md#serviços)
-- [O que acontece se o mDNS não funcionar?](docs/FAQ.md#serviços)
-- [O HomeServer precisa ser exposto à internet?](docs/FAQ.md#segurança)
+- [Por que usar `homeserver.local`?](docs/FAQ.md#7-serviços)
+- [Posso acessar pelo IP?](docs/FAQ.md#7-serviços)
+- [O que faz o Caddy?](docs/FAQ.md#7-serviços)
+- [O que acontece se o mDNS não funcionar?](docs/FAQ.md#7-serviços)
+- [O HomeServer precisa ser exposto à internet?](docs/FAQ.md#5-autenticação-e-segurança)
 
 ## 5. Usuários e autenticação
 
-- [Como funciona o administrador?](docs/FAQ.md#segurança)
-- [Como funciona a sessão do App?](docs/FAQ.md#segurança)
-- [Quanto tempo uma sessão permanece válida?](docs/FAQ.md#segurança)
-- [O que acontece depois de reiniciar a API?](docs/FAQ.md#segurança)
-- [Qual a diferença entre usuário do HomeServer e usuário do FileBrowser?](docs/FAQ.md#segurança)
+- [Como funciona o administrador?](docs/FAQ.md#5-autenticação-e-segurança)
+- [Como funciona a sessão do App?](docs/FAQ.md#5-autenticação-e-segurança)
+- [Quanto tempo uma sessão permanece válida?](docs/FAQ.md#5-autenticação-e-segurança)
+- [O que acontece depois de reiniciar a API?](docs/FAQ.md#5-autenticação-e-segurança)
+- [Qual a diferença entre usuário do HomeServer e usuário do FileBrowser?](docs/FAQ.md#5-autenticação-e-segurança)
 
 Referência: [`docs/architecture/API.md`](docs/architecture/API.md)
 
 ## 6. Arquivos e armazenamento
 
-- [Onde ficam meus arquivos?](docs/FAQ.md#dados-e-armazenamento)
-- [Qual a diferença entre `users`, `shared`, `media` e `documents`?](docs/FAQ.md#dados-e-armazenamento)
-- [Como funcionam dispositivos USB e SD Card?](docs/FAQ.md#dados-e-armazenamento)
-- [Onde ficam os backups?](docs/FAQ.md#dados-e-armazenamento)
-- [O que acontece se o armazenamento ficar cheio?](docs/FAQ.md#dados-e-armazenamento)
+- [Onde ficam meus arquivos?](docs/FAQ.md#6-armazenamento-e-dispositivos)
+- [Qual a diferença entre `users`, `shared`, `media` e `documents`?](docs/FAQ.md#6-armazenamento-e-dispositivos)
+- [Como funcionam dispositivos USB e SD Card?](docs/FAQ.md#6-armazenamento-e-dispositivos)
+- [Onde ficam os backups?](docs/FAQ.md#6-armazenamento-e-dispositivos)
+- [O que acontece se o armazenamento ficar cheio?](docs/FAQ.md#6-armazenamento-e-dispositivos)
 
 ## 7. Serviços
 
-- [Qual a função do FileBrowser?](docs/FAQ.md#serviços)
-- [Qual a função do Gitea?](docs/FAQ.md#serviços)
-- [Qual a função do Caddy?](docs/FAQ.md#serviços)
-- [Posso adicionar outros serviços?](docs/FAQ.md#serviços)
-- [Posso substituir um módulo?](docs/FAQ.md#serviços)
+- [Qual a função do FileBrowser?](docs/FAQ.md#7-serviços)
+- [Qual a função do Gitea?](docs/FAQ.md#7-serviços)
+- [Qual a função do Caddy?](docs/FAQ.md#7-serviços)
+- [Posso adicionar outros serviços?](docs/FAQ.md#7-serviços)
+- [Posso substituir um módulo?](docs/FAQ.md#7-serviços)
 
 ## 8. API e integrações
 
-- [Por que o HomeServer possui uma API própria?](docs/FAQ.md#api)
-- [O App acessa diretamente os serviços externos?](docs/FAQ.md#api)
-- [Como funciona a autenticação da API?](docs/FAQ.md#api)
-- [Posso criar outro cliente para o HomeServer?](docs/FAQ.md#api)
-- [Posso integrar outro sistema usando a API?](docs/FAQ.md#api)
+- [Por que o HomeServer possui uma API própria?](docs/FAQ.md#8-api)
+- [O App acessa diretamente os serviços externos?](docs/FAQ.md#8-api)
+- [Como funciona a autenticação da API?](docs/FAQ.md#8-api)
+- [Posso criar outro cliente para o HomeServer?](docs/FAQ.md#8-api)
+- [Posso integrar outro sistema usando a API?](docs/FAQ.md#8-api)
 
 Referência: [`api/README.md`](api/README.md)
 
 ## 9. App
 
-- [Qual a diferença entre Homepage e App?](docs/FAQ.md#app)
-- [O App funciona em celulares?](docs/FAQ.md#app)
-- [O App pode ser instalado como PWA?](docs/FAQ.md#app)
-- [O App funciona offline?](docs/FAQ.md#app)
-- [Como a interface muda conforme o usuário?](docs/FAQ.md#app)
+- [Qual a diferença entre Homepage e App?](docs/FAQ.md#9-app)
+- [O App funciona em celulares?](docs/FAQ.md#9-app)
+- [O App pode ser instalado como PWA?](docs/FAQ.md#9-app)
+- [O App funciona offline?](docs/FAQ.md#9-app)
+- [Como a interface muda conforme o usuário?](docs/FAQ.md#9-app)
 
 ## 10. Segurança
 
-- [O HomeServer é seguro para exposição direta na internet?](docs/FAQ.md#segurança)
-- [Onde ficam os tokens?](docs/FAQ.md#segurança)
+- [O HomeServer é seguro para exposição direta na internet?](SECURITY.md)
+- [Onde ficam os tokens?](docs/FAQ.md#5-autenticação-e-segurança)
 - [Como reportar uma vulnerabilidade?](SECURITY.md)
 - [Quais versões recebem correções de segurança?](SECURITY.md)
 
