@@ -74,7 +74,9 @@ Acesso rápido: **Meu espaço** → 🖨️ Imprimir. No mobile: menu **＋** �
 
 | Método | Rota | Descrição |
 |--------|------|-----------|
-| GET | `/api/v1/print` | Lista impressoras do CUPS (admin) |
+| GET | `/api/v1/print` | Lista impressoras + status (admin) |
+| GET | `/api/v1/print/jobs` | Fila de impressão (admin) |
+| DELETE | `/api/v1/print/jobs/:id` | Cancela um trabalho (admin) |
 | POST | `/api/v1/print` | Imprime texto ou arquivo (admin) |
 
 `POST /api/v1/print`:
@@ -109,6 +111,13 @@ Ou com arquivo (base64):
 | `media` | Papel: `A4` (padrão), `A5`, `Letter`, `Legal` |
 | `pages` | Intervalo de páginas (ex.: `1-3`) |
 | `orientation` | `portrait` (padrão) ou `landscape` |
+| `quality` | `normal` (padrão), `economico` (300dpi, P&B) ou `alta` (600dpi+) |
+
+### Fila de impressão
+
+- `GET /print/jobs` → trabalhos ativos (🟡) e concluídos (✅) com id, status e data.
+- `DELETE /print/jobs/:id` → cancela um trabalho ativo (ex.: `MG3110-12`).
+- Na tela do App, o card **Fila de impressão** lista os trabalhos com botão **Cancelar** (ativos).
 
 - Executado no host via nsenter (o container da API não acessa o CUPS).
 

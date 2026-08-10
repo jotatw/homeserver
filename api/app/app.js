@@ -937,6 +937,12 @@ async function renderPrint() {
   const inPages = el("input", { id: "pr-pages", class: "select-field", placeholder: "ex.: 1-3" });
   cfg.appendChild(field("Páginas", inPages));
 
+  const selQuality = el("select", { id: "pr-quality", class: "select-field" },
+    el("option", { value: "economico" }, "♻ Econômico"),
+    el("option", { value: "normal", selected: "selected" }, "Normal"),
+    el("option", { value: "alta" }, "✨ Alta qualidade"));
+  cfg.appendChild(field("Qualidade", selQuality));
+
   card1.appendChild(cfg);
   v.appendChild(card1);
 
@@ -1017,6 +1023,58 @@ async function renderPrint() {
 
   previewBtn.addEventListener("click", renderPreview);
   submitBtn.addEventListener("click", submitPrint);
+
+  // ---- Card 4: Fila de impressão ----
+  const card4 = el("div", { class: "print-card" },
+    el("h4", { class: "print-card-title" }, "Fila de impressão"),
+    el("div", { id: "print-jobs" }, el("div", { class: "loader" }, "Carregando…")));
+  v.appendChild(card4);
+
+  renderPrintJobs();
+}
+
+async function renderPrintJobs() {
+  const box = document.getElementById("print-jobs");
+  if (!box) return;
+
+  try {
+    const data = await api("/api/v1/print/jobs");
+    const jobs = data.jobs || [];
+    box.innerHTML = "";
+
+    if (!jobs.length) {
+      box.appendChild(el("p", { class: "power-hint" }, "Nenhum trabalho na fila."));
+      return;
+    }
+
+    const feed = el("div", { class: "feed" });
+    jobs.forEach((job) => {
+      const printing = job.status === "printing";
+      const row = el("div", { class: "feed-item" },
+        el("span", {}, printing ? "🟡" : "✅"),
+        el("span", { class: "app-name" }, job.id),
+        el("span", { class: "app-host" },
+          printing ? "Imprimindo…" : "Concluído" +
+          (job.date ? " · " + timeAgo(job.date) : "")));
+      if (printing) {
+        const c = el("button", { class: "btn btn-secondary", style: "height:var(--hs-touch-compact)" }, "Cancelar");
+        c.addEventListener("click", async () => {
+          if (!confirm("Cancelar o trabalho " + job.id + "?")) return;
+          try {
+            await apiOrFail("/api/v1/print/jobs/" + job.id, { method: "DELETE" });
+            toast("Trabalho cancelado.", "success");
+            renderPrintJobs();
+          } catch (_) {}
+        });
+        row.appendChild(c);
+      }
+      feed.appendChild(row);
+    });
+    box.appendChild(feed);
+  } catch (err) {
+    box.innerHTML = "";
+    box.appendChild(el("p", { class: "power-hint" }, "Não foi possível carregar a fila."));
+  }
 }
 
 function renderPreview() {
@@ -1077,6 +1135,7 @@ async function submitPrint() {
       color: document.getElementById("pr-color").value,
       media: document.getElementById("pr-media").value,
       orientation: document.getElementById("pr-orient").value,
+      quality: document.getElementById("pr-quality").value,
       pages: document.getElementById("pr-pages").value.trim() || undefined,
     };
     const file = printState.file;
