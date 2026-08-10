@@ -7,16 +7,24 @@
 /* ---------- Área de conteúdo ---------- */
 
 #view {
-  width: min(100%, 1440px);
+  width: min(100%, var(--hs-max-content));
   margin: 0 auto;
 }
 
-#view > .section:first-child {
+/* Primeira seção de cada tela = título da página.
+ * As demais seções continuam usando o estilo compacto de seção.
+ */
+#view > .section:first-of-type {
   margin-top: 0;
+  margin-bottom: var(--hs-space-4);
+  font-size: 1.35rem;
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
-.grid {
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+#view > .section:not(:first-of-type) {
+  margin-top: var(--hs-space-6);
 }
 
 /* ---------- Desktop ---------- */
@@ -27,8 +35,12 @@
   }
 
   .topbar {
-    max-width: 1440px;
+    max-width: var(--hs-max-content);
     margin: 0 auto;
+  }
+
+  .grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   }
 }
 
@@ -84,8 +96,14 @@
     width: 100%;
   }
 
-  #view > .section:first-child {
+  #view > .section:first-of-type {
     margin-top: 0;
+    margin-bottom: var(--hs-space-3);
+    font-size: 1.15rem;
+  }
+
+  #view > .section:not(:first-of-type) {
+    margin-top: var(--hs-space-5);
   }
 
   .section {
