@@ -1,31 +1,49 @@
 # design/app — HomeServer App (v2.0)
 
-> Branch: `app-design` · Sem código · Fase de design/protótipo.
-> A v2.0 será o HomeServer App: portal unificado do servidor (dashboards, storage, users, status) acessível de qualquer dispositivo.
+> Fase de design e protótipo. O objetivo da v2.0 é o HomeServer App: portal unificado do servidor, acessível por desktop e mobile.
+
+## Objetivo
+
+Esta pasta concentra a documentação do design do App antes da implementação definitiva. A abordagem é incremental: uma tela por vez, com mobile como prioridade de experiência e desktop como adaptação da mesma aplicação.
 
 ## Estrutura
 
-| Pasta | Conteúdo |
+| Arquivo/Pasta | Conteúdo |
 |---|---|
-| `references/` → arquivo `references.md` | Referências coletadas na internet (dashboards, design systems, PWA) |
-| `wireframes/` | Wireframes de telas (texto/ASCII ou imagens) |
-| `components/` | Especificação de componentes (cards, badges, toasts, dialogs, tables...) |
-| `navigation/` | Arquitetura de navegação (bottom tabs mobile, sidebar desktop, rotas) |
-| `flows/` | Fluxos de usuário (login, acesso a apps, storage, admin) |
-| `tokens/` | Design tokens (cores, tipografia, spacing, radius) |
+| `DESIGN.md` | Princípios, personalidade visual e regras gerais do design |
+| `platforms.md` | Diretrizes para mobile, tablet e desktop |
+| `profiles.md` | Perfis de Usuário comum e Administrador |
+| `roadmap.md` | Plano incremental de evolução e critérios de conclusão |
+| `references/` | Referências coletadas e análise de padrões |
+| `wireframes/` | Wireframes de telas |
+| `components/` | Especificação de componentes |
+| `navigation/` | Arquitetura de navegação e rotas |
+| `flows/` | Fluxos de usuário |
+| `tokens/` | Design tokens |
 
-## Regras da branch
+## Regras do design
 
-1. **Nenhum código** — apenas documentação de design (markdown).
-2. Todo documento de design deve referenciar `references.md` quando derivar de referência externa.
-3. Mergir em `main` **somente** quando o design estiver READY (conforme `planning/v2-readiness.md`).
+1. A documentação de design deve ser escrita em português.
+2. Código e nomes técnicos podem permanecer em inglês quando isso for necessário para implementação.
+3. O mobile deve ser projetado como experiência própria, não como uma versão reduzida do desktop.
+4. Desktop e mobile compartilham identidade, dados, permissões e componentes, mas podem utilizar composições diferentes.
+5. A interface deve permanecer leve e adequada ao objetivo doméstico do HomeServer.
+6. Novos elementos não devem ser adicionados apenas para preencher espaço.
+7. Segurança e autorização pertencem ao backend; a interface apenas reflete as permissões disponíveis.
 
-## Critérios de READY (definidos na v2-readiness)
+## Perfis iniciais
 
-- [ ] Wireframes das telas principais aprovados
-- [ ] Sistema de navegação definido (mobile + desktop)
-- [ ] Design tokens propostos
-- [ ] Fluxos de usuário mapeados
-- [ ] Revisão de acessibilidade (WCAG 2.1)
+O App começa com dois perfis:
 
-> Linha-guia de priorização: a v2.0 herda a organização da v1.4 (Meu espaço, Aplicações, Administração, Sistema) como base da arquitetura de navegação do App.
+- **Usuário comum** — foco em tarefas cotidianas, como arquivos, aplicações e impressão.
+- **Administrador** — inclui as áreas e ações necessárias para gerenciamento, manutenção e diagnóstico.
+
+A regra é reutilizar as mesmas telas sempre que possível, alterando apenas conteúdo e ações permitidas.
+
+## Critérios de READY
+
+A documentação atual de prontidão da v2.0 exige wireframes aprovados, navegação mobile/desktop definida, tokens propostos, fluxos mapeados e revisão de acessibilidade. Esses critérios continuam válidos; os novos documentos desta pasta detalham como chegaremos a eles.
+
+## Referências
+
+Quando uma decisão de design for derivada de uma referência externa, ela deve ser registrada em `references/` e a decisão deve indicar sua origem. O objetivo é usar referências para aprender padrões, não copiar interfaces.
