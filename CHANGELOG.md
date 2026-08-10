@@ -3,9 +3,9 @@
 Todas as mudanças notáveis no HomeServer são documentadas neste arquivo.
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
-## [2.0.0-rc.1] — em candidata
+## [1.6.0] — em desenvolvimento
 
-### Impressão (feature adicionada pós-RC, a pedido)
+### Impressão
 
 - **Impressão via CUPS** do host:
   - `GET /api/v1/print` — lista impressoras (admin).
@@ -15,6 +15,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 - Impressora Canon PIXMA MG3110 configurada no CUPS (driver Gutenprint).
 - Docs: `docs/PRINTING.md` (configuração, uso e API).
 - Testes: +2 em `test-api.sh` (31 total).
+
+## [2.0.0-rc.1] — em candidata
 
 ### Fixed (acceptance tests)
 
