@@ -857,28 +857,66 @@ function showCreatedToken(data) {
 
 /* ---------- Tela: Impressão (admin) ---------- */
 
+const printState = { mode: "text", file: null };
+
+function printerBadge(status) {
+  if (!status || status.state === "unknown") {
+    return el("span", { class: "badge danger" }, "🔴 Erro");
+  }
+  if (status.state === "disabled" || status.accepting === false) {
+    return el("span", { class: "badge danger" }, "🔴 Indisponível");
+  }
+  if (status.activeJobs > 0 || status.state === "printing") {
+    return el("span", { class: "badge warn" }, "🟡 Ocupada");
+  }
+  return el("span", { class: "badge ok" }, "🟢 Pronta");
+}
+
+function printerReady(status) {
+  return Boolean(status && status.state !== "disabled" && status.state !== "unknown" && status.accepting !== false);
+}
+
 async function renderPrint() {
   const v = document.getElementById("view");
   v.innerHTML = "";
 
   v.appendChild(el("h3", { class: "section" }, "Impressão"));
 
-  // Lista impressoras
+  // Status da impressora
   let printers = [];
+  let statusMap = {};
   try {
     const data = await api("/api/v1/print");
     printers = data.printers || [];
-  } catch (_) {}
+    statusMap = data.status || {};
+  } catch (err) {
+    v.appendChild(el("div", { class: "banner danger" }, "🔴", "Erro ao consultar a impressora: " + err.message));
+  }
 
-  // Configurações
-  v.appendChild(el("h4", { class: "section", style: "margin-bottom:var(--hs-space-2)" }, "Configurações"));
-  const cfg = el("div", { class: "grid print-config" });
+  // ---- Card 1: Impressora e configuração ----
+  const card1 = el("div", { class: "print-card" },
+    el("h4", { class: "print-card-title" }, "1. Impressora e configuração"));
 
-  const selPrinter = el("select", { id: "pr-printer", class: "select-field" });
+  const pRow = el("div", { class: "print-prow" });
+  const selPrinter = el("select", { id: "pr-printer", class: "select-field", style: "flex:1" });
   (printers.length ? printers : ["MG3110"]).forEach((p) =>
     selPrinter.appendChild(el("option", { value: p }, p)));
-  cfg.appendChild(field("Impressora", selPrinter));
+  pRow.appendChild(el("label", { class: "print-label", style: "min-width:90px" }, "Impressora"));
+  pRow.appendChild(selPrinter);
 
+  const statusWrap = el("span", { id: "pr-status", style: "display:inline-flex" });
+  const selP = printers[0] || "MG3110";
+  statusWrap.appendChild(printerBadge(statusMap[selP]));
+  pRow.appendChild(statusWrap);
+  card1.appendChild(pRow);
+
+  if (statusMap[selP] && statusMap[selP].lastJob) {
+    card1.appendChild(el("p", { class: "power-hint", id: "pr-last" },
+      "Última impressão: " + timeAgo(statusMap[selP].lastJob)));
+  }
+
+  // Configurações rápidas
+  const cfg = el("div", { class: "grid print-config" });
   const selColor = el("select", { id: "pr-color", class: "select-field" },
     el("option", { value: "color" }, "Colorida"),
     el("option", { value: "mono" }, "Preto e branco"));
@@ -897,70 +935,186 @@ async function renderPrint() {
   cfg.appendChild(field("Orientação", selOrient));
 
   const inPages = el("input", { id: "pr-pages", class: "select-field", placeholder: "ex.: 1-3" });
-  cfg.appendChild(field("Páginas (opcional)", inPages));
+  cfg.appendChild(field("Páginas", inPages));
 
-  v.appendChild(cfg);
+  card1.appendChild(cfg);
+  v.appendChild(card1);
 
-  // Conteúdo: texto OU arquivo
-  v.appendChild(el("h4", { class: "section", style: "margin:var(--hs-space-6) 0 var(--hs-space-2)" }, "Conteúdo"));
-  const ta = el("textarea", {
+  selPrinter.addEventListener("change", () => {
+    const name = selPrinter.value;
+    const s = statusMap[name];
+    statusWrap.innerHTML = "";
+    statusWrap.appendChild(printerBadge(s));
+    const last = document.getElementById("pr-last");
+    if (last) {
+      last.textContent = s && s.lastJob ? "Última impressão: " + timeAgo(s.lastJob) : "";
+    }
+    updatePrintDisabled();
+  });
+
+  // ---- Card 2: Conteúdo ----
+  const card2 = el("div", { class: "print-card" },
+    el("h4", { class: "print-card-title" }, "2. Conteúdo a imprimir"));
+
+  const toggle = el("div", { class: "radio-row" },
+    el("label", {},
+      el("input", { type: "radio", name: "pr-mode", value: "text", checked: "checked" }), " Texto"),
+    el("label", {},
+      el("input", { type: "radio", name: "pr-mode", value: "file" }), " Arquivo"));
+  card2.appendChild(toggle);
+
+  const textArea = el("textarea", {
     id: "pr-text", class: "print-textarea", rows: 6,
     placeholder: "Digite o texto a imprimir…",
   });
-  v.appendChild(ta);
+  card2.appendChild(textArea);
 
-  const fileRow = el("div", { class: "file-row" },
+  const fileRow = el("div", { class: "file-row", hidden: true, id: "pr-filerow" },
     el("label", { class: "btn btn-secondary", style: "cursor:pointer" },
       "📎 Escolher arquivo",
       el("input", { id: "pr-file", type: "file", accept: ".pdf,.txt,.png,.jpg,.jpeg", style: "display:none" })),
-    el("span", { class: "power-hint", id: "pr-filename" }, "ou envie um arquivo (PDF, texto, imagem)"));
-  v.appendChild(fileRow);
+    el("span", { class: "power-hint", id: "pr-filename" }, "PDF, texto ou imagem"));
+  card2.appendChild(fileRow);
+
+  const previewBox = el("div", { class: "print-preview", id: "pr-preview", hidden: true });
+  card2.appendChild(previewBox);
+
+  v.appendChild(card2);
+
+  document.querySelectorAll('input[name="pr-mode"]').forEach((r) => {
+    r.addEventListener("change", () => {
+      printState.mode = r.value;
+      const isText = r.value === "text";
+      textArea.hidden = !isText;
+      fileRow.hidden = isText;
+      previewBox.hidden = true;
+      document.getElementById("pr-preview").innerHTML = "";
+    });
+  });
 
   document.getElementById("pr-file").addEventListener("change", () => {
     const f = document.getElementById("pr-file").files[0];
-    document.getElementById("pr-filename").textContent = f ? "Arquivo: " + f.name : "ou envie um arquivo";
+    printState.file = f || null;
+    document.getElementById("pr-filename").textContent = f ? "Arquivo: " + f.name : "PDF, texto ou imagem";
+    document.getElementById("pr-preview").hidden = true;
+    document.getElementById("pr-preview").innerHTML = "";
   });
 
-  const btn = el("button", { class: "btn btn-primary", id: "pr-submit", style: "margin-top:var(--hs-space-6)" }, "🖨️ Imprimir");
-  btn.addEventListener("click", async () => {
-    btn.disabled = true;
-    btn.textContent = "Imprimindo…";
-    try {
-      const body = {
-        printer: document.getElementById("pr-printer").value,
-        color: document.getElementById("pr-color").value,
-        media: document.getElementById("pr-media").value,
-        orientation: document.getElementById("pr-orient").value,
-        pages: document.getElementById("pr-pages").value.trim() || undefined,
-      };
-      const file = document.getElementById("pr-file").files[0];
-      const text = document.getElementById("pr-text").value;
+  // ---- Card 3: Ações ----
+  const card3 = el("div", { class: "print-card print-actions" },
+    el("button", { class: "btn btn-secondary", id: "pr-preview-btn" }, "👁 Visualizar"),
+    el("button", { class: "btn btn-primary", id: "pr-submit" }, "🖨️ Imprimir"));
+  v.appendChild(card3);
 
-      if (file) {
-        body.file = {
-          name: file.name,
-          data: await fileToBase64(file),
-        };
-      } else if (text.trim()) {
-        body.text = text;
-      } else {
-        throw new Error("Digite um texto ou escolha um arquivo.");
-      }
+  const previewBtn = document.getElementById("pr-preview-btn");
+  const submitBtn = document.getElementById("pr-submit");
 
-      await apiOrFail("/api/v1/print", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      toast("Enviado para a impressora.", "success");
-    } catch (err) {
-      toast(err.message || "Falha ao imprimir.", "error");
-    } finally {
-      btn.disabled = false;
-      btn.textContent = "🖨️ Imprimir";
+  function updatePrintDisabled() {
+    const name = document.getElementById("pr-printer").value;
+    submitBtn.disabled = !printerReady(statusMap[name]);
+  }
+  updatePrintDisabled();
+
+  previewBtn.addEventListener("click", renderPreview);
+  submitBtn.addEventListener("click", submitPrint);
+}
+
+function renderPreview() {
+  const box = document.getElementById("pr-preview");
+  const isText = printState.mode === "text";
+
+  if (isText) {
+    const text = document.getElementById("pr-text").value;
+    if (!text.trim()) {
+      toast("Digite um texto para visualizar.", "warn");
+      return;
     }
-  });
-  v.appendChild(btn);
+    box.innerHTML = "";
+    box.appendChild(el("pre", { class: "print-pre" }, text));
+    box.hidden = false;
+    return;
+  }
+
+  const f = printState.file;
+  if (!f) {
+    toast("Escolha um arquivo para visualizar.", "warn");
+    return;
+  }
+
+  box.innerHTML = "";
+  const url = URL.createObjectURL(f);
+
+  if (f.type === "image/png" || f.type === "image/jpeg") {
+    box.appendChild(el("img", { src: url, class: "print-img", alt: f.name }));
+    box.hidden = false;
+  } else if (f.type === "application/pdf" || /\.pdf$/i.test(f.name)) {
+    box.appendChild(el("iframe", { src: url, class: "print-pdf", title: "Pré-visualização" }));
+    box.hidden = false;
+  } else if (f.type === "text/plain" || /\.txt$/i.test(f.name)) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      box.innerHTML = "";
+      box.appendChild(el("pre", { class: "print-pre" }, String(reader.result)));
+      box.hidden = false;
+    };
+    reader.readAsText(f);
+  } else {
+    box.innerHTML = "";
+    box.appendChild(el("p", { class: "power-hint" },
+      "Pré-visualização indisponível. O arquivo ainda poderá ser enviado para impressão."));
+    box.hidden = false;
+  }
+}
+
+async function submitPrint() {
+  const submitBtn = document.getElementById("pr-submit");
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Imprimindo…";
+
+  try {
+    const body = {
+      printer: document.getElementById("pr-printer").value,
+      color: document.getElementById("pr-color").value,
+      media: document.getElementById("pr-media").value,
+      orientation: document.getElementById("pr-orient").value,
+      pages: document.getElementById("pr-pages").value.trim() || undefined,
+    };
+    const file = printState.file;
+    const text = document.getElementById("pr-text").value;
+
+    if (printState.mode === "file") {
+      if (!file) {
+        throw new Error("Escolha um arquivo para imprimir.");
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        const mb = (file.size / 1024 / 1024).toFixed(1);
+        if (!confirm("Arquivo com " + mb + " MB.\nO arquivo é grande e pode demorar para ser processado.\nDeseja continuar?")) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "🖨️ Imprimir";
+          return;
+        }
+      }
+      body.file = { name: file.name, data: await fileToBase64(file) };
+    } else {
+      if (!text.trim()) {
+        throw new Error("Digite um texto para imprimir.");
+      }
+      body.text = text;
+    }
+
+    await apiOrFail("/api/v1/print", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    toast("Enviado para a impressora.", "success");
+    // Recarrega o status (última impressão atualizada).
+    renderPrint();
+  } catch (err) {
+    toast(err.message || "Falha ao imprimir.", "error");
+    submitBtn.disabled = false;
+    submitBtn.textContent = "🖨️ Imprimir";
+  }
 }
 
 function field(labelText, control) {

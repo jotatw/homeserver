@@ -165,12 +165,21 @@ Dispara o backup manual (executado no host via nsenter).
 
 Impressão via CUPS do host (admin). Ver `docs/PRINTING.md`.
 
-- `GET` — lista impressoras: `{ ok, data: { printers: ["MG3110"] } }`.
-- `POST` — imprime texto:
+- `GET` — lista impressoras com **status**:
+  ```json
+  { "ok": true, "data": {
+    "printers": ["MG3110"],
+    "status": { "MG3110": { "state": "idle", "accepting": true, "activeJobs": 0, "lastJob": "2026-08-10T17:59:02.000Z" } }
+  }}
+  ```
+  - `state`: `idle` | `printing` | `disabled` · `accepting`: aceita trabalhos ·
+    `activeJobs`: jobs na fila · `lastJob`: ISO do último trabalho (ou `null`).
+- `POST` — imprime texto ou arquivo:
   ```json
   { "text": "Olá, HomeServer!" }
   ```
-  `printer` é opcional (padrão `MG3110`). Executado no host via nsenter.
+  `file` (base64), `printer`, `color`, `media`, `pages`, `orientation` opcionais.
+  Arquivos acima de 5 MB → `400`. `bodyLimit` da rota: 10 MB (base64).
 
 ---
 

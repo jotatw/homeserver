@@ -5,6 +5,22 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
 ## [1.6.0] — em desenvolvimento
 
+### Impressão — status, blocos, preview e validações (Fases 1-5)
+
+- **Status da impressora** (`GET /print`): `state` (idle/printing/disabled),
+  `accepting`, `activeJobs` e `lastJob` — via `lpstat -p/-a/-o/-W completed`
+  num único docker run (parse do formato nsenter/locale C). Badge na tela:
+  🟢 Pronta · 🟡 Ocupada · 🔴 Indisponível/Erro + última impressão.
+- **Tela reorganizada em 3 blocos**: (1) Impressora e configuração ·
+  (2) Conteúdo (toggle Texto/Arquivo) · (3) Ações (Visualizar/Imprimir).
+- **Pré-visualização**: texto em `<pre>`, imagem em `<img>`, PDF em `<iframe>`
+  (fallback: "Pré-visualização indisponível…" — nunca bloqueia a impressão).
+- **Validações**: sem impressora/offline desabilita o botão · sem conteúdo
+  bloqueado · arquivo >5 MB pede confirmação · backend rejeita >5 MB (400) ·
+  `bodyLimit` da rota POST /print = 10 MB (base64).
+- Optimização: `getPrintersInfo` em um único `docker run` (~8s → ~4s).
+- Docs `PRINTING.md` e `api/README.md` atualizadas.
+
 ### Tela de Impressão (configurações + arquivos)
 
 - **Tela dedicada** `#/print` (Admin) com configurações de impressão:
