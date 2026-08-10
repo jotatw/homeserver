@@ -1,5 +1,11 @@
 import type { FastifyInstance } from "fastify";
-import { getPrintersInfo, printContent, type PrintOptions } from "../adapters/print.js";
+import {
+    getPrintersInfo,
+    printContent,
+    listJobs,
+    cancelJob,
+    type PrintOptions,
+} from "../adapters/print.js";
 import { sendOk, sendError } from "../utils/respond.js";
 import { requireAdmin } from "../plugins/auth.js";
 
@@ -11,6 +17,7 @@ interface PrintBody {
     media?: string;
     pages?: string;
     orientation?: "portrait" | "landscape";
+    quality?: "economico" | "normal" | "alta";
 }
 
 function isNonEmptyString(value: unknown): value is string {
@@ -39,6 +46,29 @@ export async function printRoutes(fastify: FastifyInstance) {
         }
     });
 
+    fastify.get("/api/v1/print/jobs", async (_req, reply) => {
+        try {
+            return sendOk(reply, { jobs: await listJobs() });
+        } catch (error) {
+            return sendError(reply, 500, error instanceof Error ? error.message : String(error));
+        }
+    });
+
+    fastify.delete("/api/v1/print/jobs/:id", async (request, reply) => {
+        const { id } = request.params as { id: string };
+
+        // Formato esperado: "<impressora>-<n>" (ex.: MG3110-12).
+        if (!/^[A-Za-z0-9_.-]+-\d+$/.test(id)) {
+            return sendError(reply, 400, "ID de trabalho inválido.");
+        }
+
+        try {
+            return sendOk(reply, await cancelJob(id));
+        } catch (error) {
+            return sendError(reply, 500, error instanceof Error ? error.message : String(error));
+        }
+    });
+
     // bodyLimit: 30 MB — arquivos são enviados em base64 (20 MB -> ~26,7 MB).
     fastify.post("/api/v1/print", { bodyLimit: 30 * 1024 * 1024 }, async (request, reply) => {
         const body = request.body as PrintBody | null;
@@ -57,6 +87,7 @@ export async function printRoutes(fastify: FastifyInstance) {
             media: isNonEmptyString(body.media) ? body.media : undefined,
             pages: isNonEmptyString(body.pages) ? body.pages : undefined,
             orientation: body.orientation,
+            quality: body.quality,
         };
 
         try {

@@ -5,6 +5,16 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
 ## [1.6.0] — em desenvolvimento
 
+### Impressão — fila (ver/cancelar) e modos de qualidade
+
+- **Fila de impressão**: `GET /print/jobs` (ativos 🟡 + concluídos ✅) e
+  `DELETE /print/jobs/:id` (cancelar). Card **Fila de impressão** na tela com
+  botão Cancelar nos trabalhos ativos.
+- **Modos de qualidade**: `economico` (300dpi + P&B), `normal`, `alta`
+  (600dpi+). Select **Qualidade** na tela (♻ Econômico / Normal / ✨ Alta).
+- `lpOptions` passa `ColorModel=Gray` (P&B) e `Resolution` conforme a qualidade.
+- Docs `PRINTING.md` atualizadas (fila + qualidade).
+
 ### Impressão — status, blocos, preview e validações (Fases 1-5)
 
 - **Status da impressora** (`GET /print`): `state` (idle/printing/disabled),

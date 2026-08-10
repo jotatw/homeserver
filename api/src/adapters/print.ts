@@ -42,6 +42,16 @@ export interface PrintOptions {
     media?: string;
     pages?: string;
     orientation?: "portrait" | "landscape";
+    quality?: "economico" | "normal" | "alta";
+}
+
+export interface PrintJob {
+    id: string;
+    printer: string;
+    user: string;
+    bytes: number;
+    date: string | null; // ISO
+    status: "printing" | "completed";
 }
 
 export interface PrintContent {
@@ -67,7 +77,12 @@ function lpOptions(opts: PrintOptions): string[] {
         args.push("-o", `media=${opts.media}`);
     }
     if (opts.color === "mono") {
-        args.push("-o", "print-color-mode=monochrome");
+        args.push("-o", "ColorModel=Gray");
+    }
+    if (opts.quality === "economico") {
+        args.push("-o", "Resolution=300dpi");
+    } else if (opts.quality === "alta") {
+        args.push("-o", "Resolution=601x600dpi", "-o", "StpColorPrecision=Best");
     }
     if (opts.pages) {
         args.push("-o", `page-ranges=${opts.pages}`);
@@ -182,6 +197,64 @@ export async function getPrintersInfo(): Promise<PrinterStatus[]> {
 export async function listPrinters(): Promise<string[]> {
     const info = await getPrintersInfo();
     return info.map((p) => p.name);
+}
+
+const JOB_MONTHS: Record<string, number> = {
+    Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
+    Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11,
+};
+
+function parseJobLine(line: string): PrintJob | null {
+    // Via nsenter (locale C): "MG3110-12  root  8388608  Mon Aug 10 15:51:47 2026"
+    const m = line.match(
+        /^(\S+)-(\d+)\s+(\S+)\s+(\d+)\s+(\w{3}) (\w{3}) (\d{1,2}) (\d{2}):(\d{2}):(\d{2}) (\d{4})/,
+    );
+    if (!m) {
+        return null;
+    }
+
+    const month = JOB_MONTHS[m[6]];
+    const ts = new Date(+m[11], month, +m[7], +m[8], +m[9], +m[10]).getTime();
+
+    return {
+        id: `${m[1]}-${m[2]}`,
+        printer: m[1],
+        user: m[3],
+        bytes: Number(m[4]),
+        date: Number.isNaN(ts) ? null : new Date(ts).toISOString(),
+        status: "printing",
+    };
+}
+
+export async function listJobs(): Promise<PrintJob[]> {
+    const raw = await runOnHost([
+        "bash", "-c",
+        "echo '==A=='; lpstat -o; echo '==C=='; lpstat -W completed -o",
+    ]);
+    const [active, completed] = raw.split(/==[AC]==/).slice(1).map((s) => s.trim());
+
+    const jobs: PrintJob[] = [];
+
+    for (const line of active.split("\n")) {
+        const job = parseJobLine(line);
+        if (job) {
+            jobs.push({ ...job, status: "printing" });
+        }
+    }
+
+    for (const line of completed.split("\n")) {
+        const job = parseJobLine(line);
+        if (job) {
+            jobs.push({ ...job, status: "completed" });
+        }
+    }
+
+    return jobs;
+}
+
+export async function cancelJob(jobId: string): Promise<{ ok: boolean }> {
+    await runOnHost(["cancel", jobId]);
+    return { ok: true };
 }
 
 export async function printContent(
