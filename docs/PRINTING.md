@@ -44,13 +44,31 @@ echo "teste" | lp -d MG3110
 
 ## 3. Uso no App
 
-- A tela **🖨️ Impressão** (Admin) reúne tudo:
-  - **Configurações**: impressora, cor (colorida/PB), papel (A4/A5/Letter/Legal),
-    orientação (retrato/paisagem) e intervalo de páginas (ex.: `1-3`).
-  - **Conteúdo**: texto livre **ou** envio de arquivo (PDF, TXT, PNG, JPG).
-  - Botão **Imprimir**.
-- Acesso rápido: no **Meu espaço**, a ação **🖨️ Imprimir** abre a tela.
-- No mobile, a tela fica no menu **＋** → Impressão.
+A tela **🖨️ Impressão** (Admin) é organizada em 3 blocos:
+
+1. **Impressora e configuração**
+   - Impressora (lista do CUPS) com **status**: 🟢 Pronta · 🟡 Ocupada ·
+     🔴 Indisponível/Erro · e **última impressão**.
+   - Cor (colorida/PB), papel (A4/A5/Letter/Legal), orientação e páginas.
+2. **Conteúdo a imprimir**
+   - Toggle **Texto** / **Arquivo** (PDF, TXT, PNG, JPG).
+   - Botão **👁 Visualizar**: texto em `<pre>`, imagem renderizada, PDF em
+     frame nativo. Se o navegador não renderizar, o arquivo ainda pode ser
+     enviado.
+3. **Ações** — **👁 Visualizar** e **🖨️ Imprimir**.
+
+Validações:
+
+- Sem impressora/offline → botão desabilitado (banner 🔴).
+- Sem conteúdo → mensagem clara.
+- Arquivo > 5 MB → confirmação antes de enviar (o backend também rejeita).
+- Sucesso/erro por toast.
+
+> O **status exibido é o conhecido pelo CUPS** (idle/printing/disabled,
+> accepting, jobs ativos). Papel/tinta/atolamento dependem do que a
+> impressora consegue reportar (a Canon pode não reportar).
+
+Acesso rápido: **Meu espaço** → 🖨️ Imprimir. No mobile: menu **＋** → Impressão.
 
 ## 4. API
 
