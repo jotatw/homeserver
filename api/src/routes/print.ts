@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { listPrinters, printContent, type PrintOptions } from "../adapters/print.js";
+import { getPrintersInfo, printContent, type PrintOptions } from "../adapters/print.js";
 import { sendOk, sendError } from "../utils/respond.js";
 import { requireAdmin } from "../plugins/auth.js";
 
@@ -22,7 +22,18 @@ export async function printRoutes(fastify: FastifyInstance) {
 
     fastify.get("/api/v1/print", async (_req, reply) => {
         try {
-            return sendOk(reply, { printers: await listPrinters() });
+            const info = await getPrintersInfo();
+            const status: Record<string, unknown> = {};
+
+            for (const p of info) {
+                const { name, ...rest } = p;
+                status[name] = rest;
+            }
+
+            return sendOk(reply, {
+                printers: info.map((p) => p.name),
+                status,
+            });
         } catch (error) {
             return sendError(reply, 500, error instanceof Error ? error.message : String(error));
         }

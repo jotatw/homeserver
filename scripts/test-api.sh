@@ -141,10 +141,19 @@ assert isinstance(u['admin'], bool), 'admin deve ser bool'
         report "GET /status com token revogado -> 401" $?
     fi
 
-    # 6d. print (admin): lista impressoras + validação
-    BODY=$(curl -sf -m 5 "${API}/api/v1/print" -H "${AUTH}" 2>/dev/null)
-    echo "${BODY}" | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['ok'] is True and 'printers' in d['data']" >/dev/null 2>&1
-    report "GET /print (admin) -> {printers}" $?
+    # 6d. print (admin): status da impressora + validação
+    BODY=$(curl -sf -m 30 "${API}/api/v1/print" -H "${AUTH}" 2>/dev/null)
+    echo "${BODY}" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+assert d['ok'] is True
+data=d['data']
+assert 'printers' in data and isinstance(data['printers'], list)
+assert 'status' in data
+for name, s in data['status'].items():
+    assert 'state' in s and 'accepting' in s and 'activeJobs' in s
+" >/dev/null 2>&1
+    report "GET /print (admin) -> {printers, status}" $?
 
     CODE=$(curl -s -o /dev/null -w "%{http_code}" -m 5 -X POST "${API}/api/v1/print" -H "${AUTH}" -H "Content-Type: application/json" -d '{}')
     [[ "${CODE}" == "400" ]]
