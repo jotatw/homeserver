@@ -9,6 +9,8 @@
 - Conexão com a internet durante a instalação.
 - Uma máquina na mesma rede local para acessar o HomeServer.
 
+Antes de começar, consulte [`QUESTIONS.md`](QUESTIONS.md) se quiser entender os requisitos e as dúvidas mais comuns.
+
 ## Passo a passo
 
 ### 1. Baixe o HomeServer
@@ -65,9 +67,10 @@ Os componentes principais devem aparecer como saudáveis.
 
 ## Próximos passos
 
+- [Perguntas](QUESTIONS.md)
 - [Instalação detalhada](docs/INSTALLATION.md)
 - [Primeiro Boot](docs/FIRST_BOOT.md)
-- [Perguntas frequentes](docs/FAQ.md)
+- [FAQ detalhado](docs/FAQ.md)
 - [README](README.md)
 
 > **Critério de qualidade da v2.0:** uma pessoa nova deve conseguir instalar e utilizar o HomeServer seguindo apenas a documentação oficial, sem precisar consultar o código-fonte.
