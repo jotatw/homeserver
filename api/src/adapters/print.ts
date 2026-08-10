@@ -8,7 +8,6 @@ const execFileAsync = promisify(execFile);
 const RUNNER_IMAGE = "debian:bookworm-slim";
 const CONTAINER_DATA = path.join("/workspace", "api", "data");
 const HOST_DATA = "/srv/git/homeserver/api/data";
-const JOB_FILE = "print-job.txt";
 
 /**
  * Impressão via CUPS do HOST.
@@ -17,8 +16,8 @@ const JOB_FILE = "print-job.txt";
  * socket do CUPS, então os comandos `lp`/`lpstat` são executados no host via
  * nsenter (mesmo padrão de backup.ts/devices.ts).
  *
- * O texto é escrito em `api/data/` (gitignored), que é montado no host,
- * e impresso com `lp`.
+ * O conteúdo (texto ou arquivo) é escrito em `api/data/` (gitignored), que é
+ * montado no host, e impresso com `lp` e as opções solicitadas.
  */
 async function runOnHost(args: string[]): Promise<string> {
     const { stdout } = await execFileAsync(
@@ -29,10 +28,45 @@ async function runOnHost(args: string[]): Promise<string> {
             "nsenter", "-t", "1", "-m", "-u", "-i", "-n", "--",
             ...args,
         ],
-        { timeout: 90000 },
+        { timeout: 120000 },
     );
 
     return stdout.trim();
+}
+
+export interface PrintOptions {
+    printer?: string;
+    color?: "color" | "mono";
+    media?: string;
+    pages?: string;
+    orientation?: "portrait" | "landscape";
+}
+
+export interface PrintContent {
+    text?: string;
+    file?: {
+        name?: string;
+        data: string; // base64
+    };
+}
+
+function lpOptions(opts: PrintOptions): string[] {
+    const args: string[] = [];
+
+    if (opts.media) {
+        args.push("-o", `media=${opts.media}`);
+    }
+    if (opts.color === "mono") {
+        args.push("-o", "print-color-mode=monochrome");
+    }
+    if (opts.pages) {
+        args.push("-o", `page-ranges=${opts.pages}`);
+    }
+    if (opts.orientation === "landscape") {
+        args.push("-o", "orientation-requested=6");
+    }
+
+    return args;
 }
 
 export async function listPrinters(): Promise<string[]> {
@@ -44,17 +78,30 @@ export async function listPrinters(): Promise<string[]> {
         .filter((name): name is string => Boolean(name));
 }
 
-export async function printText(
-    text: string,
-    printer = "MG3110",
-): Promise<{ ok: boolean }> {
+export async function printContent(
+    content: PrintContent,
+    opts: PrintOptions = {},
+): Promise<{ ok: boolean; file?: string }> {
     await fs.mkdir(CONTAINER_DATA, { recursive: true });
-    await fs.writeFile(path.join(CONTAINER_DATA, JOB_FILE), text);
+
+    let fileName = "print-job.txt";
+
+    if (content.file?.data) {
+        // Arquivo enviado em base64.
+        const name = content.file.name || "print-job.pdf";
+        const safe = path.basename(name).replace(/[^a-zA-Z0-9._-]/g, "_");
+        fileName = safe;
+        await fs.writeFile(path.join(CONTAINER_DATA, fileName), Buffer.from(content.file.data, "base64"));
+    } else {
+        await fs.writeFile(path.join(CONTAINER_DATA, fileName), content.text ?? "");
+    }
+
+    const printer = opts.printer || "MG3110";
 
     await runOnHost([
-        "lp", "-d", printer, "-o", "media=A4",
-        path.join(HOST_DATA, JOB_FILE),
+        "lp", "-d", printer, ...lpOptions(opts),
+        path.join(HOST_DATA, fileName),
     ]);
 
-    return { ok: true };
+    return { ok: true, file: fileName };
 }

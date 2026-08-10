@@ -886,3 +886,50 @@ dialog::backdrop {
   box-shadow: var(--hs-shadow-focus);
   outline: none;
 }
+
+/* ---------- Tela de Impressão ---------- */
+
+.print-config {
+  grid-template-columns: repeat(auto-fill, minmax(min(140px, 100%), 1fr));
+}
+
+.print-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hs-space-1);
+}
+
+.print-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--hs-text-muted);
+}
+
+.select-field {
+  height: var(--hs-touch);
+  padding: 0 var(--hs-space-3);
+  background: var(--hs-surface);
+  border: 1px solid var(--hs-border);
+  border-radius: var(--hs-radius-md);
+  color: var(--hs-text);
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.select-field:focus {
+  border-color: var(--hs-border-strong);
+  box-shadow: var(--hs-shadow-focus);
+  outline: none;
+}
+
+.file-row {
+  display: flex;
+  align-items: center;
+  gap: var(--hs-space-3);
+  margin-top: var(--hs-space-3);
+  flex-wrap: wrap;
+}
+
+.file-row .btn {
+  height: var(--hs-touch);
+}
