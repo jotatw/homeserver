@@ -6,7 +6,7 @@ O projeto prioriza simplicidade, arquitetura estável e evolução incremental.
 
 ## Antes de alterar o código
 
-1. Leia o `README.md` e o `docs/FAQ.md`.
+1. Leia o `README.md`, `QUICKSTART.md` e `QUESTIONS.md`.
 2. Consulte `docs/PRINCIPLES.md`.
 3. Verifique se já existe um ADR relacionado em `docs/architecture/adr/`.
 4. Identifique a camada correta para a alteração.
@@ -85,9 +85,11 @@ Alterações na API devem incluir testes de HTTP. Correções de bugs devem, qua
 
 Uma alteração que muda comportamento deve atualizar a documentação correspondente.
 
-Dúvidas recorrentes devem ser avaliadas para inclusão em `docs/FAQ.md`.
+Dúvidas recorrentes devem ser avaliadas para inclusão em `docs/FAQ.md` e no índice `QUESTIONS.md`.
 
 Decisões arquiteturais devem ser registradas em `docs/architecture/adr/`.
+
+Exemplos e documentação devem evitar nomes de usuários, IPs, caminhos pessoais ou outras configurações específicas de uma instalação. Use placeholders como `<USUARIO_ADMIN>` e `<IP_DO_SERVIDOR>` quando necessário.
 
 ## Commits
 
@@ -105,5 +107,7 @@ ci: update ...
 ## Releases
 
 Releases passam pelo Quality Gate e pelos critérios definidos em `planning/release/`.
+
+A linha v1.x pode receber correções e pequenas melhorias compatíveis enquanto a v2.0 é desenvolvida. Mudanças estruturais devem seguir o roadmap e as decisões arquiteturais da v2.0.
 
 Depois de uma Release Candidate, somente alterações de correção, documentação, testes e CI devem entrar no branch da release.
