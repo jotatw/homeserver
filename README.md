@@ -25,7 +25,7 @@ O objetivo não é competir com soluções corporativas, mas oferecer uma plataf
 
 ## Estado atual
 
-A linha **v2.0** introduz o HomeServer App como interface da plataforma. A versão atual está em preparação para release candidata.
+A linha **v1.6.x** recebe correções e pequenas melhorias enquanto a **v2.0** é preparada. A v2.0 introduz o HomeServer App como interface da plataforma e está em preparação para release candidata.
 
 O projeto possui:
 
@@ -47,6 +47,8 @@ O projeto possui:
 - testes automatizados e smoke tests;
 - Quality Gate;
 - Design System e documentação arquitetural.
+
+A linha v1.x permanece voltada a manutenção, correções e melhorias compatíveis. Mudanças estruturais e a nova experiência de plataforma pertencem à v2.0 e posteriores.
 
 ---
 
@@ -248,6 +250,8 @@ O instalador funciona como um assistente: verifica o sistema, instala o Docker q
 
 Para iniciantes, comece por [`QUICKSTART.md`](QUICKSTART.md).
 
+Perguntas e dúvidas comuns: [`QUESTIONS.md`](QUESTIONS.md).
+
 Documentação detalhada:
 
 - [`docs/INSTALLATION.md`](docs/INSTALLATION.md)
@@ -273,6 +277,8 @@ bash core/hs.sh update check
 ## Atualizações
 
 O projeto é versionado por tags Git (`vX.Y.Z`). Releases são publicadas no GitHub e no Gitea.
+
+A linha v1.x recebe correções e pequenas melhorias compatíveis. A v2.0 concentra a evolução estrutural para a plataforma e o HomeServer App.
 
 O HomeServer possui atualização integrada:
 
@@ -312,7 +318,7 @@ Antes de alterar a arquitetura:
 4. crie um ADR quando houver uma nova decisão estrutural;
 5. atualize testes e documentação.
 
-Consulte [`docs/FAQ.md`](docs/FAQ.md) para dúvidas comuns e a documentação de desenvolvimento para contribuir.
+Consulte [`CONTRIBUTING.md`](CONTRIBUTING.md) para regras de contribuição e [`QUESTIONS.md`](QUESTIONS.md) para dúvidas comuns.
 
 ---
 
@@ -328,9 +334,10 @@ planning/   → para onde o projeto está evoluindo
 Principais pontos de entrada:
 
 - `QUICKSTART.md` — instalação rápida;
+- `QUESTIONS.md` — índice das principais dúvidas;
 - `docs/INSTALLATION.md` — instalação detalhada;
 - `docs/FIRST_BOOT.md` — primeiro uso;
-- `docs/FAQ.md` — perguntas frequentes;
+- `docs/FAQ.md` — respostas detalhadas;
 - `docs/ARCHITECTURE.md` — arquitetura;
 - `docs/PRINCIPLES.md` — princípios;
 - `docs/architecture/adr/` — decisões arquiteturais;
@@ -351,6 +358,10 @@ Principais pontos de entrada:
 | **v1.3** | Autenticação, App inicial e estabilidade |
 | **v1.4** | Homepage como plataforma e Design System |
 | **v1.5** | Qualidade, segurança, testes e Architecture Freeze |
+
+### v1.6.x — Manutenção e refinamento
+
+A linha v1.6.x é usada para pequenas correções e melhorias compatíveis enquanto a v2.0 é preparada. Ela não representa uma segunda linha de evolução estrutural concorrente com a v2.0.
 
 ### v2.0 — HomeServer App
 
