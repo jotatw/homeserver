@@ -192,6 +192,10 @@ Sim. O App não deve depender diretamente da implementação interna dos serviç
 
 Sim. A API é a interface oficial para clientes que precisam interagir com a plataforma.
 
+### Posso integrar outro sistema usando a API?
+
+Sim. A API possui tokens próprios para integrações externas, respeitando as permissões definidas pela plataforma.
+
 ### Qual formato a API utiliza?
 
 As respostas seguem o contrato padronizado da API, utilizando `ok/data` para operações bem-sucedidas e `ok/error` para erros.
@@ -264,7 +268,6 @@ Esta seção registra dúvidas que surgirem e ainda precisarem de uma decisão o
 - [ ] Política oficial de suporte entre versões.
 - [ ] Processo definitivo de restauração de backup.
 - [ ] Estratégia de persistência de sessões.
-- [ ] API tokens para integrações externas.
 - [ ] Sistema de permissões granulares.
 - [ ] Estratégia oficial para acesso externo por VPN.
 
