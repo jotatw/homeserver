@@ -700,6 +700,10 @@ async function renderAdmin() {
     v.appendChild(el("p", { class: "empty" }, "Nenhum usuário encontrado."));
   }
 
+  const createUserBtn = el("button", { class: "btn btn-secondary", style: "margin-top:var(--hs-space-2)" }, "＋ Novo usuário");
+  createUserBtn.addEventListener("click", openUserDialog);
+  v.appendChild(createUserBtn);
+
   // Tokens de API
   v.appendChild(el("h3", { class: "section" }, "Tokens de API"));
   const tfeed = el("div", { class: "feed" });
@@ -730,6 +734,66 @@ async function renderAdmin() {
   const createBtn = el("button", { class: "btn btn-secondary", style: "margin-top:var(--hs-space-2)" }, "🔑 Criar token");
   createBtn.addEventListener("click", () => openTokenDialog());
   v.appendChild(createBtn);
+}
+
+/* ---------- Dialog: criar usuário (admin) ---------- */
+
+function openUserDialog() {
+  let dialog = document.getElementById("user-dialog");
+  if (!dialog) {
+    dialog = el("dialog", { id: "user-dialog" },
+      el("form", { method: "dialog", id: "user-form" },
+        el("h3", { style: "margin-bottom:var(--hs-space-4)" }, "Novo usuário"),
+        el("div", { class: "field" },
+          el("label", { for: "us-name" }, "Usuário"),
+          el("input", { id: "us-name", placeholder: "ex.: jota", pattern: "[a-z][a-z0-9_-]{1,30}", required: true })),
+        el("div", { class: "field" },
+          el("label", { for: "us-pass" }, "Senha"),
+          el("input", { id: "us-pass", type: "password", required: true })),
+        el("div", { class: "field" },
+          el("label", { for: "us-email" }, "E-mail (opcional)"),
+          el("input", { id: "us-email", type: "email", placeholder: "ex.: jota@exemplo.com" })),
+        el("label", { class: "check-row" },
+          el("input", { id: "us-gitea", type: "checkbox" }), " Criar também no Gitea"),
+        el("p", { class: "power-hint" }, "A pasta pessoal /srv/storage/users/<nome> é criada automaticamente."),
+        el("div", { class: "dialog-actions" },
+          el("button", { type: "button", class: "btn btn-secondary", id: "us-cancel" }, "Cancelar"),
+          el("button", { type: "submit", class: "btn btn-primary" }, "Criar"))));
+    document.body.appendChild(dialog);
+
+    dialog.querySelector("#us-cancel").addEventListener("click", () => dialog.close());
+    dialog.querySelector("#user-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const username = document.getElementById("us-name").value.trim();
+      const password = document.getElementById("us-pass").value;
+      const email = document.getElementById("us-email").value.trim();
+      const gitea = document.getElementById("us-gitea").checked;
+      const btn = dialog.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      btn.textContent = "Criando…";
+      try {
+        await apiOrFail("/api/v1/users", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password, email: email || undefined, gitea }),
+        });
+        toast("Usuário criado: " + username, "success");
+        dialog.close();
+        renderAdmin();
+      } catch (err) {
+        toast(err.message || "Falha ao criar usuário.", "error");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Criar";
+      }
+    });
+  }
+
+  document.getElementById("us-name").value = "";
+  document.getElementById("us-pass").value = "";
+  document.getElementById("us-email").value = "";
+  document.getElementById("us-gitea").checked = false;
+  dialog.showModal();
 }
 
 /* ---------- Dialog: criar token de API (admin) ---------- */
