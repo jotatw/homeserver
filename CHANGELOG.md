@@ -5,6 +5,17 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
 ## [2.0.0-rc.1] — em candidata
 
+### Impressão (feature adicionada pós-RC, a pedido)
+
+- **Impressão via CUPS** do host:
+  - `GET /api/v1/print` — lista impressoras (admin).
+  - `POST /api/v1/print` `{text}` — imprime texto (admin; `printer` opcional).
+  - Execução no host via nsenter (o container da API não acessa o CUPS).
+  - **App — Meu espaço**: ação **🖨️ Imprimir** (admin) com diálogo de texto.
+- Impressora Canon PIXMA MG3110 configurada no CUPS (driver Gutenprint).
+- Docs: `docs/PRINTING.md` (configuração, uso e API).
+- Testes: +2 em `test-api.sh` (31 total).
+
 ### Fixed (acceptance tests)
 
 - **Tema/sair inacessíveis** no desktop: sidebar sem scroll escondia os botões

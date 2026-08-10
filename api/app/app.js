@@ -207,6 +207,14 @@ async function renderDashboard() {
   actions.appendChild(actionCard("📁", "Arquivos", "/files/"));
   actions.appendChild(actionCard("📦", "Aplicações", "#/apps"));
   actions.appendChild(actionCard("📊", "Sistema", "#/system"));
+  if (auth.isAdmin()) {
+    const printCard = el("div", { class: "app-card" },
+      el("span", { class: "ic" }, "🖨️"),
+      el("span", { class: "app-name" }, "Imprimir"),
+      el("span", {}, "→"));
+    printCard.addEventListener("click", openPrintDialog);
+    actions.appendChild(printCard);
+  }
   v.appendChild(actions);
 
   v.appendChild(el("h3", { class: "section" }, "Atividades"));
@@ -781,6 +789,54 @@ function showCreatedToken(data) {
     dialog.querySelector("#tk-done").addEventListener("click", () => dialog.close());
   }
   document.getElementById("token-value").textContent = data.token;
+  dialog.showModal();
+}
+
+/* ---------- Dialog: imprimir (admin) ---------- */
+
+function openPrintDialog() {
+  let dialog = document.getElementById("print-dialog");
+  if (!dialog) {
+    dialog = el("dialog", { id: "print-dialog" },
+      el("form", { method: "dialog", id: "print-form" },
+        el("h3", { style: "margin-bottom:var(--hs-space-4)" }, "Imprimir"),
+        el("div", { class: "field" },
+          el("label", { for: "pr-text" }, "Texto"),
+          el("textarea", {
+            id: "pr-text", class: "print-textarea",
+            rows: 6, placeholder: "Digite o texto a imprimir…",
+            required: true })),
+        el("p", { class: "power-hint" }, "Enviado para a impressora configurada (Canon MG3110)."),
+        el("div", { class: "dialog-actions" },
+          el("button", { type: "button", class: "btn btn-secondary", id: "pr-cancel" }, "Cancelar"),
+          el("button", { type: "submit", class: "btn btn-primary" }, "Imprimir"))));
+    document.body.appendChild(dialog);
+
+    dialog.querySelector("#pr-cancel").addEventListener("click", () => dialog.close());
+    dialog.querySelector("#print-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const text = document.getElementById("pr-text").value;
+      const btn = dialog.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      btn.textContent = "Imprimindo…";
+      try {
+        await apiOrFail("/api/v1/print", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text }),
+        });
+        toast("Enviado para a impressora.", "success");
+        dialog.close();
+      } catch (err) {
+        toast(err.message || "Falha ao imprimir.", "error");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Imprimir";
+      }
+    });
+  }
+
+  document.getElementById("pr-text").value = "";
   dialog.showModal();
 }
 

@@ -107,6 +107,8 @@ App → GET /api/v1/...  (Authorization: Bearer <token>)
 | GET | `/api/v1/power` | Agendamento liga/desliga (admin) |
 | PUT | `/api/v1/power` | Define horários (admin) |
 | POST | `/api/v1/backup` | Dispara backup manual (admin) |
+| GET | `/api/v1/print` | Lista impressoras do CUPS (admin) |
+| POST | `/api/v1/print` | Imprime texto (admin) |
 
 ### `GET /api/v1/status`
 
@@ -158,6 +160,17 @@ Agendamento de ligar/desligar automático (ex.: `{ "shutdown": "22:00", "wake": 
 ### `POST /api/v1/backup`
 
 Dispara o backup manual (executado no host via nsenter).
+
+### `GET/POST /api/v1/print`
+
+Impressão via CUPS do host (admin). Ver `docs/PRINTING.md`.
+
+- `GET` — lista impressoras: `{ ok, data: { printers: ["MG3110"] } }`.
+- `POST` — imprime texto:
+  ```json
+  { "text": "Olá, HomeServer!" }
+  ```
+  `printer` é opcional (padrão `MG3110`). Executado no host via nsenter.
 
 ---
 

@@ -865,3 +865,24 @@ dialog::backdrop {
   word-break: break-all;
   user-select: all;
 }
+
+/* ---------- Impressão ---------- */
+
+.print-textarea {
+  width: 100%;
+  padding: var(--hs-space-3);
+  background: var(--hs-surface);
+  border: 1px solid var(--hs-border);
+  border-radius: var(--hs-radius-md);
+  color: var(--hs-text);
+  font-family: var(--hs-font-sans);
+  font-size: 0.95rem;
+  resize: vertical;
+  min-height: 6rem;
+}
+
+.print-textarea:focus {
+  border-color: var(--hs-border-strong);
+  box-shadow: var(--hs-shadow-focus);
+  outline: none;
+}
