@@ -14,6 +14,7 @@ Esta pasta concentra a documentação do design do App antes da implementação 
 | `platforms.md` | Diretrizes para mobile, tablet e desktop |
 | `profiles.md` | Perfis de Usuário comum e Administrador |
 | `roadmap.md` | Plano incremental de evolução e critérios de conclusão |
+| `theme-lab.md` | Processo de comparação de temas, cores e ícones antes da definição dos tokens |
 | `references/` | Referências coletadas e análise de padrões |
 | `wireframes/` | Wireframes de telas |
 | `components/` | Especificação de componentes |
@@ -30,6 +31,8 @@ Esta pasta concentra a documentação do design do App antes da implementação 
 5. A interface deve permanecer leve e adequada ao objetivo doméstico do HomeServer.
 6. Novos elementos não devem ser adicionados apenas para preencher espaço.
 7. Segurança e autorização pertencem ao backend; a interface apenas reflete as permissões disponíveis.
+8. A identidade visual deve ser construída por tokens e componentes reutilizáveis, não por estilos isolados de cada tela.
+9. Temas e ícones devem ser avaliados em situações reais antes da aprovação dos tokens definitivos.
 
 ## Perfis iniciais
 
@@ -39,6 +42,32 @@ O App começa com dois perfis:
 - **Administrador** — inclui as áreas e ações necessárias para gerenciamento, manutenção e diagnóstico.
 
 A regra é reutilizar as mesmas telas sempre que possível, alterando apenas conteúdo e ações permitidas.
+
+## Processo de design
+
+```text
+Princípios
+   ↓
+Plataformas e perfis
+   ↓
+Navegação
+   ↓
+Laboratório visual
+   ├── Temas
+   └── Ícones
+   ↓
+Tokens definitivos
+   ↓
+Componentes
+   ↓
+Wireframes
+   ↓
+Fluxos
+   ↓
+Implementação
+```
+
+O laboratório visual deve ocorrer antes da escolha definitiva de cores e do refinamento final dos componentes.
 
 ## Critérios de READY
 
