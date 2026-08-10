@@ -141,6 +141,15 @@ assert isinstance(u['admin'], bool), 'admin deve ser bool'
         report "GET /status com token revogado -> 401" $?
     fi
 
+    # 6d. print (admin): lista impressoras + validação
+    BODY=$(curl -sf -m 5 "${API}/api/v1/print" -H "${AUTH}" 2>/dev/null)
+    echo "${BODY}" | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['ok'] is True and 'printers' in d['data']" >/dev/null 2>&1
+    report "GET /print (admin) -> {printers}" $?
+
+    CODE=$(curl -s -o /dev/null -w "%{http_code}" -m 5 -X POST "${API}/api/v1/print" -H "${AUTH}" -H "Content-Type: application/json" -d '{}')
+    [[ "${CODE}" == "400" ]]
+    report "POST /print sem text -> 400" $?
+
     # 7. session retorna user {username, admin} + expiresIn
     BODY=$(curl -sf -m 5 "${API}/api/v1/auth/session" -H "${AUTH}" 2>/dev/null)
     echo "${BODY}" | python3 -c "
