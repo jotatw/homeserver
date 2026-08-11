@@ -48,14 +48,18 @@ Toda API segue o padrão `recurso` + `/status` (ex.: `/storage` e
 
 ## 8. Storage pertence ao HomeServer, nunca aos módulos.
 
-Os dados ficam centralizados em `/srv/storage` e `/srv/services`. Módulos não
-possuem dados próprios; eles utilizam o storage do HomeServer.
+Os dados persistentes do HomeServer ficam centralizados em `/srv/storage`,
+enquanto os backups ficam separados em `/srv/backup`. Infraestrutura de
+containers, código e configuração ficam em seus respectivos diretórios:
+`/srv/docker`, `/srv/git` e `/srv/config`.
+
+Módulos não devem criar estruturas de dados paralelas fora do modelo oficial.
 
 ## 9. Automações são desacopladas por hooks.
 
-Automações vivem em `automation/hooks/<evento>/`. Cada evento executa todos os
-scripts da sua pasta. Novas automações são adicionadas sem alterar o código do
-núcleo.
+Automações vivem em `automation/hooks/<evento>/`. Cada evento executa todos
+os scripts da sua pasta. Novas automações são adicionadas sem alterar o código
+do núcleo.
 
 ## 10. O HomeServer deve continuar utilizável mesmo com um módulo indisponível.
 

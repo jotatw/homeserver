@@ -1,8 +1,10 @@
-# V2 Readiness
+# V2 Readiness — Histórico
 
-Lista de prontidão para o início da v2.0 (HomeServer App).
+> **Status: HISTÓRICO.** Este documento registra a prontidão verificada antes do início da v2.0.
+>
+> Para o estado atual da release, use `planning/release/v2.0-checklist.md` e `planning/release/release-process.md`.
 
-## Status
+## Status registrado na época
 
 | Área | Estado |
 |------|--------|
@@ -16,7 +18,7 @@ Lista de prontidão para o início da v2.0 (HomeServer App).
 | Design System | PASS |
 | App Design | READY |
 
-## Critérios por área
+## Critérios verificados
 
 ### Foundation
 - `hs_*` padronizado; testes Foundation passam.
@@ -44,16 +46,18 @@ Lista de prontidão para o início da v2.0 (HomeServer App).
 - `docs/design/` completo (principles, colors, typography, spacing, icons, components).
 
 ### App Design
-- Branch `app-design` criada e publicada (github + gitea) em `design/app/`.
+- Branch `app-design` criada e publicada em `design/app/`.
 - `references.md` — 33 referências (dashboards self-hosted, design systems, PWA).
-- `wireframes/` — 6 telas (login, dashboard, apps, storage, system, admin) com variantes mobile + desktop.
-- `flows/` — 8 fluxos (auth, navigation, dashboard, apps, storage, system, admin, errors) baseados na API real e nas roles reais; gaps G1-G5 registrados.
-- `tokens/` — 7 documentos (`--hs-*` em CSS variables, dark/light).
-- `components/` — 8 famílias de componentes com anatomia, estados, a11y e refs.
+- `wireframes/` — 6 telas com variantes mobile + desktop.
+- `flows/` — 8 fluxos baseados na API e nas roles reais; gaps G1-G5 registrados.
+- `tokens/` — 7 documentos com variáveis CSS dark/light.
+- `components/` — 8 famílias de componentes com anatomia, estados, a11y e referências.
 
 ---
 
-A v2.0 só inicia quando todas as áreas estiverem **PASS/READY**.
+## Encerramento
+
+A v2.0 só iniciou após todas as áreas estarem **PASS/READY**.
 
 > Nota de revisão (2026-08-05): após a v1.5.0, o Quality Gate de CI
 > (`core/tests/run_ci.sh`) foi validado por completo — Shellcheck + Foundation 6/6
