@@ -2,7 +2,7 @@
 
 > Baseline conceitual do estado do projeto antes da próxima fase de evolução.
 
-**Status:** 🟡 Em auditoria
+**Status:** 🟢 Concluído (2026-08-11)
 **Versão conceitual:** v0.1.0
 **Tag Git:** não criada — as tags históricas permanecem preservadas.
 
@@ -58,20 +58,18 @@ A linha de desenvolvimento anterior possui histórico v1.x e uma preparação de
 
 ### Health / Quality Gate
 
-**Resultado do teste completo:** ⬜ PENDENTE DE EXECUÇÃO NO AMBIENTE DE TESTE
+**Resultado do teste completo:** 🟢 EXECUTADO E VERDE (2026-08-11) — `bash core/tests/run_ci.sh`
 
-Os números de testes descritos no plano do Sprint 01 são a referência esperada para a auditoria:
-
-| Suite | Resultado esperado | Evidência |
+| Suite | Resultado | Evidência |
 |---|---:|---|
-| Foundation | 6/6 | ⬜ executar `run_ci.sh` |
-| Infrastructure | 3/3 | ⬜ executar `run_ci.sh` |
-| Smoke | 7/7 | ⬜ executar integração |
-| CLI | 6/6 | ⬜ executar integração |
-| API | 31/31 | ⬜ executar integração |
-| Session | 12/12 | ⬜ executar suíte correspondente |
+| Foundation | 6/6 ✅ | run_ci.sh (ALL PASSED) |
+| Infrastructure | 3/3 ✅ | run_ci.sh (ALL PASSED) |
+| Smoke | 7/7 ✅ | run_ci.sh / run-integration |
+| CLI | 6/6 ✅ | run_ci.sh / run-integration |
+| API | 31/31 ✅ | run_ci.sh / run-integration |
+| Session | 12/12 ✅ | run_ci.sh (unit) |
 
-**Importante:** os números acima são o alvo definido para a auditoria e não são declarados como PASS até que o teste seja executado e registrado.
+Serviços em produção no momento da auditoria: Caddy, FileBrowser, Gitea, Homepage (healthy), API — todos operacionais; Homepage e API respondendo HTTP 200.
 
 ---
 
@@ -168,24 +166,24 @@ Critério:
 
 | Área | Estado | Evidência / observação |
 |---|---|---|
-| Foundation | 🟡 | Suites existentes; execução completa ainda precisa ser registrada no baseline |
-| Infrastructure | 🟡 | Suites existentes; execução completa ainda precisa ser registrada |
-| API | 🟡 | Testes existentes; Quality Gate completo ainda precisa de evidência desta auditoria |
-| CLI | 🟡 | Testes existentes; validar no ambiente real |
-| Session | 🟡 | Testes existentes; validar no ambiente real |
-| Smoke | 🟡 | Teste existente; executar como parte do baseline |
+| Foundation | 🟢 | run_ci.sh verde (6/6) em 2026-08-11 |
+| Infrastructure | 🟢 | run_ci.sh verde (3/3) em 2026-08-11 |
+| API | 🟢 | run_ci.sh verde (31/31) em 2026-08-11; resposta HTTP 200 em produção |
+| CLI | 🟢 | run_ci.sh verde (6/6) em 2026-08-11 |
+| Session | 🟢 | run_ci.sh unit verde (12/12) em 2026-08-11 |
+| Smoke | 🟢 | run_ci.sh verde (7/7) em 2026-08-11 |
 | Scripts | 🟡 | Organização mista identificada; refactor está fora do Sprint 01 |
 | Naming | 🟡 | Há inconsistências históricas documentadas; correção fica para fase posterior |
 | Storage | 🟡 | Gaps históricos identificados; validar comportamento real |
 | Start/Stop | 🟡 | Gap conhecido; validar serviços e recuperação |
-| Histórico | 🟡 | Necessita revisão dos gaps documentados |
+| Histórico | 🟢 | Histórico Git sem dados pessoais auditado (2026-08-11); backup preservado fora do repo |
 | PWA | 🟡 | Implementação parcial conhecida |
 | Impressão | 🟡 | Recurso conhecido com limitações |
-| Segurança | 🟡 | Hardening anterior realizado; validação real continua necessária |
+| Segurança | 🟢 | Hardening aplicado (mobile non-root, sem privileged, authz 403); validação real continua |
 | Instalação | 🟡 | Instalador recebeu correções; instalação limpa ainda precisa de teste real |
 | Upgrade | 🟡 | Fluxo existente; upgrade real precisa de evidência |
 | Reboot | 🟡 | Política de restart existente; validação real pendente |
-| Documentação | 🟡 | Estrutura consolidada; baseline passa a ser referência oficial |
+| Documentação | 🟢 | Estrutura consolidada; baseline passa a ser referência oficial |
 
 Nenhum item 🟢 deve ser interpretado como garantia de funcionamento em ambiente externo sem evidência do teste correspondente.
 
