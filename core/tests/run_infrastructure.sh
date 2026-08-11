@@ -21,6 +21,10 @@ run_test \
     "Workspace" \
     "${SCRIPT_DIR}/infrastructure/test_initialize_workspace.sh"
 
+run_test \
+    "Services" \
+    "${SCRIPT_DIR}/infrastructure/test_service.sh"
+
 show_summary
 
 suite_exit_status
