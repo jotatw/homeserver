@@ -241,7 +241,7 @@ A funcionalidade de impressão possui limitações conhecidas e não representa 
 bash core/tests/run_ci.sh
 ```
 
-O script executa ShellCheck quando disponível, a suíte Foundation + Infrastructure e a integração Smoke + CLI + API. citeturn198file0
+O script executa ShellCheck quando disponível, a suíte Foundation + Infrastructure e a integração Smoke + CLI + API.
 
 ### Resultado desta auditoria
 
