@@ -15,21 +15,30 @@ Se algo falhar, consulte a seção [Solução de problemas](#solução-de-proble
 
 ## 2. Acesse pelo navegador
 
-Abra:
+O endereço principal é:
+
+```text
+https://homeserver.local/
+```
+
+Se o nome local ainda não estiver disponível no seu dispositivo, use o endereço IP mostrado pelo instalador:
 
 ```text
 https://<IP_DO_SERVIDOR>/
 ```
 
-Use o endereço informado pelo instalador.
-
-| URL | O que é |
+| Caminho | O que é |
 |---|---|
 | `/` | Homepage — portal principal |
 | `/app` | HomeServer App — painel de administração |
 | `/files/` | FileBrowser — gerenciamento de arquivos |
 | `/git/` | Gitea — repositórios Git |
-| `/api/v1/status` | API — endpoint de status |
+
+A API é destinada ao App e a integrações:
+
+```text
+/api/v1/*
+```
 
 > O Caddy fornece o acesso HTTPS local. Como o certificado é interno à instalação, o navegador pode apresentar um aviso na primeira visita.
 
