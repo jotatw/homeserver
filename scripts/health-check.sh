@@ -35,6 +35,8 @@ check_http() {
     if [[ "${status}" -ge 1 ]]; then ok "$name" "${url}"; else fail "$name" "${url} (sem resposta)"; fi
 }
 
+warn() { printf "  \u26a0 %-18s %s\n" "$1" "$2"; }
+
 echo "== HomeServer Health Check =="
 echo
 
@@ -56,6 +58,28 @@ if [[ -x "${CORE}" ]]; then
     if [[ -n "${version}" ]]; then ok "hs version" "${version}"; else fail "hs version" "sem resposta"; fi
 else
     fail "hs version" "${CORE} não encontrado"
+fi
+
+# Recursos (saúde do hardware)
+load="$(cut -d' ' -f1 /proc/loadavg 2>/dev/null || echo 99)"
+ok_load="$(awk -v l="${load}" 'BEGIN{print (l < 2.0) ? 1 : 0}')"
+[[ "${ok_load}" == "1" ]] && ok "load (1min)" "${load}" || fail "load (1min)" "${load}"
+
+mem_pct="$(awk '/Mem:/{printf "%.0f", $3/$2*100}' <(free -m) 2>/dev/null || echo 100)"
+ok_mem="$(awk -v m="${mem_pct}" 'BEGIN{print (m < 85) ? 1 : 0}')"
+[[ "${ok_mem}" == "1" ]] && ok "memória" "${mem_pct}%" || fail "memória" "${mem_pct}%"
+
+temp_max="$(for t in /sys/class/hwmon/hwmon*/temp*_input; do [ -f "$t" ] && cat "$t"; done 2>/dev/null | sort -n | tail -1)"
+if [[ -n "${temp_max}" ]]; then
+    temp_c="$(awk -v v="${temp_max}" 'BEGIN{printf "%.0f", v/1000}')"
+    if [[ "${temp_c}" -gt 85 ]]; then
+        fail "temperatura" "${temp_c}C (alta)"
+    elif [[ "${temp_c}" -gt 70 ]]; then
+        warn "temperatura" "${temp_c}C (atencao)"
+        ok "temperatura" "${temp_c}C"
+    else
+        ok "temperatura" "${temp_c}C"
+    fi
 fi
 
 echo

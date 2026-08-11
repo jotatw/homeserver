@@ -127,3 +127,34 @@ Meu espaço · Aplicações · Armazenamento · Sistema · Administração · Im
 
 > Regra: **não planejar tudo e implementar de uma vez.** Cada item passa primeiro
 > por "o que já existe → o que pode ser simplificado → só então o que cresce".
+---
+
+## Saúde do servidor (baseline 2026-08-11)
+
+Medição real (servidor ocioso):
+
+| Métrica | Valor | Observação |
+|---|---|---|
+| Load (1/5/15) | 0.01 / 0.05 / 0.08 | muito baixo — servidor ocioso |
+| Memória | 929Mi / 2.7Gi (~34%) | saudável |
+| Temperatura (GPU) | **84-85 °C** | ⚠ alto — ponto de calor real |
+| CPU (núcleos) | 65 °C | normal |
+| Containers CPU | ~0% (ociosos) | homepage 153Mi · gitea 163Mi · api 96Mi · caddy 27Mi |
+| Disco | 5% de 290G | ok |
+
+### Ações aplicadas (manter saudável, mínimo com qualidade)
+
+- ✅ **Timers reativados**: `homeserver-night-off.timer` (desligamento noturno) e
+  `homeserver-backup.timer` (backup diário) estavam desativados — religados.
+- ✅ **Health Check ampliado**: agora reporta load, memória e temperatura
+  (alerta ⚠ >70 °C, falha >85 °C) — `scripts/health-check.sh`.
+- ⚠️ **Inconsistência de horário**: timer do sistema em **23:30**, mas
+  `config/scheduler.conf` e a documentação indicam **22:00**. Alinhar quando
+  decidirmos o horário ideal (desligar mais cedo = menos calor/ruído noturno).
+
+### Decisões de qualidade de vida (hardware)
+
+- Prioridade: **servidor ocioso quando possível** e **desligado à noite**.
+- Nada de polling agressivo ou processos ativos sem uso.
+- GPU em 84-85 °C mesmo ociosa é característica do hardware; a mitigação é o
+  desligamento noturno + evitar carga desnecessária (limitação sob demanda).
