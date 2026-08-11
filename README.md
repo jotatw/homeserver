@@ -25,7 +25,11 @@ O objetivo não é competir com soluções corporativas, mas oferecer uma plataf
 
 ## Estado atual
 
-A linha **v1.6.x** recebe correções e pequenas melhorias enquanto a **v2.0** é preparada. A v2.0 introduz o HomeServer App como interface da plataforma e está em preparação para release candidata.
+O projeto possui histórico de versões v1.x e preparação de v2.0. Neste momento, o desenvolvimento está em uma etapa de **auditoria e baseline**, antes da próxima fase de evolução.
+
+O **Baseline v0.1.0 é conceitual**: ele registra o estado do projeto sem apagar ou substituir as tags e versões históricas existentes.
+
+A linha v1.6.x permanece como histórico de manutenção e pequenas melhorias. A partir do baseline, o trabalho passa a ser organizado pelo roadmap de evolução até a v1.0 conceitual.
 
 O projeto possui:
 
@@ -48,7 +52,11 @@ O projeto possui:
 - Quality Gate;
 - Design System e documentação arquitetural.
 
-A linha v1.x permanece voltada a manutenção, correções e melhorias compatíveis. Mudanças estruturais e a nova experiência de plataforma pertencem à v2.0 e posteriores.
+### Baseline
+
+O estado atual é documentado em [`planning/release/baseline-v0.1.0.md`](planning/release/baseline-v0.1.0.md).
+
+Esse documento funciona como referência para comparar correções, regressões e evolução futura.
 
 ---
 
@@ -241,7 +249,7 @@ O contrato detalhado está em [`api/README.md`](api/README.md).
 ### Instalação rápida
 
 ```bash
-git clone https://github.com/usuario/homeserver.git
+git clone https://github.com/jotatw/homeserver.git
 cd homeserver
 sudo bash install.sh
 ```
@@ -278,8 +286,6 @@ bash core/hs.sh update check
 
 O projeto é versionado por tags Git (`vX.Y.Z`). Releases são publicadas no GitHub e no Gitea.
 
-A linha v1.x recebe correções e pequenas melhorias compatíveis. A v2.0 concentra a evolução estrutural para a plataforma e o HomeServer App.
-
 O HomeServer possui atualização integrada:
 
 ```bash
@@ -303,6 +309,8 @@ bash scripts/health-check.sh
 ```
 
 O Quality Gate é utilizado como critério para releases.
+
+O estado do último baseline e a evidência do Quality Gate devem ser registrados em [`planning/release/baseline-v0.1.0.md`](planning/release/baseline-v0.1.0.md).
 
 ---
 
@@ -343,35 +351,34 @@ Principais pontos de entrada:
 - `docs/architecture/adr/` — decisões arquiteturais;
 - `docs/design/` — Design System;
 - `planning/` — roadmap, qualidade e visão;
+- `planning/release/baseline-v0.1.0.md` — estado de referência do projeto;
 - `CHANGELOG.md` — histórico de versões.
 
 ---
 
 ## Roadmap
 
-### Concluído
+O roadmap operacional até a v1.0 está em [`planning/roadmap/v1.0.md`](planning/roadmap/v1.0.md).
 
-| Versão | Foco |
+### Fases
+
+| Fase | Foco |
 |---|---|
-| **v1.1** | Refinamento e UX da Homepage |
-| **v1.2** | Acesso unificado e Caddy |
-| **v1.3** | Autenticação, App inicial e estabilidade |
-| **v1.4** | Homepage como plataforma e Design System |
-| **v1.5** | Qualidade, segurança, testes e Architecture Freeze |
+| 0 | Baseline |
+| 1 | Organização e padronização |
+| 2 | Core / Foundation |
+| 3 | Infraestrutura |
+| 4 | Serviços |
+| 5 | Homepage / Hub |
+| 6 | Backup e armazenamento |
+| 7 | Segurança |
+| 8 | Automação |
+| 9 | UX / facilidade de uso |
+| 10 | v1.0 |
 
-### v1.6.x — Manutenção e refinamento
+As versões históricas v1.x e a preparação v2.0 permanecem no repositório como histórico e referência. O baseline conceitual não apaga esse histórico.
 
-A linha v1.6.x é usada para pequenas correções e melhorias compatíveis enquanto a v2.0 é preparada. Ela não representa uma segunda linha de evolução estrutural concorrente com a v2.0.
-
-### v2.0 — HomeServer App
-
-A v2.0 transforma o HomeServer em uma plataforma com identidade própria e uma aplicação web/PWA para gerenciamento.
-
-O escopo da release candidata inclui autenticação, navegação por papel, dashboard, armazenamento, usuários, sistema, energia, serviços, PWA e integração com a API oficial.
-
-### Futuro
-
-A visão de longo prazo inclui integração entre servidor, notebook e celular, automações, notificações, identidade e integrações externas. Esses recursos serão desenvolvidos incrementalmente após a consolidação da v2.0.
+A visão de longo prazo continua registrada em [`planning/vision.md`](planning/vision.md).
 
 ---
 
