@@ -59,7 +59,7 @@ hs_version() {
 hs_update_latest_remote() {
 
     git -C "${HS_PROJECT_ROOT}" ls-remote --tags --refs "${HS_REMOTE}" \
-        | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+$' \
+        | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+(-rc(\.[0-9]+)?)?$' \
         | sort -V \
         | tail -1
 
