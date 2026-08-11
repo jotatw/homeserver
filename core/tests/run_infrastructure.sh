@@ -22,6 +22,10 @@ run_test \
     "${SCRIPT_DIR}/infrastructure/test_initialize_workspace.sh"
 
 run_test \
+    "Backup" \
+    "${SCRIPT_DIR}/infrastructure/test_backup.sh"
+
+run_test \
     "Services" \
     "${SCRIPT_DIR}/infrastructure/test_service.sh"
 
