@@ -148,9 +148,8 @@ Medição real (servidor ocioso):
   `homeserver-backup.timer` (backup diário) estavam desativados — religados.
 - ✅ **Health Check ampliado**: agora reporta load, memória e temperatura
   (alerta ⚠ >70 °C, falha >85 °C) — `scripts/health-check.sh`.
-- ⚠️ **Inconsistência de horário**: timer do sistema em **23:30**, mas
-  `config/scheduler.conf` e a documentação indicam **22:00**. Alinhar quando
-  decidirmos o horário ideal (desligar mais cedo = menos calor/ruído noturno).
+- ✅ **Horário alinhado (2026-08-11)**: night-off dispara às **22:00**
+  (timer reinstalado; scheduler.conf e docs também 22:00; religa 07:00 via RTC).
 
 ### Decisões de qualidade de vida (hardware)
 
