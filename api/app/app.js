@@ -558,6 +558,21 @@ async function renderSystem() {
       });
       v.appendChild(tgrid);
     }
+
+    // Discos (blocos)
+    if (hardware.disks && hardware.disks.blockdevices && hardware.disks.blockdevices.length) {
+      v.appendChild(el("h3", { class: "section" }, "Discos"));
+      const dgrid = el("div", { class: "grid" });
+      hardware.disks.blockdevices.forEach((d) => {
+        const size = d.size || "";
+        const children = d.children ? d.children.length + " partição(ões)" : "";
+        dgrid.appendChild(el("div", { class: "app-card" },
+          el("span", {}, "💾"),
+          el("span", { class: "app-name" }, d.name || "?"),
+          el("span", { class: "app-host" }, size + (children ? " · " + children : ""))));
+      });
+      v.appendChild(dgrid);
+    }
   }
 }
 
@@ -684,13 +699,28 @@ async function renderAdmin() {
   if (users && users.length) {
     const t = el("table", { class: "table" });
     const head = el("tr");
-    ["Usuário", "Admin"].forEach((c) => head.appendChild(el("th", {}, c)));
+    ["Usuário", "Admin", "Ações"].forEach((c) => head.appendChild(el("th", {}, c)));
     t.appendChild(el("thead", {}, head));
     const body = el("tbody");
     users.forEach((u) => {
       const tr = el("tr");
       tr.appendChild(el("td", {}, u.username || u.id));
       tr.appendChild(el("td", {}, u.perm && u.perm.admin ? "⭐ Admin" : "padrão"));
+      const actions = el("td");
+      const btns = el("span", { style: "display:inline-flex;gap:var(--hs-space-2)" });
+
+      const pwBtn = el("button", { class: "btn btn-secondary", style: "height:var(--hs-touch-compact)" }, "Senha");
+      pwBtn.addEventListener("click", () => openPasswordDialog(u.username || u.id));
+      btns.appendChild(pwBtn);
+
+      if ((u.username || u.id) !== auth.user.username) {
+        const rmBtn = el("button", { class: "btn btn-danger", style: "height:var(--hs-touch-compact)" }, "Excluir");
+        rmBtn.addEventListener("click", () => confirmDeleteUser(u.username || u.id));
+        btns.appendChild(rmBtn);
+      }
+
+      actions.appendChild(btns);
+      tr.appendChild(actions);
       body.appendChild(tr);
     });
     t.appendChild(body);
@@ -733,6 +763,129 @@ async function renderAdmin() {
   const createBtn = el("button", { class: "btn btn-secondary", style: "margin-top:var(--hs-space-2)" }, "🔑 Criar token");
   createBtn.addEventListener("click", () => openTokenDialog());
   v.appendChild(createBtn);
+
+  // Atualização do sistema
+  v.appendChild(el("h3", { class: "section" }, "Atualização"));
+  const upBox = el("div", { class: "print-card" });
+  const upBtn = el("button", { class: "btn btn-secondary", id: "up-check" }, "⬆️ Verificar atualização");
+  const upStatus = el("p", { class: "power-hint", id: "up-status", style: "margin-top:var(--hs-space-2)" }, "");
+  upBox.appendChild(upBtn);
+  upBox.appendChild(upStatus);
+  v.appendChild(upBox);
+
+  upBtn.addEventListener("click", async () => {
+    upBtn.disabled = true;
+    upStatus.textContent = "Verificando…";
+    try {
+      const data = await apiOrFail("/api/v1/update");
+      if (data.update) {
+        upStatus.innerHTML = "Nova versão disponível: <strong>" + data.latest + "</strong> (atual: " + data.current + ")";
+        const apply = el("button", { class: "btn btn-primary", style: "margin-top:var(--hs-space-2)" }, "🔄 Aplicar atualização");
+        apply.addEventListener("click", async () => {
+          if (!confirm("Aplicar a atualização para " + data.latest + "?")) return;
+          apply.disabled = true;
+          apply.textContent = "Aplicando… (pode demorar)";
+          try {
+            await apiOrFail("/api/v1/update", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({}),
+            });
+            toast("Atualização aplicada.", "success");
+            upStatus.textContent = "Atualizado para " + data.latest + ".";
+          } catch (err) {
+            toast(err.message || "Falha ao aplicar.", "error");
+          } finally {
+            apply.remove();
+          }
+        });
+        upBox.appendChild(apply);
+      } else {
+        upStatus.textContent = "Você está atualizado (" + data.current + ").";
+      }
+    } catch (err) {
+      upStatus.textContent = err.message || "Não foi possível verificar.";
+    } finally {
+      upBtn.disabled = false;
+      upBtn.textContent = "⬆️ Verificar atualização";
+    }
+  });
+}
+
+/* ---------- Dialog: senha de usuário (admin) ---------- */
+
+function openPasswordDialog(username) {
+  let dialog = document.getElementById("pass-dialog");
+  if (!dialog) {
+    dialog = el("dialog", { id: "pass-dialog" },
+      el("form", { method: "dialog", id: "pass-form" },
+        el("h3", { style: "margin-bottom:var(--hs-space-4)" }, "Nova senha"),
+        el("div", { class: "field" },
+          el("label", { for: "ps-user" }, "Usuário"),
+          el("input", { id: "ps-user", disabled: "disabled" })),
+        el("div", { class: "field" },
+          el("label", { for: "ps-pass" }, "Nova senha"),
+          el("input", { id: "ps-pass", type: "password", required: true })),
+        el("div", { class: "dialog-actions" },
+          el("button", { type: "button", class: "btn btn-secondary", id: "ps-cancel" }, "Cancelar"),
+          el("button", { type: "submit", class: "btn btn-primary" }, "Salvar"))));
+    document.body.appendChild(dialog);
+
+    dialog.querySelector("#ps-cancel").addEventListener("click", () => dialog.close());
+    dialog.querySelector("#pass-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const uname = document.getElementById("ps-user").value;
+      const pass = document.getElementById("ps-pass").value;
+      const btn = dialog.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      try {
+        await apiOrFail("/api/v1/users/" + encodeURIComponent(uname), {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password: pass }),
+        });
+        toast("Senha atualizada: " + uname, "success");
+        dialog.close();
+      } catch (err) {
+        toast(err.message || "Falha ao alterar senha.", "error");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  }
+
+  document.getElementById("ps-user").value = username;
+  document.getElementById("ps-pass").value = "";
+  dialog.showModal();
+}
+
+function confirmDeleteUser(username) {
+  const del = el("dialog", { id: "del-dialog" },
+    el("h3", { style: "margin-bottom:var(--hs-space-3)" }, "Excluir usuário?"),
+    el("p", { class: "power-hint" }, "Remover \"" + username + "\"? O usuário perderá o acesso."),
+    el("label", { class: "check-row" },
+      el("input", { id: "del-folder", type: "checkbox" }), " Também remover a pasta de arquivos (irreversível)"),
+    el("div", { class: "dialog-actions" },
+      el("button", { class: "btn btn-secondary", id: "del-cancel" }, "Cancelar"),
+      el("button", { class: "btn btn-danger", id: "del-confirm" }, "Excluir")));
+  document.body.appendChild(del);
+
+  del.querySelector("#del-cancel").addEventListener("click", () => del.close());
+  del.querySelector("#del-confirm").addEventListener("click", async () => {
+    const folder = document.getElementById("del-folder").checked;
+    const btn = del.querySelector("#del-confirm");
+    btn.disabled = true;
+    try {
+      await apiOrFail("/api/v1/users/" + encodeURIComponent(username) + (folder ? "?folder=1" : ""), { method: "DELETE" });
+      toast("Usuário removido: " + username, "success");
+      del.close();
+      renderAdmin();
+    } catch (err) {
+      toast(err.message || "Falha ao excluir.", "error");
+      btn.disabled = false;
+    }
+  });
+  del.showModal();
 }
 
 /* ---------- Dialog: criar usuário (admin) ---------- */
