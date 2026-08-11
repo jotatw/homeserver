@@ -106,7 +106,7 @@ case "${_command}" in
                     *) echo "Uso: hs system storage status|init" >&2; exit 1 ;;
                 esac
                 ;;
-            services)       get_services_status_json; echo ;;
+            services)       get_service_status_json; echo ;;
             backup)         printf '{"last":"%s"}\n' "$(get_backup_last)" ;;
             wol)
                 case "${3:-status}" in

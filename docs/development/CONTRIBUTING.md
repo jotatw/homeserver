@@ -230,6 +230,49 @@ Comentários no código devem ser utilizados apenas para organização.
 
 ---
 
+# Organização do Repositório
+
+## Árvore principal
+
+```text
+HomeServer
+├── core/foundation/      infraestrutura do Core (hs_*)
+├── core/infrastructure/  módulos do Core (prefixo do módulo)
+├── core/adapters/        integração com serviços externos
+├── api/                  API REST + App (frontend em api/app)
+├── modules/              serviços implantáveis (compose)
+├── scripts/              utilitários (deploy, systemd, testes) — ver scripts/README.md
+├── docs/                 documentação
+├── design/               design do App
+└── planning/             baseline, roadmap, qualidade, backlog, histórico (archive/)
+```
+
+- `planning/release/baseline-v0.1.0.md` — estado de referência do projeto.
+- `planning/roadmap/v1.0.md` — evolução por FASEs (0-10) até a v1.0.0.
+
+## Evolução por fases
+
+O desenvolvimento segue o roadmap (`planning/roadmap/v1.0.md`). Regra de evolução:
+
+1. implementação (quando aplicável);
+2. testes;
+3. documentação;
+4. evidência;
+5. validação de uso;
+6. registro das limitações restantes.
+
+Uma fase posterior não deve mascarar uma pendência crítica de uma fase anterior.
+
+## Nomenclatura (revisão recente)
+
+- Módulos de Infrastructure usam **singulares**: `service.sh`, `service_status.sh`,
+  `storage.sh`, `devices.sh`, `users.sh`... (em vez de plural quando referem o módulo).
+- Funções públicas: prefixo do módulo (`get_service_status_json`, `storage_init`...).
+- Scripts em `scripts/`: `test-*` para testes, `homeserver-*` para units systemd;
+  demais são deploy/auxiliares (ver `scripts/README.md`).
+
+---
+
 # Objetivo Final
 
 Construir um HomeServer simples, modular, reutilizável e de fácil manutenção.
