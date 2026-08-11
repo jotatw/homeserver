@@ -32,15 +32,25 @@ await app.register(rateLimit, {
     timeWindow: "1 minute",
 });
 
+const HS_HOST_IP = (process.env.HS_HOST_IP || "").trim();
+
+const corsOrigins: (string | RegExp)[] = [
+    "http://homeserver.local",
+    "http://homeserver.local:80",
+    "https://homeserver.local",
+    "https://homeserver.local:443",
+];
+
+if (HS_HOST_IP) {
+    corsOrigins.push(
+        `http://${HS_HOST_IP}:3000`,
+        `http://${HS_HOST_IP}:8000`,
+        `https://${HS_HOST_IP}`,
+    );
+}
+
 await app.register(cors, {
-    origin: [
-        "http://192.168.1.10:3000",
-        "http://homeserver.local",
-        "http://homeserver.local:80",
-        "https://homeserver.local",
-        "https://homeserver.local:443",
-        /\.192\.168\.0\.10(:30)?$/,
-    ],
+    origin: corsOrigins,
     methods: ["GET", "PUT", "POST", "DELETE", "OPTIONS"],
 });
 

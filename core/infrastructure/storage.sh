@@ -74,7 +74,7 @@ storage_init() {
         mkdir -p "${dir}" || return 1
     done
 
-    chown -R usuario:usuario "${HS_STORAGE_ROOT}" 2>/dev/null || true
+    chown -R 1000:1000 "${HS_STORAGE_ROOT}" 2>/dev/null || true
 
     chmod 755 "${HS_STORAGE_ROOT}" \
         "${HS_STORAGE_ROOT}/users" \
