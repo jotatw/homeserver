@@ -2,149 +2,153 @@
 
 > Uma plataforma modular para transformar um computador comum em um servidor doméstico simples, organizado e fácil de expandir.
 
-O **HomeServer** nasceu com um objetivo simples: dar uma nova vida a computadores antigos.
+O **HomeServer** nasceu para dar uma nova vida a computadores antigos e evoluiu para uma plataforma local capaz de integrar armazenamento, usuários, serviços, automações e aplicações em uma única experiência.
 
-Com o tempo, o projeto evoluiu para uma plataforma capaz de integrar armazenamento, gerenciamento de usuários, serviços e automações em uma única interface, mantendo uma arquitetura modular e preparada para crescer sem perder a simplicidade.
+A proposta é manter a infraestrutura simples, modular e reutilizável: o HomeServer pode ser usado como servidor doméstico completo ou como base para novos projetos.
 
 ---
 
-# Filosofia
-
-O HomeServer segue alguns princípios desde o início do projeto:
+## Filosofia
 
 - Simplicidade antes de complexidade.
 - Evolução incremental.
-- Um módulo, uma responsabilidade.
-- Infraestrutura desacoplada dos serviços.
+- Uma responsabilidade por camada.
+- Infraestrutura desacoplada dos serviços externos.
 - Automação sempre que possível.
 - Documentação acompanha o código.
+- Funcionalidade local não deve depender de nuvem quando não for necessário.
+- Arquitetura estável é mais importante que quantidade de funcionalidades.
 
 O objetivo não é competir com soluções corporativas, mas oferecer uma plataforma doméstica organizada, intuitiva e fácil de manter.
 
 ---
 
-# Recursos implementados
+## Estado atual
 
-Atualmente o HomeServer oferece:
+A linha **v1.6.x** recebe correções e pequenas melhorias enquanto a **v2.0** é preparada. A v2.0 introduz o HomeServer App como interface da plataforma e está em preparação para release candidata.
 
-- Gerenciamento centralizado de armazenamento
-- Homepage com modos de utilização (Usuário / Administrador / Sistema)
-- Gerenciamento de usuários
-- API REST (respostas padronizadas `ok/data`)
-- Autenticação com token (TTL 24h) e proteção de rotas por escopo
-- FileBrowser integrado
-- Gitea
-- Samba
-- Backup automático
-- Wake-on-LAN
-- Agendamento de inicialização e desligamento (religamento via suspend S3)
-- CLI administrativa (`hs`)
-- Auto-update por releases (`hs update check|apply`)
-- Security headers e rate limit na API
-- Testes de integração (`smoke-test.sh`, `test-cli.sh`, `test-api.sh`, `run-integration.sh`)
-- ADRs (`docs/architecture/adr/`) e Architecture Freeze
-- Design System (`docs/design/`) e App Design da v2.0 (`design/app/`)
+O projeto possui:
 
----
+- Homepage como portal de acesso;
+- HomeServer App para gerenciamento;
+- autenticação e sessões próprias;
+- gerenciamento de usuários;
+- API REST oficial;
+- armazenamento centralizado;
+- FileBrowser;
+- Gitea;
+- Samba;
+- Caddy e acesso unificado na LAN;
+- backup automático;
+- agendamento de energia;
+- descoberta e gerenciamento de dispositivos;
+- CLI administrativa `hs`;
+- auto-update por releases;
+- testes automatizados e smoke tests;
+- Quality Gate;
+- Design System e documentação arquitetural.
 
-# Próximos módulos
-
-Planejados para versões futuras:
-
-- Login OIDC
-- Uptime Kuma
-- Jellyfin
-- Gateway (Reverse Proxy)
-- Integração com dispositivos USB e SD Card
-- Aplicativo para notebook
-- Aplicativo para celular
+A linha v1.x permanece voltada a manutenção, correções e melhorias compatíveis. Mudanças estruturais e a nova experiência de plataforma pertencem à v2.0 e posteriores.
 
 ---
 
-# Arquitetura
+## Para quem é
 
-O HomeServer é organizado em camadas independentes.
+O uso cotidiano do HomeServer **não exige programação**.
+
+A instalação oficial é orientada por um assistente e o objetivo do projeto é que uma pessoa nova consiga chegar de uma máquina Linux limpa a um servidor funcional usando apenas a documentação oficial.
+
+Conhecimento de Linux, Docker e programação é necessário apenas para administração avançada, manutenção ou desenvolvimento do projeto.
+
+---
+
+## Arquitetura
 
 ```text
 HomeServer
 ├── core/
-│   ├── foundation/
-│   ├── infrastructure/
-│   ├── adapters/
-│   └── hs.sh
+│   ├── foundation/          # componentes reutilizáveis
+│   ├── infrastructure/      # recursos internos
+│   ├── adapters/            # integração com serviços externos
+│   └── hs.sh                # CLI
 │
-├── api/
-│
-├── modules/
-│
-├── automation/
-│   └── hooks/
-│
-└── install.sh
+├── api/                     # API oficial da plataforma
+├── modules/                 # serviços implantáveis
+├── automation/              # automações e hooks
+├── scripts/                 # ferramentas auxiliares
+├── docs/                    # documentação do sistema
+├── planning/                # evolução e planejamento
+└── install.sh               # instalação
 ```
 
-## Foundation
+### Foundation
 
-Bibliotecas reutilizáveis.
+Base reutilizável do projeto: filesystem, validação, configuração, saída, constantes e registry.
 
-- filesystem
-- validation
-- output
-- config
-- constants
-- registry
+### Infrastructure
 
-## Infrastructure
+Implementa recursos internos do HomeServer, como storage, usuários, dispositivos, hardware, serviços, backup, scheduler e energia.
 
-Serviços internos do HomeServer.
+### Adapters
 
-- storage
-- users
-- devices
-- mount
-- hardware
-- services
-- backup
-- scheduler
+Isolam integrações com serviços externos. A Infrastructure não deve depender diretamente da implementação de um serviço externo.
 
-## Adapters
+### API
 
-Integração com serviços externos.
+É a interface oficial da plataforma. O App é apenas um cliente da API e não acessa diretamente FileBrowser, Gitea ou outros serviços.
 
-Atualmente:
+### Modules
 
-- FileBrowser
-
-Futuramente:
-
-- Telegram
-- Email
-- WhatsApp
-- GitHub
-- Outros módulos
+Serviços implantados pelo HomeServer, como Homepage, FileBrowser, Gitea, Caddy e Portainer.
 
 ---
 
-# Homepage
+## Homepage e App
 
-A Homepage é o ponto central do sistema (v1.4 — portal orientado às tarefas).
-
-Ela organiza os serviços em quatro grupos:
+A **Homepage** é o portal rápido do servidor. Ela organiza as principais ações em quatro grupos:
 
 | Grupo | Objetivo |
-|-------|----------|
+|---|---|
 | **Meu espaço** | Arquivos, projetos, downloads e mídia |
-| **Aplicações** | Serviços com status (Homepage, FileBrowser, Gitea, App) |
-| **Administração** | Gestão para administradores |
-| **Sistema** | Informações técnicas do servidor |
+| **Aplicações** | Serviços disponíveis e seus estados |
+| **Administração** | Gestão do HomeServer |
+| **Sistema** | Diagnóstico e informações técnicas |
 
-O objetivo é que o usuário nunca precise acessar diretamente cada serviço individualmente.
+O **HomeServer App** é a interface de gerenciamento da plataforma. Ele possui autenticação própria e adapta a navegação conforme o papel do usuário.
+
+A Homepage continua sendo o ponto de entrada simples; o App concentra operações administrativas e recursos da plataforma.
 
 ---
 
-# Armazenamento
+## Acesso unificado
 
-Toda a estrutura do HomeServer é organizada dentro de `/srv`.
+O Caddy fornece um único ponto de entrada na rede local:
+
+```text
+https://homeserver.local/
+```
+
+Rotas principais:
+
+| Rota | Serviço |
+|---|---|
+| `/` | Homepage |
+| `/app` | HomeServer App |
+| `/files` | FileBrowser |
+| `/git` | Gitea |
+| `/api/v1` | API |
+
+O mDNS/Avahi permite resolver `homeserver.local` na LAN quando disponível. O endereço IP continua sendo uma alternativa de acesso.
+
+O objetivo é que o usuário não precise memorizar portas individuais.
+
+> **Autonomia local:** o HomeServer foi projetado para ser utilizável dentro da rede local sem depender de serviços em nuvem.
+
+---
+
+## Armazenamento
+
+A estrutura oficial fica em `/srv`:
 
 ```text
 /srv
@@ -165,75 +169,76 @@ Toda a estrutura do HomeServer é organizada dentro de `/srv`.
 └── config/
 ```
 
-O FileBrowser utiliza `/srv/storage` como raiz.
+Backups ficam fora de `/srv/storage`, em `/srv/backup`.
 
-- Administradores possuem acesso completo.
-- Usuários comuns acessam apenas `/users/<nome>`.
+O FileBrowser utiliza `/srv/storage` como raiz:
 
----
-
-# Serviços
-
-| Serviço | Porta | Acesso unificado |
-|----------|------:|------------------|
-| Homepage | 3000 | `homeserver.local/` |
-| Gitea | 3001 | `homeserver.local/git` |
-| Gitea SSH | 2222 | `git@homeserver.local:2222` |
-| FileBrowser | 8080 | `homeserver.local/files` |
-| API | 8000 | `homeserver.local/api/v1` |
-| Samba | 445 | via rede |
-| Portainer | 9443 | módulo opcional |
-
-## Acesso unificado
-
-Todos os serviços são acessíveis por um **único ponto de entrada**:
-`https://homeserver.local` (resolvido via mDNS/Avahi na rede local; HTTP
-redireciona para HTTPS — certificado auto-assinado).
-
-- `/` → Homepage
-- `/files` → FileBrowser
-- `/git` → Gitea
-- `/app` → HomeServer App (administração)
-- `/api/v1` → API
-
-O usuário nunca precisa conhecer portas ou endereços IP. O proxy (Caddy) é o
-módulo `modules/caddy/`.
-
-> **Autonomia local**: o HomeServer é totalmente utilizável dentro da rede
-> local, sem depender de serviços em nuvem.
+- administradores podem gerenciar todo o armazenamento;
+- usuários comuns ficam limitados ao próprio espaço.
 
 ---
 
-# API
+## Autenticação
 
-A API é a interface oficial do HomeServer.
+A identidade pertence ao HomeServer.
 
-| Método | Endpoint |
-|---------|----------|
-| GET | `/api/v1/status` |
-| GET | `/api/v1/storage` |
-| GET | `/api/v1/services` |
-| GET | `/api/v1/users` |
-| GET | `/api/v1/devices` |
-| GET | `/api/v1/hardware` |
-| POST | `/api/v1/users` |
-| PUT | `/api/v1/users/:nome` |
-| DELETE | `/api/v1/users/:nome` |
-| GET | `/api/v1/events` |
-| GET | `/api/v1/power` |
-| PUT | `/api/v1/power` |
-| POST | `/api/v1/backup` |
+O fluxo principal é:
 
-Mais detalhes em `api/README.md`.
+```text
+App
+ ↓
+API /auth/login
+ ↓
+verify + is-admin
+ ↓
+sessão HomeServer
+ ↓
+request.user
+ ↓
+autorização
+```
+
+As sessões atuais ficam em memória e possuem TTL deslizante de 30 dias. Um reinício da API invalida as sessões existentes.
+
+O App nunca depende diretamente da autenticação do FileBrowser.
 
 ---
 
-# Uso
+## API
 
-## Instalação rápida
+A API é a interface oficial da plataforma. As respostas seguem o contrato `ok/data` para sucesso e `ok/error` para erros.
 
-> Para iniciantes: siga o [`QUICKSTART.md`](QUICKSTART.md) (~10 minutos, sem programação).
-> Detalhes e flags: [`docs/INSTALLATION.md`](docs/INSTALLATION.md).
+Principais grupos de endpoints:
+
+| Área | Exemplos |
+|---|---|
+| Auth | `/api/v1/auth/login`, `/auth/session`, `/auth/logout` |
+| Sistema | `/api/v1/system`, `/status` |
+| Storage | `/api/v1/storage` |
+| Serviços | `/api/v1/services` |
+| Usuários | `/api/v1/users` |
+| Dispositivos | `/api/v1/devices` |
+| Hardware | `/api/v1/hardware` |
+| Eventos | `/api/v1/events` |
+| Energia | `/api/v1/power` |
+| Backup | `/api/v1/backup` |
+| Tokens | `/api/v1/tokens` |
+| Impressão | `/api/v1/print` |
+
+O contrato detalhado está em [`api/README.md`](api/README.md).
+
+---
+
+## Instalação
+
+### Requisitos
+
+- Computador compatível com Linux;
+- Debian 12 é a base atualmente validada;
+- acesso root ou `sudo`;
+- conexão com a internet durante a instalação.
+
+### Instalação rápida
 
 ```bash
 git clone https://github.com/usuario/homeserver.git
@@ -241,163 +246,145 @@ cd homeserver
 sudo bash install.sh
 ```
 
-O instalador é um **assistente**: detecta sua rede, pergunta o usuário
-principal, gera as senhas e configura tudo. Ao final, executa um **Health
-Check** automático e mostra o endereço de acesso.
+O instalador funciona como um assistente: verifica o sistema, instala o Docker quando necessário, detecta a rede, configura o usuário principal, gera as configurações, implanta os serviços e executa o Health Check.
 
-> Primeiro acesso e configuração inicial: [`docs/FIRST_BOOT.md`](docs/FIRST_BOOT.md).
+Para iniciantes, comece por [`QUICKSTART.md`](QUICKSTART.md).
 
-### Validação da instalação
+Perguntas e dúvidas comuns: [`QUESTIONS.md`](QUESTIONS.md).
 
-O instalador foi **testado de verdade** em ambiente Docker limpo (Debian 12):
+Documentação detalhada:
 
-- ✅ Módulos oficiais (filebrowser, gitea, homepage, caddy) implantados e ativos
-- ✅ Diretórios de dados com permissões corretas (UID 1000 dos containers)
-- ✅ Health Check operacional (`scripts/health-check.sh`)
-- ✅ Re-instalação sobre estado anterior (deploy idempotente)
+- [`docs/INSTALLATION.md`](docs/INSTALLATION.md)
+- [`docs/FIRST_BOOT.md`](docs/FIRST_BOOT.md)
+- [`docs/FAQ.md`](docs/FAQ.md)
 
-> ⚠️ **Nota**: o build da **API** (`docker compose -f api/compose.yaml up -d --build`)
-> foi validado no servidor de produção. Em ambientes sem saída para os
-> repositórios npm/alpine, o build pode falhar — verifique a conectividade
-> (`registry.npmjs.org` e `dl-cdn.alpinelinux.org`) antes de instalar.
-
-## Releases e atualização automática
-
-O projeto é versionado por **tags git** (`vX.Y.Z`). Cada implementação é
-lançada como uma release publicada no GitHub e no Gitea.
-
-O HomeServer tem um sistema de **auto-update** integrado ao CLI:
-
-```bash
-# Versão atual instalada
-bash core/hs.sh version
-
-# Verifica se há release mais recente disponível
-bash core/hs.sh update check
-# => {"current":"v1.5.0","latest":"v1.5.0","update":false}
-
-# Aplica a atualização para a release mais recente
-bash core/hs.sh update apply
-```
-
-O `update apply`:
-
-1. Faz backup do estado atual (tag `pre-update-<versão>`).
-2. Atualiza o código via `git pull --ff-only origin main`.
-3. Reimplanta os módulos (`install.sh`) quando necessário.
-
-Para atualizar **sem reimplantar** módulos:
-
-```bash
-bash core/hs.sh update apply --no-redeploy
-```
-
-> O servidor acompanha a branch `main`, que contém todas as releases.
-> As tags servem de marcador de release e ponto de rollback.
+---
 
 ## CLI
 
+A CLI `hs` fornece operações administrativas do HomeServer.
+
 ```bash
-bash core/hs.sh system status
-
-bash core/hs.sh service list
-
-bash core/hs.sh user list
-
 bash core/hs.sh version
-
+bash core/hs.sh system status
+bash core/hs.sh service list
+bash core/hs.sh user list
 bash core/hs.sh update check
 ```
 
+---
+
+## Atualizações
+
+O projeto é versionado por tags Git (`vX.Y.Z`). Releases são publicadas no GitHub e no Gitea.
+
+A linha v1.x recebe correções e pequenas melhorias compatíveis. A v2.0 concentra a evolução estrutural para a plataforma e o HomeServer App.
+
+O HomeServer possui atualização integrada:
+
+```bash
+bash core/hs.sh update check
+bash core/hs.sh update apply
+```
+
+Antes de atualizar, o sistema cria um ponto de recuperação. O processo pode reimplantar os módulos quando necessário ou utilizar `--no-redeploy` quando apropriado.
+
+---
+
 ## Testes
+
+A base possui testes de Foundation, Infrastructure, API, CLI, integração e smoke tests.
+
+Exemplo:
 
 ```bash
 bash core/tests/run_all.sh
+bash scripts/health-check.sh
 ```
 
-## API
-
-```bash
-curl http://homeserver.local/api/v1/status
-```
-
-> Atualmente o acesso ainda pode utilizar o endereço IP do servidor. A adoção de `homeserver.local` faz parte da evolução planejada do projeto.
+O Quality Gate é utilizado como critério para releases.
 
 ---
 
-# Hardware utilizado
+## Desenvolvimento
 
-Projeto desenvolvido e validado em hardware modesto.
+O HomeServer foi organizado para que novas funcionalidades reutilizem as camadas existentes.
 
-- MSI MS-AA1511
-- Intel Pentium T4500
-- 3 GB RAM
-- HDD 320 GB
+Antes de alterar a arquitetura:
 
-O objetivo é permitir reutilizar computadores antigos como servidores domésticos.
+1. consulte os princípios;
+2. procure uma decisão arquitetural existente;
+3. reutilize a camada apropriada;
+4. crie um ADR quando houver uma nova decisão estrutural;
+5. atualize testes e documentação.
 
----
-
-# Roadmap
-
-## Lançado
-
-| Versão | Conteúdo |
-|--------|----------|
-| **v1.1** | Homepage refinada, melhorias de UX, organização do projeto |
-| **v1.2** | Gateway, URLs amigáveis, reverse proxy (Caddy, `homeserver.local`) |
-| **v1.3** | Autenticação com token, proteção de rotas, App com login, auto-update, fix religamento S3 |
-| **v1.4** | UX: Homepage como portal (4 grupos), cards como ações, Design System |
-| **v1.5** | Stable Foundation: code review, segurança, ADRs, testes de integração, Quality Gate |
-
-## v2.0 — HomeServer App
-
-O App unificado (web + mobile) está em fase de **design** na branch `app-design`
-(`design/app/`): referências, wireframes, fluxos por role, tokens e componentes.
-
-- Design system do App (tokens `--hs-*`, dark/light)
-- 6 telas: Login, Meu espaço, Aplicações, Armazenamento, Sistema, Administração
-- Navegação por role (sidebar desktop / bottom nav mobile)
-- Aplicativo para notebook e celular
-
-## Futuro
-
-O objetivo de longo prazo é transformar o HomeServer em um ecossistema pessoal.
-
-Servidor, notebook e celular compartilharão arquivos, usuários, notificações e automações através de uma única plataforma.
+Consulte [`CONTRIBUTING.md`](CONTRIBUTING.md) para regras de contribuição e [`QUESTIONS.md`](QUESTIONS.md) para dúvidas comuns.
 
 ---
 
-# Documentação
+## Documentação
 
-A documentação está organizada em duas áreas:
+A documentação possui responsabilidades diferentes:
 
 ```text
-docs/          → como o HomeServer funciona
-├── PRINCIPLES.md
-├── ARCHITECTURE.md
-├── architecture/    (camadas, ADRs)
-├── design/          (Design System v1.4)
-├── development/
-├── foundation/
-├── guide/
-└── security/        (threat model, auditoria v1.5)
-
-planning/      → para onde o projeto está evoluindo
-├── vision.md
-├── strategy.md
-├── roadmap/         (planos por versão)
-├── quality/         (Quality Gate, review checklist)
-├── health/          (baselines de performance)
-└── backlog/         (product backlog por área)
+docs/       → como o HomeServer funciona
+planning/   → para onde o projeto está evoluindo
 ```
 
-- **API**: veja `api/README.md`.
-- **App Design (v2.0)**: veja `design/app/` na branch `app-design`.
-- **CHANGELOG**: veja `CHANGELOG.md`.
+Principais pontos de entrada:
+
+- `QUICKSTART.md` — instalação rápida;
+- `QUESTIONS.md` — índice das principais dúvidas;
+- `docs/INSTALLATION.md` — instalação detalhada;
+- `docs/FIRST_BOOT.md` — primeiro uso;
+- `docs/FAQ.md` — respostas detalhadas;
+- `docs/ARCHITECTURE.md` — arquitetura;
+- `docs/PRINCIPLES.md` — princípios;
+- `docs/architecture/adr/` — decisões arquiteturais;
+- `docs/design/` — Design System;
+- `planning/` — roadmap, qualidade e visão;
+- `CHANGELOG.md` — histórico de versões.
 
 ---
 
-# Licença
+## Roadmap
 
-Este projeto é distribuído sob a licença MIT.
+### Concluído
+
+| Versão | Foco |
+|---|---|
+| **v1.1** | Refinamento e UX da Homepage |
+| **v1.2** | Acesso unificado e Caddy |
+| **v1.3** | Autenticação, App inicial e estabilidade |
+| **v1.4** | Homepage como plataforma e Design System |
+| **v1.5** | Qualidade, segurança, testes e Architecture Freeze |
+
+### v1.6.x — Manutenção e refinamento
+
+A linha v1.6.x é usada para pequenas correções e melhorias compatíveis enquanto a v2.0 é preparada. Ela não representa uma segunda linha de evolução estrutural concorrente com a v2.0.
+
+### v2.0 — HomeServer App
+
+A v2.0 transforma o HomeServer em uma plataforma com identidade própria e uma aplicação web/PWA para gerenciamento.
+
+O escopo da release candidata inclui autenticação, navegação por papel, dashboard, armazenamento, usuários, sistema, energia, serviços, PWA e integração com a API oficial.
+
+### Futuro
+
+A visão de longo prazo inclui integração entre servidor, notebook e celular, automações, notificações, identidade e integrações externas. Esses recursos serão desenvolvidos incrementalmente após a consolidação da v2.0.
+
+---
+
+## Licença
+
+O HomeServer é distribuído sob a **MIT License**.
+
+Consulte [`LICENSE`](LICENSE) para os termos completos.
+
+---
+
+## Projeto
+
+O HomeServer é uma base aberta para experimentação, aprendizado, reutilização e evolução de servidores domésticos.
+
+A prioridade do projeto é continuar sendo simples o suficiente para usar, estruturado o suficiente para manter e aberto o suficiente para ser reaproveitado em outros projetos.

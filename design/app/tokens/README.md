@@ -1,69 +1,82 @@
 # Design Tokens — HomeServer App (v2.0)
 
-> Derivados do Design System v1.4 (`docs/design/`) e das refs (`../references.md` §2: tokens centralizados, dark mode por classe).
-> Toda a UI do App usa **apenas** estes tokens — proibido valor "hardcoded" de cor/espaçamento/tipografia.
+> A API visual do HomeServer App. Os tokens definem aparência, espaço e estrutura sem acoplar o design a uma plataforma específica.
+
+Toda a UI deve consumir tokens `--hs-*`; valores de cor, espaçamento, tipografia e elevação não devem ser espalhados diretamente pelos componentes sem justificativa documentada.
+
+## Princípios
+
+1. **Poucos tokens, usados de forma consistente.**
+2. **Mobile e desktop compartilham a linguagem visual**, mas podem usar layouts diferentes.
+3. **Mobile usa drawer; desktop usa sidebar colapsável.** Não existe bottom navigation obrigatória nesta versão.
+4. **Identidade vem da combinação dos tokens**, não de efeitos decorativos.
+5. **Estados são semânticos** e nunca dependem apenas de cor.
+6. **Leveza é requisito:** evitar animações, sombras e efeitos que não acrescentem informação.
+7. **Acessibilidade faz parte do token:** contraste, foco e áreas de toque devem ser previsíveis.
 
 ## Como consumir
 
-Tokens são definidos como **CSS custom properties** (`--hs-*`), entregues via `@theme` (Tailwind v4) ou CSS puro. O App define **2 conjuntos** por variável: `light` e `dark` (dark é o padrão, herança da v1.4).
+Tokens são definidos como CSS custom properties (`--hs-*`). O App mantém os temas `dark` e `light`, com dark como padrão atual.
 
 ```css
 :root, [data-theme="dark"] {
   --hs-bg: #0f172a;
   --hs-surface: #1e293b;
-  /* ... */
-}
-[data-theme="light"] {
-  --hs-bg: #f8fafc;
-  --hs-surface: #ffffff;
-  /* ... */
 }
 ```
 
-- Tema selecionado em `document.documentElement.dataset.theme`; persistido + `prefers-color-scheme` como default (ref §3).
-- Variável semântica (`--hs-bg`) mapeia a paleta; componentes nunca referenciam hex direto.
+Componentes devem referenciar tokens semânticos em vez de valores hexadecimais diretamente.
 
-## Nomenclatura
+## Grupos
 
-`--hs-<grupo>-<papel>` em 5 grupos:
-
-| Grupo | Exemplo | Uso |
+| Grupo | Arquivo | Responsabilidade |
 |---|---|---|
-| `color` | `--hs-color-ok` | cores de status e primária |
-| `surface` | `--hs-surface-raised` | fundos de superfícies |
-| `text` | `--hs-text-muted` | cores de texto |
-| `space` | `--hs-space-4` | espaçamento |
-| `radius` | `--hs-radius-md` | cantos |
-| `shadow` | `--hs-shadow-md` | elevação |
-| `motion` | `--hs-motion-fast` | duração |
-| `typography` | `--hs-text-sm` / `--hs-font-sans` | texto |
+| Cores | `colors.md` | fundos, superfícies, texto, ações e estados |
+| Tipografia | `typography.md` | família, escala, pesos e leitura |
+| Espaçamento | `spacing.md` | escala, gaps e alvos de toque |
+| Layout | `layout.md` | containers, grid, sidebar, drawer e breakpoints |
+| Cantos | `radius.md` | hierarquia de superfícies |
+| Elevação | `elevation.md` | sombras e foco |
+| Movimento | `motion.md` | duração, easing e redução de movimento |
+
+## Estado atual
+
+Os tokens existentes são uma **base de design**, não uma implementação final. Antes de alterar o CSS da aplicação, os tokens serão revisados em conjunto com os wireframes mobile e desktop.
+
+### Já definido
+
+- paleta dark/light;
+- cor primária e estados;
+- tipografia baseada no sistema;
+- escala de espaçamento;
+- alvo mínimo de toque de 48px;
+- sidebar expandida/recolhida;
+- drawer mobile;
+- largura máxima de conteúdo;
+- escala de radius;
+- elevação discreta.
+
+### Ainda precisa de validação visual
+
+- paleta final e personalidade da cor primária;
+- contraste entre superfícies;
+- escala final de títulos;
+- densidade dos cards;
+- comportamento dos ícones;
+- aparência de foco, hover e active;
+- aplicação dos tokens nos wireframes reais.
 
 ## Regras de ouro
 
-1. **Estado nunca só cor**: tokens de status acompanham ícone/texto (ref §3).
-2. **Contraste**: texto sobre superfícies ≥ 4.5:1 (WCAG AA); sobre `ok/warn/danger` sempre superfície escura.
-3. **Alvos de toque ≥ 48dp** (ref §2 M3) — definido em `spacing.md`/`components.md`.
-4. **Dark mode é o padrão**; light é um modo completo, nunca "invertido de pressa".
-5. Alterar um token **não** quebra componentes — é a API visual do App (ref §2 shadcn/Tailwind `@theme`).
-6. Respeitar `prefers-reduced-motion` (ref §3).
+1. Estado nunca é representado somente por cor.
+2. Texto normal deve buscar contraste WCAG AA.
+3. Alvos de toque devem ter pelo menos 48px quando possível.
+4. Inputs mobile usam tamanho de texto que evite zoom automático indesejado.
+5. Dark e light são temas completos.
+6. `prefers-reduced-motion` deve ser respeitado.
+7. Alterar um token deve mudar a linguagem visual de forma previsível sem exigir refatoração de cada componente.
+8. Não criar token para uma exceção isolada sem necessidade.
 
-## Documentos
+## Próxima etapa
 
-| Token | Arquivo | Status |
-|---|---|---|
-| Cores (dark/light, estados) | `colors.md` | Draft v1 |
-| Tipografia (escala, fontes) | `typography.md` | Draft v1 |
-| Espaçamento (escala + layout) | `spacing.md` | Draft v1 |
-| Cantos (radius) | `radius.md` | Draft v1 |
-| Elevação (sombras) | `elevation.md` | Draft v1 |
-| Movimento (duração/easing) | `motion.md` | Draft v1 |
-
-## Origem (paridade com v1.4)
-
-| Token v2.0 | Herda de (v1.4) | Mudança |
-|---|---|---|
-| `--hs-bg`, `--hs-surface` | `bg`, `surface` | + light mode, + superfícies adicionais |
-| `--hs-color-ok/warn/danger` | `ok/warn/danger` | sem mudança (estabilidade de status) |
-| `--hs-space-*` | `space-1..10` | + tokens de layout (tela/sidebar) |
-| `--hs-radius-*` | raios de cards (12/10/8px) | formalizado em escala |
-| Tipografia | escala do v1.4 | + display do App, + tabelas/dialogs |
+Com a arquitetura de navegação definida, o próximo trabalho é validar estes tokens visualmente em um **wireframe/protótipo do Dashboard**, primeiro mobile e depois desktop. A implementação do CSS definitivo deve esperar essa validação.

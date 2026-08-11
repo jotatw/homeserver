@@ -4,17 +4,21 @@
 #
 # Assistente de instalação do HomeServer em um servidor Debian.
 # Detecta a rede e o usuário, instala Docker (se necessário),
-# gera o .env da API, implanta todos os módulos oficiais
-# (incluindo a API), inicializa o Core e executa o Health Check.
+# gera o .env da API, implanta os módulos oficiais,
+# inicializa o Core e executa o Health Check.
 #
 # Uso:
 #   sudo bash install.sh
-#   sudo bash install.sh --modules=filebrowser,gitea,homepage,caddy
+#   sudo bash install.sh --user=<usuario>
+#   sudo bash install.sh --network=<rede/CIDR>
+#   sudo bash install.sh --non-interactive --user=<usuario> --network=<rede/CIDR>
 #
 # Flags:
 #   --modules=<lista>     Módulos separados por vírgula (padrão: config/services.conf)
+#   --user=<usuario>      Usuário Linux existente usado pelo HomeServer
+#   --network=<CIDR>      Rede local usada pelo firewall
 #   --assume-yes          Responde "sim" a todas as perguntas
-#   --non-interactive     Sem perguntas: usa valores detectados (defaults)
+#   --non-interactive     Sem perguntas; falha se valores obrigatórios não forem detectados
 #   --dry-run             Mostra o que seria feito sem executar deploys
 #   --help                Mostra esta ajuda
 # ==========================================================
@@ -28,13 +32,16 @@ ASSUME_YES=0
 NON_INTERACTIVE=0
 DRY_RUN=0
 MODULES=""
+HS_USER="${HS_USER:-}"
+HS_NETWORK="${HS_NETWORK:-}"
+HS_IP="${HS_IP:-}"
 
 info()    { printf "[INFO] %s\n" "$*"; }
 success() { printf "[OK]   %s\n" "$*"; }
 warning() { printf "[WARN] %s\n" "$*"; }
 error()   { printf "[ERRO] %s\n" "$*"; }
 
-_step()   { printf "\n[%s/%s] %s\n" "$1" "$2" "$3"; }
+_step() { printf "\n[%s/%s] %s\n" "$1" "$2" "$3"; }
 
 _run() {
     if [[ "${DRY_RUN}" -eq 1 ]]; then
@@ -53,8 +60,6 @@ _yesno() {
     read -r resposta
     [[ -z "${resposta}" || "${resposta}" =~ ^[Ss] ]]
 }
-
-# ---- Requisitos ----------------------------------------------
 
 _require_root() {
     if [[ "$(id -u)" -ne 0 ]]; then
@@ -75,30 +80,78 @@ _detect_os() {
 }
 
 _detect_network() {
-    local cidr ip pfx a b c
-    cidr="$(ip -o -4 addr show scope global 2>/dev/null | awk '{print $4; exit}')"
-    ip="$(ip -o -4 addr show scope global 2>/dev/null | awk '{split($4,a,"/"); print a[1]; exit}')"
-    HS_IP="${ip:-127.0.0.1}"
+    local detected_ip detected_network
 
-    if [[ -n "${cidr}" ]]; then
-        pfx="$(printf '%s' "${cidr}" | awk -F/ '{print $2}')"
-        a="$(printf '%s' "${ip}" | awk -F. '{print $1}')"
-        b="$(printf '%s' "${ip}" | awk -F. '{print $2}')"
-        c="$(printf '%s' "${ip}" | awk -F. '{print $3}')"
-        case "${pfx}" in
-            1[6-9]|2[0-3]) HS_NETWORK="${a}.${b}.0.0/${pfx}" ;;
-            *)             HS_NETWORK="${a}.${b}.${c}.0/${pfx}" ;;
-        esac
+    if [[ -n "${HS_IP}" && -n "${HS_NETWORK}" ]]; then
+        info "Rede configurada: ${HS_NETWORK} (IP ${HS_IP})"
+        return 0
     fi
-    HS_NETWORK="${HS_NETWORK:-192.168.1.0/24}"
-    info "Rede local detectada: ${HS_NETWORK} (IP ${HS_IP})"
+
+    detected_ip="$(ip -o -4 addr show scope global 2>/dev/null | awk '{split($4,a,"/"); print a[1]; exit}')"
+    detected_network="$(ip -4 route show scope link 2>/dev/null | awk -v ip="${detected_ip}" '$0 ~ ("src " ip) {print $1; exit}')"
+
+    if [[ -n "${HS_IP}" ]]; then
+        detected_ip="${HS_IP}"
+    fi
+    if [[ -n "${detected_ip}" ]]; then
+        HS_IP="${detected_ip}"
+    fi
+    if [[ -n "${detected_network}" ]]; then
+        HS_NETWORK="${detected_network}"
+    fi
+
+    if [[ -z "${HS_IP}" || "${HS_IP}" == "127.0.0.1" ]]; then
+        if [[ "${NON_INTERACTIVE}" -eq 1 || "${ASSUME_YES}" -eq 1 ]]; then
+            error "Não foi possível detectar o endereço IPv4 da rede local."
+            error "Use --network=<CIDR> e HS_IP=<IP> em uma instalação não-interativa."
+            exit 1
+        fi
+        read -r -p "IP local do servidor: " HS_IP
+    fi
+
+    if [[ -z "${HS_NETWORK}" ]]; then
+        if [[ "${NON_INTERACTIVE}" -eq 1 || "${ASSUME_YES}" -eq 1 ]]; then
+            error "Não foi possível detectar a rede local."
+            error "Use --network=<CIDR> em uma instalação não-interativa."
+            exit 1
+        fi
+        read -r -p "Rede local em CIDR (ex.: 192.168.1.0/24): " HS_NETWORK
+    fi
+
+    if [[ ! "${HS_NETWORK}" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}/[0-9]{1,2}$ ]]; then
+        error "Rede inválida: ${HS_NETWORK}"
+        exit 1
+    fi
+
+    info "Rede local: ${HS_NETWORK} (IP ${HS_IP})"
 }
 
 _detect_user() {
-    HS_USER="${SUDO_USER:-${USER:-}}"
-    if [[ -z "${HS_USER}" || "${HS_USER}" == "root" ]]; then
-        HS_USER="usuario"
+    local detected_user="${SUDO_USER:-}"
+
+    if [[ -z "${HS_USER}" ]]; then
+        if [[ -n "${detected_user}" && "${detected_user}" != "root" ]]; then
+            HS_USER="${detected_user}"
+        elif [[ "${NON_INTERACTIVE}" -eq 1 || "${ASSUME_YES}" -eq 1 ]]; then
+            error "Não foi possível determinar o usuário principal."
+            error "Use --user=<usuario> em uma instalação não-interativa."
+            exit 1
+        else
+            read -r -p "Usuário Linux principal existente: " HS_USER
+        fi
     fi
+
+    if [[ -z "${HS_USER}" || "${HS_USER}" == "root" ]]; then
+        error "O usuário principal deve ser um usuário Linux comum."
+        exit 1
+    fi
+
+    if ! id "${HS_USER}" >/dev/null 2>&1; then
+        error "Usuário Linux não encontrado: ${HS_USER}"
+        error "Crie o usuário ou informe um usuário existente com --user=<usuario>."
+        exit 1
+    fi
+
     info "Usuário principal: ${HS_USER}"
 }
 
@@ -127,28 +180,23 @@ _install_docker() {
 
 _check_prerequisites() {
     if [[ "${DRY_RUN}" -eq 1 ]]; then
-        info "dry-run: verificaria Docker, Compose e rede 'homeserver'."
+        info "dry-run: verificaria Docker, Compose, OpenSSL e rede 'homeserver'."
         return 0
     fi
-    command -v docker >/dev/null 2>&1 || {
-        error "Docker não encontrado. Execute o instalador novamente após instalá-lo."
-        exit 1
-    }
-    docker info >/dev/null 2>&1 || {
-        error "Docker daemon não está rodando ou usuário não está no grupo docker."
-        exit 1
-    }
+
+    command -v docker >/dev/null 2>&1 || { error "Docker não encontrado."; exit 1; }
+    docker info >/dev/null 2>&1 || { error "Docker daemon não está rodando."; exit 1; }
     if ! command -v docker compose >/dev/null 2>&1 && ! docker compose version >/dev/null 2>&1; then
         error "Docker Compose não encontrado (plugin v2)."
         exit 1
     fi
+    command -v openssl >/dev/null 2>&1 || { error "OpenSSL não encontrado; ele é necessário para gerar credenciais seguras."; exit 1; }
+
     if ! docker network ls --format '{{.Name}}' | grep -qx homeserver; then
         _run docker network create homeserver
         success "Rede 'homeserver' criada."
     fi
 }
-
-# ---- Diretórios ----------------------------------------------
 
 _create_dirs() {
     mkdir -p "${DEPLOY_ROOT}" \
@@ -169,7 +217,6 @@ _create_dirs() {
 }
 
 _prepare_service_dirs() {
-    # Diretórios de dados montados pelos serviços (containers rodam como UID 1000).
     mkdir -p \
         /srv/services/filebrowser/database \
         /srv/services/filebrowser/config \
@@ -183,11 +230,9 @@ _prepare_service_dirs() {
     success "Diretórios de dados dos serviços preparados."
 }
 
-# ---- API .env ----------------------------------------------
-
 _ask_api_password() {
     if [[ "${NON_INTERACTIVE}" -eq 1 || "${ASSUME_YES}" -eq 1 ]]; then
-        HS_FILEBROWSER_PASS="$(openssl rand -hex 16 2>/dev/null || echo "changeme")"
+        HS_FILEBROWSER_PASS="$(openssl rand -hex 16)"
         warning "Senha do FileBrowser gerada automaticamente (mostrada ao final)."
         return 0
     fi
@@ -210,8 +255,6 @@ _setup_api_env() {
     local env_example="${HS_ROOT}/api/.env.example"
     local env_target="${HS_ROOT}/api/.env"
 
-    _ask_api_password
-
     if [[ -f "${env_target}" ]]; then
         info "api/.env já existe — mantendo valores atuais."
         return 0
@@ -222,27 +265,25 @@ _setup_api_env() {
         exit 1
     fi
 
+    _ask_api_password
+
     if [[ "${DRY_RUN}" -eq 1 ]]; then
         info "dry-run: geraria ${env_target}"
         return 0
     fi
 
-    local token ip
-    token="$(openssl rand -hex 31 2>/dev/null || echo "change-me")"
-    ip="$(ip route get 1 2>/dev/null | awk '{print $NF; exit}')"
-    ip="${ip:-127.0.0.1}"
+    local token
+    token="$(openssl rand -hex 31)"
 
     sed -e "s|^FILEBROWSER_ADMIN_USER=.*|FILEBROWSER_ADMIN_USER=${HS_USER}|" \
         -e "s|^FILEBROWSER_ADMIN_PASS=.*|FILEBROWSER_ADMIN_PASS=${HS_FILEBROWSER_PASS}|" \
-        -e "s|^HS_HOST_IP=.*|HS_HOST_IP=${ip}|" \
+        -e "s|^HS_HOST_IP=.*|HS_HOST_IP=${HS_IP}|" \
         -e "s|^HS_SERVICE_TOKEN=.*|HS_SERVICE_TOKEN=${token}|" \
         "${env_example}" > "${env_target}"
 
     chmod 600 "${env_target}"
     success "api/.env gerado."
 }
-
-# ---- Módulos ----------------------------------------------
 
 _deploy_module() {
     local module="$1"
@@ -252,15 +293,14 @@ _deploy_module() {
 
     [[ -d "${src}" ]] || { warning "Módulo '${module}' não encontrado."; return 1; }
 
-    # Recria o destino limpo (suporta re-instalação sobre estado antigo)
     _run rm -rf "${dst}"
     mkdir -p "${dst}"
     compose_file="$(ls "${src}"/compose.y*ml 2>/dev/null | head -n 1 || true)"
     if [[ -z "${compose_file}" ]]; then
-        warning "Módulo '${module}' não possui compose."; return 1
+        warning "Módulo '${module}' não possui compose."
+        return 1
     fi
 
-    # Copia todo o conteúdo do módulo (compose, Caddyfile, config/, etc.)
     _run cp -r "${src}/." "${dst}/"
 
     if [[ -f "${src}/.env" && -s "${src}/.env" ]]; then
@@ -280,18 +320,13 @@ _deploy_api() {
     success "API implantada."
 }
 
-# ---- Samba ----------------------------------------------
-
 _setup_samba() {
     if ! command -v smbd >/dev/null 2>&1; then
         if [[ "${DRY_RUN}" -eq 1 ]]; then
-            info "dry-run: instalaria samba"; return 0
+            info "dry-run: instalaria samba"
+            return 0
         fi
-        if [[ "${ASSUME_YES}" -eq 1 || "${NON_INTERACTIVE}" -eq 1 ]]; then
-            DEBIAN_FRONTEND=noninteractive apt-get install -y samba
-        else
-            DEBIAN_FRONTEND=noninteractive apt-get install -y samba
-        fi
+        DEBIAN_FRONTEND=noninteractive apt-get install -y samba
     fi
 
     if ! testparm -s 2>/dev/null | grep -q "^\[shared\]"; then
@@ -337,12 +372,11 @@ SMBCONF
     success "Samba iniciado."
 }
 
-# ---- Firewall ----------------------------------------------
-
 _configure_firewall() {
     if ! command -v ufw >/dev/null 2>&1; then
         if [[ "${DRY_RUN}" -eq 1 ]]; then
-            info "dry-run: instalaria ufw"; return 0
+            info "dry-run: instalaria ufw"
+            return 0
         fi
         DEBIAN_FRONTEND=noninteractive apt-get install -y ufw
     fi
@@ -365,8 +399,6 @@ _configure_firewall() {
     success "Firewall configurado (rede ${HS_NETWORK})."
 }
 
-# ---- Automações ----------------------------------------------
-
 _setup_backup() {
     mkdir -p /srv/scripts
     _run cp "${HS_ROOT}/scripts/backup.sh" /srv/scripts/backup.sh
@@ -388,8 +420,6 @@ _setup_power() {
     success "Agendamento configurado (desliga 22h00, religa 07h00)."
 }
 
-# ---- Core -------------------------------------------------
-
 _setup_core() {
     if [[ -f "${HS_ROOT}/core/hs.sh" ]]; then
         chmod +x "${HS_ROOT}/core/hs.sh" 2>/dev/null || true
@@ -407,8 +437,6 @@ _setup_core() {
     fi
 }
 
-# ---- Health Check ----------------------------------------------
-
 _health_check() {
     if [[ "${DRY_RUN}" -eq 1 ]]; then
         info "dry-run: executaria scripts/health-check.sh"
@@ -419,10 +447,8 @@ _health_check() {
     bash "${HS_ROOT}/scripts/health-check.sh"
 }
 
-# ---- Resumo final ----------------------------------------------
-
 _summary() {
-    local ip="${HS_IP:-127.0.0.1}"
+    local ip="${HS_IP}"
 
     echo
     echo "============================================================"
@@ -430,12 +456,12 @@ _summary() {
     echo "============================================================"
     echo
     echo " Acesse:"
-    echo "   Homepage      https://${ip}/"
-    echo "   App           https://${ip}/app"
-    echo "   API           https://${ip}/api/v1/status"
+    echo "   Homepage      https://homeserver.local/"
+    echo "   App           https://homeserver.local/app"
+    echo "   Fallback      https://${ip}/"
     echo
     if [[ -n "${HS_FILEBROWSER_PASS:-}" && "${DRY_RUN}" -ne 1 ]]; then
-        echo " Credenciais do FileBrowser:"
+        echo " Credenciais iniciais do armazenamento:"
         echo "   usuário: ${HS_USER}"
         echo "   senha  : ${HS_FILEBROWSER_PASS}"
         echo
@@ -443,8 +469,6 @@ _summary() {
     echo " Próximos passos: veja docs/FIRST_BOOT.md"
     echo "============================================================"
 }
-
-# ---- Main ----------------------------------------------------
 
 _usage() {
     sed -n 's/^# *//p' "$0" | tail -n +2 | sed -n '1,30p'
@@ -455,6 +479,8 @@ main() {
     for arg in "$@"; do
         case "${arg}" in
             --modules=*) MODULES="${arg#*=}" ;;
+            --user=*) HS_USER="${arg#*=}" ;;
+            --network=*) HS_NETWORK="${arg#*=}" ;;
             --assume-yes) ASSUME_YES=1 ;;
             --non-interactive) NON_INTERACTIVE=1 ;;
             --dry-run) DRY_RUN=1 ;;
@@ -476,8 +502,7 @@ main() {
     _check_prerequisites
 
     if [[ -z "${MODULES}" && -f "${HS_ROOT}/config/services.conf" ]]; then
-        MODULES="$(sed -e '/^[[:space:]]*#/d' -e '/^[[:space:]]*$/d' \
-                    "${HS_ROOT}/config/services.conf" | tr '\n' ',')"
+        MODULES="$(sed -e '/^[[:space:]]*#/d' -e '/^[[:space:]]*$/d' "${HS_ROOT}/config/services.conf" | tr '\n' ',')"
         info "Módulos ativos (config/services.conf): ${MODULES}"
     fi
 
