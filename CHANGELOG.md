@@ -3,58 +3,54 @@
 Todas as mudanças notáveis no HomeServer são documentadas neste arquivo.
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
-## [1.6.0] — em desenvolvimento
+## Em desenvolvimento (baseline v0.1.0 → roadmap v1.0)
 
-### Impressão — fila (ver/cancelar) e modos de qualidade
+> O trabalho a seguir pertence ao **baseline v0.1.0** e ao roadmap de evolução
+> até a **v1.0.0**. As versões v1.x/v2.x são histórico (abaixo).
 
-- **Fila de impressão**: `GET /print/jobs` (ativos 🟡 + concluídos ✅) e
-  `DELETE /print/jobs/:id` (cancelar). Card **Fila de impressão** na tela com
-  botão Cancelar nos trabalhos ativos.
-- **Modos de qualidade**: `economico` (300dpi + P&B), `normal`, `alta`
-  (600dpi+). Select **Qualidade** na tela (♻ Econômico / Normal / ✨ Alta).
-- `lpOptions` passa `ColorModel=Gray` (P&B) e `Resolution` conforme a qualidade.
-- Docs `PRINTING.md` atualizadas (fila + qualidade).
+### Organização e evolução
 
-### Impressão — status, blocos, preview e validações (Fases 1-5)
-
-- **Status da impressora** (`GET /print`): `state` (idle/printing/disabled),
-  `accepting`, `activeJobs` e `lastJob` — via `lpstat -p/-a/-o/-W completed`
-  num único docker run (parse do formato nsenter/locale C). Badge na tela:
-  🟢 Pronta · 🟡 Ocupada · 🔴 Indisponível/Erro + última impressão.
-- **Tela reorganizada em 3 blocos**: (1) Impressora e configuração ·
-  (2) Conteúdo (toggle Texto/Arquivo) · (3) Ações (Visualizar/Imprimir).
-- **Pré-visualização**: texto em `<pre>`, imagem em `<img>`, PDF em `<iframe>`
-  (fallback: "Pré-visualização indisponível…" — nunca bloqueia a impressão).
-- **Validações**: sem impressora/offline desabilita o botão · sem conteúdo
-  bloqueado · arquivo >5 MB pede confirmação · backend rejeita >5 MB (400) ·
-  `bodyLimit` da rota POST /print = 10 MB (base64).
-- Optimização: `getPrintersInfo` em um único `docker run` (~8s → ~4s).
-- Docs `PRINTING.md` e `api/README.md` atualizadas.
-
-### Tela de Impressão (configurações + arquivos)
-
-- **Tela dedicada** `#/print` (Admin) com configurações de impressão:
-  - impressora (lista do CUPS), cor (colorida/PB), papel (A4/A5/Letter/Legal),
-    orientação (retrato/paisagem), intervalo de páginas.
-  - conteúdo por **texto** ou **upload de arquivo** (PDF/TXT/PNG/JPG, base64).
-- API `POST /print` ampliada: `file`, `color`, `media`, `pages`, `orientation`.
-- Navegação: item **Impressão** na sidebar (desktop) e no menu ＋ (mobile);
-  ação "Imprimir" do Meu espaço abre a tela.
-- Docs `PRINTING.md` atualizadas (config, uso e API).
-- Validado: texto+mono/A5/landscape e arquivo base64; 400 sem conteúdo.
+- **Baseline v0.1.0** (auditoria, arquitetura, problemas, limitações, Quality
+  Gate) em `planning/release/baseline-v0.1.0.md`.
+- **Roadmap por FASEs (0-10)** em `planning/roadmap/v1.0.md`. FASEs 0-3
+  concluídas; FASE 4 em andamento.
+- **Mapa CLI→App** em `planning/review/mapa-cli-app.md` (tudo operável pelo App).
+- **Objetivo central** (mínimo funcional, hardware de vida útil longa) em
+  `planning/review/simplicidade-app.md`.
+- **Hardening de segurança**: dados pessoais removidos do histórico Git;
+  dry-run real; autorização verificada (403); secrets fora do repositório.
+- **App**: usuários (criar, trocar senha, excluir com pasta), tokens de API,
+  atualização (verificar/aplicar), discos, navegação por role, PWA instalável.
+- **Testes**: infra 7/7 · API 31/31 · session 12/12 · smoke 7/7 · cli 6/6.
 
 ### Impressão
 
-- **Impressão via CUPS** do host:
-  - `GET /api/v1/print` — lista impressoras (admin).
-  - `POST /api/v1/print` `{text}` — imprime texto (admin; `printer` opcional).
-  - Execução no host via nsenter (o container da API não acessa o CUPS).
-  - **App — Meu espaço**: ação **🖨️ Imprimir** (admin) com diálogo de texto.
-- Impressora Canon PIXMA MG3110 configurada no CUPS (driver Gutenprint).
-- Docs: `docs/PRINTING.md` (configuração, uso e API).
-- Testes: +2 em `test-api.sh` (31 total).
+- **Fila de impressão**: `GET /print/jobs` (ativos + concluídos) e
+  `DELETE /print/jobs/:id` (cancelar). Card **Fila** na tela.
+- **Modos de qualidade**: `economico` (300dpi + P&B), `normal`, `alta` (600dpi+).
+- **Status da impressora** (`GET /print`): state/accepting/activeJobs/lastJob
+  (1 docker run; parse do formato nsenter). Badge 🟢/🟡/🔴 + última impressão.
+- **Tela em 3 blocos**: impressora+config · conteúdo (texto/arquivo) · ações.
+- **Pré-visualização**: texto `<pre>`, imagem `<img>`, PDF `<iframe>`.
+- **Validações**: offline desabilita; sem conteúdo bloqueado; arquivo >20 MB
+  confirmado; backend 400; `bodyLimit` 30 MB (base64).
+- Docs `PRINTING.md` e `api/README.md`.
 
-## [2.0.0-rc.1] — em candidata
+### Segurança e privacidade
+
+- Histórico Git reescrito sem dados pessoais; backup preservado fora do repo.
+- Dry-run do instalador real (não cria dirs/credenciais).
+- Containers sem `privileged`; homepage non-root; restart `unless-stopped`.
+- Autorização: usuário comum → 403 em rotas admin.
+
+### Servidor (saúde / hardware)
+
+- Timers de backup e desligamento noturno reativados (22h → 07h).
+- Health Check ampliado: load, memória e temperatura (alerta >70 °C).
+
+## Histórico (v1.x / v2.x — não fazem parte da linha atual)
+
+### v2.0.0-rc.1 (2026-08-05) — experimental
 
 ### Fixed (acceptance tests)
 
@@ -217,6 +213,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
 - Sessão antiga (TTL 24h) não carregava a role — App não sabia se era admin.
 
+
+## [1.5.0] — 2026-08-05
 
 ### Added
 
