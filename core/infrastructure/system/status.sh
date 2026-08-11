@@ -21,7 +21,7 @@ system_status_json() {
     disk_a="$(get_disk_available)"
     disk_p="$(get_disk_percent)"
 
-    services="$(get_services_status_json)"
+    services="$(get_service_status_json)"
     backup="$(get_backup_last)"
     wol="$(wol_status)"
 

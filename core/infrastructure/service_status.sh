@@ -1,4 +1,4 @@
-get_services_status_json() {
+get_service_status_json() {
     local service state first=1
 
     if ! command -v docker >/dev/null 2>&1; then

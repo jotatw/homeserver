@@ -90,7 +90,7 @@ _load_infrastructure() {
         docker.sh \
         compose.sh \
         service.sh \
-        services_status.sh \
+        service_status.sh \
         users.sh \
         backup.sh \
         events.sh \
