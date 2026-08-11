@@ -19,7 +19,7 @@ services:
       - /dev:/dev:ro
       - /srv/storage:/srv/storage:ro
       - /srv/backup:/srv/backup:ro
-      - //home/usuario/.ssh/id_ed25519:/root/.ssh/id_ed25519:ro
+      - ${HS_SSH_KEY:-/nonexistent}:/root/.ssh/id_ed25519:ro
     restart: unless-stopped
     command: npm run dev
     ports:

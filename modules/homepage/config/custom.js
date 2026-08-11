@@ -134,7 +134,7 @@
     const BASE =
       window.location.hostname === "homeserver.local"
         ? ""
-        : "http://192.168.1.10:8000";
+        : `http://${window.location.hostname}:8000`;
 
     Promise.all([
       fetch(BASE + "/api/v1/version").then((r) => r.json()).catch(() => null),
@@ -210,7 +210,7 @@
   const BASE =
     window.location.hostname === "homeserver.local"
       ? ""
-      : "http://192.168.1.10:8000";
+      : `http://${window.location.hostname}:8000`;
 
   function powerFetch(url, opts) {
     return fetch(url, {

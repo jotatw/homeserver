@@ -15,8 +15,21 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 HS="${PROJECT_ROOT}/core/hs.sh"
 
-ADMIN_USER="${HS_ADMIN_USER:-usuario}"
-ADMIN_PASS="${HS_ADMIN_PASS:-usuario-exemplo}"
+ADMIN_USER="${HS_ADMIN_USER:-}"
+ADMIN_PASS="${HS_ADMIN_PASS:-}"
+
+if [[ -z "${ADMIN_USER}" || -z "${ADMIN_PASS}" ]]; then
+    API_ENV="${PROJECT_ROOT:-${SCRIPT_DIR}/..}/api/.env"
+    if [[ -f "${API_ENV}" ]]; then
+        [[ -z "${ADMIN_USER}" ]] && ADMIN_USER="$(sed -n 's/^FILEBROWSER_ADMIN_USER=//p' "${API_ENV}" | head -1)"
+        [[ -z "${ADMIN_PASS}" ]] && ADMIN_PASS="$(sed -n 's/^FILEBROWSER_ADMIN_PASS=//p' "${API_ENV}" | head -1)"
+    fi
+fi
+
+if [[ -z "${ADMIN_USER}" || -z "${ADMIN_PASS}" ]]; then
+    echo "Erro: defina HS_ADMIN_USER e HS_ADMIN_PASS (ou configure api/.env com FILEBROWSER_ADMIN_USER/PASS)." >&2
+    exit 1
+fi
 
 PASS=0
 FAIL=0

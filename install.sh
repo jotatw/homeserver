@@ -199,6 +199,10 @@ _check_prerequisites() {
 }
 
 _create_dirs() {
+    if [[ "${DRY_RUN}" -eq 1 ]]; then
+        info "dry-run: criaria a estrutura /srv (storage, services, backup, logs, scripts)"
+        return 0
+    fi
     mkdir -p "${DEPLOY_ROOT}" \
              /srv/docker/volumes \
              /srv/storage/users \
@@ -217,16 +221,19 @@ _create_dirs() {
 }
 
 _prepare_service_dirs() {
+    if [[ "${DRY_RUN}" -eq 1 ]]; then
+        info "dry-run: criaria as pastas de dados dos serviços e ajustaria o dono (UID 1000)"
+        return 0
+    fi
     mkdir -p \
         /srv/services/filebrowser/database \
         /srv/services/filebrowser/config \
         /srv/services/filebrowser/backups \
         /srv/services/gitea
 
-    if [[ -n "${HS_USER:-}" && "${HS_USER}" != "root" ]]; then
-        chown -R "${HS_USER}:${HS_USER}" /srv/services 2>/dev/null || true
-        chown -R "${HS_USER}:${HS_USER}" /srv/storage 2>/dev/null || true
-    fi
+    # O container roda como UID 1000 — dono padrão das pastas de serviço.
+    chown -R 1000:1000 /srv/services 2>/dev/null || true
+    chown -R 1000:1000 /srv/storage 2>/dev/null || true
     success "Diretórios de dados dos serviços preparados."
 }
 
@@ -272,13 +279,21 @@ _setup_api_env() {
         return 0
     fi
 
-    local token
+    local token ssh_key home_dir
     token="$(openssl rand -hex 31)"
+
+    # Detecta a chave SSH do usuário principal (para o update via git).
+    home_dir="$(getent passwd "${HS_USER}" | cut -d: -f6 || true)"
+    ssh_key=""
+    if [[ -n "${home_dir}" && -f "${home_dir}/.ssh/id_ed25519" ]]; then
+        ssh_key="${home_dir}/.ssh/id_ed25519"
+    fi
 
     sed -e "s|^FILEBROWSER_ADMIN_USER=.*|FILEBROWSER_ADMIN_USER=${HS_USER}|" \
         -e "s|^FILEBROWSER_ADMIN_PASS=.*|FILEBROWSER_ADMIN_PASS=${HS_FILEBROWSER_PASS}|" \
         -e "s|^HS_HOST_IP=.*|HS_HOST_IP=${HS_IP}|" \
         -e "s|^HS_SERVICE_TOKEN=.*|HS_SERVICE_TOKEN=${token}|" \
+        -e "s|^HS_SSH_KEY=.*|HS_SSH_KEY=${ssh_key}|" \
         "${env_example}" > "${env_target}"
 
     chmod 600 "${env_target}"

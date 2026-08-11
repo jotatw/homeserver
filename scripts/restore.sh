@@ -49,9 +49,9 @@ fi
 echo
 echo "Corrigindo propriedade (backup foi criado como root)..."
 chown -R 1000:1000 /srv/services
-chown -R usuario:usuario /srv/storage
-chown -R usuario:usuario /srv/git
-chown -R usuario:usuario /srv/docker/compose
+chown -R 1000:1000 /srv/storage
+chown -R 1000:1000 /srv/git
+chown -R 1000:1000 /srv/docker/compose
 
 echo
 echo "Restauração concluída."
