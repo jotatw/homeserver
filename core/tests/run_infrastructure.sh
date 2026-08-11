@@ -26,8 +26,16 @@ run_test \
     "${SCRIPT_DIR}/infrastructure/test_backup.sh"
 
 run_test \
+    "Storage" \
+    "${SCRIPT_DIR}/infrastructure/test_storage.sh"
+
+run_test \
     "Services" \
     "${SCRIPT_DIR}/infrastructure/test_service.sh"
+
+run_test \
+    "Services Status" \
+    "${SCRIPT_DIR}/infrastructure/test_service_status.sh"
 
 show_summary
 
