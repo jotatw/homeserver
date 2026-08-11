@@ -77,8 +77,7 @@ _load_foundation() {
         config.sh \
         output.sh \
         validation.sh \
-        filesystem.sh \
-        registry.sh
+        filesystem.sh
 }
 #
 # Carrega os componentes da Infrastructure.

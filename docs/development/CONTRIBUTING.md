@@ -78,7 +78,7 @@ Cada camada usa um prefixo próprio, comunicando sua responsabilidade.
 
 | Camada | Prefixo | Exemplos |
 |--------|---------|----------|
-| Foundation | `hs_*` | `hs_fs_*`, `hs_cfg_*`, `hs_val_*`, `hs_out_*`, `hs_const_*`, `hs_registry_*` |
+| Foundation | `hs_*` | `hs_fs_*`, `hs_cfg_*`, `hs_val_*`, `hs_out_*` (constantes via `readonly`) |
 | Infrastructure | prefixo do módulo | `storage_*`, `users_*`, `devices_*`, `hardware_*`, `backup_*`, `scheduler_*`, `power_*`, `compose_*`, `service_*` |
 | Adapters | `filebrowser_*` | `filebrowser_login`, `filebrowser_create_user` |
 | CLI | `hs <comando> <subcomando>` | `hs user create`, `hs system status` |
