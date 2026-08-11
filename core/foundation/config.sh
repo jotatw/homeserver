@@ -90,3 +90,9 @@ readonly HS_WORKSPACE_DIRECTORIES=(
     "${HS_PROJECT_BACKUP_DIR}"
     "${HS_PROJECT_SERVICES_DIR}"
 )
+
+# ----------------------------------------------------------
+# Configuração de serviços
+# ----------------------------------------------------------
+
+readonly HS_SERVICES_CONF="${HS_PROJECT_ROOT}/config/services.conf"
