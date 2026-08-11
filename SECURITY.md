@@ -1,36 +1,40 @@
-# Security Policy
+# Política de Segurança
 
-## Supported Versions
+## Versões suportadas
 
-Security fixes are applied to the actively maintained release line.
+O projeto segue a linha de versões publicada no `CHANGELOG.md`.
 
-| Version | Support |
+| Versão | Suporte |
 |---|---|
-| v2.x | Supported |
-| v1.x | Maintenance only while v2.0 is being finalized |
-| Older releases | Unsupported |
+| v2.x | Suportada |
+| v1.x | Manutenção enquanto a v2.0 é finalizada |
+| Versões anteriores | Não suportadas |
 
-## Reporting a Vulnerability
+Correções de segurança devem ser aplicadas preferencialmente à versão mais recente suportada.
 
-Do not open a public GitHub issue for an undisclosed security vulnerability.
+## Reportando uma vulnerabilidade
 
-Report the problem privately through the repository's available GitHub security reporting channel. Include:
+Não abra uma issue pública do GitHub para uma vulnerabilidade de segurança ainda não divulgada.
 
-- affected version;
-- affected component or file;
-- steps to reproduce;
-- expected and actual behavior;
-- possible impact;
-- any suggested mitigation, if known.
+Reporte o problema de forma privada pelo canal de segurança disponível no repositório. Inclua:
 
-Please do not include passwords, API tokens, private keys, personal data, or other secrets in a report.
+- versão afetada;
+- componente ou arquivo afetado;
+- passos para reproduzir;
+- comportamento esperado e comportamento observado;
+- possível impacto;
+- mitigação sugerida, se conhecida.
 
-## Scope
+Não inclua senhas, tokens de API, chaves privadas, dados pessoais ou outros segredos no relatório.
 
-Security reports may concern the HomeServer core, API, installation process, authentication, update mechanism, Docker configuration, storage permissions, or other code maintained by this repository.
+## Escopo
 
-Third-party services bundled or integrated by HomeServer may have their own security policies. When appropriate, vulnerabilities should also be reported to the upstream project.
+Relatórios podem envolver o Core, API, instalador, autenticação, mecanismo de atualização, configuração Docker, permissões de armazenamento ou outros componentes mantidos neste repositório.
 
-## General Guidance
+Serviços de terceiros integrados ao HomeServer podem possuir suas próprias políticas de segurança. Quando apropriado, vulnerabilidades também devem ser reportadas ao projeto responsável pelo serviço.
 
-HomeServer is designed primarily for trusted local networks. Do not expose the API or administrative interfaces directly to the public internet unless an appropriate security layer is intentionally configured.
+## Orientações gerais
+
+O HomeServer foi projetado principalmente para redes locais confiáveis. Não exponha a API ou interfaces administrativas diretamente à internet pública sem configurar deliberadamente uma camada de segurança adequada.
+
+Mantenha o sistema atualizado, utilize credenciais próprias para cada instalação e nunca versione arquivos `.env`, tokens ou chaves privadas.
