@@ -9,8 +9,10 @@ services:
     security_opt:
       - no-new-privileges:true
 
+    user: "${PUID:-1000}:${PGID:-1000}"
+
     group_add:
-      - "989"
+      - "${PGID:-1000}"
 
     environment:
       TZ: ${TZ}
