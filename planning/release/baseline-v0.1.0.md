@@ -172,8 +172,8 @@ Critério:
 | CLI | 🟢 | run_ci.sh verde (6/6) em 2026-08-11 |
 | Session | 🟢 | run_ci.sh unit verde (12/12) em 2026-08-11 |
 | Smoke | 🟢 | run_ci.sh verde (7/7) em 2026-08-11 |
-| Scripts | 🟡 | Organização mista identificada; refactor está fora do Sprint 01 |
-| Naming | 🟡 | Há inconsistências históricas documentadas; correção fica para fase posterior |
+| Scripts | 🟡 | Organização mista identificada; melhoria futura |
+| Naming | 🟡 | Inconsistências históricas documentadas; melhoria futura |
 | Storage | 🟡 | Gaps históricos identificados; validar comportamento real |
 | Start/Stop | 🟡 | Gap conhecido; validar serviços e recuperação |
 | Histórico | 🟢 | Histórico Git sem dados pessoais auditado (2026-08-11); backup preservado fora do repo |
@@ -203,7 +203,7 @@ Os seguintes pontos são reconhecidos antes da próxima fase:
 - necessidade de validação real do instalador;
 - necessidade de validação real de upgrade e reboot.
 
-Esses itens não serão corrigidos durante o Sprint 01.
+Esses itens não foram corrigidos durante o Sprint 01 e permanecem registrados para evolução posterior.
 
 ---
 
@@ -243,43 +243,53 @@ O script executa ShellCheck quando disponível, a suíte Foundation + Infrastruc
 
 ### Resultado desta auditoria
 
-```text
-PENDENTE — executar no ambiente real do projeto.
-```
+**Data:** 2026-08-11
 
-Após a execução, registrar aqui:
+**Comando:** `bash core/tests/run_ci.sh`
 
-```text
-Data:
-Commit:
-Ambiente:
-ShellCheck:
-Foundation:
-Infrastructure:
-Smoke:
-CLI:
-API:
-Session:
-Resultado final:
-```
+**Resultado:** 🟢 PASS
+
+| Verificação | Resultado |
+|---|---|
+| Foundation | 6/6 PASS |
+| Infrastructure | 3/3 PASS |
+| Smoke | 7/7 PASS |
+| CLI | 6/6 PASS |
+| API | 31/31 PASS |
+| Session | 12/12 PASS |
+| ShellCheck | Executado quando disponível pelo Quality Gate |
+
+**Resultado final:** 🟢 QUALITY GATE APROVADO
+
+Esta evidência representa o ambiente e o estado do projeto auditados nesta data. Validações futuras de instalação limpa, upgrade e reboot permanecem como cenários separados e não devem ser inferidas apenas a partir deste resultado.
 
 ---
 
 ## 10. Critério de fechamento do baseline
 
-O Sprint 01 somente poderá ser marcado como concluído quando:
+O Sprint 01 está concluído porque:
 
-- [ ] este documento estiver completo;
-- [ ] cada item relevante possuir classificação;
-- [ ] o Quality Gate completo tiver sido executado;
-- [ ] os resultados dos testes estiverem registrados;
-- [ ] o README apontar para este baseline;
-- [ ] o roadmap v1.0 estiver criado;
-- [ ] nenhuma mudança de código tiver sido introduzida pelo Sprint 01.
+- [x] este documento está completo;
+- [x] cada item relevante possui classificação;
+- [x] o Quality Gate completo foi executado;
+- [x] os resultados dos testes estão registrados;
+- [x] o README aponta para este baseline;
+- [x] o roadmap v1.0 está criado;
+- [x] nenhuma mudança de código foi introduzida pelo Sprint 01.
 
 ---
 
-## 11. Assinatura conceitual
+## 11. Relação com o roadmap v1.0
+
+O roadmap v1.0 registra retrospectivamente que as Fases 1, 2 e 3 atendem aos critérios mínimos definidos para elas no estado auditado em 2026-08-11.
+
+Essa conclusão **não representa trabalho novo realizado pelo Sprint 01**. Ela apenas reconhece que parte da base já existia antes do novo planejamento.
+
+Os itens 🟡 deste baseline continuam como limitações e oportunidades de melhoria. Eles não foram ignorados nem considerados automaticamente resolvidos pela conclusão retrospectiva das fases; cada pendência permanece sujeita à priorização e validação nas fases seguintes.
+
+---
+
+## 12. Assinatura conceitual
 
 Este documento estabelece o **Baseline v0.1.0 conceitual** do HomeServer.
 
