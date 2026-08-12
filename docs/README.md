@@ -13,10 +13,12 @@ Bem-vindo à documentação técnica do HomeServer.
 | `architecture/` | Detalhamento do Core, Infrastructure e decisões arquiteturais. |
 | `design/` | Design System e especificações da aplicação. |
 | `security/` | Threat model, premissas e auditorias de segurança. |
-| `guide/` | Guia conceitual e histórico para montar e evoluir um HomeServer. |
 | `INSTALLATION.md` | Instalação operacional detalhada. |
 | `FIRST_BOOT.md` | Validação e primeiros passos após a instalação. |
 | `FAQ.md` | Dúvidas e problemas frequentes. |
+
+> O guia conceitual/histórico (experiências de construção) foi arquivado em
+> `planning/archive/guide/` — fora da documentação técnica ativa.
 
 ## Planejamento (`planning/`)
 

@@ -28,11 +28,12 @@ export async function appRoutes(fastify: FastifyInstance) {
 
     fastify.get("/app", serve("index.html"));
 
-    fastify.get("/app/:file", (req, reply) => {
-        const { file } = req.params as { file: string };
+    // Serve os estáticos do App (html/css/js/assets) em /app/<caminho>.
+    fastify.get("/app/*", (req, reply) => {
+        const file = (req.params as Record<string, string>)["*"] ?? "";
 
-        // Apenas arquivos estáticos da pasta do App (sem path traversal).
-        if (!file.includes(".") || file.includes("..")) {
+        // Apenas arquivos estáticos (sem path traversal).
+        if (!file.includes(".") || file.includes("..") || file.startsWith("/")) {
             return reply.code(404).send("Not found");
         }
 

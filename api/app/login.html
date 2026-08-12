@@ -6,10 +6,10 @@
   <meta name="theme-color" content="#0f172a">
   <title>Entrar — HomeServer</title>
   <link rel="manifest" href="/app/manifest.json">
-  <link rel="icon" type="image/png" href="/app/icon-192.png">
-  <link rel="apple-touch-icon" href="/app/icon-192.png">
-  <link rel="stylesheet" href="/app/theme.css">
-  <link rel="stylesheet" href="/app/style.css">
+  <link rel="icon" type="image/png" href="/app/assets/icon-192.png">
+  <link rel="apple-touch-icon" href="/app/assets/icon-192.png">
+  <link rel="stylesheet" href="/app/css/theme.css">
+  <link rel="stylesheet" href="/app/css/style.css">
 </head>
 <body>
   <div class="login-shell">
@@ -32,8 +32,8 @@
       <p class="host" id="login-host"></p>
     </div>
   </div>
-  <script src="/app/auth.js"></script>
-  <script src="/app/login.js"></script>
+  <script src="/app/js/auth.js"></script>
+  <script src="/app/js/login.js"></script>
   <script>
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("/app/sw.js");
