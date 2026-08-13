@@ -188,11 +188,14 @@ alterações arbitrárias na Foundation ou na Infrastructure.
 
 A definição atual do projeto é:
 
-> Um módulo é qualquer componente que possa ser instalado, atualizado ou
-> removido sem alterar a Foundation nem a Infrastructure do HomeServer.
+> Um módulo é um componente que pode evoluir de forma independente,
+> reutilizando contratos da plataforma e sem exigir alterações arbitrárias na
+> Foundation ou Infrastructure apenas para existir.
 
-A estrutura definitiva e o contrato de módulos ainda serão definidos antes de
-se tornarem uma interface oficial da plataforma.
+Independência arquitetural não significa que instalação, atualização ou remoção
+já estejam implementadas como uma interface oficial. Esses comportamentos fazem
+parte do futuro contrato de modularidade e deverão ser definidos, validados e
+documentados antes da criação de um sistema oficial de módulos.
 
 Até essa definição, novos componentes não devem assumir mecanismos implícitos
 de descoberta, carregamento ou configuração automática que ainda não foram
