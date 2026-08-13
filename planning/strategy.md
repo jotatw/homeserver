@@ -134,7 +134,7 @@ HomeServer App
 API
    │
    ▼
-Capacidades da Plataforma
+Capacidade da Plataforma
    │
    ▼
 Infrastructure / Adapters / Serviços
@@ -147,9 +147,11 @@ Por isso, a evolução deve preferir:
 ```text
 Capacidade da plataforma
         ↓
-Contrato da API
+Contrato apropriado
         ↓
-Operação no App
+API, quando exposta a clientes
+        ↓
+App / CLI / Integrações
 ```
 
 O CLI continua sendo importante para instalação, recuperação, automação,
@@ -169,7 +171,7 @@ Plataforma
    ↓
 Operação centralizada
    ↓
-Modularidade
+Preparação para modularidade
    ↓
 Módulos Oficiais
    ↓
@@ -196,16 +198,18 @@ meio do App e da API.
 A prioridade é transformar capacidades técnicas em operações compreensíveis e
 orientadas à intenção do usuário.
 
-### Fase 4 — Modularidade
+### Fase 4 — Preparação para modularidade
 
-Permitir que a plataforma cresça sem aumentar a complexidade do Core: sistema
-de módulos, instalação, atualização, remoção, configuração e versionamento.
+Preparar serviços e componentes para evoluírem de forma independente, com
+responsabilidades claras, dependências explícitas e contratos reutilizáveis,
+sem criar prematuramente um sistema de plugins ou módulos automáticos.
 
 ### Fase 5 — Módulos Oficiais
 
-Disponibilizar funcionalidades através de módulos independentes, quando esse
-modelo estiver definido e estável. Cada usuário deve poder utilizar apenas as
-capacidades necessárias.
+Disponibilizar funcionalidades através de módulos independentes somente após o
+contrato de modularidade estar definido, validado e documentado por decisão
+arquitetural. Instalação, atualização, remoção, configuração e versionamento
+fazem parte desse contrato e não devem ser assumidos antes de sua definição.
 
 ### Fase 6 — Ecossistema
 
