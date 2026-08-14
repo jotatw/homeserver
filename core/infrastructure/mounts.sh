@@ -56,7 +56,7 @@ mount_device() {
 }
 
 #
-# Desmonta um dispositivo montado.
+# Desmonta um dispositivo montado (e remove o diretório órfão).
 #
 # Uso: unmount_device <tipo> <rótulo>
 #
@@ -67,13 +67,28 @@ unmount_device() {
     target="$(mount_target "${type}" "${label}")"
 
     sudo systemd-umount "${target}"
+    rmdir "${target}" 2>/dev/null || true
 }
 
 #
-# Ejeta um dispositivo.
+# Ejeta um dispositivo (e limpa os pontos de montagem sob devices/).
 #
 # Uso: eject_device <dispositivo>   (ex.: sdb)
 #
 eject_device() {
-    sudo eject "/dev/${1}"
+    local dev="/dev/${1}"
+    local target
+
+    # Desmonta e remove diretórios locais do dispositivo antes de ejetar.
+    while read -r target; do
+        [[ -n "${target}" ]] || continue
+        case "${target}" in
+            "${HS_DEVICES_ROOT}"/*)
+                sudo systemd-umount "${target}" 2>/dev/null || true
+                rmdir "${target}" 2>/dev/null || true
+                ;;
+        esac
+    done < <(findmnt -rn -o SOURCE,TARGET | awk -v d="${dev}" '($1 == d) || ($1 ~ "^" d "[0-9]") {print $2}')
+
+    sudo eject "${dev}"
 }

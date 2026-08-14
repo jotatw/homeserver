@@ -418,21 +418,28 @@ _setup_backup() {
     mkdir -p /srv/scripts
     _run cp "${HS_ROOT}/scripts/backup.sh" /srv/scripts/backup.sh
     _run chmod +x /srv/scripts/backup.sh
-    _run cp "${HS_ROOT}/scripts/homeserver-backup.service" /etc/systemd/system/
-    _run cp "${HS_ROOT}/scripts/homeserver-backup.timer" /etc/systemd/system/
-    _run systemctl daemon-reload
-    _run systemctl enable --now homeserver-backup.timer
+    _run bash "${HS_ROOT}/core/hs.sh" scheduler init
+    _run bash "${HS_ROOT}/core/hs.sh" scheduler enable backup
     success "Backup configurado (diário às 03h)."
 }
 
 _setup_power() {
     _run cp "${HS_ROOT}/scripts/power-schedule.sh" /srv/scripts/power-schedule.sh
     _run chmod +x /srv/scripts/power-schedule.sh
-    _run cp "${HS_ROOT}/scripts/homeserver-night-off.service" /etc/systemd/system/
-    _run cp "${HS_ROOT}/scripts/homeserver-night-off.timer" /etc/systemd/system/
-    _run systemctl daemon-reload
-    _run systemctl enable --now homeserver-night-off.timer
+    _run bash "${HS_ROOT}/core/hs.sh" scheduler init
+    _run bash "${HS_ROOT}/core/hs.sh" scheduler enable night-off
     success "Agendamento configurado (desliga 22h00, religa 07h00)."
+}
+
+_setup_devices() {
+    # Autodeteccao de perifericos removiveis (USB/SD) via udev + systemd-mount.
+    _run mkdir -p /etc/udev/rules.d /srv/automation/hooks
+    _run cp "${HS_ROOT}/scripts/90-homeserver-devices.rules" /etc/udev/rules.d/
+    _run cp "${HS_ROOT}/scripts/handle-device.sh" /usr/local/bin/handle-device.sh
+    _run chmod +x /usr/local/bin/handle-device.sh
+    _run udevadm control --reload-rules
+    _run udevadm trigger
+    success "Dispositivos configurados (hotplug USB/SD via udev)."
 }
 
 _setup_core() {
@@ -521,14 +528,14 @@ main() {
         info "Módulos ativos (config/services.conf): ${MODULES}"
     fi
 
-    _step 1 8 "Criando diretórios"
+    _step 1 9 "Criando diretórios"
     _create_dirs
     _prepare_service_dirs
 
-    _step 2 8 "Gerando api/.env"
+    _step 2 9 "Gerando api/.env"
     _setup_api_env
 
-    _step 3 8 "Implantando módulos"
+    _step 3 9 "Implantando módulos"
     local m
     IFS=',' read -ra MODULE_LIST <<< "${MODULES}"
     for m in "${MODULE_LIST[@]}"; do
@@ -538,20 +545,23 @@ main() {
         esac
     done
 
-    _step 4 8 "Implantando API"
+    _step 4 9 "Implantando API"
     _deploy_api
 
-    _step 5 8 "Inicializando Core (CLI)"
+    _step 5 9 "Inicializando Core (CLI)"
     _setup_core
 
-    _step 6 8 "Configurando firewall"
+    _step 6 9 "Configurando firewall"
     if _yesno "Configurar firewall UFW?"; then _configure_firewall; fi
 
-    _step 7 8 "Automações (backup e energia)"
+    _step 7 9 "Automações (backup e energia)"
     if _yesno "Configurar backup automático (diário às 03h)?"; then _setup_backup; fi
     if _yesno "Configurar agendamento liga/desliga (22h00/07h00)?"; then _setup_power; fi
 
-    _step 8 8 "Health Check"
+    _step 8 9 "Dispositivos (hotplug USB/SD)"
+    _setup_devices
+
+    _step 9 9 "Health Check"
     _health_check
 
     _summary

@@ -13,17 +13,35 @@ Scripts copiados/utilizados em runtime no servidor (via `install.sh` → `/srv/s
 | `restore.sh` | Restauração de backup |
 | `handle-device.sh` | Ação em eventos de dispositivo (hotplug) |
 
-*(O `install.sh` copia `backup.sh` e `power-schedule.sh` para `/srv/scripts`; as units systemd apontam para lá.)*
+*(O `install.sh` copia `backup.sh` e `power-schedule.sh` para `/srv/scripts`; os timers do scheduler (`hs-task-*`) apontam para lá.)*
 
 ## systemd
 
-Unidades do sistema (copiadas pelo instalador para `/etc/systemd/system/`):
+### Agendamento (canônico — `hs scheduler`)
+
+O backup diário (03h) e a suspensão noturna (22h → religa 07:00 via RTC) são
+**gerenciados pelo scheduler a partir de `config/scheduler.conf`**:
+`hs scheduler init` gera `hs-task-backup.timer` e `hs-task-night-off.timer` em
+`/etc/systemd/system/` (executando `/srv/scripts/backup.sh` e
+`/srv/scripts/power-schedule.sh`). **Não usar timers separados para estas
+tarefas.**
+
+### Wake-on-LAN
 
 | Arquivo | Função |
 |---|---|
-| `homeserver-backup.service` / `.timer` | Backup diário (03h) |
-| `homeserver-night-off.service` / `.timer` | Suspensão noturna (22h) |
-| `homeserver-wol.service` | Wake-on-LAN |
+| `homeserver-wol.service` | Ativa Wake-on-LAN no boot (`ethtool wol g`) |
+
+### Legado (não gerenciar)
+
+| Arquivo | Função |
+|---|---|
+| `homeserver-backup.service` / `.timer` | Histórico (duplicava o backup do scheduler) |
+| `homeserver-night-off.service` / `.timer` | Histórico (duplicava o night-off do scheduler) |
+
+Desabilitados/removidos do instalador em 2026-08-14: a coexistência com o
+scheduler causava **disparo duplo** do `power-schedule.sh` que quebrava o
+religamento noturno (RTC). Preservados apenas como referência.
 
 ## testes
 
