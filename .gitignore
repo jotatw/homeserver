@@ -1,6 +1,10 @@
 # VS Code
 .vscode/
 
+# IDE (IntelliJ)
+.idea/
+*.iml
+
 # Logs
 *.log
 
@@ -37,4 +41,5 @@ services/
 
 # Node
 node_modules/
+api/dist/
 

@@ -10,7 +10,7 @@ revisão e teste antes de integrar.
 | Docker Engine | 29.7.1 | — | ✅ | |
 | Docker Compose | v5.3.1 | — | ✅ | |
 | Node.js (API) | v22.23.2 | node:22-alpine | ✅ | |
-| Debian | 13 (trixie) | — | ✅ | Sistema base |
+| Debian | 12 (bookworm) validado · produção 13 (trixie) | — | ✅ | Base documentada/validada = 12; produção atual em 13 |
 | Bash | distro | — | ✅ | |
 
 ## Serviços (containers)

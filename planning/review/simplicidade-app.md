@@ -144,12 +144,29 @@ Medição real (servidor ocioso):
 
 ### Ações aplicadas (manter saudável, mínimo com qualidade)
 
-- ✅ **Timers reativados**: `homeserver-night-off.timer` (desligamento noturno) e
-  `homeserver-backup.timer` (backup diário) estavam desativados — religados.
 - ✅ **Health Check ampliado**: agora reporta load, memória e temperatura
   (alerta ⚠ >70 °C, falha >85 °C) — `scripts/health-check.sh`.
-- ✅ **Horário alinhado (2026-08-11)**: night-off dispara às **22:00**
-  (timer reinstalado; scheduler.conf e docs também 22:00; religa 07:00 via RTC).
+- ✅ **Agendamento unificado no scheduler** (canônico): backup diário (03h) e
+  night-off (22h → religa 07:00 via RTC) são gerenciados por
+  `config/scheduler.conf` via `hs scheduler` (units `hs-task-backup` /
+  `hs-task-night-off`). **Não usar timers separados para estas tarefas.**
+
+### Incidente 2026-08-14 — timers duplicados (corrigido)
+
+A reativação dos timers legados `homeserver-night-off.timer` /
+`homeserver-backup.timer` (registrada em 08-11) criou **disparo duplo** com as
+tarefas do scheduler (ambos às 22h/03h). Duas invocações de `power-schedule.sh`
+rodavam em corrida: um processo restaurava os wakes (NIC/USB) **enquanto** o
+outro suspendia → despertava imediato (~5s), consumia o alarme do RTC e o ciclo
+22h/07h deixava de religar sozinho (servidor indisponível até ação manual).
+
+- **Correção (2026-08-14)**: `systemctl disable --now
+  homeserver-night-off.timer homeserver-backup.timer` — ficam ativos apenas os
+  timers `hs-task-*` do scheduler.
+- **Validação**: suspend S3 de 90s (`rtcwake -m mem`) religou em ~91s (exit 0);
+  wakes restaurados e wakealarm consumido.
+- **Regressão**: `install.sh` configura backup/energia via `hs scheduler
+  enable` (sem timers legados).
 
 ### Decisões de qualidade de vida (hardware)
 

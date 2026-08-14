@@ -112,7 +112,7 @@ bash install.sh
 ### 7. Documentos de release
 
 - CHANGELOG atualizado (com **Known Issues** quando houver).
-- Checklist da versão (ex.: `v2.0-checklist.md`) — tudo PASS → tag.
+- Checklist da versão (ex.: `planning/archive/release-v2.0/v2.0-checklist.md`) — tudo PASS → tag.
 - Release notes (não técnicas, voltadas ao usuário).
 
 ### 8. Release Candidata
