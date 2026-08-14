@@ -158,7 +158,7 @@ Uma alteração de segurança ou confiabilidade só é considerada validada quan
 
 > "Funcionou para mim" não é evidência suficiente.
 
-Os critérios de validação estão definidos em `planning/quality/pre-release-test-matrix.md` e, para a v2.0, em `planning/release/v2.0-hardening.md`.
+Os critérios de validação estão definidos em `planning/quality/pre-release-test-matrix.md` e o checklist permanente de hardening em `planning/release/hardening.md`.
 
 ## 15. Aplicação
 

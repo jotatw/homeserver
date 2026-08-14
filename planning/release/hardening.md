@@ -188,3 +188,33 @@ Nunca marcar PASS apenas por observação informal.
 A release não pode ser aprovada com item CRÍTICO aberto, vulnerabilidade de autenticação/autorização, instalação quebrada, perda de dados, upgrade quebrado, reboot quebrado, backup não restaurável, Zero Knowledge Test falhando ou Quality Gate vermelho.
 
 Itens ALTO somente podem permanecer com mitigação documentada, justificativa e decisão explícita.
+
+---
+
+## Anexo — Log de hardening
+
+> Registro das correções aplicadas no código-base. Estado por item segundo o
+> fluxo IDENTIFICADO → … → VALIDADO.
+
+### 2026-08-14 — Agendamento de energia: eliminar timers duplicados
+
+**Fenômeno:** o servidor não religava sozinho pelo RTC após o night-off —
+ficava indisponível até o acionamento manual do botão de força.
+
+**Causa raiz (ALTO):** o timer legado `homeserver-night-off.timer` coexistia
+com o `hs-task-night-off.timer` do scheduler (ambos às 22:00). Duas invocações
+de `power-schedule.sh` rodavam em corrida: um processo restaurava os wakes
+(NIC/USB) **enquanto** o outro suspendia → despertar imediato (~5s), alarme RTC
+consumido e ciclo 22h/07h perdido. O mesmo risco existia para o backup
+(`homeserver-backup.timer` + `hs-task-backup.timer`, ambos 03:00).
+
+**Correção (VALIDADO 2026-08-14):**
+
+- `systemctl disable --now homeserver-night-off.timer homeserver-backup.timer`
+  — permanecem ativos apenas `hs-task-night-off.timer` e `hs-task-backup.timer`;
+- `/srv/scripts/power-schedule.sh` sincronizado com o repositório;
+- teste controlado S3: `rtcwake -m mem` +90s → religou em ~91s (`exit 0`),
+  wakes restaurados e wakealarm consumido.
+
+**Regressão:** `install.sh` configura backup/energia via `hs scheduler
+init` + `hs scheduler enable` — sem timers legados.
