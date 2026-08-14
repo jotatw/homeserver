@@ -1,0 +1,18 @@
+# HomeServer — montagem automática de dispositivos removíveis
+#
+# Monta em /srv/storage/devices/<tipo>/<rótulo>/ via systemd-mount.
+# Apenas partições de dispositivos removíveis (ATTRS{removable}=="1").
+#
+# Recarregar: udevadm control --reload-rules && udevadm trigger
+
+ACTION=="add", KERNEL=="sd[b-z][0-9]", ATTRS{removable}=="1", \
+    RUN+="/usr/local/bin/handle-device.sh mount %k"
+
+ACTION=="add", KERNEL=="mmcblk[0-9]p[0-9]", ATTRS{removable}=="1", \
+    RUN+="/usr/local/bin/handle-device.sh mount %k"
+
+ACTION=="remove", KERNEL=="sd[b-z][0-9]", ATTRS{removable}=="1", \
+    RUN+="/usr/local/bin/handle-device.sh unmount %k"
+
+ACTION=="remove", KERNEL=="mmcblk[0-9]p[0-9]", ATTRS{removable}=="1", \
+    RUN+="/usr/local/bin/handle-device.sh unmount %k"
