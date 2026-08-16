@@ -24,19 +24,25 @@ MODULE INSTANCE
 ## Fundamentos
 
 - [Fundamentos da modularização](fundamentos.md)
+- [Alinhamento dos módulos com a M1](m1-alignment.md)
 
-O documento `fundamentos.md` preserva as decisões fechadas nas etapas M1.1 a M1.6:
+O documento `fundamentos.md` preserva as decisões fechadas nas etapas M1.1 a M1.6. As decisões transversais restantes permanecem consolidadas em `planning/architecture/`.
 
-1. informações mínimas que o Core precisa conhecer sobre um módulo;
-2. separação entre serviço, módulo, capacidade e implementação;
-3. descoberta, catálogo e registro conceitual;
-4. dependências e validação pelo Core;
-5. lifecycle administrativo, operacional e de operações;
-6. propriedade, persistência e remoção segura de dados.
+## Grupos planejados
+
+- [Core Platform](core-platform/README.md)
+- [Storage and Data](storage-data/README.md)
+- [Application Services](application-services/README.md)
+- [Media and Entertainment](media-entertainment/README.md)
+- [Access and Network](access-network/README.md)
+- [Automation and Operations](automation-operations/README.md)
+- [Observability and Maintenance](observability-maintenance/README.md)
+- [Security and Resilience](security-resilience/README.md)
+- [Optional and Specialized](optional-specialized/README.md)
+
+Os grupos são uma organização funcional do planejamento. Eles não representam fronteiras obrigatórias de acoplamento técnico.
 
 ## Consolidação M1
-
-As etapas seguintes foram organizadas em documentos transversais da arquitetura:
 
 - [Arquitetura modular](../architecture/README.md)
 - [Integrações](../architecture/integrations.md)
@@ -49,4 +55,4 @@ As etapas seguintes foram organizadas em documentos transversais da arquitetura:
 
 Documentos específicos de grupos ou módulos devem complementar esta base. Eles não devem redefinir unilateralmente os contratos transversais consolidados na M1.
 
-As pendências concretas permanecem registradas na decisão consolidada e devem ser resolvidas antes ou durante a implementação do mecanismo correspondente.
+O planejamento de grupo é considerado fechado quando seu escopo e fronteiras estão definidos. Detalhes concretos de implementação permanecem para as fases correspondentes do roadmap.
