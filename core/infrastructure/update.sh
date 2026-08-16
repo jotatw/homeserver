@@ -30,6 +30,7 @@
 # ==========================================================
 
 HS_REMOTE="${HS_REMOTE:-origin}"
+HS_UPDATE_CHANNEL="${HS_UPDATE_CHANNEL:-v1}"   # linha de release acompanhada (ex.: v1)
 
 #
 # Retorna a versão atual (última tag alcançável do HEAD).
@@ -40,7 +41,8 @@ HS_REMOTE="${HS_REMOTE:-origin}"
 hs_version() {
 
     local version
-    version="$(git -C "${HS_PROJECT_ROOT}" describe --tags --abbrev=0 2>/dev/null || true)"
+    version="$(git -C "${HS_PROJECT_ROOT}" describe --tags --abbrev=0 \
+        --match "v${HS_UPDATE_CHANNEL}.*" 2>/dev/null || true)"
 
     if [[ -z "${version}" ]]; then
         version="$(git -C "${HS_PROJECT_ROOT}" rev-parse --short HEAD 2>/dev/null || echo "desconhecida")"
@@ -51,15 +53,21 @@ hs_version() {
 }
 
 #
-# Última release (tag vX.Y.Z) do remote.
+# Última release (tag vX.Y.Z) da linha atual no remote.
+#
+# A linha é definida por HS_UPDATE_CHANNEL (default "v1"): somente tags
+# `v1.x.y` entram na comparação — tags de outras linhas ficam como histórico.
 #
 # Saída:
 #   vX.Y.Z ou vazio.
 #
 hs_update_latest_remote() {
 
+    local rx="^${HS_UPDATE_CHANNEL//./\.}\."
+
     git -C "${HS_PROJECT_ROOT}" ls-remote --tags --refs "${HS_REMOTE}" \
         | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+(-rc(\.[0-9]+)?)?$' \
+        | grep -E "${rx}" \
         | sort -V \
         | tail -1
 
