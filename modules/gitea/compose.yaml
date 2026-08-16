@@ -2,7 +2,7 @@ services:
   gitea:
 
     # Imagem
-    image: docker.gitea.com/gitea:latest
+    image: gitea/gitea:1.27.0
 
     # Identificação
     container_name: gitea

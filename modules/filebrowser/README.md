@@ -1,5 +1,9 @@
 # FileBrowser
 
+> ⚠️ **Fim de vida (EOL).** O FileBrowser será arquivado em **2026-09-01**,
+> sem novas releases nem correções de segurança. Versão pinada: **v2.63.23**.
+> Política e plano de transição: [`planning/security/filebrowser-eol.md`](../../planning/security/filebrowser-eol.md).
+
 ## Objetivo
 
 O FileBrowser é o gerenciador de arquivos do HomeLab.
