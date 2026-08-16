@@ -2,7 +2,7 @@ services:
   filebrowser:
 
     # Imagem
-    image: filebrowser/filebrowser:latest
+    image: filebrowser/filebrowser:v2.63.23
 
     # Identificação
     container_name: filebrowser
