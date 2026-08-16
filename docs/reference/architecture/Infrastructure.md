@@ -90,7 +90,7 @@ As Applications não executam operações de infraestrutura diretamente.
 
 ## Decisões arquiteturais
 
-Decisões relevantes são registradas em `docs/architecture/adr/`.
+Decisões relevantes são registradas em `docs/reference/architecture/adr/`.
 
 Consulte o [índice de ADRs](adr/README.md).
 

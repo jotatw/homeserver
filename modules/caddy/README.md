@@ -63,7 +63,7 @@ O Caddy usa os certificados da **CA interna do HomeServer** (gerados por
 certificado auto-assinado descartável.
 
 Para o navegador parar de bloquear as páginas, instale a CA **uma vez por
-dispositivo** (guia completo: `docs/tls-local.md`):
+dispositivo** (guia completo: `../../docs/install/tls-local.md`):
 
 ```bash
 # baixe a CA (pré-trust, porta 80)
@@ -72,7 +72,7 @@ curl -k http://192.168.0.10/hs-ca.pem -o hs-ca.pem   # ou homeserver.local
 
 - Linux: copiar `hs-ca.pem` para `/usr/local/share/ca-certificates/` e rodar
   `sudo update-ca-certificates`.
-- Windows/macOS/Android/iOS: ver `docs/tls-local.md`.
+- Windows/macOS/Android/iOS: ver `../../docs/install/tls-local.md`.
 
 Acesso após a instalação:
 

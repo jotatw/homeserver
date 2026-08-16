@@ -163,7 +163,7 @@ Dispara o backup manual (executado no host via nsenter).
 
 ### `GET/POST /api/v1/print`
 
-Impressão via CUPS do host (admin). Ver `docs/PRINTING.md`.
+Impressão via CUPS do host (admin). Ver `../docs/use/PRINTING.md`.
 
 - `GET` — lista impressoras com **status**:
   ```json

@@ -274,8 +274,8 @@ normal após a plataforma estar instalada e configurada.
 
 ## Relação com outros documentos
 
-- `docs/PRINCIPLES.md` define os princípios permanentes.
-- `docs/ARCHITECTURE.md` define as responsabilidades e fronteiras técnicas.
+- `../docs/reference/PRINCIPLES.md` define os princípios permanentes.
+- `../docs/reference/ARCHITECTURE.md` define as responsabilidades e fronteiras técnicas.
 - `planning/vision.md` define onde o projeto pretende chegar.
 - `planning/roadmap/v1.0.md` define as fases concretas até a v1.0.
 - `planning/quality/` registra critérios e evidências de qualidade.

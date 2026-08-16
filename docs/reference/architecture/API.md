@@ -40,7 +40,7 @@ A autenticação utiliza sessões da API para usuários e tokens específicos pa
 
 ## Documentação principal
 
-A referência operacional dos endpoints, autenticação, sessões, variáveis de ambiente e contrato App ↔ API está em [`api/README.md`](../../api/README.md).
+A referência operacional dos endpoints, autenticação, sessões, variáveis de ambiente e contrato App ↔ API está em [`api/README.md`](../../../api/README.md).
 
 As decisões arquiteturais relacionadas à API estão em [`adr/`](adr/).
 

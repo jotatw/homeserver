@@ -181,9 +181,9 @@ A partir desta decisão:
 
 Esta decisão concretiza:
 
-- `docs/PRINCIPLES.md` — App-First Administration, API como fronteira e
+- `docs/reference/PRINCIPLES.md` — App-First Administration, API como fronteira e
   evolução por contratos;
-- `docs/ARCHITECTURE.md` — responsabilidades entre App, API e plataforma;
+- `docs/reference/ARCHITECTURE.md` — responsabilidades entre App, API e plataforma;
 - `planning/strategy.md` — qualidade de vida e operação centralizada;
 - `planning/quality/user-quality-of-life.md` — critérios de maturidade e
   necessidade de terminal.

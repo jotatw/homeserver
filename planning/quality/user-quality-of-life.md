@@ -353,8 +353,8 @@ Validado
 # Relação com outros documentos
 
 - `planning/strategy.md` define qualidade de vida como direção estratégica.
-- `docs/PRINCIPLES.md` define os princípios permanentes.
-- `docs/ARCHITECTURE.md` define as fronteiras entre as camadas.
+- `../docs/reference/PRINCIPLES.md` define os princípios permanentes.
+- `../docs/reference/ARCHITECTURE.md` define as fronteiras entre as camadas.
 - `planning/roadmap/v1.0.md` define as fases de evolução.
 - `planning/release/baseline-v0.1.0.md` registra o estado inicial e suas
   evidências.

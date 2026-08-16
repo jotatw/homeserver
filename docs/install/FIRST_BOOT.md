@@ -107,4 +107,4 @@ Antes de uma atualização importante, mantenha uma cópia do backup disponível
 | `hs` não é encontrado | Use `sudo bash core/hs.sh ...` a partir do diretório do projeto |
 | Serviço em reinício contínuo | `docker ps` e `docker logs <container>` |
 
-Para um diagnóstico mais completo, consulte `docs/INSTALLATION.md`, `docs/FAQ.md` e `QUESTIONS.md`.
+Para um diagnóstico mais completo, consulte `INSTALLATION.md`, `../use/FAQ.md` e `../use/QUESTIONS.md`.

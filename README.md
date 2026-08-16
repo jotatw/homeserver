@@ -256,15 +256,15 @@ sudo bash install.sh
 
 O instalador funciona como um assistente: verifica o sistema, instala o Docker quando necessário, detecta a rede, configura o usuário principal, gera as configurações, implanta os serviços e executa o Health Check.
 
-Para iniciantes, comece por [`QUICKSTART.md`](QUICKSTART.md).
+Para iniciantes, comece por [`docs/install/QUICKSTART.md`](docs/install/QUICKSTART.md).
 
-Perguntas e dúvidas comuns: [`QUESTIONS.md`](QUESTIONS.md).
+Perguntas e dúvidas comuns: [`docs/use/QUESTIONS.md`](docs/use/QUESTIONS.md).
 
 Documentação detalhada:
 
-- [`docs/INSTALLATION.md`](docs/INSTALLATION.md)
-- [`docs/FIRST_BOOT.md`](docs/FIRST_BOOT.md)
-- [`docs/FAQ.md`](docs/FAQ.md)
+- [`docs/install/INSTALLATION.md`](docs/install/INSTALLATION.md)
+- [`docs/install/FIRST_BOOT.md`](docs/install/FIRST_BOOT.md)
+- [`docs/use/FAQ.md`](docs/use/FAQ.md)
 
 ---
 
@@ -326,7 +326,7 @@ Antes de alterar a arquitetura:
 4. crie um ADR quando houver uma nova decisão estrutural;
 5. atualize testes e documentação.
 
-Consulte [`CONTRIBUTING.md`](CONTRIBUTING.md) para regras de contribuição e [`QUESTIONS.md`](QUESTIONS.md) para dúvidas comuns.
+Consulte [`CONTRIBUTING.md`](CONTRIBUTING.md) para regras de contribuição e [`docs/use/QUESTIONS.md`](docs/use/QUESTIONS.md) para dúvidas comuns.
 
 ---
 
@@ -335,22 +335,21 @@ Consulte [`CONTRIBUTING.md`](CONTRIBUTING.md) para regras de contribuição e [`
 A documentação possui responsabilidades diferentes:
 
 ```text
-docs/       → como o HomeServer funciona
+docs/       → como o HomeServer funciona (por objetivo)
 planning/   → para onde o projeto está evoluindo
 ```
 
-Principais pontos de entrada:
+Ponto de entrada: [`docs/README.md`](docs/README.md) — índice organizado por
+**instalar** (`docs/install/`), **usar** (`docs/use/`), **contribuir**
+(`docs/contribute/`) e **referência técnica** (`docs/reference/`).
 
-- `QUICKSTART.md` — instalação rápida;
-- `QUESTIONS.md` — índice das principais dúvidas;
-- `docs/INSTALLATION.md` — instalação detalhada;
-- `docs/FIRST_BOOT.md` — primeiro uso;
-- `docs/FAQ.md` — respostas detalhadas;
-- `docs/ARCHITECTURE.md` — arquitetura;
-- `docs/PRINCIPLES.md` — princípios;
-- `docs/architecture/adr/` — decisões arquiteturais;
-- `docs/design/` — Design System;
-- `planning/` — roadmap, qualidade e visão;
+Principais pontos:
+
+- `docs/install/` — instalação rápida (`QUICKSTART`), detalhada (`INSTALLATION`), primeiro uso (`FIRST_BOOT`) e TLS local;
+- `docs/use/` — Homepage/App, CLI (`hs`), perguntas frequentes (`FAQ`/`QUESTIONS`) e impressão;
+- `docs/contribute/` — contribuição, desenvolvimento e testes;
+- `docs/reference/` — arquitetura, princípios, decisões (ADR), design e segurança;
+- `planning/` — roadmap, qualidade, evolução e arquitetura modular (M1);
 - `planning/release/baseline-v0.1.0.md` — estado de referência do projeto;
 - `CHANGELOG.md` — histórico de versões.
 

@@ -235,11 +235,11 @@ dependências explícitas.
 
 Esta decisão concretiza e complementa:
 
-- `docs/PRINCIPLES.md` — responsabilidades, desacoplamento, serviços,
+- `docs/reference/PRINCIPLES.md` — responsabilidades, desacoplamento, serviços,
   modularidade, contratos e isolamento de falhas;
-- `docs/ARCHITECTURE.md` — fronteiras entre Infrastructure, Adapters, serviços
+- `docs/reference/ARCHITECTURE.md` — fronteiras entre Infrastructure, Adapters, serviços
   e módulos;
-- `docs/architecture/adr/0008-app-api-platform-boundary.md` — clientes dependem
+- `docs/reference/architecture/adr/0008-app-api-platform-boundary.md` — clientes dependem
   de contratos da plataforma;
 - `planning/strategy.md` — modularidade como etapa posterior à consolidação das
   capacidades;
