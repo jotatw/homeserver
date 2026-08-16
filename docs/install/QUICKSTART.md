@@ -9,7 +9,7 @@
 - Conexão com a internet durante a instalação.
 - Uma máquina na mesma rede local para acessar o HomeServer.
 
-Antes de começar, consulte [`QUESTIONS.md`](QUESTIONS.md) se quiser entender os requisitos e as dúvidas mais comuns.
+Antes de começar, consulte [`QUESTIONS.md`](../use/QUESTIONS.md) se quiser entender os requisitos e as dúvidas mais comuns.
 
 ## Passo a passo
 
@@ -53,7 +53,7 @@ https://<IP_DO_SERVIDOR>/
 - **Homepage**: portal principal para acessar os serviços.
 - **App** (`/app`): interface do HomeServer para administração e gerenciamento.
 
-Siga também o guia de [Primeiro Boot](docs/FIRST_BOOT.md) para conhecer o ambiente inicial.
+Siga também o guia de [Primeiro Boot](FIRST_BOOT.md) para conhecer o ambiente inicial.
 
 ### 5. Verifique a instalação
 
@@ -67,10 +67,10 @@ Os componentes principais devem aparecer como saudáveis.
 
 ## Próximos passos
 
-- [Perguntas](QUESTIONS.md)
-- [Instalação detalhada](docs/INSTALLATION.md)
-- [Primeiro Boot](docs/FIRST_BOOT.md)
-- [FAQ detalhado](docs/FAQ.md)
-- [README](README.md)
+- [Perguntas](../use/QUESTIONS.md)
+- [Instalação detalhada](INSTALLATION.md)
+- [Primeiro Boot](FIRST_BOOT.md)
+- [FAQ detalhado](../use/FAQ.md)
+- [README](../../README.md)
 
 > **Critério de qualidade da v2.0:** uma pessoa nova deve conseguir instalar e utilizar o HomeServer seguindo apenas a documentação oficial, sem precisar consultar o código-fonte.

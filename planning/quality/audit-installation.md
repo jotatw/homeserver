@@ -25,9 +25,9 @@
 
 ### Critérios
 
-- [x] `QUICKSTART.md` permite instalar em ~10 min sem saber programar.
-- [x] `docs/INSTALLATION.md` detalha pré-requisitos, flags e o que o instalador faz.
-- [x] `docs/FIRST_BOOT.md` explica o que esperar, validação e primeiras configurações.
+- [x] `docs/install/QUICKSTART.md` permite instalar em ~10 min sem saber programar.
+- [x] `docs/install/INSTALLATION.md` detalha pré-requisitos, flags e o que o instalador faz.
+- [x] `docs/install/FIRST_BOOT.md` explica o que esperar, validação e primeiras configurações.
 - [x] README aponta para o QUICKSTART.
 
 ---

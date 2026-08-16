@@ -1,6 +1,6 @@
 # Instalação
 
-> Documento operacional de instalação. Para a versão rápida, veja [`QUICKSTART.md`](../QUICKSTART.md).
+> Documento operacional de instalação. Para a versão rápida, veja [`QUICKSTART.md`](QUICKSTART.md).
 
 ## Pré-requisitos
 
