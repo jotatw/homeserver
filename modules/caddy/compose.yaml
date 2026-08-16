@@ -10,8 +10,12 @@ services:
       - "80:80"
       - "443:443"
 
+    environment:
+      - LAN_IP=${HS_HOST_IP:-192.168.0.10}
+
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - /srv/config/tls:/etc/tls:ro
       - caddy_data:/data
       - caddy_config:/config
 

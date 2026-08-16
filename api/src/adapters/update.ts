@@ -40,3 +40,39 @@ export async function applyUpdate(noRedeploy: boolean): Promise<Record<string, s
         throw new Error(err.stdout?.trim() || "Falha ao aplicar a atualização.");
     }
 }
+
+/**
+ * Operações de pacotes do sistema (apt) rodam no HOST via nsenter,
+ * pois exigem root (padrão do power/devices). O container da API
+ * não tem privilégios para apt.
+ */
+async function runOnHost(args: string[]): Promise<string> {
+    const { stdout } = await execFileAsync(
+        "docker",
+        [
+            "run", "--rm", "--privileged", "--pid", "host",
+            "debian:bookworm-slim",
+            "nsenter", "-t", "1", "-m", "-u", "-i", "-n", "--",
+            "bash", "/srv/git/homeserver/core/hs.sh", ...args,
+        ],
+        { timeout: 600000 },
+    );
+
+    return stdout.trim();
+}
+
+export interface OsUpdateInfo {
+    upgradable: number;
+    reboot: boolean;
+    refresh: boolean;
+}
+
+export async function checkOsUpdate(): Promise<OsUpdateInfo> {
+    const raw = await runOnHost(["update", "os", "check"]);
+    return JSON.parse(raw) as OsUpdateInfo;
+}
+
+export async function applyOsUpdate(): Promise<Record<string, boolean | number>> {
+    const raw = await runOnHost(["update", "os", "apply"]);
+    return JSON.parse(raw) as Record<string, boolean | number>;
+}

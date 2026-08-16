@@ -12,6 +12,7 @@ Scripts copiados/utilizados em runtime no servidor (via `install.sh` → `/srv/s
 | `power-schedule.sh` | Suspend/agenda de energia (wakes USB/NIC gerenciados) |
 | `restore.sh` | Restauração de backup |
 | `handle-device.sh` | Ação em eventos de dispositivo (hotplug) |
+| `tls-renew.sh` | Renovação periódica da CA/certificados locais (scheduler) |
 
 *(O `install.sh` copia `backup.sh` e `power-schedule.sh` para `/srv/scripts`; os timers do scheduler (`hs-task-*`) apontam para lá.)*
 

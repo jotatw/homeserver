@@ -66,8 +66,10 @@ Comandos:
   scheduler enable|disable|run <tarefa>
   power status|enable|disable
   power set <desliga HH:MM> <liga HH:MM>
+  tls init|renew|status|info
   version
   update check|apply [--no-redeploy]
+  update os check|apply
 EOF
 }
 
@@ -247,6 +249,18 @@ case "${_command}" in
         esac
         ;;
 
+    tls)
+        _subcommand="${2:-}"
+
+        case "${_subcommand}" in
+            init)   tls_init ;;
+            renew)  tls_renew ;;
+            status) tls_status ;;
+            info)   tls_info ;;
+            *)      _usage; exit 1 ;;
+        esac
+        ;;
+
     version)
         hs_version
         ;;
@@ -257,7 +271,14 @@ case "${_command}" in
         case "${_subcommand}" in
             check)  hs_update_check ;;
             apply)  hs_update_apply "${@:3}" ;;
-            *)      echo "Uso: hs update check|apply [--no-redeploy]" >&2; exit 1 ;;
+            os)
+                case "${3:-}" in
+                    check) hs_update_os_check ;;
+                    apply) hs_update_os_apply ;;
+                    *) echo "Uso: hs update os check|apply" >&2; exit 1 ;;
+                esac
+                ;;
+            *)      echo "Uso: hs update check|apply [--no-redeploy] | update os check|apply" >&2; exit 1 ;;
         esac
         ;;
 
