@@ -8,6 +8,25 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 > O trabalho a seguir pertence ao **baseline v0.1.0** e ao roadmap de evolução
 > até a **v1.0.0**. As versões v1.x/v2.x são histórico (abaixo).
 
+### v1.0.0 (preparação, 2026-08-16)
+
+- **HTTPS local (CA interna)**: `hs tls` gera CA + certificados
+  (`/srv/config/tls`) com SANs `homeserver.local`/IP; Caddy passa a servir o
+  certificado da CA; download da CA via `http://…/hs-ca.pem` (pré-trust);
+  renovação automática (tarefa `tls-renew`); guia `docs/install/tls-local.md`.
+- **Atualização de pacotes (apt)**: `hs update os check|apply`, API
+  `GET/POST /api/v1/update/os` e botão no App (Administração → Atualização);
+  execução robusta via `systemd-run` (sobrevive a restarts do docker durante
+  upgrade do docker-ce). Upgrade real aplicado (25 pacotes; kernel 6.12.101).
+- **Release/versão**: `hs update` passa a acompanhar a **linha v1**
+  (`HS_UPDATE_CHANNEL`); tags v2.x viram histórico; `api/package.json` → 1.0.0.
+- **Dependências**: imagens pinadas (filebrowser `v2.63.23` **EOL** · gitea
+  `1.27.0` registro oficial · homepage `v1.13.2`); `npm audit` 0 vulnerávels;
+  `planning/dependencies.md` reconciliado.
+- **Documentação por objetivo**: `docs/` reorganizada em `install/`, `use/`,
+  `contribute/` e `reference/`; índice em `docs/README.md`; links corrigidos.
+- **Meta/CI**: badges (CI/licença), `npm audit` no CI.
+
 ### Organização e evolução
 
 - **Baseline v0.1.0** (auditoria, arquitetura, problemas, limitações, Quality
