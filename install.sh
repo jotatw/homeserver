@@ -442,6 +442,17 @@ _setup_devices() {
     success "Dispositivos configurados (hotplug USB/SD via udev)."
 }
 
+_setup_tls() {
+    # CA interna + certificados locais + renovação semanal.
+    _run mkdir -p /srv/config/tls
+    _run cp "${HS_ROOT}/scripts/tls-renew.sh" /srv/scripts/tls-renew.sh
+    _run chmod +x /srv/scripts/tls-renew.sh
+    _run bash "${HS_ROOT}/core/hs.sh" scheduler init
+    _run bash "${HS_ROOT}/core/hs.sh" scheduler enable tls-renew
+    _run bash "${HS_ROOT}/core/hs.sh" tls init
+    success "TLS local configurado (CA interna + renovação semanal)."
+}
+
 _setup_core() {
     if [[ -f "${HS_ROOT}/core/hs.sh" ]]; then
         chmod +x "${HS_ROOT}/core/hs.sh" 2>/dev/null || true
@@ -528,14 +539,14 @@ main() {
         info "Módulos ativos (config/services.conf): ${MODULES}"
     fi
 
-    _step 1 9 "Criando diretórios"
+    _step 1 10 "Criando diretórios"
     _create_dirs
     _prepare_service_dirs
 
-    _step 2 9 "Gerando api/.env"
+    _step 2 10 "Gerando api/.env"
     _setup_api_env
 
-    _step 3 9 "Implantando módulos"
+    _step 3 10 "Implantando módulos"
     local m
     IFS=',' read -ra MODULE_LIST <<< "${MODULES}"
     for m in "${MODULE_LIST[@]}"; do
@@ -545,23 +556,26 @@ main() {
         esac
     done
 
-    _step 4 9 "Implantando API"
+    _step 4 10 "Implantando API"
     _deploy_api
 
-    _step 5 9 "Inicializando Core (CLI)"
+    _step 5 10 "Inicializando Core (CLI)"
     _setup_core
 
-    _step 6 9 "Configurando firewall"
+    _step 6 10 "Configurando firewall"
     if _yesno "Configurar firewall UFW?"; then _configure_firewall; fi
 
-    _step 7 9 "Automações (backup e energia)"
+    _step 7 10 "Automações (backup e energia)"
     if _yesno "Configurar backup automático (diário às 03h)?"; then _setup_backup; fi
     if _yesno "Configurar agendamento liga/desliga (22h00/07h00)?"; then _setup_power; fi
 
-    _step 8 9 "Dispositivos (hotplug USB/SD)"
+    _step 8 10 "Dispositivos (hotplug USB/SD)"
     _setup_devices
 
-    _step 9 9 "Health Check"
+    _step 9 10 "TLS local (CA interna)"
+    _setup_tls
+
+    _step 10 10 "Health Check"
     _health_check
 
     _summary

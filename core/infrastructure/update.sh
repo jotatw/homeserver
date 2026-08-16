@@ -163,3 +163,126 @@ hs_update_apply() {
     printf '{"from":"%s","to":"%s","backup":"%s"}\n' "${current}" "${target}" "${backup_tag}"
 
 }
+
+# ==========================================================
+# Atualização de pacotes do sistema (apt) — independente do update
+# de código/release. Requer root (sudo no host; runner nsenter na
+# API). Resultado em /var/log/homeserver-os-update.log.
+# ==========================================================
+
+HS_OS_UPDATE_LOG="${HS_OS_UPDATE_LOG:-/var/log/homeserver-os-update.log}"
+
+_sdo() {
+    if [[ "$(id -u)" -eq 0 ]]; then
+        "$@"
+    else
+        sudo "$@"
+    fi
+}
+
+_os_log() {
+    local now
+    now="$(date '+%F %T')"
+    _sdo bash -c "echo '[${now}] $*' >> '${HS_OS_UPDATE_LOG}'" 2>/dev/null || true
+}
+
+_os_apt() {
+    _sdo env DEBIAN_FRONTEND=noninteractive "$@"
+}
+
+#
+# Verifica pacotes atualizáveis do sistema.
+#
+# Saída:
+#   {"upgradable":N,"reboot":0|1,"refresh":true}
+#
+hs_update_os_check() {
+    local upgradable reboot=0
+    upgradable=0
+
+    _sdo apt-get update -qq 2>/dev/null
+    upgradable="$(_sdo /usr/bin/apt list --upgradable 2>/dev/null | grep -c 'upgradable' || true)"
+    [[ -f /var/run/reboot-required ]] && reboot=1
+
+    printf '{"upgradable":%s,"reboot":%s,"refresh":true}\n' "${upgradable}" "${reboot}"
+}
+
+#
+# Detecta se estamos dentro de um container (runner da API).
+# Nesse contexto, upgrades que reiniciam o container runtime (docker-ce,
+# containerd) matariam o processo em execução — por isso o apply é
+# delegado a um unit transient do systemd do HOST (sobrevive ao restart).
+#
+_update_in_container() {
+    [[ -f /.dockerenv ]] || [[ -f /run/.containerenv ]] \
+        || grep -q '/docker/' /proc/1/cgroup 2>/dev/null
+}
+
+#
+# Wrapper do apt usado via systemd-run (roda como root no HOST).
+#
+_update_os_script() {
+    local script="$1"
+    cat > "${script}" <<'EOF'
+#!/usr/bin/env bash
+set -uo pipefail
+export DEBIAN_FRONTEND=noninteractive
+apt-get update >/dev/null 2>&1
+apt-get upgrade -y --with-new-pkgs >/dev/null 2>&1
+apt-get autoremove --purge -y >/dev/null 2>&1
+dpkg --configure -a >/dev/null 2>&1
+dpkg --triggers-only --pending >/dev/null 2>&1
+echo "$?" > /tmp/hs-os-update.status
+EOF
+    chmod +x "${script}"
+}
+
+#
+# Aplica atualização de todos os pacotes do sistema (apt).
+#
+# Retorno:
+#   0 -> Sucesso
+#   1 -> Falha
+#
+hs_update_os_apply() {
+    local status_file reboot=0 upgradable=0 unit ok=0
+
+    _os_log "update os: inicio"
+
+    if _update_in_container; then
+        # Host é o alvo; deleta em unit transient do systemd para
+        # sobreviver a restarts do docker/containerd durante o upgrade.
+        status_file="/tmp/hs-os-update.status"
+        rm -f "${status_file}"
+        _update_os_script "/tmp/hs-os-update.sh"
+
+        _sdo systemd-run --quiet --no-block --unit=hs-os-update \
+            bash /tmp/hs-os-update.sh 2>/dev/null || {
+                _os_log "update os: falha ao agendar via systemd-run"
+                return 1
+            }
+
+        unit="hs-os-update"
+        ok=0
+        for _ in $(seq 1 240); do
+            [[ -f "${status_file}" ]] && { ok=1; break; }
+            sleep 5
+        done
+        [[ "${ok}" -eq 1 ]] || {
+            _os_log "update os: timeout aguardando systemd-run"
+            return 1
+        }
+        _sdo systemctl stop "${unit}" 2>/dev/null || true
+    else
+        _os_apt apt-get update || { _os_log "update os: apt-get update FALHOU"; return 1; }
+        _os_apt apt-get upgrade -y --with-new-pkgs || { _os_log "update os: apt-get upgrade FALHOU"; return 1; }
+        _os_apt apt-get autoremove --purge -y || true
+        _sdo dpkg --configure -a >/dev/null 2>&1 || true
+    fi
+
+    upgradable="$(_sdo /usr/bin/apt list --upgradable 2>/dev/null | grep -c 'upgradable' || true)"
+    [[ -f /var/run/reboot-required ]] && reboot=1
+
+    _os_log "update os: concluido (reboot=${reboot}, pendentes=${upgradable})"
+    printf '{"applied":true,"reboot":%s,"upgradable":%s}\n' "${reboot}" "${upgradable}"
+}

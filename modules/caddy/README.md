@@ -56,10 +56,28 @@ apt install avahi-daemon
 systemctl restart avahi-daemon
 ```
 
-## HTTPS local
+## HTTPS local (CA interna)
 
-O Caddy usa `tls internal` (certificado auto-assinado). O navegador exibirá
-um aviso de segurança na primeira visita — aceite o certificado para
-prosseguir. Acesso:
+O Caddy usa os certificados da **CA interna do HomeServer** (gerados por
+`hs tls init` em `/srv/config/tls`, montados em `/etc/tls`). Não usa
+certificado auto-assinado descartável.
 
-- `https://homeserver.local` (HTTP redireciona para HTTPS)
+Para o navegador parar de bloquear as páginas, instale a CA **uma vez por
+dispositivo** (guia completo: `docs/tls-local.md`):
+
+```bash
+# baixe a CA (pré-trust, porta 80)
+curl -k http://192.168.0.10/hs-ca.pem -o hs-ca.pem   # ou homeserver.local
+```
+
+- Linux: copiar `hs-ca.pem` para `/usr/local/share/ca-certificates/` e rodar
+  `sudo update-ca-certificates`.
+- Windows/macOS/Android/iOS: ver `docs/tls-local.md`.
+
+Acesso após a instalação:
+
+- `https://homeserver.local`
+- `https://192.168.0.10` (o IP está no SAN do certificado)
+
+O certificado é renovado automaticamente (tarefa `tls-renew` do scheduler,
+semanal) e o Caddy é recarregado sem interrupção.

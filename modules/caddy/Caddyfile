@@ -1,5 +1,8 @@
-homeserver.local {
-    tls internal
+# Serviço único para homeserver.local e o IP da LAN.
+# O IP pode ser configurado via LAN_IP (compose) — default 192.168.0.10.
+homeserver.local {$LAN_IP:192.168.0.10} {
+    # Certificado da CA interna (gerado por `hs tls init` em /srv/config/tls).
+    tls /etc/tls/server.pem /etc/tls/server.key
 
     # FileBrowser (remove /files)
     handle_path /files/* {
@@ -24,5 +27,20 @@ homeserver.local {
     # Homepage (padrão)
     handle {
         reverse_proxy homepage:3000
+    }
+}
+
+# CA local para download (porta 80) — instale nos dispositivos antes de
+# confiar no HTTPS. Serve /hs-ca.pem -> /etc/tls/ca.pem.
+http://homeserver.local, http://{$LAN_IP:192.168.0.10} {
+    @ca path /hs-ca.pem
+    handle @ca {
+        root * /etc/tls
+        uri replace /hs-ca.pem /ca.pem
+        file_server
+    }
+
+    handle {
+        redir https://{host}{uri} permanent
     }
 }

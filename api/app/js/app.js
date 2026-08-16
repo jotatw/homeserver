@@ -810,6 +810,53 @@ async function renderAdmin() {
       upBtn.textContent = "⬆️ Verificar atualização";
     }
   });
+
+  // Pacotes do sistema (apt)
+  v.appendChild(el("h3", { class: "section" }, "Pacotes do sistema"));
+  const osBox = el("div", { class: "print-card" });
+  const osBtn = el("button", { class: "btn btn-secondary", id: "up-os-check" }, "🧰 Verificar pacotes (apt)");
+  const osStatus = el("p", { class: "power-hint", id: "up-os-status", style: "margin-top:var(--hs-space-2)" }, "");
+  osBox.appendChild(osBtn);
+  osBox.appendChild(osStatus);
+  v.appendChild(osBox);
+
+  osBtn.addEventListener("click", async () => {
+    osBtn.disabled = true;
+    osStatus.textContent = "Verificando…";
+    try {
+      const d = await apiOrFail("/api/v1/update/os");
+      const reboot = d.reboot ? " · reinicialização pendente" : "";
+      if (d.upgradable > 0) {
+        osStatus.innerHTML = d.upgradable + " pacote(s) disponível(is)" + reboot + ".";
+        const apply = el("button", { class: "btn btn-primary", style: "margin-top:var(--hs-space-2)" }, "🔄 Atualizar pacotes");
+        apply.addEventListener("click", async () => {
+          if (!confirm("Atualizar todos os pacotes do sistema? Isso pode demorar.")) return;
+          apply.disabled = true;
+          apply.textContent = "Atualizando… (pode demorar)";
+          try {
+            const r = await apiOrFail("/api/v1/update/os", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: "{}",
+            });
+            toast("Pacotes atualizados.", "success");
+            osStatus.innerHTML = "Atualizado." + (r.reboot ? " ⚠ Recomenda-se reiniciar o servidor." : "");
+          } catch (err) {
+            toast(err.message || "Falha ao atualizar pacotes.", "error");
+          } finally {
+            apply.remove();
+          }
+        });
+        osBox.appendChild(apply);
+      } else {
+        osStatus.textContent = "Sistema atualizado" + reboot + ".";
+      }
+    } catch (err) {
+      osStatus.textContent = err.message || "Não foi possível verificar os pacotes.";
+    } finally {
+      osBtn.disabled = false;
+    }
+  });
 }
 
 /* ---------- Dialog: senha de usuário (admin) ---------- */
