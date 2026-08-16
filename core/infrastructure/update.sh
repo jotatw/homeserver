@@ -41,8 +41,10 @@ HS_UPDATE_CHANNEL="${HS_UPDATE_CHANNEL:-v1}"   # linha de release acompanhada (e
 hs_version() {
 
     local version
-    version="$(git -C "${HS_PROJECT_ROOT}" describe --tags --abbrev=0 \
-        --match "v${HS_UPDATE_CHANNEL}.*" 2>/dev/null || true)"
+    # HEAD explícito: com `git -C` + `--abbrev=0` a resolução implícita de
+    # HEAD falhava ("No names found") em alguns ambientes.
+    version="$(git -C "${HS_PROJECT_ROOT}" describe HEAD --tags --abbrev=0 \
+        --match "${HS_UPDATE_CHANNEL}.*" 2>/dev/null || true)"
 
     if [[ -z "${version}" ]]; then
         version="$(git -C "${HS_PROJECT_ROOT}" rev-parse --short HEAD 2>/dev/null || echo "desconhecida")"
@@ -63,13 +65,11 @@ hs_version() {
 #
 hs_update_latest_remote() {
 
-    local rx="^${HS_UPDATE_CHANNEL//./\.}\."
-
-    git -C "${HS_PROJECT_ROOT}" ls-remote --tags --refs "${HS_REMOTE}" \
-        | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+(-rc(\.[0-9]+)?)?$' \
-        | grep -E "${rx}" \
-        | sort -V \
-        | tail -1
+    # Chega a release mais recente da linha atual (HS_UPDATE_CHANNEL) que seja
+    # alcançável a partir de origin/main — tags de linhas antigas (v1.x
+    # históricas, v2.x) ficam fora, pois não são ancestrais do main atual.
+    git -C "${HS_PROJECT_ROOT}" describe "${HS_REMOTE}/main" --tags --abbrev=0 \
+        --match "${HS_UPDATE_CHANNEL}.*" 2>/dev/null || true
 
 }
 
