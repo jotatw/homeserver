@@ -2,6 +2,9 @@
 
 > Uma plataforma modular para transformar um computador comum em um servidor doméstico simples, organizado e fácil de expandir.
 
+[![CI](https://img.shields.io/github/actions/workflow/status/jotatw/homeserver/ci.yml?branch=main&label=CI)](https://github.com/jotatw/homeserver/actions/workflows/ci.yml)
+[![Licença](https://img.shields.io/github/license/jotatw/homeserver)](LICENSE)
+
 O **HomeServer** nasceu para dar uma nova vida a computadores antigos e evoluiu para uma plataforma local capaz de integrar armazenamento, usuários, serviços, automações e aplicações em uma única experiência.
 
 A proposta é manter a infraestrutura simples, modular e reutilizável: o HomeServer pode ser usado como servidor doméstico completo ou como base para novos projetos.
