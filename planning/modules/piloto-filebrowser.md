@@ -37,9 +37,23 @@
 hs module instance add filebrowser
 hs module instances
 hs module op filebrowser status
-hs module op filebrowser restart
+
+# Ciclo completo (operacional + administrativo)
+hs module op filebrowser stop      # container para (operacional)
+hs module op filebrowser start     # container volta (operacional)
+hs module op filebrowser disable   # sai de services.conf (administrativo)
+hs module op filebrowser enable    # volta a services.conf (administrativo)
 hs module status filebrowser
 ```
+
+**Resultado validado (2026-08-16):** journal registra as quatro operações
+(append-only); `desired`/`observed` e metadados da instância (`lastOp`,
+`lastOpOk`) atualizados; `services.conf` reflete disable/enable; serviço
+**healthy** e `/files` respondendo **200** após o ciclo.
+
+> Confirma a distinção M1 **operação ≠ estado**: `stop`/`start` mexem no
+> estado operacional do container; `disable`/`enable` mudam apenas o estado
+> administrativo (`config/services.conf`) — o Core valida e registra cada uma.
 
 ## Observação para a substituição
 
