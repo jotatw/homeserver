@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { getDevices, mountDevice, unmountDevice, ejectDevice } from "../adapters/devices.js";
-import { sendOk, sendError } from "../utils/respond.js";
+import { sendOk, sendError, sendInternalError } from "../utils/respond.js";
 import { requireAdmin } from "../plugins/auth.js";
 
 interface DeviceActionBody {
@@ -14,12 +14,14 @@ function isNonEmptyString(value: unknown): value is string {
 }
 
 export async function devicesRoutes(fastify: FastifyInstance) {
-    // Leitura: qualquer usuário autenticado.
-    fastify.get("/api/v1/devices", async (_req, reply) => {
-        return sendOk(reply, await getDevices());
+    fastify.get("/api/v1/devices", async (request, reply) => {
+        try {
+            return sendOk(reply, await getDevices());
+        } catch (error) {
+            return sendInternalError(reply, request.log, error);
+        }
     });
 
-    // Gerenciamento: somente admin.
     fastify.post("/api/v1/devices/mount", { preHandler: requireAdmin }, async (request, reply) => {
         const body = request.body as DeviceActionBody | null;
 
@@ -30,7 +32,7 @@ export async function devicesRoutes(fastify: FastifyInstance) {
         try {
             return sendOk(reply, await mountDevice(body.type!, body.label!, body.device!));
         } catch (error) {
-            return sendError(reply, 500, error instanceof Error ? error.message : String(error));
+            return sendInternalError(reply, request.log, error);
         }
     });
 
@@ -44,7 +46,7 @@ export async function devicesRoutes(fastify: FastifyInstance) {
         try {
             return sendOk(reply, await unmountDevice(body.type!, body.label!));
         } catch (error) {
-            return sendError(reply, 500, error instanceof Error ? error.message : String(error));
+            return sendInternalError(reply, request.log, error);
         }
     });
 
@@ -58,7 +60,7 @@ export async function devicesRoutes(fastify: FastifyInstance) {
         try {
             return sendOk(reply, await ejectDevice(body.device!));
         } catch (error) {
-            return sendError(reply, 500, error instanceof Error ? error.message : String(error));
+            return sendInternalError(reply, request.log, error);
         }
     });
 }
