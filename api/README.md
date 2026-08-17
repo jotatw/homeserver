@@ -99,6 +99,10 @@ App → GET /api/v1/...  (Authorization: Bearer <token>)
 | GET | `/api/v1/services` · `/services/status` | Serviços ativos + estado |
 | GET | `/api/v1/hardware` | Sensores, discos, rede, USB |
 | GET | `/api/v1/devices` | Dispositivos montados |
+| GET | `/api/v1/modules` | Definitions dos módulos (arquitetura M1) |
+| GET | `/api/v1/modules/:id` | Definition de um módulo |
+| GET | `/api/v1/modules/instances` | Instâncias registradas (admin) |
+| POST | `/api/v1/modules/:id/op` | Executa operação de módulo (admin; `{ "op": "start|stop|restart|enable|disable|update|status" }`) |
 | GET | `/api/v1/events` | Eventos recentes (backup, dispositivo, boot) |
 | GET | `/api/v1/users` | Lista usuários (admin) |
 | POST | `/api/v1/users` | Cria usuário (admin) |

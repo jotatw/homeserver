@@ -13,6 +13,7 @@ import { powerRoutes } from "./routes/power.js";
 import { hardwareRoutes } from "./routes/hardware.js";
 import { backupRoutes } from "./routes/backup.js";
 import { tokenRoutes } from "./routes/tokens.js";
+import { moduleRoutes } from "./routes/modules.js";
 import { printRoutes } from "./routes/print.js";
 import { appRoutes } from "./routes/app.js";
 import { authRoutes } from "./routes/auth.js";
@@ -68,6 +69,7 @@ await app.register(powerRoutes);
 await app.register(hardwareRoutes);
 await app.register(backupRoutes);
 await app.register(tokenRoutes);
+await app.register(moduleRoutes);
 await app.register(printRoutes);
 await app.register(appRoutes);
 
