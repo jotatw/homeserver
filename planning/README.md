@@ -24,6 +24,7 @@ planning/
 ├── health/                   # histórico e evidências de saúde
 ├── backlog/                  # itens de trabalho
 ├── review/                   # revisões planejadas
+│   └── levantamento-servicos.md   # estado atual dos serviços → base da modularização
 ├── support/                  # políticas de suporte
 └── archive/                  # documentação histórica
 ```
