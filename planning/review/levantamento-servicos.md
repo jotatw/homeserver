@@ -62,8 +62,11 @@ Para cada serviço: **grupo de módulos** (do `planning/modules/`) + papel conce
 
 ## 6. Achados / gaps (priorizados)
 
-- **S1 — Segredo no repositório**: Bearer token da API **hardcoded** em `modules/homepage/config/services.yaml`. → substituir por variável/placeholder e rotacionar.
-- **S2 — Contrato env**: faltam `.env.example` em 4 módulos → reprodutibilidade/instalação.
+- **S1 — Segredo no repositório** ✅ *resolvido 2026-08-16*: token (que era o
+  `HS_SERVICE_TOKEN`) removido do config e substituído por `{{HOMEPAGE_VAR_API_TOKEN}}`;
+  **rotacionado** no servidor (antigo revogado, novo em `.env`).
+- **S2 — Contrato env** ✅ *resolvido 2026-08-16*: adicionados `.env.example` para
+  filebrowser, gitea, homepage e portainer.
 - **S3 — Desacoplamento**: `docker exec gitea` direto em `users.sh` (FileBrowser já tem adapter). Contra a M1 ("implementações acessadas por adapters").
 - **S4 — Fronteira de integração**: config da Homepage diverge no deploy; widgets apontam para a API; rotas/menu como integração (M1: module ≠ rota/menu) ainda não têm contrato.
 - **S5 — Estado**: `get_service_status_json` = observed state mínimo; faltam desired state/health/validação (M1: operação ≠ estado; execução ≠ sucesso).
