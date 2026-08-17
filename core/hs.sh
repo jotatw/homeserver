@@ -18,6 +18,7 @@
 #   system hostname|os|kernel|architecture|uptime|info
 #   system memory|disk|cpu|load|services|backup|events|status
 #   service list|enable|disable|start|stop|restart|status|update
+#   module definitions|info <id>|status <id>|op <id> <operação>
 #   status
 #   user create <nome> [--password=...] [--gitea]
 #   user rm <nome> [--remove-folder]
@@ -47,6 +48,7 @@ Comandos:
   system memory|disk|cpu|load|services|backup|events|status
   service list
   service enable|disable|start|stop|restart|status|update <serviço>
+  module definitions|info <id>|status <id>|op <id> <operação>
   status
   user create <nome> [--password=...] [--gitea]
   user list
@@ -197,6 +199,18 @@ case "${_command}" in
             unmount) unmount_device "${3:?tipo}" "${4:?rótulo}" ;;
             eject)   eject_device "${3:?dispositivo}" ;;
             *)       _usage; exit 1 ;;
+        esac
+        ;;
+
+    module)
+        _subcommand="${2:-}"
+
+        case "${_subcommand}" in
+            definitions) module_definitions ;;
+            info)        module_definition_read "${3:?id do módulo}" ;;
+            status)      module_status "${3:?id do módulo}" ;;
+            op)          module_op "${3:?id do módulo}" "${4:?operação}" ;;
+            *)           _usage; exit 1 ;;
         esac
         ;;
 

@@ -1,0 +1,24 @@
+{
+  "id": "gitea",
+  "contractVersion": 1,
+  "version": "1.27.0",
+  "title": "Gitea",
+  "description": "Git self-hosted (desenvolvimento doméstico).",
+  "classification": "service",
+  "capabilities": ["git.hosting", "git.http", "git.ssh"],
+  "dependencies": ["storage.persistent"],
+  "resources": [
+    {"kind": "volume", "ref": "data", "path": "/srv/services/gitea"}
+  ],
+  "integrations": [
+    {"kind": "route", "path": "/git"},
+    {"kind": "port", "protocol": "ssh", "port": 2222}
+  ],
+  "operations": ["start", "stop", "restart", "enable", "disable", "update", "status"],
+  "implementation": {
+    "engine": "docker-compose",
+    "path": "compose.yaml",
+    "compatible": ["hs>=1.0.0"]
+  },
+  "health": {"kind": "http", "port": 3001, "path": "/git/"}
+}

@@ -1,0 +1,29 @@
+{
+  "id": "caddy",
+  "contractVersion": 1,
+  "version": "2",
+  "title": "Caddy",
+  "description": "Proxy reverso e acesso unificado (rotas path-based + TLS local).",
+  "classification": "service",
+  "capabilities": ["network.routing", "network.tls", "access.endpoint"],
+  "dependencies": ["network.local", "tls.ca"],
+  "resources": [
+    {"kind": "volume", "ref": "caddy_data", "path": "caddy_data"},
+    {"kind": "volume", "ref": "caddy_config", "path": "caddy_config"},
+    {"kind": "file", "ref": "tls", "path": "/srv/config/tls"}
+  ],
+  "integrations": [
+    {"kind": "route", "path": "/", "target": "homepage"},
+    {"kind": "route", "path": "/files", "target": "filebrowser"},
+    {"kind": "route", "path": "/git", "target": "gitea"},
+    {"kind": "route", "path": "/app", "target": "api"},
+    {"kind": "route", "path": "/api/v1", "target": "api"}
+  ],
+  "operations": ["start", "stop", "restart", "enable", "disable", "update", "status"],
+  "implementation": {
+    "engine": "docker-compose",
+    "path": "compose.yaml",
+    "compatible": ["hs>=1.0.0"]
+  },
+  "health": {"kind": "http", "port": 80, "path": "/"}
+}

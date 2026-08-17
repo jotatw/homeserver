@@ -90,6 +90,7 @@ _load_infrastructure() {
         compose.sh \
         service.sh \
         service_status.sh \
+        modules.sh \
         users.sh \
         backup.sh \
         events.sh \

@@ -38,6 +38,7 @@ IMPLEMENTATION
 - [Versionamento e compatibilidade](versioning-and-compatibility.md)
 - [Operações e recuperação](operations-and-recovery.md)
 - [Decisão consolidada M1](decisions/m1-foundation.md)
+- [Skeleton de implementação (Module Core)](decisions/m1-skeleton-implementation.md) — escolhas concretas de layout/formato/persistência
 
 ## Regra de organização
 

@@ -1,0 +1,24 @@
+{
+  "id": "homepage",
+  "contractVersion": 1,
+  "version": "1.13.2",
+  "title": "Homepage",
+  "description": "Portal de entrada (cards, grupos e widgets do sistema).",
+  "classification": "service",
+  "capabilities": ["ui.portal", "integration.widgets"],
+  "dependencies": ["api.contract"],
+  "resources": [
+    {"kind": "volume", "ref": "config", "path": "config"}
+  ],
+  "integrations": [
+    {"kind": "route", "path": "/"},
+    {"kind": "docker.socket", "ref": "/var/run/docker.sock"}
+  ],
+  "operations": ["start", "stop", "restart", "enable", "disable", "update", "status"],
+  "implementation": {
+    "engine": "docker-compose",
+    "path": "compose.yaml",
+    "compatible": ["hs>=1.0.0"]
+  },
+  "health": {"kind": "http", "port": 3000, "path": "/"}
+}
