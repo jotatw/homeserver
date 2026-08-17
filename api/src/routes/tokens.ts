@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { createApiToken, listApiTokens, revokeApiToken } from "../tokens.js";
-import { sendOk, sendError } from "../utils/respond.js";
+import { sendOk, sendError, sendInternalError } from "../utils/respond.js";
 import { requireAdmin } from "../plugins/auth.js";
 
 function isNonEmptyString(value: unknown): value is string {
@@ -10,11 +10,11 @@ function isNonEmptyString(value: unknown): value is string {
 export async function tokenRoutes(fastify: FastifyInstance) {
     fastify.addHook("preHandler", requireAdmin);
 
-    fastify.get("/api/v1/tokens", async (_req, reply) => {
+    fastify.get("/api/v1/tokens", async (request, reply) => {
         try {
             return sendOk(reply, await listApiTokens());
         } catch (error) {
-            return sendError(reply, 500, error instanceof Error ? error.message : String(error));
+            return sendInternalError(reply, request.log, error);
         }
     });
 
@@ -29,7 +29,7 @@ export async function tokenRoutes(fastify: FastifyInstance) {
             const result = await createApiToken(body.name.trim());
             return sendOk(reply, { ...result.record, token: result.token }, 201);
         } catch (error) {
-            return sendError(reply, 500, error instanceof Error ? error.message : String(error));
+            return sendInternalError(reply, request.log, error);
         }
     });
 
@@ -43,7 +43,7 @@ export async function tokenRoutes(fastify: FastifyInstance) {
             }
             return sendOk(reply, { revoked: id });
         } catch (error) {
-            return sendError(reply, 500, error instanceof Error ? error.message : String(error));
+            return sendInternalError(reply, request.log, error);
         }
     });
 }
