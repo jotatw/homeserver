@@ -687,9 +687,11 @@ function openMountDialog() {
 /* ---------- Administração (admin) ---------- */
 
 async function renderAdmin() {
-  const [users, tokens] = await Promise.all([
+  const [users, tokens, mods, instances] = await Promise.all([
     api("/api/v1/users"),
     api("/api/v1/tokens"),
+    api("/api/v1/modules"),
+    api("/api/v1/modules/instances"),
   ]);
   const v = document.getElementById("view");
   v.innerHTML = "";
@@ -763,6 +765,51 @@ async function renderAdmin() {
   const createBtn = el("button", { class: "btn btn-secondary", style: "margin-top:var(--hs-space-2)" }, "🔑 Criar token");
   createBtn.addEventListener("click", () => openTokenDialog());
   v.appendChild(createBtn);
+
+  // Módulos (arquitetura modular — M1)
+  v.appendChild(el("h3", { class: "section" }, "Módulos"));
+  const mfeed = el("div", { class: "feed" });
+  if (mods && mods.length) {
+    const instMap = {};
+    (instances || []).forEach((i) => { instMap[i.definition] = i; });
+    mods.forEach((m) => {
+      const row = el("div", { class: "feed-item", style: "flex-direction:column;align-items:flex-start;gap:var(--hs-space-2)" });
+      const head = el("div", { style: "display:flex;align-items:center;gap:var(--hs-space-2);width:100%;flex-wrap:wrap" });
+      head.appendChild(el("span", { class: "app-name" }, m.title || m.id));
+      head.appendChild(el("span", { class: "app-host" },
+        m.id + " · v" + m.version + (instMap[m.id] ? " · 🟢 instância ativa" : " · ⚪ sem instância")));
+      row.appendChild(head);
+      row.appendChild(el("div", { class: "app-host", style: "opacity:.8" },
+        "Capacidades: " + ((m.capabilities || []).join(" · ") || "—")));
+      const ops = el("span", { style: "display:inline-flex;flex-wrap:wrap;gap:var(--hs-space-2)" });
+      const labels = { start: "▶ Iniciar", stop: "⏹ Parar", restart: "🔄 Reiniciar", enable: "✅ Ativar", disable: "⛔ Desativar", update: "⬆️ Atualizar", status: "👁 Status" };
+      (m.operations || []).forEach((op) => {
+        const b = el("button", { class: "btn btn-secondary", style: "height:var(--hs-touch-compact)" }, labels[op] || op);
+        b.addEventListener("click", async () => {
+          if (op === "stop" && !confirm("Parar o módulo " + m.id + "?")) return;
+          b.disabled = true;
+          try {
+            await apiOrFail("/api/v1/modules/" + m.id + "/op", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ op }),
+            });
+            toast(m.id + ": " + op + " concluído.", "success");
+            renderAdmin();
+          } catch (err) {
+            toast(err.message || "Falha em " + op + ".", "error");
+            b.disabled = false;
+          }
+        });
+        ops.appendChild(b);
+      });
+      row.appendChild(ops);
+      mfeed.appendChild(row);
+    });
+  } else {
+    mfeed.appendChild(el("div", { class: "feed-item" }, "Nenhum módulo encontrado."));
+  }
+  v.appendChild(mfeed);
 
   // Atualização do sistema
   v.appendChild(el("h3", { class: "section" }, "Atualização"));
