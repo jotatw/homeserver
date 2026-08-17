@@ -5,7 +5,7 @@ import {
     listModuleInstances,
     runModuleOp,
 } from "../adapters/modules.js";
-import { sendOk, sendError } from "../utils/respond.js";
+import { sendOk, sendError, sendInternalError } from "../utils/respond.js";
 import { requireAdmin } from "../plugins/auth.js";
 
 const OPERATIONS = new Set([
@@ -20,11 +20,11 @@ const OPERATIONS = new Set([
 
 export async function moduleRoutes(fastify: FastifyInstance) {
     // Leitura: qualquer usuário autenticado (hook global).
-    fastify.get("/api/v1/modules", async (_request, reply) => {
+    fastify.get("/api/v1/modules", async (request, reply) => {
         try {
             return sendOk(reply, await listModuleDefinitions());
         } catch (error) {
-            return sendError(reply, 500, error instanceof Error ? error.message : String(error));
+            return sendInternalError(reply, request.log, error);
         }
     });
 
@@ -34,16 +34,16 @@ export async function moduleRoutes(fastify: FastifyInstance) {
         try {
             return sendOk(reply, await getModuleDefinition(id));
         } catch (error) {
-            return sendError(reply, 500, error instanceof Error ? error.message : String(error));
+            return sendInternalError(reply, request.log, error);
         }
     });
 
     // Instâncias e operações: somente admin.
-    fastify.get("/api/v1/modules/instances", { preHandler: requireAdmin }, async (_request, reply) => {
+    fastify.get("/api/v1/modules/instances", { preHandler: requireAdmin }, async (request, reply) => {
         try {
             return sendOk(reply, await listModuleInstances());
         } catch (error) {
-            return sendError(reply, 500, error instanceof Error ? error.message : String(error));
+            return sendInternalError(reply, request.log, error);
         }
     });
 
@@ -58,7 +58,7 @@ export async function moduleRoutes(fastify: FastifyInstance) {
         try {
             return sendOk(reply, await runModuleOp(id, body.op));
         } catch (error) {
-            return sendError(reply, 500, error instanceof Error ? error.message : String(error));
+            return sendInternalError(reply, request.log, error);
         }
     });
 }
