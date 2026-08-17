@@ -31,7 +31,13 @@ get_service_status_json() {
     printf "["
     while read -r service; do
         [[ -n "${service}" ]] || continue
-        state="$(docker inspect -f '{{.State.Status}}' "${service}" 2>/dev/null || echo "not_found")"
+        # Sanea a saída do docker inspect: algumas versões despejam ruído
+        # (ex.: newline) no stdout quando o daemon está indisponível — o que
+        # quebraria o JSON. Normaliza para um token seguro; sem resultado,
+        # reporta "not_found".
+        state="$(docker inspect -f '{{.State.Status}}' "${service}" 2>/dev/null | tr -d '[:space:]')"
+        [[ -n "${state}" ]] || state="not_found"
+        state="${state//[^A-Za-z0-9_.-]/_}"
         [[ ${first} -eq 0 ]] && printf ","
         printf '\n  {"name":"%s","status":"%s"}' "${service}" "${state}"
         first=0
