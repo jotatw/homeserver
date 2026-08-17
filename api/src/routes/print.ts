@@ -6,7 +6,7 @@ import {
     cancelJob,
     type PrintOptions,
 } from "../adapters/print.js";
-import { sendOk, sendError } from "../utils/respond.js";
+import { sendOk, sendError, sendInternalError } from "../utils/respond.js";
 import { requireAdmin } from "../plugins/auth.js";
 
 interface PrintBody {
@@ -27,7 +27,7 @@ function isNonEmptyString(value: unknown): value is string {
 export async function printRoutes(fastify: FastifyInstance) {
     fastify.addHook("preHandler", requireAdmin);
 
-    fastify.get("/api/v1/print", async (_req, reply) => {
+    fastify.get("/api/v1/print", async (request, reply) => {
         try {
             const info = await getPrintersInfo();
             const status: Record<string, unknown> = {};
@@ -42,22 +42,21 @@ export async function printRoutes(fastify: FastifyInstance) {
                 status,
             });
         } catch (error) {
-            return sendError(reply, 500, error instanceof Error ? error.message : String(error));
+            return sendInternalError(reply, request.log, error);
         }
     });
 
-    fastify.get("/api/v1/print/jobs", async (_req, reply) => {
+    fastify.get("/api/v1/print/jobs", async (request, reply) => {
         try {
             return sendOk(reply, { jobs: await listJobs() });
         } catch (error) {
-            return sendError(reply, 500, error instanceof Error ? error.message : String(error));
+            return sendInternalError(reply, request.log, error);
         }
     });
 
     fastify.delete("/api/v1/print/jobs/:id", async (request, reply) => {
         const { id } = request.params as { id: string };
 
-        // Formato esperado: "<impressora>-<n>" (ex.: MG3110-12).
         if (!/^[A-Za-z0-9_.-]+-\d+$/.test(id)) {
             return sendError(reply, 400, "ID de trabalho inválido.");
         }
@@ -65,11 +64,10 @@ export async function printRoutes(fastify: FastifyInstance) {
         try {
             return sendOk(reply, await cancelJob(id));
         } catch (error) {
-            return sendError(reply, 500, error instanceof Error ? error.message : String(error));
+            return sendInternalError(reply, request.log, error);
         }
     });
 
-    // bodyLimit: 30 MB — arquivos são enviados em base64 (20 MB -> ~26,7 MB).
     fastify.post("/api/v1/print", { bodyLimit: 30 * 1024 * 1024 }, async (request, reply) => {
         const body = request.body as PrintBody | null;
 
@@ -100,14 +98,13 @@ export async function printRoutes(fastify: FastifyInstance) {
             );
             return sendOk(reply, result);
         } catch (error) {
-            const message = error instanceof Error ? error.message : String(error);
+            const message = error instanceof Error ? error.message : "";
 
-            // Arquivo acima do limite permitido é um erro de entrada (400).
             if (message.includes("limite de 20 MB")) {
-                return sendError(reply, 400, message);
+                return sendError(reply, 400, "Arquivo acima do limite permitido de 20 MB.");
             }
 
-            return sendError(reply, 500, message);
+            return sendInternalError(reply, request.log, error);
         }
     });
 }
