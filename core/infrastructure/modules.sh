@@ -102,6 +102,51 @@ PY
 }
 
 #
+# Lista as instâncias registradas no Module Core.
+#
+module_instance_list() {
+    python3 - "${HS_MODULES_STATE}" <<'PY' || true
+import json, os, glob, sys
+base = sys.argv[1]
+out = []
+for f in sorted(glob.glob(os.path.join(base, "instances", "*.json"))):
+    try:
+        out.append(json.load(open(f, encoding="utf-8")))
+    except Exception:
+        continue
+print(json.dumps(out, ensure_ascii=False))
+PY
+}
+
+#
+# Registra uma instância de um módulo (default: nome = id do módulo).
+#
+module_instance_add() {
+    local id="${1:?id do módulo}" name="${2:-${1}}"
+    local file now
+
+    module_exists "${id}" || return 1
+
+    [[ "${name}" =~ ^[a-z0-9][a-z0-9-]*$ ]] || {
+        echo "Nome de instância inválido: ${name} (use [a-z0-9-])." >&2
+        return 1
+    }
+
+    _module_ensure_state
+
+    file="${HS_MODULES_STATE}/instances/${name}.json"
+    if [[ -f "${file}" ]]; then
+        echo "Instância já registrada: ${name}" >&2
+        return 1
+    fi
+
+    now="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    _module_sdo bash -c "printf '%s' '{\"name\":\"${name}\",\"definition\":\"${id}\",\"desired\":\"enabled\",\"config\":{},\"bindings\":{},\"created\":\"${now}\",\"updated\":\"${now}\"}' > '${file}'" || return 1
+
+    printf '{"name":"%s","definition":"%s","desired":"enabled"}\n' "${name}" "${id}"
+}
+
+#
 # Garante os diretórios de estado do Module Core.
 #
 _module_ensure_state() {
@@ -170,6 +215,19 @@ PY
 
     # Registra desired/observed.
     _module_sdo bash -c "printf '{\"op\":\"${op}\",\"ts\":\"${now}\",\"ok\":${ok}}' > '${HS_MODULES_STATE}/state/${id}.json'" 2>/dev/null || true
+
+    # Atualiza metadados da instância (se registrada) — último op/timestamp.
+    if [[ -f "${HS_MODULES_STATE}/instances/${id}.json" ]]; then
+        _module_sdo python3 - "${HS_MODULES_STATE}/instances/${id}.json" "${op}" "${now}" "${ok}" <<'PY' 2>/dev/null || true
+import json, sys
+p, op, now, ok = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4] == "0"
+d = json.load(open(p, encoding="utf-8"))
+d["lastOp"] = op
+d["lastOpOk"] = ok
+d["updated"] = now
+json.dump(d, open(p, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+PY
+    fi
 
     printf '{"id":"%s","op":"%s","ok":%s}\n' "${id}" "${op}" "${ok}"
     return "${ok}"
