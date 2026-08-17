@@ -89,7 +89,7 @@
           type: customapi
           url: http://api:8000/api/v1/status
           headers:
-            Authorization: Bearer f45136cd97a35d901fdd370595077d5586125612b0a402b5
+            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
           refreshInterval: 30000
           display: dynamic-list
           mappings:
@@ -103,7 +103,7 @@
           type: customapi
           url: http://api:8000/api/v1/hardware
           headers:
-            Authorization: Bearer f45136cd97a35d901fdd370595077d5586125612b0a402b5
+            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
           refreshInterval: 60000
           display: dynamic-list
           mappings:
@@ -118,7 +118,7 @@
           type: customapi
           url: http://api:8000/api/v1/devices
           headers:
-            Authorization: Bearer f45136cd97a35d901fdd370595077d5586125612b0a402b5
+            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
           refreshInterval: 15000
           display: dynamic-list
           mappings:
@@ -131,7 +131,7 @@
           type: customapi
           url: http://api:8000/api/v1/storage
           headers:
-            Authorization: Bearer f45136cd97a35d901fdd370595077d5586125612b0a402b5
+            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
           refreshInterval: 30000
           mappings:
             - field: data.ready
@@ -158,7 +158,7 @@
           type: customapi
           url: http://api:8000/api/v1/events
           headers:
-            Authorization: Bearer f45136cd97a35d901fdd370595077d5586125612b0a402b5
+            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
           refreshInterval: 30000
           display: dynamic-list
           mappings:
@@ -172,7 +172,7 @@
           type: customapi
           url: http://api:8000/api/v1/status
           headers:
-            Authorization: Bearer f45136cd97a35d901fdd370595077d5586125612b0a402b5
+            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
           refreshInterval: 30000
           mappings:
             - field: data.hostname
