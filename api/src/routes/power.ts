@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { getPower, setPower } from "../adapters/power.js";
-import { sendOk, sendError } from "../utils/respond.js";
+import { sendOk, sendError, sendInternalError } from "../utils/respond.js";
 import { requireAdmin } from "../plugins/auth.js";
 
 export async function powerRoutes(fastify: FastifyInstance) {
@@ -27,7 +27,7 @@ export async function powerRoutes(fastify: FastifyInstance) {
             );
             return sendOk(reply, result);
         } catch (error) {
-            return sendError(reply, 500, error instanceof Error ? error.message : String(error));
+            return sendInternalError(reply, request.log, error);
         }
     });
 }
