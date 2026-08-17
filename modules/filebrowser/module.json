@@ -1,0 +1,26 @@
+{
+  "id": "filebrowser",
+  "contractVersion": 1,
+  "version": "2.63.23",
+  "title": "FileBrowser",
+  "description": "Gerenciador de arquivos (acesso e administração do storage). EOL 2026-09-01.",
+  "classification": "service",
+  "capabilities": ["files.access", "files.manage"],
+  "dependencies": ["storage.persistent"],
+  "resources": [
+    {"kind": "volume", "ref": "config", "path": "/srv/services/filebrowser/config"},
+    {"kind": "volume", "ref": "database", "path": "/srv/services/filebrowser/database"},
+    {"kind": "mount", "ref": "storage", "path": "/srv/storage"}
+  ],
+  "integrations": [
+    {"kind": "route", "path": "/files"},
+    {"kind": "adapter", "ref": "filebrowser"}
+  ],
+  "operations": ["start", "stop", "restart", "enable", "disable", "update", "status"],
+  "implementation": {
+    "engine": "docker-compose",
+    "path": "compose.yaml",
+    "compatible": ["hs>=1.0.0"]
+  },
+  "health": {"kind": "http", "port": 8080, "path": "/files/"}
+}

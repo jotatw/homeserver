@@ -1,0 +1,23 @@
+{
+  "id": "portainer",
+  "contractVersion": 1,
+  "version": "lts",
+  "title": "Portainer",
+  "description": "UI de gestão do Docker (módulo opcional; não implantado por padrão).",
+  "classification": "service",
+  "capabilities": ["docker.ui", "docker.manage"],
+  "dependencies": ["docker.engine"],
+  "resources": [
+    {"kind": "volume", "ref": "data", "path": "/srv/docker/volumes/portainer"}
+  ],
+  "integrations": [
+    {"kind": "docker.socket", "ref": "/var/run/docker.sock"}
+  ],
+  "operations": ["start", "stop", "restart", "enable", "disable", "update", "status"],
+  "implementation": {
+    "engine": "docker-compose",
+    "path": "compose.yaml",
+    "compatible": ["hs>=1.0.0"]
+  },
+  "health": {"kind": "https", "port": 9443, "path": "/"}
+}
