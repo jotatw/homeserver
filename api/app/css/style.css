@@ -287,7 +287,7 @@ input:focus-visible {
   font-weight: 600;
   color: var(--hs-text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
 }
 
 .stat-card .stat-value {
@@ -336,18 +336,22 @@ input:focus-visible {
   flex-shrink: 0;
 }
 
-.app-card .status-dot {
+.status-dot {
   width: 8px;
   height: 8px;
   border-radius: var(--hs-radius-full);
   flex-shrink: 0;
 }
 
-.app-card .status-dot.ok {
+.status-dot.ok {
   background: var(--hs-color-ok);
 }
 
-.app-card .status-dot.danger {
+.status-dot.warn {
+  background: var(--hs-color-warn);
+}
+
+.status-dot.danger {
   background: var(--hs-color-danger);
 }
 
@@ -427,7 +431,7 @@ input:focus-visible {
   background: var(--hs-surface);
   border: 1px solid var(--hs-border);
   border-radius: var(--hs-radius-lg);
-  overflow: hidden;
+  overflow: visible;
   box-shadow: var(--hs-shadow-sm);
 }
 
@@ -488,7 +492,7 @@ input:focus-visible {
   color: var(--hs-text-muted);
   font-size: 0.8rem;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
 }
 
 .table td {
@@ -736,6 +740,113 @@ dialog::backdrop {
 .badge.warn  { background: var(--hs-color-warn-soft);  color: var(--hs-color-warn); }
 .badge.danger{ background: var(--hs-color-danger-soft); color: var(--hs-color-danger); }
 .badge.info  { background: var(--hs-color-info-soft);  color: var(--hs-color-info); }
+
+/* ---------- Ícones SVG ---------- */
+
+.ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ic svg,
+.feed-item svg,
+.app-card svg,
+.sheet-item svg,
+.ops-pop svg {
+  display: block;
+}
+
+/* ---------- Chips (busca/filtros) ---------- */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--hs-space-2);
+}
+
+.chip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--hs-radius-full);
+  flex-shrink: 0;
+}
+
+.chip-dot.ok {
+  background: var(--hs-color-ok);
+}
+
+.chip-dot.danger {
+  background: var(--hs-color-danger);
+}
+
+/* ---------- Módulos (Administração) ---------- */
+
+.module-row {
+  align-items: center;
+}
+
+.module-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.module-ops {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--hs-space-2);
+  flex-shrink: 0;
+}
+
+.ops-menu {
+  position: relative;
+}
+
+.ops-menu summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.ops-menu summary::-webkit-details-marker {
+  display: none;
+}
+
+.ops-menu-btn {
+  min-width: var(--hs-touch-compact);
+  padding: 0 var(--hs-space-2);
+}
+
+.ops-pop {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 30;
+  min-width: 11rem;
+  background: var(--hs-surface-raised);
+  border: 1px solid var(--hs-border);
+  border-radius: var(--hs-radius-md);
+  box-shadow: var(--hs-shadow-lg);
+  padding: var(--hs-space-1);
+  display: flex;
+  flex-direction: column;
+}
+
+.ops-pop-item {
+  display: flex;
+  align-items: center;
+  gap: var(--hs-space-2);
+  height: var(--hs-touch-compact);
+  padding: 0 var(--hs-space-3);
+  border-radius: var(--hs-radius-sm);
+  color: var(--hs-text);
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+.ops-pop-item:hover {
+  background: var(--hs-surface-hover);
+}
 
 /* ---------- Responsivo ---------- */
 
