@@ -1,16 +1,16 @@
 import type { FastifyInstance } from "fastify";
 import { createUser, listUsers, deleteUser, changeUserPassword } from "../adapters/users.js";
-import { sendOk, sendError } from "../utils/respond.js";
+import { sendOk, sendError, sendInternalError } from "../utils/respond.js";
 import { requireAdmin } from "../plugins/auth.js";
 
 export async function userRoutes(fastify: FastifyInstance) {
     fastify.addHook("preHandler", requireAdmin);
 
-    fastify.get("/api/v1/users", async (_req, reply) => {
+    fastify.get("/api/v1/users", async (request, reply) => {
         try {
             return sendOk(reply, await listUsers());
         } catch (error) {
-            return sendError(reply, 500, error instanceof Error ? error.message : String(error));
+            return sendInternalError(reply, request.log, error);
         }
     });
 
@@ -36,7 +36,7 @@ export async function userRoutes(fastify: FastifyInstance) {
 
             return sendOk(reply, user, 201);
         } catch (error) {
-            return sendError(reply, 500, error instanceof Error ? error.message : String(error));
+            return sendInternalError(reply, request.log, error);
         }
     });
 
@@ -52,7 +52,7 @@ export async function userRoutes(fastify: FastifyInstance) {
             const result = await changeUserPassword(username, body.password);
             return sendOk(reply, result);
         } catch (error) {
-            return sendError(reply, 500, error instanceof Error ? error.message : String(error));
+            return sendInternalError(reply, request.log, error);
         }
     });
 
@@ -65,7 +65,7 @@ export async function userRoutes(fastify: FastifyInstance) {
             await deleteUser(username, removeFolder);
             return sendOk(reply, { deleted: username });
         } catch (error) {
-            return sendError(reply, 500, error instanceof Error ? error.message : String(error));
+            return sendInternalError(reply, request.log, error);
         }
     });
 }
