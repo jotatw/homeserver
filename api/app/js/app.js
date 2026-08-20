@@ -887,7 +887,7 @@ async function renderAdmin() {
           el("summary", { class: "btn btn-secondary ops-menu-btn", "aria-label": "Mais operações de " + m.id },
             icon("dots", "ic")),
           el("div", { class: "ops-pop" },
-            rest.map((op) => {
+            ...rest.map((op) => {
               const b = el("button", { type: "button", class: "ops-pop-item" },
                 icon(({ start: "play", stop: "square", restart: "refresh", enable: "check", disable: "x", update: "download", status: "eye" }[op] || "dots"), "ic"),
                 el("span", {}, labels[op] || op));
