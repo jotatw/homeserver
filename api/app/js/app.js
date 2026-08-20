@@ -27,6 +27,60 @@ function toast(message, kind = "info") {
   setTimeout(() => t.remove(), 5000);
 }
 
+/* ---------- Ícones (SVG monoline, stroke 1.8) ---------- */
+
+const ICON_WRAP =
+  '<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';
+
+const ICONS = {
+  home: '<path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10"/>',
+  box: '<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96L12 12.01l8.73-5.05"/><line x1="12" y1="22.08" x2="12" y2="12"/>',
+  folder: '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>',
+  activity: '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
+  settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  printer: '<polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>',
+  sun: '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>',
+  moon: '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
+  power: '<path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/>',
+  plus: '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+  user: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  users: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  key: '<path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>',
+  shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  code: '<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>',
+  layers: '<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>',
+  monitor: '<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>',
+  harddrive: '<line x1="22" y1="12" x2="2" y2="12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/><line x1="6" y1="16" x2="6.01" y2="16"/><line x1="10" y1="16" x2="10.01" y2="16"/>',
+  database: '<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>',
+  plug: '<path d="M9 2v6"/><path d="M15 2v6"/><path d="M6 8h12v4a6 6 0 0 1-12 0V8z"/><line x1="12" y1="18" x2="12" y2="22"/>',
+  zap: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+  clock: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  bell: '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
+  wifi: '<path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>',
+  thermometer: '<path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>',
+  film: '<rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/>',
+  file: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+  filetext: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
+  refresh: '<polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>',
+  download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+  eye: '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
+  play: '<polygon points="5 3 19 12 5 21 5 3"/>',
+  square: '<rect x="5" y="5" width="14" height="14" rx="1"/>',
+  check: '<polyline points="20 6 9 17 4 12"/>',
+  x: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+  paperclip: '<path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>',
+  chevron: '<polyline points="9 18 15 12 9 6"/>',
+  pencil: '<path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>',
+  alert: '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+  toolbox: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+  dots: '<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>',
+};
+
+function icon(name, cls = "") {
+  const span = el("span", { class: cls, "aria-hidden": "true", html: ICON_WRAP + (ICONS[name] || ICONS.box) + "</svg>" });
+  return span;
+}
+
 function human(bytes) {
   if (bytes >= 1073741824) return (bytes / 1073741824).toFixed(1) + " GB";
   if (bytes >= 1048576) return (bytes / 1048576).toFixed(1) + " MB";
@@ -46,12 +100,12 @@ function timeAgo(dateStr) {
 /* ---------- Navegação declarativa (flows/navigation.md §2) ---------- */
 
 const NAV = [
-  { route: "dashboard", title: "Meu espaço", icon: "🏠", minRole: "user", desktop: true, mobile: true },
-  { route: "apps", title: "Aplicações", icon: "📦", minRole: "user", desktop: true, mobile: true },
-  { route: "storage", title: "Armazenamento", icon: "📁", minRole: "user", desktop: true, mobile: true },
-  { route: "system", title: "Sistema", icon: "📊", minRole: "user", desktop: true, mobile: true },
-  { route: "admin", title: "Administração", icon: "⚙️", minRole: "admin", desktop: true, mobile: true },
-  { route: "print", title: "Impressão", icon: "🖨️", minRole: "admin", desktop: true, mobile: false },
+  { route: "dashboard", title: "Meu espaço", icon: "home", minRole: "user", desktop: true, mobile: true },
+  { route: "apps", title: "Aplicações", icon: "box", minRole: "user", desktop: true, mobile: true },
+  { route: "storage", title: "Armazenamento", icon: "folder", minRole: "user", desktop: true, mobile: true },
+  { route: "system", title: "Sistema", icon: "activity", minRole: "user", desktop: true, mobile: true },
+  { route: "admin", title: "Administração", icon: "settings", minRole: "admin", desktop: true, mobile: true },
+  { route: "print", title: "Impressão", icon: "printer", minRole: "admin", desktop: true, mobile: false },
 ];
 
 const roleRank = { user: 1, admin: 2 };
@@ -85,18 +139,22 @@ function buildNav() {
   nav.innerHTML = "";
   bottom.innerHTML = "";
 
-  items.forEach((n) => {
-    const a = el("a", { href: "#/" + n.route, class: "nav-item", "data-route": n.route },
-      el("span", {}, n.icon), el("span", {}, n.title));
-    nav.appendChild(a);
-    const m = el("a", { href: "#/" + n.route, class: "nav-item", "data-route": n.route },
-      el("span", { class: "ic" }, n.icon), el("span", {}, n.title));
-    bottom.appendChild(m);
+  const desktopItems = items.filter((n) => n.desktop !== false);
+  const mobileItems = items.filter((n) => n.mobile !== false);
+
+  desktopItems.forEach((n) => {
+    nav.appendChild(el("a", { href: "#/" + n.route, class: "nav-item", "data-route": n.route },
+      icon(n.icon), el("span", {}, n.title)));
+  });
+
+  mobileItems.forEach((n) => {
+    bottom.appendChild(el("a", { href: "#/" + n.route, class: "nav-item", "data-route": n.route },
+      icon(n.icon, "ic"), el("span", {}, n.title)));
   });
 
   // Overflow: abre o drawer com perfil, tema e sair (design navigation.md).
   const plus = el("button", { class: "nav-item", id: "bottom-plus", "aria-label": "Mais opções" },
-    el("span", { class: "ic" }, "＋"),
+    icon("plus", "ic"),
     el("span", {}, "Mais"));
   plus.addEventListener("click", openOverflowSheet);
   bottom.appendChild(plus);
@@ -108,14 +166,14 @@ function openOverflowSheet() {
     sheet = el("dialog", { id: "overflow-sheet", class: "sheet" },
       el("div", { class: "sheet-handle" }),
       el("div", { class: "sheet-item" },
-        el("span", { class: "ic" }, "👤"),
+        icon("user", "ic"),
         el("span", { class: "app-name", id: "sheet-user" })),
       el("button", { class: "sheet-item", id: "sheet-print" },
-        el("span", { class: "ic" }, "🖨️"), el("span", {}, "Impressão")),
+        icon("printer", "ic"), el("span", {}, "Impressão")),
       el("button", { class: "sheet-item", id: "sheet-theme" },
-        el("span", { class: "ic" }, "🌗"), el("span", {}, "Tema")),
+        icon("moon", "ic"), el("span", {}, "Tema")),
       el("button", { class: "sheet-item sheet-danger", id: "sheet-sair" },
-        el("span", { class: "ic" }, "⏻"), el("span", {}, "Sair")));
+        icon("power", "ic"), el("span", {}, "Sair")));
     document.body.appendChild(sheet);
   }
 
@@ -148,8 +206,8 @@ function currentRoute() {
 function renderUser() {
   const label = auth.user ? auth.user.username : "";
   const badge = auth.isAdmin() ? ' <span class="badge-admin">ADMIN</span>' : "";
-  document.getElementById("sidebar-user").innerHTML = "👤 " + label + badge;
-  document.getElementById("topbar-user").innerHTML = "👤 " + label + badge;
+  document.getElementById("sidebar-user").innerHTML = icon("user").outerHTML + " " + label + badge;
+  document.getElementById("topbar-user").innerHTML = icon("user").outerHTML + " " + label + badge;
 }
 
 /* ---------- Router ---------- */
@@ -188,7 +246,9 @@ async function router() {
     await renders[route]();
   } catch (err) {
     v.innerHTML = "";
-    v.appendChild(el("p", { class: "empty error-msg" }, "⚠️ ", err.message));
+    v.appendChild(el("p", { class: "empty error-msg" },
+      icon("alert", "empty-icon"),
+      err.message));
   }
 }
 
@@ -208,11 +268,11 @@ async function renderDashboard() {
 
   v.appendChild(el("h3", { class: "section" }, "Acesso rápido"));
   const actions = el("div", { class: "grid" });
-  actions.appendChild(actionCard("📁", "Arquivos", "/files/"));
-  actions.appendChild(actionCard("📦", "Aplicações", "#/apps"));
-  actions.appendChild(actionCard("📊", "Sistema", "#/system"));
+  actions.appendChild(actionCard("folder", "Arquivos", "/files/"));
+  actions.appendChild(actionCard("box", "Aplicações", "#/apps"));
+  actions.appendChild(actionCard("activity", "Sistema", "#/system"));
   if (auth.isAdmin()) {
-    actions.appendChild(actionCard("🖨️", "Imprimir", "#/print"));
+    actions.appendChild(actionCard("printer", "Imprimir", "#/print"));
   }
   v.appendChild(actions);
 
@@ -261,9 +321,9 @@ async function refreshDashboard() {
     feed.innerHTML = "";
     if (events && events.length) {
       events.slice(0, 8).forEach((ev) => {
-        const icon = { backup: "💾", device: "🔌", system: "⚙️", power: "🔋" }[ev.type] || "📄";
+        const iconName = { backup: "database", device: "plug", system: "settings", power: "zap" }[ev.type] || "filetext";
         feed.appendChild(el("div", { class: "feed-item" },
-          el("span", {}, icon), el("span", {}, ev.action || ev.type),
+          icon(iconName), el("span", {}, ev.action || ev.type),
           el("span", { class: "feed-time" }, ev.time ? timeAgo(ev.time) : "")));
       });
     } else {
@@ -285,10 +345,10 @@ function statCard(label, value, pct) {
     bar);
 }
 
-function actionCard(icon, title, href) {
+function actionCard(iconName, title, href) {
   const isHash = href.startsWith("#");
   const a = el("a", { href, class: "app-card", target: isHash ? "_self" : "_blank" },
-    el("span", { class: "ic" }, icon),
+    icon(iconName, "ic"),
     el("span", { class: "app-name" }, title),
     el("span", {}, "→"));
   return a;
@@ -297,12 +357,12 @@ function actionCard(icon, title, href) {
 /* ---------- Aplicações ---------- */
 
 const APP_MAP = {
-  homepage: { title: "Homepage", host: "/", icon: "🏠" },
-  api: { title: "HomeServer App", host: "/app", icon: "📊" },
-  filebrowser: { title: "FileBrowser", host: "/files/", icon: "📁" },
-  gitea: { title: "Gitea", host: "/git/", icon: "🔧" },
-  caddy: { title: "Proxy (Caddy)", host: "", icon: "🛡️" },
-  portainer: { title: "Portainer", host: "", icon: "🐳" },
+  homepage: { title: "Homepage", host: "/", icon: "home" },
+  api: { title: "HomeServer App", host: "/app", icon: "monitor" },
+  filebrowser: { title: "FileBrowser", host: "/files/", icon: "folder" },
+  gitea: { title: "Gitea", host: "/git/", icon: "code" },
+  caddy: { title: "Proxy (Caddy)", host: "", icon: "shield" },
+  portainer: { title: "Portainer", host: "", icon: "layers" },
 };
 
 async function renderApps() {
@@ -325,8 +385,10 @@ async function renderApps() {
   toolbar.appendChild(search);
 
   const chips = el("div", { class: "chips" });
-  [["all", "Todos"], ["running", "🟢 Ativos"], ["down", "🔴 Offline"]].forEach(([key, label]) => {
-    const chip = el("button", { class: "chip" + (key === "all" ? " active" : ""), "data-filter": key }, label);
+  [["all", "Todos"], ["running", "Ativos", "ok"], ["down", "Offline", "danger"]].forEach(([key, label, cls]) => {
+    const chip = el("button", { class: "chip" + (key === "all" ? " active" : ""), "data-filter": key },
+      cls ? el("span", { class: "chip-dot " + cls }, "") : null,
+      el("span", {}, label));
     chip.addEventListener("click", () => {
       state.filter = key;
       chips.querySelectorAll(".chip").forEach((c) => c.classList.toggle("active", c.dataset.filter === key));
@@ -351,7 +413,7 @@ async function renderApps() {
   function renderGrid() {
     grid.innerHTML = "";
     const list = services
-      .filter((s) => matches(s, APP_MAP[s.name] || { title: s.name, host: "", icon: "📄" }))
+      .filter((s) => matches(s, APP_MAP[s.name] || { title: s.name, host: "", icon: "filetext" }))
       .sort((a, b) => (a.status === "running" ? -1 : 1) - (b.status === "running" ? -1 : 1));
 
     if (!list.length) {
@@ -363,13 +425,13 @@ async function renderApps() {
     }
 
     list.forEach((s) => {
-      const meta = APP_MAP[s.name] || { title: s.name, host: "", icon: "📄" };
+      const meta = APP_MAP[s.name] || { title: s.name, host: "", icon: "filetext" };
       const up = s.status === "running";
       const card = el("div", { class: "app-card" },
-        el("span", { class: "ic" }, meta.icon),
+        icon(meta.icon, "ic"),
         el("span", { class: "status-dot " + (up ? "ok" : "danger") }),
         el("span", { class: "app-name" }, meta.title),
-        el("span", { class: "app-host" }, up ? "● Ativo" : "✕ Offline"));
+        el("span", { class: "app-host" }, up ? "Ativo" : "Offline"));
       if (meta.host && up) {
         card.addEventListener("click", () => window.open(meta.host, "_blank"));
         card.style.cursor = "pointer";
@@ -410,24 +472,24 @@ async function renderStorage() {
   // 2. Raiz de dados
   v.appendChild(el("h3", { class: "section" }, "Dados"));
   const dados = el("div", { class: "feed" });
-  dados.appendChild(feedRow("📁", "Raiz de dados", st.root || "—"));
-  dados.appendChild(feedRow("💾", "Total armazenado", st.total_size_human || "—"));
-  dados.appendChild(feedRow("●", "Pronto", st.ready ? "Sim" : "Não"));
+  dados.appendChild(feedRow("folder", "Raiz de dados", st.root || "—"));
+  dados.appendChild(feedRow("harddrive", "Total armazenado", st.total_size_human || "—"));
+  dados.appendChild(feedRow("check", "Pronto", st.ready ? "Sim" : "Não"));
   v.appendChild(dados);
 
   // 3. Pastas por usuário
   v.appendChild(el("h3", { class: "section" }, "Pastas"));
   const folders = [
-    ["👤", "Usuários", st.users ?? 0],
-    ["🤝", "Compartilhado", st.shared ?? 0],
-    ["🎞️", "Mídia", st.media ?? 0],
-    ["📄", "Documentos", st.documents ?? 0],
-    ["🔌", "Dispositivos", st.devices ?? 0],
+    ["user", "Usuários", st.users ?? 0],
+    ["users", "Compartilhado", st.shared ?? 0],
+    ["film", "Mídia", st.media ?? 0],
+    ["filetext", "Documentos", st.documents ?? 0],
+    ["plug", "Dispositivos", st.devices ?? 0],
   ];
   const fgrid = el("div", { class: "grid" });
-  folders.forEach(([icon, label, value]) =>
+  folders.forEach(([iconName, label, value]) =>
     fgrid.appendChild(el("div", { class: "app-card" },
-      el("span", {}, icon),
+      icon(iconName, "ic"),
       el("span", { class: "app-name" }, label),
       el("span", { class: "app-host" }, String(value)))));
   v.appendChild(fgrid);
@@ -438,7 +500,7 @@ async function renderStorage() {
   if (devices && devices.length) {
     devices.forEach((d) => {
       const row = el("div", { class: "feed-item" },
-        el("span", {}, "🔌"),
+        icon("plug"),
         el("span", { class: "app-name", style: "overflow:hidden;text-overflow:ellipsis;white-space:nowrap" }, d.label),
         el("span", { class: "feed-time" }, (d.type || "").toUpperCase()));
       if (auth.isAdmin()) {
@@ -473,22 +535,23 @@ async function renderStorage() {
   v.appendChild(feed);
 
   if (auth.isAdmin()) {
-    const mountBtn = el("button", { class: "btn btn-secondary", style: "margin-top:var(--hs-space-2)" }, "🔌 Montar dispositivo");
+    const mountBtn = el("button", { class: "btn btn-secondary", style: "margin-top:var(--hs-space-2)" },
+      icon("plug", "ic"), " Montar dispositivo");
     mountBtn.addEventListener("click", () => openMountDialog());
     v.appendChild(mountBtn);
   }
 
-  // 5. CTA honesto (gap G1: a API não navega arquivos)
+  // 5. Navegação de arquivos (FileBrowser)
   v.appendChild(el("div", { class: "empty", style: "padding-top: var(--hs-space-8)" },
-    el("span", { class: "empty-icon" }, "📭"),
-    "Navegação de arquivos não está disponível nesta versão.",
+    icon("folder", "empty-icon"),
+    "Os arquivos são gerenciados pelo FileBrowser.",
     el("br", {}),
     el("a", { href: "/files/", target: "_blank" }, "Ir para o FileBrowser →")));
 }
 
-function feedRow(icon, label, value) {
+function feedRow(iconName, label, value) {
   return el("div", { class: "feed-item" },
-    el("span", {}, icon),
+    icon(iconName),
     el("span", { class: "app-name" }, label),
     el("span", { class: "feed-time" }, value));
 }
@@ -529,11 +592,12 @@ async function renderSystem() {
     // Energia
     v.appendChild(el("h3", { class: "section" }, "Energia"));
     const pwr = el("div", { class: "feed" });
-    pwr.appendChild(feedRow("⏰", "Desliga às", power.shutdown || "—"));
-    pwr.appendChild(feedRow("🔔", "Liga às", power.wake || "—"));
-    pwr.appendChild(feedRow("⚡", "Agendado", power.enabled ? "Sim" : "Não"));
+    pwr.appendChild(feedRow("clock", "Desliga às", power.shutdown || "—"));
+    pwr.appendChild(feedRow("bell", "Liga às", power.wake || "—"));
+    pwr.appendChild(feedRow("zap", "Agendado", power.enabled ? "Sim" : "Não"));
     v.appendChild(pwr);
-    const editBtn = el("button", { class: "btn btn-secondary", style: "margin-top:var(--hs-space-2)" }, "✏️ Editar agenda");
+    const editBtn = el("button", { class: "btn btn-secondary", style: "margin-top:var(--hs-space-2)" },
+      icon("pencil", "ic"), " Editar agenda");
     editBtn.addEventListener("click", () => openPowerDialog(power));
     v.appendChild(editBtn);
 
@@ -541,7 +605,7 @@ async function renderSystem() {
     if (hardware.network) {
       v.appendChild(el("h3", { class: "section" }, "Rede"));
       const net = el("div", { class: "feed" });
-      net.appendChild(feedRow("🌐", "IP", hardware.network.ip || "—"));
+      net.appendChild(feedRow("wifi", "IP", hardware.network.ip || "—"));
       v.appendChild(net);
     }
 
@@ -553,7 +617,7 @@ async function renderSystem() {
         const hot = t.temp >= 80;
         tgrid.appendChild(el("div", { class: "app-card", style: hot ? "border-color:var(--hs-color-danger)" : "" },
           el("span", { class: "status-dot " + (hot ? "danger" : "ok") }),
-          el("span", { class: "app-name" }, (t.label || t.chip) + (hot ? " ⚠" : "")),
+          el("span", { class: "app-name" }, (t.label || t.chip) + (hot ? " · quente" : "")),
           el("span", { class: "app-host" }, t.temp + "°C")));
       });
       v.appendChild(tgrid);
@@ -567,7 +631,7 @@ async function renderSystem() {
         const size = d.size || "";
         const children = d.children ? d.children.length + " partição(ões)" : "";
         dgrid.appendChild(el("div", { class: "app-card" },
-          el("span", {}, "💾"),
+          icon("harddrive", "ic"),
           el("span", { class: "app-name" }, d.name || "?"),
           el("span", { class: "app-host" }, size + (children ? " · " + children : ""))));
       });
@@ -631,6 +695,23 @@ function openPowerDialog(power) {
 
 function badge(text, kind) {
   return el("span", { class: "badge " + kind }, text);
+}
+
+async function runModuleOp(m, op, btn) {
+  if (op === "stop" && !confirm("Parar o módulo " + m.id + "?")) return;
+  btn.disabled = true;
+  try {
+    await apiOrFail("/api/v1/modules/" + m.id + "/op", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ op }),
+    });
+    toast(m.id + ": " + op + " concluído.", "success");
+    renderAdmin();
+  } catch (err) {
+    toast(err.message || "Falha em " + op + ".", "error");
+    btn.disabled = false;
+  }
 }
 
 /* ---------- Dialog: montar dispositivo (admin) ---------- */
@@ -707,7 +788,7 @@ async function renderAdmin() {
     users.forEach((u) => {
       const tr = el("tr");
       tr.appendChild(el("td", {}, u.username || u.id));
-      tr.appendChild(el("td", {}, u.perm && u.perm.admin ? "⭐ Admin" : "padrão"));
+      tr.appendChild(el("td", {}, u.perm && u.perm.admin ? el("span", { class: "badge ok" }, "Admin") : "padrão"));
       const actions = el("td");
       const btns = el("span", { style: "display:inline-flex;gap:var(--hs-space-2)" });
 
@@ -731,7 +812,8 @@ async function renderAdmin() {
     v.appendChild(el("p", { class: "empty" }, "Nenhum usuário encontrado."));
   }
 
-  const createUserBtn = el("button", { class: "btn btn-secondary", style: "margin-top:var(--hs-space-2)" }, "＋ Novo usuário");
+  const createUserBtn = el("button", { class: "btn btn-secondary", style: "margin-top:var(--hs-space-2)" },
+    icon("plus", "ic"), " Novo usuário");
   createUserBtn.addEventListener("click", openUserDialog);
   v.appendChild(createUserBtn);
 
@@ -741,7 +823,7 @@ async function renderAdmin() {
   if (tokens && tokens.length) {
     tokens.forEach((tk) => {
       const row = el("div", { class: "feed-item" },
-        el("span", {}, "🔑"),
+        icon("key"),
         el("span", { class: "app-name" }, tk.name),
         el("span", { class: "app-host" },
           tk.prefix + "… · " + (tk.lastUsedAt ? "usado" : "novo")));
@@ -762,7 +844,8 @@ async function renderAdmin() {
   }
   v.appendChild(tfeed);
 
-  const createBtn = el("button", { class: "btn btn-secondary", style: "margin-top:var(--hs-space-2)" }, "🔑 Criar token");
+  const createBtn = el("button", { class: "btn btn-secondary", style: "margin-top:var(--hs-space-2)" },
+    icon("key", "ic"), " Criar token");
   createBtn.addEventListener("click", () => openTokenDialog());
   v.appendChild(createBtn);
 
@@ -773,37 +856,48 @@ async function renderAdmin() {
     const instMap = {};
     (instances || []).forEach((i) => { instMap[i.definition] = i; });
     mods.forEach((m) => {
-      const row = el("div", { class: "feed-item", style: "flex-direction:column;align-items:flex-start;gap:var(--hs-space-2)" });
-      const head = el("div", { style: "display:flex;align-items:center;gap:var(--hs-space-2);width:100%;flex-wrap:wrap" });
-      head.appendChild(el("span", { class: "app-name" }, m.title || m.id));
-      head.appendChild(el("span", { class: "app-host" },
-        m.id + " · v" + m.version + (instMap[m.id] ? " · 🟢 instância ativa" : " · ⚪ sem instância")));
-      row.appendChild(head);
-      row.appendChild(el("div", { class: "app-host", style: "opacity:.8" },
-        "Capacidades: " + ((m.capabilities || []).join(" · ") || "—")));
-      const ops = el("span", { style: "display:inline-flex;flex-wrap:wrap;gap:var(--hs-space-2)" });
-      const labels = { start: "▶ Iniciar", stop: "⏹ Parar", restart: "🔄 Reiniciar", enable: "✅ Ativar", disable: "⛔ Desativar", update: "⬆️ Atualizar", status: "👁 Status" };
-      (m.operations || []).forEach((op) => {
-        const b = el("button", { class: "btn btn-secondary", style: "height:var(--hs-touch-compact)" }, labels[op] || op);
-        b.addEventListener("click", async () => {
-          if (op === "stop" && !confirm("Parar o módulo " + m.id + "?")) return;
-          b.disabled = true;
-          try {
-            await apiOrFail("/api/v1/modules/" + m.id + "/op", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ op }),
-            });
-            toast(m.id + ": " + op + " concluído.", "success");
-            renderAdmin();
-          } catch (err) {
-            toast(err.message || "Falha em " + op + ".", "error");
-            b.disabled = false;
-          }
-        });
-        ops.appendChild(b);
-      });
-      row.appendChild(ops);
+      const active = Boolean(instMap[m.id]);
+      const ops = m.operations || [];
+      const labels = { start: "Iniciar", stop: "Parar", restart: "Reiniciar", enable: "Ativar", disable: "Desativar", update: "Atualizar", status: "Status" };
+      const primaryOp = active ? (ops.includes("stop") ? "stop" : null) : (ops.includes("start") ? "start" : null);
+      const rest = ops.filter((op) => op !== primaryOp);
+
+      const row = el("div", { class: "feed-item module-row" },
+        icon("box", "ic"),
+        el("div", { class: "module-meta" },
+          el("div", { class: "app-name" },
+            (m.title || m.id),
+            active
+              ? el("span", { class: "badge ok", style: "margin-left:var(--hs-space-2)" }, "ativa")
+              : el("span", { class: "badge", style: "margin-left:var(--hs-space-2)" }, "ocioso")),
+          el("div", { class: "app-host" }, m.id + " · v" + m.version)));
+
+      const opsWrap = el("div", { class: "module-ops" });
+
+      if (primaryOp) {
+        const primary = el("button", {
+          class: "btn btn-secondary", style: "height:var(--hs-touch-compact)",
+        }, labels[primaryOp]);
+        primary.addEventListener("click", () => runModuleOp(m, primaryOp, primary));
+        opsWrap.appendChild(primary);
+      }
+
+      if (rest.length) {
+        const more = el("details", { class: "ops-menu" },
+          el("summary", { class: "btn btn-secondary ops-menu-btn", "aria-label": "Mais operações de " + m.id },
+            icon("dots", "ic")),
+          el("div", { class: "ops-pop" },
+            rest.map((op) => {
+              const b = el("button", { type: "button", class: "ops-pop-item" },
+                icon(({ start: "play", stop: "square", restart: "refresh", enable: "check", disable: "x", update: "download", status: "eye" }[op] || "dots"), "ic"),
+                el("span", {}, labels[op] || op));
+              b.addEventListener("click", () => runModuleOp(m, op, b));
+              return b;
+            })));
+        opsWrap.appendChild(more);
+      }
+
+      row.appendChild(opsWrap);
       mfeed.appendChild(row);
     });
   } else {
@@ -814,7 +908,8 @@ async function renderAdmin() {
   // Atualização do sistema
   v.appendChild(el("h3", { class: "section" }, "Atualização"));
   const upBox = el("div", { class: "print-card" });
-  const upBtn = el("button", { class: "btn btn-secondary", id: "up-check" }, "⬆️ Verificar atualização");
+  const upBtn = el("button", { class: "btn btn-secondary", id: "up-check" },
+    icon("refresh", "ic"), " Verificar atualização");
   const upStatus = el("p", { class: "power-hint", id: "up-status", style: "margin-top:var(--hs-space-2)" }, "");
   upBox.appendChild(upBtn);
   upBox.appendChild(upStatus);
@@ -827,7 +922,8 @@ async function renderAdmin() {
       const data = await apiOrFail("/api/v1/update");
       if (data.update) {
         upStatus.innerHTML = "Nova versão disponível: <strong>" + data.latest + "</strong> (atual: " + data.current + ")";
-        const apply = el("button", { class: "btn btn-primary", style: "margin-top:var(--hs-space-2)" }, "🔄 Aplicar atualização");
+        const apply = el("button", { class: "btn btn-primary", style: "margin-top:var(--hs-space-2)" },
+          icon("download", "ic"), " Aplicar atualização");
         apply.addEventListener("click", async () => {
           if (!confirm("Aplicar a atualização para " + data.latest + "?")) return;
           apply.disabled = true;
@@ -854,14 +950,15 @@ async function renderAdmin() {
       upStatus.textContent = err.message || "Não foi possível verificar.";
     } finally {
       upBtn.disabled = false;
-      upBtn.textContent = "⬆️ Verificar atualização";
+      upBtn.innerHTML = icon("refresh", "ic").outerHTML + " Verificar atualização";
     }
   });
 
   // Pacotes do sistema (apt)
   v.appendChild(el("h3", { class: "section" }, "Pacotes do sistema"));
   const osBox = el("div", { class: "print-card" });
-  const osBtn = el("button", { class: "btn btn-secondary", id: "up-os-check" }, "🧰 Verificar pacotes (apt)");
+  const osBtn = el("button", { class: "btn btn-secondary", id: "up-os-check" },
+    icon("toolbox", "ic"), " Verificar pacotes (apt)");
   const osStatus = el("p", { class: "power-hint", id: "up-os-status", style: "margin-top:var(--hs-space-2)" }, "");
   osBox.appendChild(osBtn);
   osBox.appendChild(osStatus);
@@ -875,7 +972,8 @@ async function renderAdmin() {
       const reboot = d.reboot ? " · reinicialização pendente" : "";
       if (d.upgradable > 0) {
         osStatus.innerHTML = d.upgradable + " pacote(s) disponível(is)" + reboot + ".";
-        const apply = el("button", { class: "btn btn-primary", style: "margin-top:var(--hs-space-2)" }, "🔄 Atualizar pacotes");
+        const apply = el("button", { class: "btn btn-primary", style: "margin-top:var(--hs-space-2)" },
+          icon("refresh", "ic"), " Atualizar pacotes");
         apply.addEventListener("click", async () => {
           if (!confirm("Atualizar todos os pacotes do sistema? Isso pode demorar.")) return;
           apply.disabled = true;
@@ -887,7 +985,7 @@ async function renderAdmin() {
               body: "{}",
             });
             toast("Pacotes atualizados.", "success");
-            osStatus.innerHTML = "Atualizado." + (r.reboot ? " ⚠ Recomenda-se reiniciar o servidor." : "");
+            osStatus.innerHTML = "Atualizado." + (r.reboot ? " Recomenda-se reiniciar o servidor." : "");
           } catch (err) {
             toast(err.message || "Falha ao atualizar pacotes.", "error");
           } finally {
@@ -1108,15 +1206,15 @@ const printState = { mode: "text", file: null };
 
 function printerBadge(status) {
   if (!status || status.state === "unknown") {
-    return el("span", { class: "badge danger" }, "🔴 Erro");
+    return el("span", { class: "badge danger" }, "Erro");
   }
   if (status.state === "disabled" || status.accepting === false) {
-    return el("span", { class: "badge danger" }, "🔴 Indisponível");
+    return el("span", { class: "badge danger" }, "Indisponível");
   }
   if (status.activeJobs > 0 || status.state === "printing") {
-    return el("span", { class: "badge warn" }, "🟡 Ocupada");
+    return el("span", { class: "badge warn" }, "Ocupada");
   }
-  return el("span", { class: "badge ok" }, "🟢 Pronta");
+  return el("span", { class: "badge ok" }, "Pronta");
 }
 
 function printerReady(status) {
@@ -1137,7 +1235,7 @@ async function renderPrint() {
     printers = data.printers || [];
     statusMap = data.status || {};
   } catch (err) {
-    v.appendChild(el("div", { class: "banner danger" }, "🔴", "Erro ao consultar a impressora: " + err.message));
+    v.appendChild(el("div", { class: "banner danger" }, "Erro ao consultar a impressora: " + err.message));
   }
 
   // ---- Card 1: Impressora e configuração ----
@@ -1185,9 +1283,9 @@ async function renderPrint() {
   cfg.appendChild(field("Páginas", inPages));
 
   const selQuality = el("select", { id: "pr-quality", class: "select-field" },
-    el("option", { value: "economico" }, "♻ Econômico"),
+    el("option", { value: "economico" }, "Econômico"),
     el("option", { value: "normal", selected: "selected" }, "Normal"),
-    el("option", { value: "alta" }, "✨ Alta qualidade"));
+    el("option", { value: "alta" }, "Alta qualidade"));
   cfg.appendChild(field("Qualidade", selQuality));
 
   card1.appendChild(cfg);
@@ -1224,7 +1322,7 @@ async function renderPrint() {
 
   const fileRow = el("div", { class: "file-row", hidden: true, id: "pr-filerow" },
     el("label", { class: "btn btn-secondary", style: "cursor:pointer" },
-      "📎 Escolher arquivo",
+      icon("paperclip", "ic"), " Escolher arquivo",
       el("input", { id: "pr-file", type: "file", accept: ".pdf,.txt,.png,.jpg,.jpeg", style: "display:none" })),
     el("span", { class: "power-hint", id: "pr-filename" }, "PDF, texto ou imagem"));
   card2.appendChild(fileRow);
@@ -1255,8 +1353,8 @@ async function renderPrint() {
 
   // ---- Card 3: Ações ----
   const card3 = el("div", { class: "print-card print-actions" },
-    el("button", { class: "btn btn-secondary", id: "pr-preview-btn" }, "👁 Visualizar"),
-    el("button", { class: "btn btn-primary", id: "pr-submit" }, "🖨️ Imprimir"));
+    el("button", { class: "btn btn-secondary", id: "pr-preview-btn" }, icon("eye", "ic"), " Visualizar"),
+    el("button", { class: "btn btn-primary", id: "pr-submit" }, icon("printer", "ic"), " Imprimir"));
   v.appendChild(card3);
 
   const previewBtn = document.getElementById("pr-preview-btn");
@@ -1298,7 +1396,7 @@ async function renderPrintJobs() {
     jobs.forEach((job) => {
       const printing = job.status === "printing";
       const row = el("div", { class: "feed-item" },
-        el("span", {}, printing ? "🟡" : "✅"),
+        el("span", { class: "status-dot " + (printing ? "warn" : "ok") }),
         el("span", { class: "app-name" }, job.id),
         el("span", { class: "app-host" },
           printing ? "Imprimindo…" : "Concluído" +
@@ -1396,7 +1494,7 @@ async function submitPrint() {
         const mb = (file.size / 1024 / 1024).toFixed(1);
         if (!confirm("Arquivo com " + mb + " MB.\nO arquivo é grande e pode demorar para ser processado.\nDeseja continuar?")) {
           submitBtn.disabled = false;
-          submitBtn.textContent = "🖨️ Imprimir";
+          submitBtn.innerHTML = icon("printer", "ic").outerHTML + " Imprimir";
           return;
         }
       }
@@ -1419,7 +1517,7 @@ async function submitPrint() {
   } catch (err) {
     toast(err.message || "Falha ao imprimir.", "error");
     submitBtn.disabled = false;
-    submitBtn.textContent = "🖨️ Imprimir";
+    submitBtn.innerHTML = icon("printer", "ic").outerHTML + " Imprimir";
   }
 }
 
