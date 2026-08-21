@@ -48,13 +48,19 @@ check("Limpa token legado do localStorage",
 check("Expiração com expiresAt", authSrc.includes("expiresAt"));
 check("Verificação de expiração", authSrc.includes("isExpired"));
 
-// 3. Sanitização XSS
+// 3. Modelo XSS: html=constantes internas (ícones), dados externos via esc()
 const appSrc = readFileSync("app/js/app.js", "utf-8");
-check("el() sanitiza innerHTML com textContent",
-  appSrc.includes("div.textContent = v") && appSrc.includes("div.innerHTML")
+check("el() html é innerHTML (ícones SVG constantes renderizam)",
+  /else if \(k === "html"\) e\.innerHTML = v;/.test(appSrc)
 );
-check("el() não usa innerHTML direto para atributos HTML",
-  !appSrc.match(/setAttribute\(.*html.*innerHTML/)
+check("esc() global para dados externos em HTML",
+  /function esc\(str\)/.test(authSrc) && appSrc.includes("esc(data.latest)")
+);
+check("innerHTML com dados da API são escapados",
+  appSrc.includes("esc(data.latest)") && appSrc.includes("esc(d.upgradable)") && appSrc.includes("esc(label)")
+);
+check("toast() usa textContent (sem innerHTML)",
+  authSrc.includes("t.textContent = message;")
 );
 
 // 4. Autenticação robusta
