@@ -52,6 +52,32 @@ function isPublicPath(url: string): boolean {
     return false;
 }
 
+/**
+ * Paths de leitura automática/polling.
+ *
+ * Estes GETs são consultados periodicamente pelo App (dashboard, status,
+ * widgets). Não contam como atividade real do usuário: não renovam a sessão
+ * (S2 do Security Hardening) para que polling não prolongue indefinidamente
+ * a validade de uma sessão ociosa.
+ */
+function isPollingPath(url: string): boolean {
+    return [
+        "/api/v1/status",
+        "/api/v1/events",
+        "/api/v1/services",
+        "/api/v1/services/status",
+        "/api/v1/storage",
+        "/api/v1/storage/status",
+        "/api/v1/hardware",
+        "/api/v1/power",
+        "/api/v1/devices",
+        "/api/v1/print",
+        "/api/v1/print/jobs",
+        "/api/v1/update",
+        "/api/v1/update/os",
+    ].includes(url);
+}
+
 type Outcome = { ok: true } | { ok: false; status: number; error: string };
 
 function fail(status: number, error: string): Outcome {
@@ -94,7 +120,7 @@ async function authenticate(request: FastifyRequest): Promise<Outcome> {
         return { ok: true };
     }
 
-    const session = getSession(token);
+    const session = getSession(token, { renew: !isPollingPath(request.url) });
 
     if (!session) {
         return fail(401, "Sessão inválida ou expirada.");

@@ -7,7 +7,9 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "test:session": "tsx tests/session.test.ts"
+    "test:session": "tsx tests/session.test.ts",
+    "test:executor": "tsx tests/executor.test.ts",
+    "test": "tsx tests/session.test.ts && tsx tests/executor.test.ts"
   },
   "dependencies": {
     "@fastify/cors": "^11.3.0",
