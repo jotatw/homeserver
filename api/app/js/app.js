@@ -5,11 +5,18 @@
 
 /* ---------- Helpers ---------- */
 
+/* ---------- Helpers ---------- */
+
 function el(tag, attrs = {}, ...children) {
   const e = document.createElement(tag);
   Object.entries(attrs).forEach(([k, v]) => {
     if (k === "class") e.className = v;
-    else if (k === "html") e.innerHTML = v;
+    else if (k === "html") {
+      const div = document.createElement("div");
+      div.textContent = v;
+      e.innerHTML = div.innerHTML;
+    }
+    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
     else e.setAttribute(k, v);
   });
   children.forEach((c) => {
