@@ -16,21 +16,30 @@ Registrar requisitos, implementação, testes e evidências. Uma correção sem 
 
 ## S1 — Sanitização de erros
 
+Status: 🟡 implementado; validação final em ambiente real pendente.
+
 Prioridade: P0.
 
 Problema: detalhes internos podem ser retornados diretamente ao cliente.
 
+### Implementação atual
+
+- `api/src/utils/respond.ts` centraliza respostas públicas com `sendOk()` e `sendError()`.
+- `sendInternalError()` registra o erro original no logger da requisição e retorna uma mensagem pública controlada.
+- As rotas administrativas revisadas utilizam o helper para falhas inesperadas.
+- Erros esperados de validação, autenticação, autorização e recursos inexistentes continuam usando mensagens públicas específicas e status HTTP apropriados.
+
 Objetivo:
 
-- respostas públicas controladas;
-- detalhes técnicos apenas em logs e, quando aplicável, no Journal;
-- identificador de operação ou correlação quando houver operação relevante.
+- [x] respostas públicas controladas;
+- [x] detalhes técnicos encaminhados para logs internos;
+- [ ] identificador de operação/correlação para operações relevantes — depende da evolução do Journal.
 
 Critério de saída:
 
-- respostas de erro não expõem stack trace, paths internos, comandos ou detalhes sensíveis;
-- diagnóstico completo continua disponível para investigação autorizada;
-- testes cobrem falhas representativas.
+- [x] respostas de erro não devem expor stack trace, paths internos, comandos ou detalhes sensíveis no fluxo sanitizado;
+- [x] diagnóstico completo permanece disponível no logger interno;
+- [ ] falhas representativas devem ser executadas e registradas como evidência final.
 
 ## S2 — Sessões
 
@@ -115,18 +124,15 @@ Todos os adaptadores que invocam comandos no host (`backup.ts`, `devices.ts`, `m
 
 **4. Testes Automatizados**
 
-- `api/tests/executor.test.ts` — 22 testes cobrindo:
-  - Rejeição de comandos/argumentos inválidos (injeção, path traversal, formatos inválidos).
-  - Aceitação de comandos válidos (validação passa).
-  - Cobertura de todos os comandos da allowlist.
+- `api/tests/executor.test.ts` — 22 testes cobrindo rejeição de comandos/argumentos inválidos, aceitação de comandos válidos e cobertura da allowlist.
 
 **Critério de saída:**
 
-- [x] polling não renova a sessão por si só;
-- [x] inatividade expira conforme política definida;
-- [x] nenhuma sessão permanece válida além do limite absoluto;
-- [x] testes cobrem login, atividade, polling e expiração (`api/tests/session.test.ts`, 19/19 PASS).
-- [x] allowlist bloqueia injeção de comando, path traversal, formatos inválidos (`api/tests/executor.test.ts`, 22/22 PASS).
+- [x] allowlist bloqueia execução arbitrária e formatos inválidos;
+- [x] parâmetros críticos são validados antes da execução;
+- [x] Core mantém validações próprias em operações relevantes;
+- [x] adaptadores revisados usam o executor centralizado;
+- [x] testes do executor cobrem os contratos de validação.
 
 ## S4 — Defesa em profundidade para módulos
 
@@ -134,61 +140,29 @@ Status: implementado e validado (2026-08-21). Ver `planning/security/validation.
 
 ### Objetivo
 
-Defesa em profundidade para operações de módulos: validações em múltiplas camadas (API → Core → Engine) com máquina de estados, validação de dependências/capabilities, e locking para concorrência.
+Defesa em profundidade para operações de módulos: validações em múltiplas camadas (API → Core → Engine) com máquina de estados, validação de dependências/capabilities e locking para concorrência.
 
 ### Implementação (2026-08-21)
 
-**1. Máquina de estados / transições permitidas (`_module_validate_transition`)**
-
-- `start`: só se não running/starting
-- `stop`: só se running
-- `restart`: só se running/stopped
-- `update`: só se não ocupado (starting/stopping/updating)
-- `enable/disable`: sempre permitidas (administrativas)
-- `status`: sempre permitido
-
-**2. Validação de dependências e capabilities**
-
-- `_module_validate_dependencies`: lê `dependencies` da Definition e verifica se satisfeitas (logging por enquanto)
-- `_module_validate_capability`: verifica se módulo declara capability requerida
-
-**3. Locking para concorrência (`_module_lock_acquire` / `_module_lock_release`)**
-
-- Lock baseado em diretório (mkdir atômico) em `/srv/config/modules/locks/<id>.lock`
-- Impede operações concorrentes no mesmo módulo
-- Liberado automaticamente ao final (`_module_op_finalize`)
-
-**3. Validações de entrada no Core**
-
-- `_module_read_definition`: validação completa da Definition (campos obrigatórios, id consistente)
-- `module_instance_add`: validação de slug para nome de instância (`^[a-z0-9][a-z0-9-]*$`)
-- `module_op`: valida operação contra Definition (`operations` list)
-
-**4. Validação de transições (`_module_validate_transition`)**
-
-Máquina de estados com transições permitidas:
-- `start`: só se estado ≠ running/starting
-- `stop`: só se estado == running
-- `restart`: só se running/stopped
-- `update`: só se não ocupado (starting/stopping/updating)
-- `enable/disable`: sempre permitidas
-
-**5. Integração no fluxo `module_op`**
-
-- `_module_validate_operation`: combina check de conflitos, lock, transição, dependências
-- Lock adquirido antes da operação, liberado no final (`_module_op_finalize`)
-- Journal e state atualizados após execução
+- máquina de estados para transições permitidas;
+- validação de Definition e operações suportadas;
+- validação de dependências e capabilities;
+- locking atômico por módulo em `/srv/config/modules/locks/<id>.lock`;
+- integração das validações no fluxo `module_op`;
+- atualização de estado e Journal após a execução.
 
 **Critério de saída:**
 
 - [x] existência do módulo/instância validada;
 - [x] operação suportada validada contra Definition;
-- [x] estado e transição permitidos (máquina de estados);
+- [x] estado e transição permitidos;
 - [x] dependências e capabilities verificadas;
-- [x] autorização (via middleware API + validação Core);
-- [x] conflitos com operações em andamento prevenidos (locking).
+- [x] autorização aplicada antes da operação;
+- [x] conflitos com operações em andamento prevenidos.
 
 ## S5 — Sessão no frontend e XSS hardening
+
+Status: ⚪ planejamento futuro.
 
 Prioridade: P2.
 
@@ -205,18 +179,17 @@ A evolução deverá considerar em conjunto:
 
 ## S6 — Validação contínua
 
+Status: 🟢 automação ampliada; evidências de ambiente real permanecem necessárias.
+
 Toda melhoria deve seguir:
 
 `Requirement → Implementation → Test → Result → Evidence`
 
-A suíte de segurança deve crescer junto com o projeto. Regressões em autenticação, autorização, sessões e operações privilegiadas devem ser bloqueadas antes de ampliar funcionalidades administrativas.
+A suíte de segurança cresce junto com o projeto. A CI executa a suíte completa da API via `npm test`, incluindo testes de sessão, executor e segurança. Regressões automatizadas nessas áreas devem bloquear o pipeline.
 
-## Ordem de execução
+## Próximos passos
 
-1. S1 — sanitização de erros;
-2. S2 — política de sessões;
-3. validação e regressão;
-4. inventário completo de privilégios e operações;
-5. S3/S4 — desenho e implementação gradual da fronteira de operações;
-6. S5 — evolução de sessão/frontend;
-7. validação contínua em todas as fases.
+1. executar a validação final de S1 com falhas representativas no ambiente real;
+2. registrar resultados e evidências em `planning/security/validation.md`;
+3. continuar a evolução de S5 junto da arquitetura de sessão/frontend, sem migração isolada;
+4. manter novas operações administrativas dentro do contrato do executor centralizado e da validação em camadas.
