@@ -74,6 +74,10 @@ const ICONS = {
   alert: '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
   toolbox: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
   dots: '<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>',
+  server: '<rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/>',
+  heart: '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>',
+  grip: '<circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/>',
+  maximize: '<polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>',
 };
 
 function icon(name, cls = "") {
@@ -252,87 +256,10 @@ async function router() {
   }
 }
 
-/* ---------- Dashboard (Meu espaço) ---------- */
-
-async function renderDashboard() {
-  const v = document.getElementById("view");
-  v.innerHTML = "";
-
-  // Estrutura com ids (banner, stats, ações, feed) — polling atualiza os valores.
-  v.appendChild(el("div", { class: "banner", id: "db-banner" }, "●", "Carregando…"));
-
-  v.appendChild(el("h3", { class: "section" }, "Servidor"));
-  const grid = el("div", { class: "grid", id: "db-stats" });
-  ["cpu", "mem", "disk", "uptime"].forEach((k) => grid.appendChild(el("div", { class: "stat-card skeleton" })));
-  v.appendChild(grid);
-
-  v.appendChild(el("h3", { class: "section" }, "Acesso rápido"));
-  const actions = el("div", { class: "grid" });
-  actions.appendChild(actionCard("folder", "Arquivos", "/files/"));
-  actions.appendChild(actionCard("box", "Aplicações", "#/apps"));
-  actions.appendChild(actionCard("activity", "Sistema", "#/system"));
-  if (auth.isAdmin()) {
-    actions.appendChild(actionCard("printer", "Imprimir", "#/print"));
-  }
-  v.appendChild(actions);
-
-  v.appendChild(el("h3", { class: "section" }, "Atividades"));
-  v.appendChild(el("div", { class: "feed", id: "db-feed" }));
-
-  await refreshDashboard();
-  dashboardTimer = setInterval(refreshDashboard, 30000);
-}
-
-async function refreshDashboard() {
-  try {
-    const [status, events] = await Promise.all([
-      api("/api/v1/status"),
-      api("/api/v1/events"),
-    ]);
-
-    // Banner de status
-    const banner = document.getElementById("db-banner");
-    const services = status.services || [];
-    const up = services.filter((s) => s.status === "running").length;
-    let bannerClass = "ok", bannerText = `Servidor OK · ${up} apps em execução`;
-    if (services.length > 0 && up < services.length) {
-      bannerClass = "warn";
-      bannerText = `${services.length - up} de ${services.length} serviços com problema`;
-    } else if (services.length === 0) {
-      bannerClass = "danger";
-      bannerText = "Nenhum serviço reportando";
-    }
-    banner.className = "banner " + bannerClass;
-    banner.textContent = "● " + bannerText;
-
-    // Stat cards
-    const disk = status.disk || {};
-    const mem = status.memory || {};
-    const cpu = status.cpu || {};
-    const stats = document.getElementById("db-stats");
-    stats.innerHTML = "";
-    stats.appendChild(statCard("CPU", (cpu.percent ?? 0) + "%", cpu.percent ?? 0));
-    stats.appendChild(statCard("Memória", (mem.percent ?? 0) + "%", mem.percent ?? 0));
-    stats.appendChild(statCard("Disco", (disk.percent ?? 0) + "%", disk.percent ?? 0));
-    stats.appendChild(statCard("Uptime", status.uptime || "—", 0));
-
-    // Feed de atividades
-    const feed = document.getElementById("db-feed");
-    feed.innerHTML = "";
-    if (events && events.length) {
-      events.slice(0, 8).forEach((ev) => {
-        const iconName = { backup: "database", device: "plug", system: "settings", power: "zap" }[ev.type] || "filetext";
-        feed.appendChild(el("div", { class: "feed-item" },
-          icon(iconName), el("span", {}, ev.action || ev.type),
-          el("span", { class: "feed-time" }, ev.time ? timeAgo(ev.time) : "")));
-      });
-    } else {
-      feed.appendChild(el("div", { class: "feed-item" }, "Sem atividades registradas."));
-    }
-  } catch (_) {
-    // api() já trata 401 (logout). Erros de rede ficam silenciosos no polling.
-  }
-}
+/* ---------- Dashboard (Meu espaço) ----------
+ * Delegado ao widget system (dashboard-widgets.js) — Fase 5
+ * Mantido clearDashboardPolling como compat.
+ */
 
 function statCard(label, value, pct) {
   const bar = pct > 0
