@@ -677,15 +677,16 @@ async function refreshServices() {
     }
     services.forEach((s) => {
       const up = s.status === "running";
-      const row = el("div", { class: "feed-item module-row" },
-        el("span", { class: "status-dot " + (s.status === "running" ? "ok" : "danger") }),
-        el("div", { class: "module-meta" },
-          el("div", { class: "app-name" },
-            s.name,
-            s.status === "running" ? el("span", { class: "badge ok", style: "margin-left:var(--hs-space-2)" }, "ativo") : el("span", { class: "badge", style: "margin-left:var(--hs-space-2)" }, "parado")),
-          el("div", { class: "app-host" }, s.description || "Serviço do sistema"));
+
+      const meta = el("div", { class: "module-meta" },
+        el("div", { class: "app-name" },
+          s.name,
+          el("span", { class: "badge " + (up ? "ok" : "danger"), style: "margin-left:var(--hs-space-2)" }, up ? "ativo" : "parado")),
+        el("div", { class: "app-host" }, s.description || "Serviço do sistema"));
+
       const opsWrap = el("div", { class: "module-ops" });
-      if (s.status === "running") {
+
+      if (up) {
         const stopBtn = el("button", { class: "btn btn-secondary", style: "height:var(--hs-touch-compact)" }, "Parar");
         stopBtn.addEventListener("click", () => runServiceOp(s.name, "stop", stopBtn));
         opsWrap.appendChild(stopBtn);
@@ -697,22 +698,23 @@ async function refreshServices() {
         startBtn.addEventListener("click", () => runServiceOp(s.name, "start", startBtn));
         opsWrap.appendChild(startBtn);
       }
+
+      const pop = el("div", { class: "ops-pop" });
+      [["restart", "refresh", "Reiniciar"], ["enable", "check", "Ativar"], ["disable", "x", "Desativar"]].forEach(([op, ic, label]) => {
+        const b = el("button", { type: "button", class: "ops-pop-item" }, icon(ic, "ic"), el("span", {}, label));
+        b.addEventListener("click", () => runServiceOp(s.name, op, null));
+        pop.appendChild(b);
+      });
       const more = el("details", { class: "ops-menu" },
         el("summary", { class: "btn btn-secondary ops-menu-btn", "aria-label": "Mais operações" }, icon("dots", "ic")),
-        el("div", { class: "ops-pop" },
-          el("button", { type: "button", class: "ops-pop-item" }, icon("refresh", "ic"), el("span", {}, "Reiniciar")).addEventListener("click", () => runServiceOp(s.name, "restart", null)),
-          el("button", { type: "button", class: "ops-pop-item" }, icon("check", "ic"), el("span", {}, "Ativar")).addEventListener("click", () => runServiceOp(s.name, "enable", null)),
-          el("button", { type: "button", class: "ops-pop-item" }, icon("x", "ic"), el("span", {}, "Desativar")).addEventListener("click", () => runServiceOp(s.name, "disable", null)),
-      ));
+        pop);
       opsWrap.appendChild(more);
+
       const row = el("div", { class: "feed-item module-row" },
-        icon("box", "ic"),
-        el("div", { class: "module-meta" },
-          el("div", { class: "app-name" }, s.name),
-          el("div", { class: "app-host" }, s.description || "Serviço do sistema")),
-        opsWrap
-      );
-      document.getElementById("services-feed")?.appendChild(row);
+        el("span", { class: "status-dot " + (up ? "ok" : "danger") }),
+        meta,
+        opsWrap);
+      sfeedEl.appendChild(row);
     });
   } catch (err) {
     const sfeedEl = document.getElementById("services-feed");
@@ -915,83 +917,7 @@ async function renderAdmin() {
   v.appendChild(el("h3", { class: "section" }, "Serviços"));
   const sfeed = el("div", { class: "feed", id: "services-feed" });
   v.appendChild(sfeed);
-
-  async function renderServices() {
-    try {
-      const services = await api("/api/v1/services");
-      const sfeed = document.getElementById("services-feed");
-      if (!sfeed) return;
-      sfeed.innerHTML = "";
-
-      if (!services || !services.length) {
-        sfeed.appendChild(el("div", { class: "feed-item" }, "Nenhum serviço encontrado."));
-        return;
-      }
-
-      services.forEach((s) => {
-        const up = s.status === "running";
-        const sfeedEl = document.getElementById("services-feed");
-        if (!sfeedEl) return;
-
-        const row = el("div", { class: "feed-item module-row" },
-          el("span", { class: "status-dot " + (s.status === "running" ? "ok" : "danger") }),
-          el("div", { class: "module-meta" },
-            el("div", { class: "app-name" },
-              s.name,
-              s.status === "running" ? el("span", { class: "badge ok", style: "margin-left:var(--hs-space-2)" }, "ativo") : el("span", { class: "badge", style: "margin-left:var(--hs-space-2)" }, "parado")),
-            el("div", { class: "app-host" }, s.description || "Serviço do sistema"));
-
-        const opsWrap = el("div", { class: "module-ops" });
-
-        if (s.status === "running") {
-          const stopBtn = el("button", { class: "btn btn-secondary", style: "height:var(--hs-touch-compact)" }, "Parar");
-          stopBtn.addEventListener("click", () => runServiceOp(s.name, "stop", stopBtn));
-          opsWrap.appendChild(stopBtn);
-
-          const restartBtn = el("button", { class: "btn btn-secondary", style: "height:var(--hs-touch-compact)" }, "Reiniciar");
-          restartBtn.addEventListener("click", () => runServiceOp(s.name, "restart", restartBtn));
-          opsWrap.appendChild(restartBtn);
-        } else {
-          const startBtn = el("button", { class: "btn btn-primary", style: "height:var(--hs-touch-compact)" }, "Iniciar");
-          startBtn.addEventListener("click", () => runServiceOp(s.name, "start", startBtn));
-          opsWrap.appendChild(startBtn);
-        }
-
-        const moreOps = ["restart", "enable", "disable"].filter(op => {
-          if (op === "restart") return true;
-          return true;
-        });
-
-        const more = el("details", { class: "ops-menu" },
-          el("summary", { class: "btn btn-secondary ops-menu-btn", "aria-label": "Mais operações" },
-            icon("dots", "ic")),
-          el("div", { class: "ops-pop" },
-            el("button", { type: "button", class: "ops-pop-item" },
-              icon("refresh", "ic"), el("span", {}, "Reiniciar")).addEventListener("click", () => runServiceOp(s.name, "restart", null)),
-            el("button", { type: "button", class: "ops-pop-item" },
-              icon("check", "ic"), el("span", {}, "Ativar")).addEventListener("click", () => runServiceOp(s.name, "enable", null)),
-            el("button", { type: "button", class: "ops-pop-item" },
-              icon("x", "ic"), el("span", {}, "Desativar")).addEventListener("click", () => runServiceOp(s.name, "disable", null)),
-        ));
-        opsWrap.appendChild(more);
-
-        const row = el("div", { class: "feed-item module-row" },
-          icon("box", "ic"),
-          el("div", { class: "module-meta" },
-            el("div", { class: "app-name" }, s.name),
-            el("div", { class: "app-host" }, s.description || "Serviço do sistema")),
-          opsWrap
-        );
-
-        sfeedEl.appendChild(row);
-      });
-    } catch (err) {
-      sfeedEl.appendChild(el("div", { class: "feed-item error-msg" }, "Falha ao carregar serviços."));
-    }
-  }
-
-  // Carrega serviços inicialmente
-  await renderServices();
+  await refreshServices();
 
   // Atualização do sistema
   v.appendChild(el("h3", { class: "section" }, "Atualização"));
@@ -1661,13 +1587,6 @@ async function init() {
   buildNav();
   renderUser();
   router();
-
-  // Refresh ao focar a aba (se estiver no dashboard com polling).
-  document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible" && dashboardTimer) {
-      refreshDashboard();
-    }
-  });
 }
 
 init();
