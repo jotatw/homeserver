@@ -60,6 +60,11 @@ fi
 rm -f "${LATEST}"
 ln -s "${TARGET}" "${LATEST}"
 
+# Manifest SHA256 para validação (amostra dos arquivos críticos, exclui o próprio manifest)
+if command -v sha256sum >/dev/null 2>&1; then
+    find "${TARGET}" -type f ! -name "manifest.sha256" -size -50M 2>/dev/null | head -n 500 | xargs sha256sum 2>/dev/null > "${TARGET}/manifest.sha256" || true
+fi
+
 find "${BACKUP_ROOT}" -mindepth 1 -maxdepth 1 -type d -mtime +${KEEP_DAYS} -exec rm -rf {} \; 2>/dev/null
 
 log "Backup concluído com sucesso"
