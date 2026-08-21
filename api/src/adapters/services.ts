@@ -1,17 +1,7 @@
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
-
-const execFileAsync = promisify(execFile);
-
-const CORE = "/workspace/core/hs.sh";
-
-async function runCore(args: string[]): Promise<string> {
-    const { stdout } = await execFileAsync("/bin/bash", [CORE, ...args]);
-    return stdout.trim();
-}
+import { cachedRunCore, runCore } from "../utils/cache.js";
 
 export async function getServices() {
-    const raw = await runCore(["system", "services"]);
+    const raw = await cachedRunCore("services", 10000, ["system", "services"]);
     return JSON.parse(raw);
 }
 
