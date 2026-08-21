@@ -24,9 +24,22 @@ Os estados possíveis são:
 - respostas públicas não expõem comandos ou argumentos internos;
 - detalhes continuam disponíveis em logs autorizados.
 
-### Evidência mínima
+### Implementação registrada
 
-Provocar falhas representativas e verificar simultaneamente resposta HTTP e registro interno.
+`api/src/utils/respond.ts` possui `sendInternalError()`, usado para falhas inesperadas no fluxo sanitizado. O helper registra o erro original no logger e retorna uma mensagem pública controlada.
+
+Erros esperados continuam usando `sendError()` com mensagens públicas específicas e status HTTP apropriados.
+
+### Evidência pendente
+
+Ainda é necessário provocar falhas representativas no ambiente executando a API e registrar simultaneamente:
+
+1. status e corpo da resposta HTTP;
+2. confirmação de que a mensagem interna original não chegou ao cliente;
+3. confirmação de que o detalhe técnico foi registrado internamente;
+4. versão/commit testado e resultado.
+
+**Estado: 🟡 implementado; validação final pendente.**
 
 ## S2 — Sessões
 
@@ -45,13 +58,13 @@ Testes automatizados para login, leitura automática, atividade real, idle timeo
 
 `api/tests/session.test.ts` — 19/19 PASS:
 
-- login cria sessão com `createdAt`, `lastUserActivityAt`, `expiresAt` (limite absoluto);
-- leitura sem renovação (`getSession(token)`) não renova, mas valida;
-- polling (paths de leitura automática em `plugins/auth.ts`) não renova a sessão;
-- atividade real (`getSession(token, { renew: true })`) renova `lastUserActivityAt`;
-- inatividade expira conforme `HS_SESSION_TTL_MS` (padrão 30 dias);
-- limite absoluto (`HS_SESSION_ABSOLUTE_TTL_MS`, padrão 90 dias) expira a sessão mesmo com atividade contínua;
-- `sessionExpiresIn` reflete o limite mais próximo (absoluto ou inatividade).
+- login cria sessão com `createdAt`, `lastUserActivityAt`, `expiresAt`;
+- leitura sem renovação valida sem renovar;
+- polling não renova a sessão;
+- atividade real renova `lastUserActivityAt`;
+- inatividade expira conforme `HS_SESSION_TTL_MS`;
+- limite absoluto expira a sessão mesmo com atividade contínua;
+- `sessionExpiresIn` reflete o limite mais próximo.
 
 **Estado: 🟢 validado.**
 
@@ -73,16 +86,11 @@ Testes negativos para operação desconhecida, parâmetros inválidos, usuário 
 ### Evidência registrada (2026-08-21)
 
 `api/tests/executor.test.ts` — 22/22 PASS:
-- Rejeição de comandos não permitidos (execução arbitrária, injeção de comando, path traversal).
-- Validação rigorosa de argumentos por regex:
-  - `device`: type (usb|sdcard|external|temporary), label (`[a-zA-Z0-9_-]+`), device (`[a-zA-Z0-9]+`).
-  - `module`: id slug (`[a-z0-9][a-z0-9-]*`), op (`start|stop|restart|enable|disable|update|status`).
-  - `power`: `HH:MM` para horários.
-  - `print`: impressora, opções `-o`, arquivo em `/api/data/`.
-  - `cancel`: jobId formato `<printer>-<número>`.
-  - `lpstat`: apenas scripts compostos permitidos.
-  - `backup`: script sem argumentos.
-- Aceitação de comandos válidos (validação passa, execução delegada ao host).
+
+- rejeição de comandos não permitidos, injeção de comando e path traversal;
+- validação de argumentos para operações de device, module, power, print, cancel, lpstat, backup e update;
+- aceitação de contratos válidos antes da delegação ao host;
+- cobertura dos comandos/operações permitidos pelo executor.
 
 **Estado: 🟢 validado.**
 
@@ -102,20 +110,21 @@ Matriz de testes por operação e transição de estado.
 
 ### Evidência registrada (2026-08-21)
 
-`core/infrastructure/modules.sh` — implementação S4:
+`core/infrastructure/modules.sh` implementa:
 
-- **Máquina de estados** (`_module_validate_transition`): transições permitidas (start/stop/restart/update) baseadas no estado atual.
-- **Locking concorrência** (`_module_lock_acquire`/`_module_lock_release`): mkdir atômico em `/srv/config/modules/locks/<id>.lock`.
-- **Validação dependências/capabilities**: `_module_validate_dependencies`, `_module_validate_capability`.
-- **Validação definição/operação**: `_module_read_definition`, validação contra `operations` na Definition.
-- **Integração no `module_op`**: `_module_validate_operation` combina lock, transição, dependências.
+- máquina de estados para transições permitidas;
+- locking de concorrência com diretório atômico;
+- validação de dependências/capabilities;
+- validação de Definition e operação;
+- integração das validações no fluxo `module_op`.
 
-**Critérios de saída atendidos:**
+Critérios registrados como atendidos:
+
 - [x] existência do módulo/instância validada;
 - [x] operação suportada validada contra Definition;
-- [x] estado e transição permitidos (máquina de estados);
+- [x] estado e transição permitidos;
 - [x] dependências e capabilities verificadas;
-- [x] conflitos com operações em andamento prevenidos (locking).
+- [x] conflitos com operações em andamento prevenidos.
 
 **Estado: 🟢 validado.**
 
@@ -127,6 +136,21 @@ Matriz de testes por operação e transição de estado.
 - proteção contra leitura indevida por JavaScript considerada;
 - HTTPS, cookies e CSRF tratados como conjunto;
 - PWA validado após mudança.
+
+**Estado: ⚪ planejado.**
+
+## S6 — Validação contínua
+
+### Implementação atual
+
+- `api/tests/session.test.ts`;
+- `api/tests/executor.test.ts`;
+- `api/tests/security.test.ts`;
+- CI executa `npm test` após typecheck e build.
+
+A automação cobre regressões detectáveis pela suíte atual, mas não substitui validação de operações privilegiadas e recuperação no ambiente real.
+
+**Estado: 🟢 automação implementada; evidência operacional contínua.**
 
 ## Registro de evidências
 
