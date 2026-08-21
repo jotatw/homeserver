@@ -142,7 +142,7 @@ O HTTPS protege a comunicação quando configurado pelo Caddy, mas isso não sig
 
 ### Onde ficam os backups?
 
-Backups ficam fora de `/srv/storage`, em `/srv/backup`.
+Backups ficam fora de `/srv/storage`, em `/srv/backup/daily/<AAAA-MM-DD>` com symlink `latest`. Retenção: 14 dias (automático em `scripts/backup.sh`). Cada backup gera `manifest.sha256` para validação (`hs system backup validate`). Restauração: `sudo bash scripts/restore.sh [data|latest]` — ver `scripts/restore.sh` (para em `docker stop` antes de restaurar `docker/services`).
 
 ### Posso conectar um pendrive ou HD externo?
 

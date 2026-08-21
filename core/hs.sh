@@ -111,7 +111,13 @@ case "${_command}" in
                 esac
                 ;;
             services)       get_service_status_json; echo ;;
-            backup)         printf '{"last":"%s"}\n' "$(get_backup_last)" ;;
+            backup)
+                case "${3:-status}" in
+                    status)   printf '{"last":"%s"}\n' "$(get_backup_last)" ;;
+                    validate) backup_validate_json ;;
+                    *) echo "Uso: hs system backup status|validate" >&2; exit 1 ;;
+                esac
+                ;;
             wol)
                 case "${3:-status}" in
                     status) wol_status ;;

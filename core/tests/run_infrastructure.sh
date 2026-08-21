@@ -26,6 +26,10 @@ run_test \
     "${SCRIPT_DIR}/infrastructure/test_backup.sh"
 
 run_test \
+    "Backup validate/restore" \
+    "${SCRIPT_DIR}/infrastructure/test_backup_validate.sh"
+
+run_test \
     "Storage" \
     "${SCRIPT_DIR}/infrastructure/test_storage.sh"
 
