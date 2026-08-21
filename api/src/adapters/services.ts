@@ -14,3 +14,8 @@ export async function getServices() {
     const raw = await runCore(["system", "services"]);
     return JSON.parse(raw);
 }
+
+export async function serviceOp(name: string, op: "start" | "stop" | "restart" | "enable" | "disable") {
+    const raw = await runCore(["service", name, op]);
+    return JSON.parse(raw);
+}
