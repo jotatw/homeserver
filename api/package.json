@@ -9,7 +9,8 @@
     "start": "node dist/server.js",
     "test:session": "tsx tests/session.test.ts",
     "test:executor": "tsx tests/executor.test.ts",
-    "test": "tsx tests/session.test.ts && tsx tests/executor.test.ts"
+    "test:security": "tsx tests/security.test.ts",
+    "test": "tsx tests/session.test.ts && tsx tests/executor.test.ts && tsx tests/security.test.ts"
   },
   "dependencies": {
     "@fastify/cors": "^11.3.0",
