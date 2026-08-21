@@ -2,39 +2,87 @@
 
 ## Versões suportadas
 
-O projeto segue a linha de versões publicada no `CHANGELOG.md`.
+O HomeServer está em desenvolvimento ativo.
 
-| Versão | Suporte |
-|---|---|
-| v2.x | Suportada |
-| v1.x | Manutenção enquanto a v2.0 é finalizada |
-| Versões anteriores | Não suportadas |
+Relatos de segurança devem ser considerados principalmente contra a versão mais recente da branch `main` ou contra a release estável mais recente quando ela existir.
 
-Correções de segurança devem ser aplicadas preferencialmente à versão mais recente suportada.
+Versões antigas podem receber correções quando necessário, mas não possuem garantia de suporte contínuo.
 
 ## Reportando uma vulnerabilidade
 
-Não abra uma issue pública do GitHub para uma vulnerabilidade de segurança ainda não divulgada.
+Não publique detalhes de uma vulnerabilidade ainda não corrigida em uma Issue pública, Pull Request público ou Discussion.
 
-Reporte o problema de forma privada pelo canal de segurança disponível no repositório. Inclua:
+Use o recurso **Private Security Advisory** do GitHub neste repositório quando ele estiver disponível. Caso não seja possível utilizar esse recurso, entre em contato com o mantenedor pelo canal indicado no perfil do GitHub.
 
-- versão afetada;
+Inclua, quando possível:
+
+- versão, commit ou branch afetada;
 - componente ou arquivo afetado;
+- descrição do problema;
 - passos para reproduzir;
-- comportamento esperado e comportamento observado;
+- comportamento esperado e observado;
 - possível impacto;
-- mitigação sugerida, se conhecida.
+- mitigação ou correção sugerida, se conhecida.
 
-Não inclua senhas, tokens de API, chaves privadas, dados pessoais ou outros segredos no relatório.
+Não inclua senhas, tokens, chaves privadas, dados pessoais ou outros segredos no relatório.
+
+## O que acontece após o reporte
+
+O problema será analisado antes da divulgação pública de detalhes técnicos.
+
+Quando aplicável, o processo será:
+
+```text
+Relato privado
+      ↓
+Análise e reprodução
+      ↓
+Classificação do impacto
+      ↓
+Correção
+      ↓
+Testes e validação
+      ↓
+Atualização de segurança
+      ↓
+Divulgação responsável
+```
+
+O prazo de resposta ou correção depende da gravidade, complexidade e disponibilidade do mantenedor. Como o projeto é atualmente mantido por uma única pessoa, não há SLA formal.
 
 ## Escopo
 
-Relatórios podem envolver o Core, API, instalador, autenticação, mecanismo de atualização, configuração Docker, permissões de armazenamento ou outros componentes mantidos neste repositório.
+Relatórios podem envolver componentes mantidos neste repositório, incluindo:
 
-Serviços de terceiros integrados ao HomeServer podem possuir suas próprias políticas de segurança. Quando apropriado, vulnerabilidades também devem ser reportadas ao projeto responsável pelo serviço.
+- Core e Foundation;
+- API e autenticação;
+- sessões e autorização;
+- operações privilegiadas no host;
+- instalador e mecanismo de atualização;
+- configuração de Docker e containers;
+- permissões e armazenamento;
+- backup e recuperação;
+- automações e módulos mantidos pelo projeto.
 
-## Orientações gerais
+Serviços de terceiros integrados ao HomeServer podem possuir suas próprias políticas de segurança. Quando a vulnerabilidade pertencer ao serviço externo, ela também deve ser reportada ao projeto responsável.
 
-O HomeServer foi projetado principalmente para redes locais confiáveis. Não exponha a API ou interfaces administrativas diretamente à internet pública sem configurar deliberadamente uma camada de segurança adequada.
+## Uso seguro
 
-Mantenha o sistema atualizado, utilize credenciais próprias para cada instalação e nunca versione arquivos `.env`, tokens ou chaves privadas.
+O HomeServer foi projetado principalmente para uso em redes locais. Não exponha a API, interfaces administrativas ou serviços internos diretamente à internet pública sem configurar deliberadamente as camadas de segurança necessárias.
+
+Recomendações básicas:
+
+- mantenha o sistema e o HomeServer atualizados;
+- utilize credenciais próprias e não reutilize senhas administrativas;
+- nunca versione arquivos `.env`, tokens ou chaves privadas;
+- revise cuidadosamente mudanças que adicionem comandos, permissões ou operações privilegiadas;
+- mantenha backups e teste a recuperação periodicamente.
+
+## Desenvolvimento
+
+Mudanças que afetem autenticação, autorização, sessões, execução de operações privilegiadas, armazenamento ou exposição de serviços devem incluir validação proporcional ao risco.
+
+A política detalhada de hardening e as evidências técnicas do projeto estão em:
+
+- `planning/security/hardening-plan.md`
+- `planning/security/validation.md`
