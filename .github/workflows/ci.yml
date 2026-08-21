@@ -51,5 +51,5 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Session unit tests
-        run: npm run test:session
+      - name: API test suite
+        run: npm test
