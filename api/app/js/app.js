@@ -714,6 +714,78 @@ async function runModuleOp(m, op, btn) {
   }
 }
 
+async function runServiceOp(name, op, btn) {
+  if (op === "stop" && !confirm("Parar o serviço " + name + "?")) return;
+  if (btn) btn.disabled = true;
+  try {
+    await apiOrFail("/api/v1/services/" + name + "/" + op, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
+    });
+    toast(name + ": " + op + " concluído.", "success");
+    await refreshServices();
+  } catch (err) {
+    toast(err.message || "Falha em " + op + ".", "error");
+    if (btn) btn.disabled = false;
+  }
+}
+
+async function refreshServices() {
+  try {
+    const services = await api("/api/v1/services");
+    const sfeedEl = document.getElementById("services-feed");
+    if (!sfeedEl) return;
+    sfeedEl.innerHTML = "";
+    if (!services || !services.length) {
+      sfeedEl.innerHTML = '<div class="feed-item">Nenhum serviço encontrado.</div>';
+      return;
+    }
+    services.forEach((s) => {
+      const up = s.status === "running";
+      const row = el("div", { class: "feed-item module-row" },
+        el("span", { class: "status-dot " + (s.status === "running" ? "ok" : "danger") }),
+        el("div", { class: "module-meta" },
+          el("div", { class: "app-name" },
+            s.name,
+            s.status === "running" ? el("span", { class: "badge ok", style: "margin-left:var(--hs-space-2)" }, "ativo") : el("span", { class: "badge", style: "margin-left:var(--hs-space-2)" }, "parado")),
+          el("div", { class: "app-host" }, s.description || "Serviço do sistema"));
+      const opsWrap = el("div", { class: "module-ops" });
+      if (s.status === "running") {
+        const stopBtn = el("button", { class: "btn btn-secondary", style: "height:var(--hs-touch-compact)" }, "Parar");
+        stopBtn.addEventListener("click", () => runServiceOp(s.name, "stop", stopBtn));
+        opsWrap.appendChild(stopBtn);
+        const restartBtn = el("button", { class: "btn btn-secondary", style: "height:var(--hs-touch-compact)" }, "Reiniciar");
+        restartBtn.addEventListener("click", () => runServiceOp(s.name, "restart", restartBtn));
+        opsWrap.appendChild(restartBtn);
+      } else {
+        const startBtn = el("button", { class: "btn btn-primary", style: "height:var(--hs-touch-compact)" }, "Iniciar");
+        startBtn.addEventListener("click", () => runServiceOp(s.name, "start", startBtn));
+        opsWrap.appendChild(startBtn);
+      }
+      const more = el("details", { class: "ops-menu" },
+        el("summary", { class: "btn btn-secondary ops-menu-btn", "aria-label": "Mais operações" }, icon("dots", "ic")),
+        el("div", { class: "ops-pop" },
+          el("button", { type: "button", class: "ops-pop-item" }, icon("refresh", "ic"), el("span", {}, "Reiniciar")).addEventListener("click", () => runServiceOp(s.name, "restart", null)),
+          el("button", { type: "button", class: "ops-pop-item" }, icon("check", "ic"), el("span", {}, "Ativar")).addEventListener("click", () => runServiceOp(s.name, "enable", null)),
+          el("button", { type: "button", class: "ops-pop-item" }, icon("x", "ic"), el("span", {}, "Desativar")).addEventListener("click", () => runServiceOp(s.name, "disable", null)),
+      ));
+      opsWrap.appendChild(more);
+      const row = el("div", { class: "feed-item module-row" },
+        icon("box", "ic"),
+        el("div", { class: "module-meta" },
+          el("div", { class: "app-name" }, s.name),
+          el("div", { class: "app-host" }, s.description || "Serviço do sistema")),
+        opsWrap
+      );
+      document.getElementById("services-feed")?.appendChild(row);
+    });
+  } catch (err) {
+    const sfeedEl = document.getElementById("services-feed");
+    if (sfeedEl) sfeedEl.innerHTML = '<div class="feed-item error-msg">Falha ao carregar serviços.</div>';
+  }
+}
+
 /* ---------- Dialog: montar dispositivo (admin) ---------- */
 
 function openMountDialog() {
@@ -904,6 +976,88 @@ async function renderAdmin() {
     mfeed.appendChild(el("div", { class: "feed-item" }, "Nenhum módulo encontrado."));
   }
   v.appendChild(mfeed);
+
+  // Serviços (Fase 4: gerenciamento de serviços)
+  v.appendChild(el("h3", { class: "section" }, "Serviços"));
+  const sfeed = el("div", { class: "feed", id: "services-feed" });
+  v.appendChild(sfeed);
+
+  async function renderServices() {
+    try {
+      const services = await api("/api/v1/services");
+      const sfeed = document.getElementById("services-feed");
+      if (!sfeed) return;
+      sfeed.innerHTML = "";
+
+      if (!services || !services.length) {
+        sfeed.appendChild(el("div", { class: "feed-item" }, "Nenhum serviço encontrado."));
+        return;
+      }
+
+      services.forEach((s) => {
+        const up = s.status === "running";
+        const sfeedEl = document.getElementById("services-feed");
+        if (!sfeedEl) return;
+
+        const row = el("div", { class: "feed-item module-row" },
+          el("span", { class: "status-dot " + (s.status === "running" ? "ok" : "danger") }),
+          el("div", { class: "module-meta" },
+            el("div", { class: "app-name" },
+              s.name,
+              s.status === "running" ? el("span", { class: "badge ok", style: "margin-left:var(--hs-space-2)" }, "ativo") : el("span", { class: "badge", style: "margin-left:var(--hs-space-2)" }, "parado")),
+            el("div", { class: "app-host" }, s.description || "Serviço do sistema"));
+
+        const opsWrap = el("div", { class: "module-ops" });
+
+        if (s.status === "running") {
+          const stopBtn = el("button", { class: "btn btn-secondary", style: "height:var(--hs-touch-compact)" }, "Parar");
+          stopBtn.addEventListener("click", () => runServiceOp(s.name, "stop", stopBtn));
+          opsWrap.appendChild(stopBtn);
+
+          const restartBtn = el("button", { class: "btn btn-secondary", style: "height:var(--hs-touch-compact)" }, "Reiniciar");
+          restartBtn.addEventListener("click", () => runServiceOp(s.name, "restart", restartBtn));
+          opsWrap.appendChild(restartBtn);
+        } else {
+          const startBtn = el("button", { class: "btn btn-primary", style: "height:var(--hs-touch-compact)" }, "Iniciar");
+          startBtn.addEventListener("click", () => runServiceOp(s.name, "start", startBtn));
+          opsWrap.appendChild(startBtn);
+        }
+
+        const moreOps = ["restart", "enable", "disable"].filter(op => {
+          if (op === "restart") return true;
+          return true;
+        });
+
+        const more = el("details", { class: "ops-menu" },
+          el("summary", { class: "btn btn-secondary ops-menu-btn", "aria-label": "Mais operações" },
+            icon("dots", "ic")),
+          el("div", { class: "ops-pop" },
+            el("button", { type: "button", class: "ops-pop-item" },
+              icon("refresh", "ic"), el("span", {}, "Reiniciar")).addEventListener("click", () => runServiceOp(s.name, "restart", null)),
+            el("button", { type: "button", class: "ops-pop-item" },
+              icon("check", "ic"), el("span", {}, "Ativar")).addEventListener("click", () => runServiceOp(s.name, "enable", null)),
+            el("button", { type: "button", class: "ops-pop-item" },
+              icon("x", "ic"), el("span", {}, "Desativar")).addEventListener("click", () => runServiceOp(s.name, "disable", null)),
+        ));
+        opsWrap.appendChild(more);
+
+        const row = el("div", { class: "feed-item module-row" },
+          icon("box", "ic"),
+          el("div", { class: "module-meta" },
+            el("div", { class: "app-name" }, s.name),
+            el("div", { class: "app-host" }, s.description || "Serviço do sistema")),
+          opsWrap
+        );
+
+        sfeedEl.appendChild(row);
+      });
+    } catch (err) {
+      sfeedEl.appendChild(el("div", { class: "feed-item error-msg" }, "Falha ao carregar serviços."));
+    }
+  }
+
+  // Carrega serviços inicialmente
+  await renderServices();
 
   // Atualização do sistema
   v.appendChild(el("h3", { class: "section" }, "Atualização"));
