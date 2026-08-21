@@ -13,10 +13,13 @@
 #   - opcionalmente cria o usuário no Gitea (perfil OIDC)
 #
 # Dependências:
-#   - adapters/filebrowser.sh
-#   - docker (Gitea / limpeza de pasta)
+#   - adapters/filebrowser.sh (apenas para criar usuário no FileBrowser)
+#   - foundation/filesystem.sh (criação/remoção de pasta em /srv/storage)
+#   - docker apenas para Gitea opcional
 #
 # Não faz:
+#   - Não monta storage nem depende de módulo específico para criar pasta
+#     (usa filesystem puro — desacoplado de FileBrowser).
 #   - Não conversa diretamente com a API do FileBrowser.
 #   - Toda integração externa passa pelo adapter.
 #
@@ -77,8 +80,18 @@ hs_user_create() {
 
     scope="/users/${username}"
 
-    # Garante a pasta própria no storage (via container que monta /srv/storage).
-    docker exec filebrowser mkdir -p "/srv${scope}" 2>/dev/null || true
+    # Garante a pasta própria no storage via camada Infrastructure
+    # (desacoplado de FileBrowser — funciona mesmo se o módulo estiver
+    # desabilitado/trocado; FileBrowser apenas recebe o scope).
+    local user_dir="${HS_STORAGE_ROOT:-/srv/storage}/users/${username}"
+    if ! hs_fs_directory_exists "${user_dir}"; then
+        hs_fs_create_directory "${user_dir}" || {
+            echo "Falha ao criar diretório do usuário: ${user_dir}" >&2
+            return 1
+        }
+        chown 1000:1000 "${user_dir}" 2>/dev/null || true
+        chmod 755 "${user_dir}" 2>/dev/null || true
+    fi
 
     token="$(filebrowser_login)"
     filebrowser_create_user "${token}" "${username}" "${password}" "${scope}"
@@ -217,7 +230,10 @@ hs_user_rm() {
     fi
 
     if [[ ${remove_folder} -eq 1 ]]; then
-        docker exec filebrowser rm -rf "/srv/users/${username}" 2>/dev/null || true
+        local user_dir="${HS_STORAGE_ROOT:-/srv/storage}/users/${username}"
+        if hs_fs_directory_exists "${user_dir}"; then
+            hs_fs_remove_directory "${user_dir}" 2>/dev/null || rm -rf "${user_dir}" 2>/dev/null || true
+        fi
         echo "Pasta removida: /users/${username}" >&2
     fi
 
