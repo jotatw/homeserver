@@ -110,29 +110,21 @@ const auth = {
   },
 };
 
-/* ---------- XSS sanitization ---------- */
+/* ---------- Utilidades compartilhadas (login.html e index.html) ---------- */
+
 const HTML_ESCAPE = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#x27;" };
-function escapeHtml(str) {
+function esc(str) {
   return String(str).replace(/[&<>"']/g, (c) => HTML_ESCAPE[c]);
 }
 
-function safeEl(tag, attrs, ...children) {
-  const e = document.createElement(tag);
-  Object.entries(attrs).forEach(([k, v]) => {
-    if (k === "class") e.className = v;
-    else if (k === "html") {
-      const div = document.createElement("div");
-      div.textContent = v;
-      e.innerHTML = div.innerHTML;
-    }
-    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
-    else e.setAttribute(k, v);
-  });
-  children.forEach((c) => {
-    if (c === null || c === undefined) return;
-    e.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
-  });
-  return e;
+function toast(message, kind = "info") {
+  const region = document.getElementById("toast-region");
+  if (!region) return;
+  const t = document.createElement("div");
+  t.className = "toast " + kind;
+  t.textContent = message;
+  region.appendChild(t);
+  setTimeout(() => t.remove(), 5000);
 }
 
 async function api(path, options = {}) {

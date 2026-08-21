@@ -5,17 +5,16 @@
 
 /* ---------- Helpers ---------- */
 
-/* ---------- Helpers ---------- */
-
+/* ---------- Helpers ----------
+ * esc() e toast() vivem em auth.js (compartilhados com login.html).
+ * el(): `html` em attrs é SOMENTE para constantes internas (SVGs do ICONS)
+ * — dados externos vão como filhos string (createTextNode, seguro).
+ */
 function el(tag, attrs = {}, ...children) {
   const e = document.createElement(tag);
   Object.entries(attrs).forEach(([k, v]) => {
     if (k === "class") e.className = v;
-    else if (k === "html") {
-      const div = document.createElement("div");
-      div.textContent = v;
-      e.innerHTML = div.innerHTML;
-    }
+    else if (k === "html") e.innerHTML = v;
     else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
     else e.setAttribute(k, v);
   });
@@ -24,14 +23,6 @@ function el(tag, attrs = {}, ...children) {
     e.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
   });
   return e;
-}
-
-function toast(message, kind = "info") {
-  const region = document.getElementById("toast-region");
-  if (!region) return;
-  const t = el("div", { class: "toast " + kind }, message);
-  region.appendChild(t);
-  setTimeout(() => t.remove(), 5000);
 }
 
 /* ---------- Ícones (SVG monoline, stroke 1.8) ---------- */
@@ -217,8 +208,8 @@ function currentRoute() {
 function renderUser() {
   const label = auth.user ? auth.user.username : "";
   const badge = auth.isAdmin() ? ' <span class="badge-admin">ADMIN</span>' : "";
-  document.getElementById("sidebar-user").innerHTML = icon("user").outerHTML + " " + label + badge;
-  document.getElementById("topbar-user").innerHTML = icon("user").outerHTML + " " + label + badge;
+  document.getElementById("sidebar-user").innerHTML = icon("user").outerHTML + " " + esc(label) + badge;
+  document.getElementById("topbar-user").innerHTML = icon("user").outerHTML + " " + esc(label) + badge;
 }
 
 /* ---------- Router ---------- */
@@ -935,7 +926,7 @@ async function renderAdmin() {
     try {
       const data = await apiOrFail("/api/v1/update");
       if (data.update) {
-        upStatus.innerHTML = "Nova versão disponível: <strong>" + data.latest + "</strong> (atual: " + data.current + ")";
+        upStatus.innerHTML = "Nova versão disponível: <strong>" + esc(data.latest) + "</strong> (atual: " + esc(data.current) + ")";
         const apply = el("button", { class: "btn btn-primary", style: "margin-top:var(--hs-space-2)" },
           icon("download", "ic"), " Aplicar atualização");
         apply.addEventListener("click", async () => {
@@ -985,7 +976,7 @@ async function renderAdmin() {
       const d = await apiOrFail("/api/v1/update/os");
       const reboot = d.reboot ? " · reinicialização pendente" : "";
       if (d.upgradable > 0) {
-        osStatus.innerHTML = d.upgradable + " pacote(s) disponível(is)" + reboot + ".";
+        osStatus.innerHTML = esc(d.upgradable) + " pacote(s) disponível(is)" + reboot + ".";
         const apply = el("button", { class: "btn btn-primary", style: "margin-top:var(--hs-space-2)" },
           icon("refresh", "ic"), " Atualizar pacotes");
         apply.addEventListener("click", async () => {
