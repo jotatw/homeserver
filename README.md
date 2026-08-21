@@ -28,11 +28,11 @@ O objetivo não é competir com soluções corporativas, mas oferecer uma plataf
 
 ## Estado atual
 
-O projeto possui histórico de versões v1.x e preparação de v2.0. Neste momento, o desenvolvimento está em uma etapa de **auditoria e baseline**, antes da próxima fase de evolução.
+O projeto possui histórico de versões v1.x e preparação conceitual para uma futura v2.0. O desenvolvimento atual está na etapa de **consolidação após o baseline**, com arquitetura modular planejada, hardening principal implementado e foco nas próximas evoluções de App, UX e validação operacional.
 
-O **Baseline v0.1.0 é conceitual**: ele registra o estado do projeto sem apagar ou substituir as tags e versões históricas existentes.
+O **Baseline v0.1.0 é conceitual**: ele registra um marco de referência sem apagar ou substituir as tags e versões históricas existentes.
 
-A linha v1.6.x permanece como histórico de manutenção e pequenas melhorias. A partir do baseline, o trabalho passa a ser organizado pelo roadmap de evolução até a v1.0 conceitual.
+A linha v1.6.x permanece como histórico de manutenção e pequenas melhorias. A evolução posterior ao baseline é organizada pelo roadmap conceitual até uma primeira release estável v1.0.0.
 
 O projeto possui:
 
@@ -46,20 +46,21 @@ O projeto possui:
 - Gitea;
 - Samba;
 - Caddy e acesso unificado na LAN;
-- backup automático;
+- backup automático e validação de integridade implementada;
 - agendamento de energia;
 - descoberta e gerenciamento de dispositivos;
 - CLI administrativa `hs`;
 - auto-update por releases;
-- testes automatizados e smoke tests;
-- Quality Gate;
+- testes automatizados, smoke tests e CI;
+- executor centralizado para operações privilegiadas;
+- validação em camadas para operações de módulos;
 - Design System e documentação arquitetural.
 
 ### Baseline
 
-O estado atual é documentado em [`planning/release/baseline-v0.1.0.md`](planning/release/baseline-v0.1.0.md).
+O estado de referência é documentado em [`planning/release/baseline-v0.1.0.md`](planning/release/baseline-v0.1.0.md).
 
-Esse documento funciona como referência para comparar correções, regressões e evolução futura.
+Esse documento funciona como referência para comparar correções, regressões e evolução futura. O status operacional das fases posteriores é mantido no roadmap e nas evidências específicas de cada área.
 
 ---
 
@@ -209,7 +210,12 @@ request.user
 autorização
 ```
 
-As sessões atuais ficam em memória e possuem TTL deslizante de 30 dias. Um reinício da API invalida as sessões existentes.
+As sessões atuais ficam em memória e possuem duas políticas independentes:
+
+- **inatividade:** 30 dias por padrão (`HS_SESSION_TTL_MS`);
+- **limite absoluto:** 90 dias por padrão (`HS_SESSION_ABSOLUTE_TTL_MS`).
+
+Leituras classificadas como polling não renovam a sessão por si só; atividade definida pela política de autenticação pode renovar `lastUserActivityAt`. Um reinício da API invalida as sessões existentes porque o armazenamento atual é em memória.
 
 O App nunca depende diretamente da autenticação do FileBrowser.
 
@@ -258,142 +264,3 @@ sudo bash install.sh
 ```
 
 O instalador funciona como um assistente: verifica o sistema, instala o Docker quando necessário, detecta a rede, configura o usuário principal, gera as configurações, implanta os serviços e executa o Health Check.
-
-Para iniciantes, comece por [`docs/install/QUICKSTART.md`](docs/install/QUICKSTART.md).
-
-Perguntas e dúvidas comuns: [`docs/use/QUESTIONS.md`](docs/use/QUESTIONS.md).
-
-Documentação detalhada:
-
-- [`docs/install/INSTALLATION.md`](docs/install/INSTALLATION.md)
-- [`docs/install/FIRST_BOOT.md`](docs/install/FIRST_BOOT.md)
-- [`docs/use/FAQ.md`](docs/use/FAQ.md)
-
----
-
-## CLI
-
-A CLI `hs` fornece operações administrativas do HomeServer.
-
-```bash
-bash core/hs.sh version
-bash core/hs.sh system status
-bash core/hs.sh service list
-bash core/hs.sh user list
-bash core/hs.sh update check
-```
-
----
-
-## Atualizações
-
-O projeto é versionado por tags Git (`vX.Y.Z`). Releases são publicadas no GitHub e no Gitea.
-
-O HomeServer possui atualização integrada:
-
-```bash
-bash core/hs.sh update check
-bash core/hs.sh update apply
-```
-
-Antes de atualizar, o sistema cria um ponto de recuperação. O processo pode reimplantar os módulos quando necessário ou utilizar `--no-redeploy` quando apropriado.
-
----
-
-## Testes
-
-A base possui testes de Foundation, Infrastructure, API, CLI, integração e smoke tests.
-
-Exemplo:
-
-```bash
-bash core/tests/run_all.sh
-bash scripts/health-check.sh
-```
-
-O Quality Gate é utilizado como critério para releases.
-
-O estado do último baseline e a evidência do Quality Gate devem ser registrados em [`planning/release/baseline-v0.1.0.md`](planning/release/baseline-v0.1.0.md).
-
----
-
-## Desenvolvimento
-
-O HomeServer foi organizado para que novas funcionalidades reutilizem as camadas existentes.
-
-Antes de alterar a arquitetura:
-
-1. consulte os princípios;
-2. procure uma decisão arquitetural existente;
-3. reutilize a camada apropriada;
-4. crie um ADR quando houver uma nova decisão estrutural;
-5. atualize testes e documentação.
-
-Consulte [`CONTRIBUTING.md`](CONTRIBUTING.md) para regras de contribuição e [`docs/use/QUESTIONS.md`](docs/use/QUESTIONS.md) para dúvidas comuns.
-
----
-
-## Documentação
-
-A documentação possui responsabilidades diferentes:
-
-```text
-docs/       → como o HomeServer funciona (por objetivo)
-planning/   → para onde o projeto está evoluindo
-```
-
-Ponto de entrada: [`docs/README.md`](docs/README.md) — índice organizado por
-**instalar** (`docs/install/`), **usar** (`docs/use/`), **contribuir**
-(`docs/contribute/`) e **referência técnica** (`docs/reference/`).
-
-Principais pontos:
-
-- `docs/install/` — instalação rápida (`QUICKSTART`), detalhada (`INSTALLATION`), primeiro uso (`FIRST_BOOT`) e TLS local;
-- `docs/use/` — Homepage/App, CLI (`hs`), perguntas frequentes (`FAQ`/`QUESTIONS`) e impressão;
-- `docs/contribute/` — contribuição, desenvolvimento e testes;
-- `docs/reference/` — arquitetura, princípios, decisões (ADR), design e segurança;
-- `planning/` — roadmap, qualidade, evolução e arquitetura modular (M1);
-- `planning/release/baseline-v0.1.0.md` — estado de referência do projeto;
-- `CHANGELOG.md` — histórico de versões.
-
----
-
-## Roadmap
-
-O roadmap operacional até a v1.0 está em [`planning/roadmap/v1.0.md`](planning/roadmap/v1.0.md).
-
-### Fases
-
-| Fase | Foco |
-|---|---|
-| 0 | Baseline |
-| 1 | Organização e padronização |
-| 2 | Core / Foundation |
-| 3 | Infraestrutura |
-| 4 | Serviços |
-| 5 | Homepage / Hub |
-| 6 | Backup e armazenamento |
-| 7 | Segurança |
-| 8 | Automação |
-| 9 | UX / facilidade de uso |
-| 10 | v1.0 |
-
-As versões históricas v1.x e a preparação v2.0 permanecem no repositório como histórico e referência. O baseline conceitual não apaga esse histórico.
-
-A visão de longo prazo continua registrada em [`planning/vision.md`](planning/vision.md).
-
----
-
-## Licença
-
-O HomeServer é distribuído sob a **MIT License**.
-
-Consulte [`LICENSE`](LICENSE) para os termos completos.
-
----
-
-## Projeto
-
-O HomeServer é uma base aberta para experimentação, aprendizado, reutilização e evolução de servidores domésticos.
-
-A prioridade do projeto é continuar sendo simples o suficiente para usar, estruturado o suficiente para manter e aberto o suficiente para ser reaproveitado em outros projetos.
