@@ -1,13 +1,49 @@
 /* ============================================================
- * HomeServer App — Auth (v3.0 · Security Hardening S5)
+ * HomeServer App — Auth (v3.1 · Security Hardening S5)
  * Contrato: {ok, data:{user:{username, admin}, expiresIn}}
- * Token mantido em memória (não localStorage) para proteção XSS.
+ *
+ * Token em sessionStorage: sobrevive ao reload da aba (o redirect
+ * pós-login é uma navegação completa que zera a memória JS) e morre
+ * ao fechar a aba — sem persistência de 30d como o localStorage.
  * ============================================================ */
 
+const HS_SESSION_KEY = "hs_session";
+
+function _loadSession() {
+  try {
+    const raw = sessionStorage.getItem(HS_SESSION_KEY);
+    if (!raw) return null;
+    const s = JSON.parse(raw);
+    if (!s || !s.token) return null;
+    return s;
+  } catch (_) {
+    return null;
+  }
+}
+
+function _saveSession(token, expiresAt) {
+  try {
+    sessionStorage.setItem(HS_SESSION_KEY, JSON.stringify({ token, expiresAt }));
+  } catch (_) {}
+}
+
+function _clearSession() {
+  auth.token = "";
+  auth.user = null;
+  auth.expiresAt = 0;
+  try {
+    sessionStorage.removeItem(HS_SESSION_KEY);
+    // Limpa token legado do localStorage (versões anteriores ao S5).
+    localStorage.removeItem("hs_token");
+  } catch (_) {}
+}
+
+const _boot = _loadSession();
+
 const auth = {
-  token: "",
+  token: _boot ? _boot.token : "",
   user: null,
-  expiresAt: 0,
+  expiresAt: _boot ? _boot.expiresAt : 0,
 
   async login(username, password) {
     const r = await fetch("/api/v1/auth/login", {
@@ -25,6 +61,7 @@ const auth = {
       role: body.data.user.admin ? "admin" : "user",
     };
     this.expiresAt = Date.now() + (body.data.expiresIn || 2592000) * 1000;
+    _saveSession(this.token, this.expiresAt);
 
     return body.data;
   },
@@ -36,9 +73,7 @@ const auth = {
         headers: { Authorization: "Bearer " + this.token },
       });
     } catch (_) {}
-    this.token = "";
-    this.user = null;
-    this.expiresAt = 0;
+    _clearSession();
   },
 
   isAdmin() {
@@ -51,18 +86,14 @@ const auth = {
 
   async check() {
     if (!this.token || this.isExpired()) {
-      this.token = "";
-      this.user = null;
-      this.expiresAt = 0;
+      _clearSession();
       return false;
     }
     const r = await fetch("/api/v1/auth/session", {
       headers: { Authorization: "Bearer " + this.token },
     });
     if (!r.ok) {
-      this.token = "";
-      this.user = null;
-      this.expiresAt = 0;
+      _clearSession();
       return false;
     }
     const body = await r.json();
@@ -73,6 +104,7 @@ const auth = {
     };
     if (body.data.expiresIn) {
       this.expiresAt = Date.now() + body.data.expiresIn * 1000;
+      _saveSession(this.token, this.expiresAt);
     }
     return true;
   },
@@ -105,9 +137,7 @@ function safeEl(tag, attrs, ...children) {
 
 async function api(path, options = {}) {
   if (auth.isExpired()) {
-    auth.token = "";
-    auth.user = null;
-    auth.expiresAt = 0;
+    _clearSession();
     window.location.hash = "#/login";
     throw new Error("Sessão expirada.");
   }
@@ -119,9 +149,7 @@ async function api(path, options = {}) {
     },
   });
   if (r.status === 401) {
-    auth.token = "";
-    auth.user = null;
-    auth.expiresAt = 0;
+    _clearSession();
     window.location.hash = "#/login";
     throw new Error("Sessão expirada.");
   }

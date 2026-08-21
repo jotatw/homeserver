@@ -34,12 +34,17 @@ check("XSS filter habilitado", serverSrc.includes("xssFilter"));
 check("Referrer policy configurado", serverSrc.includes("referrerPolicy"));
 check("Cross-origin resource policy", serverSrc.includes("crossOriginResourcePolicy"));
 
-// 2. Token não persiste em localStorage
+// 2. Token em sessionStorage (não localStorage — sem persistência entre sessões/abas)
 const authSrc = readFileSync("app/js/auth.js", "utf-8");
-check("Token não usa localStorage",
-  !authSrc.includes("localStorage.setItem") && !authSrc.includes("localStorage.getItem")
+check("Token não usa localStorage para sessão",
+  !authSrc.includes("localStorage.setItem(\"hs_token") && !authSrc.includes("localStorage.getItem(\"hs_token")
 );
-check("Token mantido em memória (this.token)", authSrc.includes("this.token ="));
+check("Token em sessionStorage (morre ao fechar a aba)",
+  authSrc.includes("sessionStorage.setItem") && authSrc.includes("sessionStorage.removeItem")
+);
+check("Limpa token legado do localStorage",
+  authSrc.includes("localStorage.removeItem(\"hs_token\")")
+);
 check("Expiração com expiresAt", authSrc.includes("expiresAt"));
 check("Verificação de expiração", authSrc.includes("isExpired"));
 
