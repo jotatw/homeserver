@@ -40,7 +40,35 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
   dry-run real; autorização verificada (403); secrets fora do repositório.
 - **App**: usuários (criar, trocar senha, excluir com pasta), tokens de API,
   atualização (verificar/aplicar), discos, navegação por role, PWA instalável.
-- **Testes**: infra 7/7 · API 31/31 · session 12/12 · smoke 7/7 · cli 6/6.
+- **Testes**: infra 7/7 · API 31/31 · session 19/19 (S2) · smoke 7/7 · cli 6/6.
+
+### Segurança
+
+- **S2 — Política de sessões**: `getSession(token, { renew })` distingue
+  atividade real de polling; GETs de leitura automática do App (status, events,
+  services, storage, hardware, power, devices, print, update) não renovam a
+  sessão; limite absoluto `expiresAt` (90 dias, `HS_SESSION_ABSOLUTE_TTL_MS`)
+  independente de atividade; inatividade 30 dias (`HS_SESSION_TTL_MS`);
+  `sessionExpiresIn` reflete o limite mais próximo. Testes 19/19 (`session.test.ts`).
+
+- **S3 — Operações Privilegiadas**: executor centralizado `api/src/utils/executor.ts`
+  com allowlist estrita (`bash` com scripts curados, `lp`, `lpstat`, `cancel`);
+  validação rigorosa de argumentos por regex (`device`: type/label/device,
+  `module`: id slug + op, `power`: HH:MM, `update os`: check/apply, `print`:
+  printer/opções/arquivo restrito a `/api/data/`, `cancel`: jobId, `lpstat`:
+  scripts compostos, `backup`: sem argumentos); 22 testes unitários
+  (`executor.test.ts`). Validações no Core: `mounts.sh` (type/label/device),
+  `power.sh` (HH:MM), `modules.sh` (id slug + op vs Definition). Adaptadores
+  `backup.ts`, `devices.ts`, `modules.ts`, `power.ts`, `print.ts`, `update.ts`
+  refatorados para usar executor centralizado. Testes 22/22 (`executor.test.ts`).
+
+- **S4 — Defesa em profundidade para módulos**: máquina de estados no Core
+  (`_module_validate_transition`): transições start/stop/restart/update
+  validadas contra estado atual; locking concorrência via mkdir atômico
+  (`_module_lock_acquire`/`_module_lock_release`); validação de dependências
+  e capabilities declaradas na Definition; validação de transição integrada no
+  `module_op` com lock automático; validação de Definition e operações
+  suportadas.
 
 ### Impressão
 

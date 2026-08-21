@@ -1,5 +1,6 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
+import { runHostUpdate } from "../utils/executor.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -41,26 +42,6 @@ export async function applyUpdate(noRedeploy: boolean): Promise<Record<string, s
     }
 }
 
-/**
- * Operações de pacotes do sistema (apt) rodam no HOST via nsenter,
- * pois exigem root (padrão do power/devices). O container da API
- * não tem privilégios para apt.
- */
-async function runOnHost(args: string[]): Promise<string> {
-    const { stdout } = await execFileAsync(
-        "docker",
-        [
-            "run", "--rm", "--privileged", "--pid", "host",
-            "debian:bookworm-slim",
-            "nsenter", "-t", "1", "-m", "-u", "-i", "-n", "--",
-            "bash", "/srv/git/homeserver/core/hs.sh", ...args,
-        ],
-        { timeout: 600000 },
-    );
-
-    return stdout.trim();
-}
-
 export interface OsUpdateInfo {
     upgradable: number;
     reboot: boolean;
@@ -68,11 +49,11 @@ export interface OsUpdateInfo {
 }
 
 export async function checkOsUpdate(): Promise<OsUpdateInfo> {
-    const raw = await runOnHost(["update", "os", "check"]);
+    const raw = await runHostUpdate("check");
     return JSON.parse(raw) as OsUpdateInfo;
 }
 
 export async function applyOsUpdate(): Promise<Record<string, boolean | number>> {
-    const raw = await runOnHost(["update", "os", "apply"]);
+    const raw = await runHostUpdate("apply");
     return JSON.parse(raw) as Record<string, boolean | number>;
 }

@@ -1,7 +1,8 @@
-// Teste unitário de sessão (expiração, sliding, role, versão de token).
+// Teste unitário de sessão (S2: inatividade, limite absoluto, renovação por atividade, polling).
 // Roda com: npx tsx tests/session.test.ts (dentro de api/)
 
 process.env.HS_SESSION_TTL_MS = "250";
+process.env.HS_SESSION_ABSOLUTE_TTL_MS = "600";
 
 const {
     createSession,
@@ -38,37 +39,68 @@ check("sessionExpiresIn > 0", sessionExpiresIn(getSession(adminToken)!) > 0);
 
 const admin = getSession(adminToken)!;
 check("createdAt presente", typeof admin.createdAt === "number" && admin.createdAt > 0);
+check("lastUserActivityAt presente", typeof admin.lastUserActivityAt === "number" && admin.lastUserActivityAt > 0);
+check("expiresAt presente (limite absoluto)", typeof admin.expiresAt === "number" && admin.expiresAt > admin.createdAt);
 check("tokenVersion = 1", admin.tokenVersion === 1);
 
 // 2. token inexistente
 check("token inexistente -> null", getSession("nao-existe") === null);
 
-// 3. expiração (TTL 250ms; sem uso -> expira)
+// 3. expiração por inatividade (TTL 250ms; sem uso -> expira)
 _clearSessionsForTest();
 const expToken = createSession("usuario", true);
 await sleep(400);
-check("sessão expira após TTL sem uso (400ms > 250ms)", getSession(expToken) === null);
+check("sessão expira por inatividade (400ms > 250ms)", getSession(expToken) === null);
 
-// 4. sliding (uso renova a expiração)
+// 4. leitura/polling NÃO renova (sem {renew: true})
 _clearSessionsForTest();
-const slideToken = createSession("usuario", true);
+const pollToken = createSession("usuario", true);
 await sleep(200);
-check("uso em 200ms renova (ainda válida)", getSession(slideToken) !== null);
+check("leitura em 200ms não renova mas continua válida", getSession(pollToken) !== null);
 await sleep(200);
-// total ~400ms desde a criação; se fosse fixo desde createdAt, expiraria.
-// Com sliding (renovado em 200ms), faltam 50ms para expirar -> ainda válida.
-check("sliding: ainda válida após 400ms com uso em 200ms", getSession(slideToken) !== null);
-await sleep(300);
-check("expira após 300ms sem uso", getSession(slideToken) === null);
+// total ~400ms; polling não renovou -> inatividade de 250ms estourada.
+check("polling não renova: expira após 400ms sem atividade real", getSession(pollToken) === null);
 
-// 5. logout/destruição
+// 5. atividade real renova (getSession com renew:true)
+_clearSessionsForTest();
+const actToken = createSession("usuario", true);
+await sleep(200);
+check("atividade em 200ms renova (ainda válida)", getSession(actToken, { renew: true }) !== null);
+await sleep(200);
+// total ~400ms; renovada em 200ms -> faltam 50ms para inatividade expirar.
+check("atividade renova: ainda válida após 400ms com uso em 200ms", getSession(actToken, { renew: true }) !== null);
+await sleep(300);
+check("expira após 300ms sem nova atividade", getSession(actToken) === null);
+
+// 6. limite absoluto (expiresAt = 600ms) mesmo com atividade contínua
+_clearSessionsForTest();
+const absToken = createSession("usuario", true);
+// atividade renovando a cada 200ms — porém o limite absoluto de 600ms é intransponível.
+await sleep(200);
+getSession(absToken, { renew: true });
+await sleep(200);
+getSession(absToken, { renew: true });
+check("limite absoluto: ainda válida em 400ms com atividade", getSession(absToken, { renew: true }) !== null);
+await sleep(250);
+check("limite absoluto: expira em ~650ms mesmo com atividade", getSession(absToken, { renew: true }) === null);
+
+// 7. sessionExpiresIn respeita o limite mais próximo (absoluto < inatividade aqui)
+_clearSessionsForTest();
+const boundToken = createSession("usuario", true);
+await sleep(200);
+const s = getSession(boundToken)!;
+const remaining = sessionExpiresIn(s);
+check("sessionExpiresIn reflete limite absoluto (absoluto=600ms)", remaining <= 1);
+await sleep(300);
+
+// 8. logout/destruição
 _clearSessionsForTest();
 const killToken = createSession("usuario", true);
 destroySession(killToken);
 check("sessão destruída -> null", getSession(killToken) === null);
 
 console.log();
-console.log("Session Tests");
+console.log("Session Tests (S2)");
 console.log(`Total : ${passed + failures}`);
 console.log(`PASS  : ${passed}`);
 console.log(`FAIL  : ${failures}`);

@@ -43,3 +43,6 @@ services/
 node_modules/
 api/dist/
 
+# Graphify (local only, não vai ao GitHub)
+graphify-out/
+

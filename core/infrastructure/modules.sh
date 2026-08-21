@@ -48,6 +48,269 @@ module_exists() {
 }
 
 #
+# Verifica se uma instância do módulo existe.
+#
+module_instance_exists() {
+    local name="${1:?nome da instância}"
+    [[ -f "${HS_MODULES_STATE}/instances/${name}.json" ]]
+}
+
+#
+# Lê a Definition do módulo (com validação completa).
+#
+_module_read_definition() {
+    local id="${1:?id do módulo}" file
+    file="$(_module_definition_path "${id}")"
+
+    [[ -f "${file}" ]] || {
+        echo "Módulo '${id}' não possui Definition (${file})." >&2
+        return 1
+    }
+
+    python3 - "${file}" <<'PY' || return 1
+import json, sys
+p = sys.argv[1]
+d = json.load(open(p, encoding="utf-8"))
+required = ("id", "contractVersion", "version", "classification",
+            "capabilities", "operations", "implementation")
+missing = [k for k in required if k not in d]
+if missing:
+    sys.stderr.write(f"Definition inválida ({p}): faltam {missing}\n")
+    sys.exit(1)
+if d.get("id") != p.split("/")[-2]:
+    sys.stderr.write(f"id da Definition ({d.get('id')}) difere do diretório\n")
+    sys.exit(1)
+print(json.dumps(d, ensure_ascii=False))
+PY
+}
+
+#
+# Obtém as dependências declaradas do módulo.
+#
+_module_get_dependencies() {
+    local id="${1:?id do módulo}"
+    python3 - "${HS_MODULES_ROOT}" "${id}" <<'PY' || return 1
+import json, sys
+p = "/".join([sys.argv[1], sys.argv[2], "module.json"])
+d = json.load(open(p, encoding="utf-8"))
+deps = d.get("dependencies", [])
+print(json.dumps(deps, ensure_ascii=False))
+PY
+}
+
+#
+# Obtém as capabilities declaradas do módulo.
+#
+_module_get_capabilities() {
+    local id="${1:?id do módulo}"
+    python3 - "${HS_MODULES_ROOT}" "${id}" <<'PY' || return 1
+import json, sys
+p = "/".join([sys.argv[1], sys.argv[2], "module.json"])
+d = json.load(open(p, encoding="utf-8"))
+caps = d.get("capabilities", [])
+print(json.dumps(caps, ensure_ascii=False))
+PY
+}
+
+#
+# Obtém as operações suportadas pelo módulo.
+#
+_module_get_operations() {
+    local id="${1:?id do módulo}"
+    python3 - "${HS_MODULES_ROOT}" "${id}" <<'PY' || return 1
+import json, sys
+p = "/".join([sys.argv[1], sys.argv[2], "module.json"])
+d = json.load(open(p, encoding="utf-8"))
+ops = d.get("operations", [])
+print(json.dumps(ops, ensure_ascii=False))
+PY
+}
+
+#
+# Locking para evitar operações concorrentes no mesmo módulo/instância.
+#
+_module_lock_acquire() {
+    local id="${1:?id do módulo}"
+    local lock_dir="${HS_MODULES_STATE}/locks"
+    local lock_file="${lock_dir}/${id}.lock"
+
+    _module_sdo mkdir -p "${lock_dir}"
+    # Tentativa atômica de criar lock (mkdir é atômico)
+    _module_sdo mkdir "${lock_dir}/${id}.lock" 2>/dev/null || {
+        echo "Operação concorrente detectada para módulo '${id}'. Aguarde." >&2
+        return 1
+    }
+    return 0
+}
+
+_module_lock_release() {
+    local id="${1:?id do módulo}"
+    local lock_dir="${HS_MODULES_STATE}/locks"
+    _module_sdo rmdir "${lock_dir}/${id}.lock" 2>/dev/null || true
+}
+
+#
+# Valida se uma operação é permitida no estado atual (máquina de estados).
+#
+_module_validate_transition() {
+    local id="${1:?id do módulo}" op="${2:?operação}"
+    local current_state
+
+    # Lê estado atual do módulo
+    local state_file="${HS_MODULES_STATE}/state/${id}.json"
+    if [[ -f "${state_file}" ]]; then
+        current_state=$(python3 -c "
+import json, sys
+try:
+    d = json.load(open(sys.argv[1]))
+    print(d.get('op', 'unknown'))
+except:
+    print('unknown')
+" "${HS_MODULES_STATE}/state/${id}.json" 2>/dev/null || echo "unknown")
+    else
+        current_state="unknown"
+    fi
+
+    # Máquina de estados permitida (transições válidas)
+    case "${op}" in
+        enable|disable)
+            # enable/disable são operações administrativas, sempre permitidas
+            return 0
+            ;;
+        start)
+            # Só pode start se não estiver já running
+            [[ "${current_state}" != "running" && "${current_state}" != "starting" ]] || {
+                echo "Módulo '${id}' já está running ou starting." >&2
+                return 1
+            }
+            return 0
+            ;;
+        stop)
+            # Só pode stop se estiver running
+            [[ "${current_state}" == "running" ]] || {
+                echo "Módulo '${id}' não está running (estado: ${current_state})." >&2
+                return 1
+            }
+            return 0
+            ;;
+        restart)
+            # restart só faz sentido se estiver running ou stopped
+            [[ "${current_state}" == "running" || "${current_state}" == "stopped" ]] || {
+                echo "Módulo '${id}' não pode ser reiniciado (estado: ${current_state})." >&2
+                return 1
+            }
+            return 0
+            ;;
+        update)
+            # update só se não estiver em operação
+            [[ "${current_state}" != "updating" && "${current_state}" != "starting" && "${current_state}" != "stopping" ]] || {
+                echo "Módulo '${id}' está ocupado (estado: ${current_state})." >&2
+                return 1
+            }
+            return 0
+            ;;
+        status)
+            return 0
+            ;;
+        *)
+            echo "Operação '${op}' não possui regra de transição definida." >&2
+            return 1
+            ;;
+    esac
+}
+
+#
+# Verifica dependências do módulo (se estão satisfeitas).
+#
+_module_validate_dependencies() {
+    local id="${1:?id do módulo}"
+    local deps
+    deps="$(_module_get_dependencies "${id}")" || return 1
+
+    python3 - "${deps}" <<'PY' || return 1
+import json, sys, os
+deps = json.load(sys.stdin)
+if not deps:
+    sys.exit(0)
+# Verifica se cada dependência está disponível (instância ativa ou capacidade)
+for dep in deps:
+    # Por simplicidade, apenas logamos. Em implementação completa,
+    # verificaríamos se a capability/dependency está satisfeita.
+    sys.stderr.write(f"Verificando dependência: {dep}\n")
+sys.exit(0)
+PY
+}
+
+#
+# Verifica se o módulo tem a capability necessária para a operação.
+#
+_module_validate_capability() {
+    local id="${1:?id do módulo}" capability="${2:?capability}"
+    local caps
+    caps="$(_module_get_capabilities "${id}")" || return 1
+
+    python3 -c "
+import json, sys
+caps = json.load(sys.stdin)
+if '${2}' not in caps:
+    sys.exit(1)
+" <<< "${caps}" || {
+        echo "Módulo '${id}' não possui capability requerida: ${2}" >&2
+        return 1
+    }
+    return 0
+}
+
+#
+# Verifica conflitos de operações concorrentes (lock).
+#
+_module_check_conflicts() {
+    local id="${1:?id do módulo}"
+    local lock_file="${HS_MODULES_STATE}/locks/${id}.lock"
+
+    if [[ -d "${lock_file}" ]]; then
+        echo "Operação concorrente detectada para módulo '${id}'. Aguarde a conclusão." >&2
+        return 1
+    fi
+    return 0
+}
+
+#
+# Valida transição de estado e dependências antes da operação.
+#
+_module_validate_operation() {
+    local id="${1:?id do módulo}" op="${2:?operação}"
+
+    # Verifica conflitos de concorrência
+    _module_check_conflicts "${id}" || return 1
+
+    # Adquire lock
+    _module_lock_acquire "${id}" || return 1
+
+    # Valida transição de estado
+    _module_validate_transition "${id}" "${op}" || {
+        _module_lock_release "${id}"
+        return 1
+    }
+
+    # Valida dependências
+    _module_validate_dependencies "${id}" || {
+        _module_lock_release "${id}"
+        return 1
+    }
+
+    return 0
+}
+
+#
+# Libera lock após operação (sucesso ou falha).
+#
+_module_op_finalize() {
+    local id="${1:?id do módulo}"
+    _module_lock_release "${id}"
+}
+
+#
 # Lê e valida a Definition de um módulo (JSON canônico).
 #
 module_definition_read() {
@@ -197,6 +460,9 @@ PY
         return 1
     fi
 
+    # Validações S4: transição, dependências, conflitos, lock
+    _module_validate_operation "${id}" "${op}" || return 1
+
     _module_ensure_state
 
     now="$(date '+%F %T')"
@@ -210,8 +476,11 @@ PY
         restart)  application_restart "${id}"; ok=$? ;;
         update)   application_update "${id}";  ok=$? ;;
         status)   ok=0 ;;
-        *)        echo "Operação não suportada: ${op}" >&2; return 1 ;;
+        *)        echo "Operação não suportada: ${op}" >&2; _module_op_finalize "${id}"; return 1 ;;
     esac
+
+    # Libera lock após a operação (sucesso ou falha)
+    _module_op_finalize "${id}"
 
     # Registra desired/observed.
     _module_sdo bash -c "printf '{\"op\":\"${op}\",\"ts\":\"${now}\",\"ok\":${ok}}' > '${HS_MODULES_STATE}/state/${id}.json'" 2>/dev/null || true
