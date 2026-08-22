@@ -1,12 +1,21 @@
-# Questions — HomeServer
+# Perguntas sobre o HomeServer
 
-> Índice das principais dúvidas que podem surgir antes, durante ou depois de instalar o HomeServer.
+> Um mapa para encontrar respostas. Este documento não duplica explicações: ele aponta para o lugar onde cada assunto é explicado.
 
-Este documento funciona como um mapa de perguntas. As respostas detalhadas ficam na documentação correspondente, evitando duplicação entre os documentos do projeto.
+## Comece pelo caminho certo
+
+| Quero saber... | Veja |
+|---|---|
+| O que é e como tudo funciona | [`HOW_IT_WORKS.md`](HOW_IT_WORKS.md) |
+| Como instalar | [`QUICKSTART.md`](../install/QUICKSTART.md) |
+| O que fazer depois de instalar | [`FIRST_BOOT.md`](../install/FIRST_BOOT.md) |
+| Como usar Homepage e App | [`app.md`](app.md) |
+| Como usar o terminal | [`cli.md`](cli.md) |
+| Dúvidas frequentes | [`FAQ.md`](FAQ.md) |
 
 ---
 
-## 1. Sobre o projeto
+## Sobre o projeto
 
 - [O que é o HomeServer?](FAQ.md#1-sobre-o-projeto)
 - [Para quem ele foi criado?](FAQ.md#1-sobre-o-projeto)
@@ -14,137 +23,88 @@ Este documento funciona como um mapa de perguntas. As respostas detalhadas ficam
 - [O HomeServer depende da internet?](FAQ.md#1-sobre-o-projeto)
 - [Posso usar o projeto como base para outro servidor?](FAQ.md#1-sobre-o-projeto)
 
-## 2. Antes da instalação
+## Antes da instalação
 
-- [Qual hardware é necessário?](FAQ.md#3-instalação)
 - [Qual sistema operacional é suportado?](FAQ.md#3-instalação)
+- [Qual hardware é necessário?](../install/INSTALLATION.md#pré-requisitos)
 - [Preciso instalar Docker manualmente?](FAQ.md#3-instalação)
-- [O instalador altera o quê no sistema?](FAQ.md#3-instalação)
+- [O que o instalador faz?](FAQ.md#3-instalação)
 - [A instalação apaga meus dados?](FAQ.md#3-instalação)
 
-Guia principal: [`QUICKSTART.md`](../install/QUICKSTART.md)
-
-Guia detalhado: [`docs/INSTALLATION.md`](../install/INSTALLATION.md)
-
-## 3. Primeiro uso
+## Primeiro uso
 
 - [Como acesso o servidor depois da instalação?](FAQ.md#4-primeiro-uso)
-- [O que é a Homepage?](FAQ.md#9-app)
-- [O que é o HomeServer App?](FAQ.md#9-app)
-- [Como crio usuários?](FAQ.md#4-primeiro-uso)
+- [O que é a Homepage?](app.md#homepage)
+- [O que é o HomeServer App?](app.md#homeserver-app)
 - [Como verifico se o servidor está funcionando?](FAQ.md#4-primeiro-uso)
+- [Como funciona o acesso dos usuários?](FAQ.md#4-primeiro-uso)
 
-Guia: [`docs/FIRST_BOOT.md`](../install/FIRST_BOOT.md)
+Guia: [`FIRST_BOOT.md`](../install/FIRST_BOOT.md)
 
-## 4. Acesso e rede
+## Acesso e rede
 
-- [Por que usar `homeserver.local`?](FAQ.md#7-serviços)
-- [Posso acessar pelo IP?](FAQ.md#7-serviços)
+- [Como acesso por `homeserver.local`?](../install/FIRST_BOOT.md#2-acesse-pelo-navegador)
+- [Posso acessar pelo IP?](../install/FIRST_BOOT.md#2-acesse-pelo-navegador)
 - [O que faz o Caddy?](FAQ.md#7-serviços)
-- [O que acontece se o mDNS não funcionar?](FAQ.md#7-serviços)
+- [O que acontece se o nome local não funcionar?](../install/FIRST_BOOT.md#2-acesse-pelo-navegador)
 - [O HomeServer precisa ser exposto à internet?](FAQ.md#5-autenticação-e-segurança)
 
-## 5. Usuários e autenticação
+## Usuários e autenticação
 
-- [Como funciona o administrador?](FAQ.md#5-autenticação-e-segurança)
-- [Como funciona a sessão do App?](FAQ.md#5-autenticação-e-segurança)
+- [Como funciona o login do App?](FAQ.md#5-autenticação-e-segurança)
+- [Como funciona a sessão?](FAQ.md#5-autenticação-e-segurança)
 - [Quanto tempo uma sessão permanece válida?](FAQ.md#5-autenticação-e-segurança)
 - [O que acontece depois de reiniciar a API?](FAQ.md#5-autenticação-e-segurança)
-- [Qual a diferença entre usuário do HomeServer e usuário do FileBrowser?](FAQ.md#5-autenticação-e-segurança)
 
-Referência: [`docs/architecture/API.md`](../reference/architecture/API.md)
-
-## 6. Arquivos e armazenamento
+## Arquivos e armazenamento
 
 - [Onde ficam meus arquivos?](FAQ.md#6-armazenamento-e-dispositivos)
-- [Qual a diferença entre `users`, `shared`, `media` e `documents`?](FAQ.md#6-armazenamento-e-dispositivos)
-- [Como funcionam dispositivos USB e SD Card?](FAQ.md#6-armazenamento-e-dispositivos)
 - [Onde ficam os backups?](FAQ.md#6-armazenamento-e-dispositivos)
-- [O que acontece se o armazenamento ficar cheio?](FAQ.md#6-armazenamento-e-dispositivos)
+- [Posso conectar um pendrive ou HD externo?](FAQ.md#6-armazenamento-e-dispositivos)
+- [O HomeServer funciona sem um disco dedicado?](FAQ.md#6-armazenamento-e-dispositivos)
 
-## 7. Serviços
+## Serviços e módulos
 
 - [Qual a função do FileBrowser?](FAQ.md#7-serviços)
 - [Qual a função do Gitea?](FAQ.md#7-serviços)
 - [Qual a função do Caddy?](FAQ.md#7-serviços)
-- [Posso adicionar outros serviços?](FAQ.md#7-serviços)
-- [Posso substituir um módulo?](FAQ.md#7-serviços)
+- [Por que o HomeServer usa serviços externos?](FAQ.md#7-serviços)
+- [Posso substituir ou adicionar um serviço?](FAQ.md#7-serviços)
 
-## 8. API e integrações
+## API e integrações
 
-- [Por que o HomeServer possui uma API própria?](FAQ.md#8-api)
+- [Por que existe uma API própria?](FAQ.md#8-api)
 - [O App acessa diretamente os serviços externos?](FAQ.md#8-api)
-- [Como funciona a autenticação da API?](FAQ.md#8-api)
-- [Posso criar outro cliente para o HomeServer?](FAQ.md#8-api)
-- [Posso integrar outro sistema usando a API?](FAQ.md#8-api)
+- [Posso criar outro aplicativo?](FAQ.md#8-api)
+- [Posso integrar outro sistema?](FAQ.md#8-api)
 
-Referência: [`api/README.md`](../../api/README.md)
+Referência técnica: [`api/README.md`](../../api/README.md)
 
-## 9. App
+## Segurança
 
-- [Qual a diferença entre Homepage e App?](FAQ.md#9-app)
-- [O App funciona em celulares?](FAQ.md#9-app)
-- [O App pode ser instalado como PWA?](FAQ.md#9-app)
-- [O App funciona offline?](FAQ.md#9-app)
-- [Como a interface muda conforme o usuário?](FAQ.md#9-app)
-
-## 10. Segurança
-
-- [O HomeServer é seguro para exposição direta na internet?](../../SECURITY.md)
-- [Onde ficam os tokens?](FAQ.md#5-autenticação-e-segurança)
+- [O HomeServer deve ser exposto diretamente à internet?](../../SECURITY.md)
 - [Como reportar uma vulnerabilidade?](../../SECURITY.md)
-- [Quais versões recebem correções de segurança?](../../SECURITY.md)
+- [Quais informações de segurança estão documentadas?](../reference/security/README.md)
 
-Referências:
+## Desenvolvimento e personalização
 
-- [`SECURITY.md`](../../SECURITY.md)
-- [`docs/security/`](../reference/security/)
-- [`docs/architecture/adr/`](../reference/architecture/adr/)
+- [Como modificar ou personalizar o HomeServer?](../contribute/CONTRIBUTING.md)
+- [Como começar a desenvolver?](../contribute/DEVELOPMENT.md)
+- [Como executar os testes?](../contribute/TESTING.md)
+- [Quando uma alteração exige um ADR?](../contribute/DEVELOPMENT.md)
 
-## 11. Desenvolvimento
+## Evolução do projeto
 
-- [Como começo a desenvolver para o HomeServer?](../../CONTRIBUTING.md)
-- [Onde devo colocar uma nova funcionalidade?](../../CONTRIBUTING.md)
-- [Quando devo criar um Adapter?](../../CONTRIBUTING.md)
-- [Quando uma alteração exige um ADR?](../../CONTRIBUTING.md)
-- [Como executar os testes?](../../CONTRIBUTING.md)
-- [Como funciona o Quality Gate?](../../CONTRIBUTING.md)
-
-## 12. Decisões arquiteturais
-
-Perguntas sobre **por que** uma decisão foi tomada devem ser respondidas pelos ADRs sempre que a decisão for estrutural.
-
-- [Por que existe uma API própria?](../reference/architecture/adr/0007-identity-authentication.md)
-- [Por que o App não acessa FileBrowser diretamente?](../reference/architecture/adr/0007-identity-authentication.md)
-- [Quais decisões definem a arquitetura estável?](../reference/architecture/adr/)
-
-## 13. Evolução do projeto
-
-- [Qual é o roadmap atual do projeto?](../../planning/roadmap/evolution.md)
-- [Como o projeto evolui e valida novas funcionalidades?](../../planning/foundations/evolution-and-validation.md)
-- [Como funciona o processo de release?](../../planning/release/release-process.md)
-- [Quando a primeira release oficial será publicada?](../../planning/release/v1.0-checklist.md)
-
-## 14. Dúvidas ainda não respondidas
-
-Quando uma dúvida recorrente não possuir documentação suficiente, ela deve ser registrada aqui antes de receber uma resposta definitiva.
-
-- [ ] Como restaurar completamente um backup em uma instalação limpa?
-- [ ] Como migrar o HomeServer para outro disco sem reinstalar?
-- [ ] Como adicionar um novo módulo seguindo o padrão oficial?
-- [ ] Como criar uma integração externa usando API Tokens?
-
-Essas perguntas permanecem como backlog documental até que exista uma resposta validada e documentada.
-
----
+- [Qual é o roadmap atual?](../../planning/roadmap/evolution.md)
+- [Como o projeto evolui e valida mudanças?](../../planning/foundations/evolution-and-validation.md)
+- [Como funciona uma futura release?](../../planning/release/release-process.md)
 
 ## Como manter este documento
 
-`QUESTIONS.md` é um índice, não uma segunda documentação completa.
+Quando surgir uma dúvida:
 
-Quando uma pergunta tiver uma resposta estável:
-
-1. documente a resposta no documento técnico apropriado;
-2. adicione ou atualize o link nesta lista;
-3. se a resposta representar uma decisão arquitetural, registre também um ADR;
-4. evite duplicar a explicação completa aqui.
+1. procure primeiro se a resposta já existe na documentação;
+2. se existir, adicione ou atualize o link aqui;
+3. se a resposta ainda não existir, documente o comportamento validado no local apropriado;
+4. se a resposta representar uma decisão arquitetural, registre ou atualize o ADR correspondente;
+5. evite transformar este arquivo em uma segunda FAQ.
