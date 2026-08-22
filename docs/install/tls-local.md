@@ -1,34 +1,47 @@
-# TLS local — instalar a CA nos dispositivos
+# HTTPS local — confiar no certificado do HomeServer
 
-O HomeServer usa uma **CA interna** (`/srv/config/tls/ca.pem`) para gerar os
-certificados de `https://homeserver.local` e `https://<IP-da-LAN>`.
+O HomeServer usa HTTPS dentro da rede local para proteger a comunicação entre seus dispositivos e o servidor.
 
-Os navegadores só confiam nos certificados depois que você instala essa CA no
-dispositivo — **uma única vez por aparelho**. Feito isso, nenhuma página do
-HomeServer volta a exibir o aviso "não seguro".
+Para isso, o servidor possui uma **CA local** em:
 
-Os certificados expiram e são renovados automaticamente (sempre com a mesma
-CA), então a instalação é definitiva até a CA ser rotacionada.
-
----
-
-## Baixar a CA
-
-Abra no navegador, ou via terminal:
-
-```
-http://192.168.0.10/hs-ca.pem
+```text
+/srv/config/tls/ca.pem
 ```
 
-(ou `http://homeserver.local/hs-ca.pem`). Salve o arquivo como `hs-ca.pem`.
+Essa CA é usada para assinar os certificados do HomeServer. Um dispositivo só passa a reconhecer esses certificados como confiáveis depois que a CA for instalada nele.
 
-> O download é servido apenas por HTTP justamente para ser possível acessá-lo
-> **antes** de confiar no HTTPS. Depois de instalar a CA, o acesso passa a ser
-> todo sobre HTTPS.
+## Quando preciso fazer isso?
 
----
+Faça a instalação da CA quando:
 
-## Linux (Debian/Ubuntu)
+- o navegador mostrar um aviso de certificado ao acessar o HomeServer;
+- você quiser acessar o servidor por HTTPS sem precisar ignorar avisos de segurança.
+
+Normalmente é necessário fazer isso **uma vez em cada computador ou celular** que usará o HomeServer.
+
+> Se a CA do servidor for substituída ou rotacionada no futuro, os dispositivos precisarão confiar na nova CA.
+
+## Passo 1 — Baixe a CA
+
+Abra no navegador:
+
+```text
+http://homeserver.local/hs-ca.pem
+```
+
+Se o nome `homeserver.local` não estiver disponível no dispositivo, use o endereço IP atual do servidor:
+
+```text
+http://<IP_DO_SERVIDOR>/hs-ca.pem
+```
+
+O arquivo deve ser salvo como `hs-ca.pem`.
+
+> O download usa HTTP apenas para permitir que a CA seja obtida **antes** de o dispositivo confiar no HTTPS local. Depois da instalação, use normalmente o endereço HTTPS do HomeServer.
+
+## Passo 2 — Instale no seu dispositivo
+
+### Linux (Debian/Ubuntu)
 
 ```bash
 sudo cp hs-ca.pem /usr/local/share/ca-certificates/homeserver-local.crt
@@ -38,66 +51,89 @@ sudo update-ca-certificates
 Teste:
 
 ```bash
-curl https://homeserver.local/ -I
+curl -I https://homeserver.local/
 ```
 
----
+### Windows
 
-## Windows
+1. Abra `hs-ca.pem`.
+2. Escolha **Instalar certificado**.
+3. Selecione **Máquina local**.
+4. Escolha instalar em **Autoridades de Certificação Raiz Confiáveis**.
+5. Conclua a instalação e reinicie o navegador.
+6. Abra `https://homeserver.local/`.
 
-1. Duplo clique em `hs-ca.pem` → **Instalar certificado**.
-2. Selecione **Máquina local** → **Avançar**.
-3. Escolha *Colocar todos os certificados no repositório a seguir* →
-   **Autoridades de Certificação Raiz Confiáveis** → **Concluir**.
-4. Reinicie o navegador (Chrome/Edge) e abra `https://homeserver.local`.
+### macOS
 
----
+1. Abra `hs-ca.pem` com o **Acesso às Chaves**.
+2. Adicione o certificado ao chaveiro **Sistema**.
+3. Abra as informações da CA e, em **Confiança**, selecione **Confiar sempre**.
+4. Reinicie o navegador e abra `https://homeserver.local/`.
 
-## macOS
+### Android
 
-1. Abra `hs-ca.pem` → o app **Acesso às Chaves**/Keychain.
-2. Adicione em **Sistema**; depois, em *Certificados*, clique duas vezes na CA.
-3. Em **Confiança → Ao usar este certificado**, marque **Confiar sempre**.
-4. Saia e reabra o navegador (Safari/Chrome).
+1. Baixe `hs-ca.pem`.
+2. Abra as configurações de segurança e credenciais do sistema.
+3. Escolha instalar um **Certificado de CA**.
+4. Selecione `hs-ca.pem` e confirme.
+5. Abra novamente `https://homeserver.local/`.
 
----
+Os nomes exatos dos menus podem variar conforme a versão e o fabricante do aparelho.
 
-## Android
+### iPhone e iPad
 
-1. Faça o download de `hs-ca.pem`.
-2. **Configurações → Segurança → Criptografia e credenciais →
-   Instalar certificado → Certificado de CA**.
-3. Selecione o arquivo baixado e confirme.
+1. Baixe `hs-ca.pem` pelo navegador.
+2. Abra **Ajustes → Geral → Perfil baixado** e instale o perfil.
+3. Vá em **Ajustes → Geral → Sobre → Configurações de confiança de certificados**.
+4. Ative a confiança para a CA do HomeServer.
+5. Abra novamente `https://homeserver.local/`.
 
-> No Chrome, o alerta pode continuar se voce usou o site sem a CA antes:
-> **Configurações do site → Limpar dados** e recarregue.
+## Passo 3 — Verifique
 
----
+Depois de instalar a CA, abra:
 
-## iOS / iPadOS
+```text
+https://homeserver.local/
+```
 
-1. Baixe `hs-ca.pem` (via Ajustes não navega arquivos; use o Safari).
-2. **Ajustes → Geral → Perfil baixado** → instale o perfil.
-3. **Ajustes → Geral → Informações → Configurações de confiança de
-   certificados** → ative a confiança total na CA do HomeServer.
-4. Safari: recarregue `https://homeserver.local`.
+O navegador deve reconhecer o certificado como confiável.
 
----
+Se você utiliza o endereço IP, teste o IP **atual do seu servidor**, desde que ele esteja coberto pelo certificado configurado.
 
-## Verificar
+## Se ainda aparecer um aviso
 
-Depois da instalação, estes endereços abrem sem aviso:
+Verifique, nesta ordem:
 
-- `https://homeserver.local`
-- `https://192.168.0.10`
+1. se você instalou a CA correta baixada do próprio HomeServer;
+2. se a instalação foi feita no dispositivo que está acessando o servidor;
+3. se o navegador foi reiniciado;
+4. se está acessando o nome ou endereço coberto pelo certificado;
+5. se a CA do servidor foi substituída desde a instalação no dispositivo.
 
-## Gerenciar a CA no servidor
+## Gerenciar TLS no servidor
+
+A CLI possui comandos para consultar e gerenciar o TLS:
 
 ```bash
-hs tls init    # garante CA + certificado (idempotente)
-hs tls renew   # renova se faltarem <30 dias e recarrega o proxy
-hs tls status  # estado legível
-hs tls info    # resumo JSON
+bash core/hs.sh tls status
+bash core/hs.sh tls info
+bash core/hs.sh tls init
+bash core/hs.sh tls renew
 ```
 
-A renovação semanal é automática (tarefa `tls-renew` do scheduler).
+Em resumo:
+
+| Comando | O que faz |
+|---|---|
+| `tls status` | Mostra o estado atual do TLS |
+| `tls info` | Mostra informações resumidas |
+| `tls init` | Garante que a infraestrutura TLS exista |
+| `tls renew` | Executa o fluxo de renovação configurado |
+
+A referência oficial da sintaxe disponível é sempre:
+
+```bash
+bash core/hs.sh --help
+```
+
+Voltar para [Instalar o HomeServer](README.md).
