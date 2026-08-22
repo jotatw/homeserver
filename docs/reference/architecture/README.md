@@ -1,37 +1,88 @@
 # Arquitetura técnica
 
-Esta seção detalha a organização técnica do HomeServer e complementa a visão geral em [`../ARCHITECTURE.md`](../ARCHITECTURE.md).
+Esta seção reúne a referência detalhada da arquitetura atual do HomeServer.
 
-## Camadas e contratos
+Antes de entrar nos documentos desta pasta, consulte [`../ARCHITECTURE.md`](../ARCHITECTURE.md) para uma visão geral. Os arquivos aqui aprofundam responsabilidades, fronteiras e contratos específicos.
 
-- [`CORE.md`](CORE.md) — papel do Core e regras de organização.
-- [`FOUNDATION.md`](FOUNDATION.md) — componentes reutilizáveis e contratos básicos.
-- [`Infrastructure.md`](Infrastructure.md) — operações concretas do ambiente e integração com o sistema.
-- [`API.md`](API.md) — papel arquitetural da API oficial.
-- [`APPLICATION_API.md`](APPLICATION_API.md) — contrato entre aplicações e API.
-- [`MODULES.md`](MODULES.md) — extensão modular e isolamento de responsabilidades.
+## Qual documento devo consultar?
 
-## Decisões arquiteturais
+```text
+Quero entender o papel do núcleo
+        ↓
+CORE.md
 
-- [`adr/`](adr/) — Architecture Decision Records.
+Quero entender a base reutilizável
+        ↓
+FOUNDATION.md
 
-## Relação entre documentos
+Quero entender operações da plataforma e do sistema
+        ↓
+Infrastructure.md
+
+Quero entender a fronteira HTTP da plataforma
+        ↓
+API.md
+        ↓
+api/README.md para endpoints e contratos concretos
+
+Quero entender a relação entre aplicações e capacidades internas
+        ↓
+APPLICATION_API.md
+
+Quero entender extensões e componentes opcionais
+        ↓
+MODULES.md
+
+Quero saber por que uma decisão arquitetural foi tomada
+        ↓
+adr/
+```
+
+## Estrutura
 
 ```text
 ARCHITECTURE.md
       │
-      ├── visão geral da arquitetura atual
-      │
+      └── visão geral da arquitetura atual
+
 architecture/
-      ├── Core
-      ├── Foundation
-      ├── Infrastructure
-      ├── API
-      ├── Application API
-      ├── Modules
-      └── ADRs
+      ├── CORE.md
+      ├── FOUNDATION.md
+      ├── Infrastructure.md
+      ├── API.md
+      ├── APPLICATION_API.md
+      ├── MODULES.md
+      └── adr/
 ```
 
-Os documentos desta pasta descrevem responsabilidades e contratos técnicos. Planejamento de evolução futura permanece em [`planning/`](../../../planning/README.md).
+## Como os documentos se relacionam
+
+Os documentos desta pasta não devem repetir o mesmo conteúdo com nomes diferentes.
+
+| Documento | Pergunta principal |
+|---|---|
+| `CORE.md` | Qual é o papel do núcleo da plataforma? |
+| `FOUNDATION.md` | Quais recursos reutilizáveis formam a base das demais camadas? |
+| `Infrastructure.md` | Como capacidades concretas interagem com o sistema e a infraestrutura? |
+| `API.md` | Qual é o papel arquitetural da API? |
+| `APPLICATION_API.md` | Como aplicações e interfaces acessam capacidades internas sem depender de detalhes físicos? |
+| `MODULES.md` | Como extensões opcionais se encaixam na arquitetura? |
+| `adr/` | Por que decisões arquiteturais específicas foram tomadas? |
+
+## O que não pertence aqui?
+
+Esta pasta descreve a arquitetura atual e seus detalhes técnicos.
+
+Outros assuntos possuem seus próprios locais:
+
+```text
+Princípios duradouros        → ../PRINCIPLES.md
+Planejamento e evolução      → ../../../planning/
+Endpoints concretos da API   → ../../../api/README.md
+Instalação e operação        → ../../install/ e ../../use/
+Personalização e contribuição→ ../../contribute/
+```
+
+Evite registrar uma ideia futura como se já fosse comportamento arquitetural atual. Quando algo ainda estiver em planejamento ou experimentação, a documentação deve deixar isso explícito.
 
 Voltar para [`Referência técnica`](../README.md).
