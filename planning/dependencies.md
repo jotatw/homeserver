@@ -1,9 +1,8 @@
 # HomeServer — Dependências
 
-Registro de versões. Não atualizar "no escuro": toda atualização passa por
-revisão e teste antes de integrar.
+Registro de versões. Não atualizar "no escuro": toda atualização passa por revisão e teste antes de integrar.
 
-> Estado verificado em **2026-08-16** (antes do v1.0.0).
+> Estado verificado em **2026-08-16**.
 
 ## Runtime
 
@@ -42,8 +41,7 @@ revisão e teste antes de integrar.
 | tsx | 4.23.12 | dev |
 | @types/node | 24.13.3 | dev |
 
-`npm audit` e `npm outdated` executados em 2026-08-16: **0 vulnerabilidades**
-(`fast-uri` corrigido via bump do fastify).
+`npm audit` e `npm outdated` executados em 2026-08-16: **0 vulnerabilidades** (`fast-uri` corrigido via bump do fastify).
 
 ## Pacotes apt (host)
 
@@ -59,6 +57,6 @@ revisão e teste antes de integrar.
 
 ## Pendências
 
-- [ ] Avaliar sucessores do **FileBrowser** (EOL) — ver `planning/security/filebrowser-eol.md` (fase própria).
-- [ ] Validar **Zero Knowledge Test** e **upgrade/reboot real** na matriz do v1.0.0.
+- [ ] Avaliar sucessores do **FileBrowser** (EOL) — ver `planning/security/filebrowser-eol.md`.
+- [ ] Validar **Zero Knowledge Test** e **upgrade/reboot real** quando forem aplicáveis ao próximo ciclo de consolidação ou a uma futura release oficial.
 - [ ] Manter `npm audit`/`npm outdated` periódicos no Quality Gate.
