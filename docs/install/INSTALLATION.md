@@ -6,7 +6,7 @@
 
 | Requisito | Mínimo | Observação |
 |---|---|---|
-| Sistema | **Debian 12** (bookworm) | Projeto validado em Debian |
+| Sistema | **Debian 12** (bookworm) | Base atualmente documentada e validada |
 | Hardware | x86_64, 2+ GB RAM | Testado em Pentium T4500, 3 GB |
 | Acesso | root (`sudo`) | O instalador exige root |
 | Internet | sim | Apenas durante a instalação |
@@ -25,14 +25,14 @@
 6. **Implanta** a API (`api/compose.yaml`).
 7. **Inicializa** o Core (`core/hs.sh`).
 8. **Configura** firewall (UFW), backup (diário 03h) e agenda de energia
-   (desliga 22h / liga 07h) — confirmados em perguntas.
+   (desliga 22h / liga 07h) conforme as opções confirmadas durante a instalação.
 9. **Executa** o Health Check e mostra o resumo final.
 
 ## Instalando
 
 ```bash
 # 1. Baixe
-git clone https://github.com/usuario/homeserver.git
+git clone https://github.com/jotatw/homeserver.git
 cd homeserver
 
 # 2. Instale
@@ -59,8 +59,7 @@ sudo bash install.sh --non-interactive
 sudo bash install.sh --modules=homepage,api
 ```
 
-> ⚠️ Em `--non-interactive`, a senha do FileBrowser é gerada e exibida no
-> resumo final. Guarde-a.
+> Em `--non-interactive`, a senha do FileBrowser é gerada e exibida no resumo final. Guarde-a.
 
 ## O que é criado
 
@@ -90,5 +89,4 @@ Os serviços usam: `3000` (homepage), `3001` (gitea), `8080` (filebrowser),
 
 ### Rede diferente de `192.168.x.0/24`
 
-O instalador detecta a rede automaticamente via `ip route`. Nenhum ajuste
-manual é necessário. Se algo não ficar acessível, veja `docs/FIRST_BOOT.md`.
+O instalador detecta a rede automaticamente via `ip route`. Nenhum ajuste manual é necessário. Se algo não ficar acessível, veja [`FIRST_BOOT.md`](FIRST_BOOT.md).
