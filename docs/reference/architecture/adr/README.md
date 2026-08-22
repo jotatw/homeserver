@@ -37,15 +37,15 @@ Um ADR aceito continua sendo um registro histórico mesmo quando posteriormente 
 
 | ID | Decisão | Status |
 |----|---------|--------|
-| [ADR-0001](0001-authentication.md) | Autenticação na API | Aceito |
+| [ADR-0001](0001-authentication.md) | Autenticação inicial da API | Substituído pelo ADR-0007 |
 | [ADR-0002](0002-autoupdate.md) | Sistema de auto-update | Aceito |
 | [ADR-0003](0003-religamento-s3.md) | Religamento via suspend S3 | Aceito |
 | [ADR-0004](0004-nomenclatura.md) | Nomenclatura por camada | Aceito |
 | [ADR-0005](0005-api-response.md) | Padronização da resposta da API | Aceito |
-| [ADR-0006](0006-architecture-freeze.md) | Estabilidade e evolução da arquitetura | Requer revisão |
+| [ADR-0006](0006-architecture-freeze.md) | Estabilidade e evolução da arquitetura | Aceito |
 | [ADR-0007](0007-identity-authentication.md) | Identity & Authentication | Aceito |
-| [ADR-0008](0008-app-api-platform-boundary.md) | App e API como fronteira da plataforma | Aceito |
-| [ADR-0009](0009-service-decoupling-and-modularity.md) | Desacoplamento de serviços e preparação para modularidade | Aceito |
+| [ADR-0008](0008-app-api-platform-boundary.md) | Interfaces consumidoras e API como fronteira da plataforma | Aceito |
+| [ADR-0009](0009-service-decoupling-and-modularity.md) | Desacoplamento de capacidades e modularidade progressiva | Aceito |
 
 ## Regras para novos ADRs
 
