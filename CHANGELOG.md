@@ -21,9 +21,9 @@ O Baseline v0.1.0 é a referência conceitual do estado inicial da consolidaçã
 - Health Check ampliado para incluir load, memória e temperatura.
 - Documentação organizada por objetivo em `docs/install/`, `docs/use/`, `docs/contribute/` e `docs/reference/`.
 - Fundamentos de evolução e validação, critérios de qualidade, planejamento de interfaces e arquitetura modular documentados.
-- Recuperação automática de serviços: `scripts/service-watchdog.sh` verifica os serviços habilitados a cada 15 min e reinicia os que não estiverem `running`, registrando no feed de eventos; desabilitável sem quebrar o núcleo.
-- Validação diária de backup: `scripts/backup-check.sh` às 05:30 valida o último backup (`hs system backup validate`), registrando OK/INVÁLIDO no log que alimenta o feed.
-- Scheduler no App (API+UI): `hs scheduler status`, executor com allowlist para `scheduler`, endpoints `GET /api/v1/scheduler` e `POST /api/v1/scheduler/:name/{enable,disable,run}` (admin) e seção "Tarefas agendadas" na Administração.
+- Recuperação automática de serviços por watchdog configurável.
+- Validação diária do último backup.
+- Scheduler integrado à API e à interface administrativa conforme a capacidade implementada.
 
 ### Alterado
 
@@ -52,49 +52,44 @@ A seção de desenvolvimento registra evidências históricas de execução, inc
 
 ## Histórico
 
-As seções abaixo preservam mudanças e versões anteriores para rastreabilidade. Elas não definem o estado atual nem representam suporte ativo.
+As entradas abaixo preservam versões, sprints, correções e estados anteriores para rastreabilidade. Elas não definem o estado atual, o roadmap ativo ou suporte formal.
 
 ### v2.0.0-rc.1 (2026-08-05) — experimental
 
-### Fixed (acceptance tests)
+#### Fixed (acceptance tests)
 
-- **Tema/sair inacessíveis** no desktop: sidebar sem scroll escondia os botões em telas baixas → `overflow-y: auto` + **event delegation global** (funciona mesmo se um render falhar).
-- **Bottom nav mobile quebrada**: o CSS esperava `<nav>` interno, mas o HTML usa `<nav class="bottomnav">` → `display: flex` nunca aplicava (itens inacessíveis). Corrigido com `display: flex` no container real.
-- **Mobile**: drawer `＋` (bottom sheet) com perfil, tema e sair — acesso completo no mobile.
-- **Aplicações**: app-card com ellipsis no nome (sem quebrar caixas) + hover com elevação.
-- **Armazenamento**: seção dispositivos sempre visível (vazia → "nenhum"); botão desmontar com loading e erro real.
-- **Cache**: `Cache-Control: no-cache` nos estáticos do App durante o desenvolvimento.
+- Tema e sair inacessíveis no desktop: sidebar sem scroll escondia os botões em telas baixas; corrigido com scroll e delegação de eventos.
+- Bottom navigation mobile quebrada por seletor incompatível com a estrutura real; corrigida no container utilizado.
+- Mobile recebeu drawer para ações de perfil, tema e sair.
+- Aplicações receberam tratamento de nomes longos e melhoria de interação dos cards.
+- Armazenamento passou a manter a seção de dispositivos visível e a exibir feedback para desmontagem.
+- Cache dos estáticos do App foi ajustado para evitar versões antigas durante o desenvolvimento.
 
-### Release Process (histórico)
-
-- `planning/release/`: processos e checklists de release registrados para evolução posterior.
-- `planning/support/support-policy.md`: política de suporte atualizada posteriormente para um modelo baseado em releases oficiais.
-
-### PWA instalável
+#### PWA instalável
 
 - `manifest.json` com modo standalone, ícones e `theme_color`.
-- App e login registram manifest e service worker mínimo como base para evolução futura.
+- App e login registravam manifest e service worker mínimo como base para evolução futura.
 
-### Polling (Meu espaço)
+#### Polling (Meu espaço)
 
-- Dashboard atualiza periodicamente e realiza refresh ao recuperar foco, conforme o comportamento registrado naquele momento.
+- Dashboard atualizava periodicamente e realizava refresh ao recuperar foco, conforme o comportamento daquele estado histórico.
 
-### Contrato App ↔ API
+#### Contrato App ↔ API
 
-- `api/README.md` documenta o contrato entre interface e API e a regra de comunicação pela API oficial.
+- O contrato entre interface e API passou a ser documentado explicitamente, com comunicação pela API oficial.
 
-### Known Issues
+#### Known Issues daquele estado
 
-- Navegação de arquivos não disponível diretamente no App naquele estado; o FileBrowser permanecia o ponto de acesso ao fluxo de arquivos.
-- Operações completas de serviços no App permaneciam pendentes naquele estado.
+- Navegação de arquivos não disponível diretamente no App; FileBrowser permanecia o ponto de acesso.
+- Operações completas de serviços no App permaneciam pendentes.
 - Histórico de métricas não estava disponível.
 - Offline completo do App permanecia como evolução futura.
 
-### Sprints 0-7 (histórico)
+### Sprints 0-7 — histórico de implementação
 
 #### Sprint 7 — Integrations
 
-- API Tokens para integrações externas: listagem, criação com exibição única, revogação e autenticação de integração com permissões restritas.
+- API Tokens para integrações externas, com criação, listagem, revogação e permissões restritas.
 - Persistência baseada em hash SHA-256 do token.
 - Integração administrativa no App conforme o estado daquele sprint.
 
@@ -131,6 +126,6 @@ As seções abaixo preservam mudanças e versões anteriores para rastreabilidad
 - Validação de body e testes de sessão.
 - ADR de identidade e autenticação.
 
----
+### Histórico anterior
 
-> Outras entradas históricas permanecem preservadas abaixo desta seção no arquivo original quando aplicável. O histórico não redefine a documentação, o roadmap ou o suporte atuais.
+Versões e estados anteriores a essa consolidação permanecem disponíveis no histórico Git do repositório. O changelog atual preserva os principais marcos necessários para compreender a evolução, enquanto o Git continua sendo a fonte de rastreabilidade completa de cada alteração.
