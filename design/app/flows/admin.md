@@ -2,36 +2,36 @@
 
 > Tela: `../wireframes/admin.md` · API: `/users*`, `/backup`, `/update`, `/power` (todos admin-only)
 > Refs: `../references.md` §2 (data tables, dialogs, toasts)
-> Este fluxo descreve as operações de administração implementáveis na v1.5.
+> Este fluxo descreve operações administrativas planejadas para a interface.
 
-## 1. Operações e endpoints (reais, v1.5)
+## 1. Operações e endpoints
 
 | Operação | Endpoint | Payload/comportamento | Duração |
 |---|---|---|---|
-| Listar usuários | `GET /users` | `user list` → array (schema FileBrowser: id, username, scope, perm...) | rápida |
-| Criar usuário | `POST /users` body `{username, password?, email?, gitea?}` | `hs user create` → 201 | rápida |
-| Trocar senha | `PUT /users/:username` body `{password}` | `hs user password` | rápida |
-| Remover usuário | `DELETE /users/:username?folder=1` | `hs user rm [--remove-folder]` | rápida |
-| Executar backup | `POST /backup` | roda `backup.sh` em container privilegiado | **lenta (até 300s)** |
-| Verificar atualização | `GET /update` | `{current, latest, update}` | rede (pode demorar) |
-| Aplicar atualização | `POST /update` body `{noRedeploy?}` | `hs update apply` → JSON | **lenta (redeploy)** |
-| Agenda de energia | `GET|PUT /power` | `{shutdown, wake, enabled}` | rápida |
+| Listar usuários | `GET /users` | `user list` → array | rápida |
+| Criar usuário | `POST /users` | cria usuário conforme contrato da API | rápida |
+| Trocar senha | `PUT /users/:username` | atualiza credencial conforme contrato da API | rápida |
+| Remover usuário | `DELETE /users/:username?folder=1` | remove usuário; pasta é opcional | rápida |
+| Executar backup | `POST /backup` | operação de backup | **lenta** |
+| Verificar atualização | `GET /update` | estado Git da instalação | rede |
+| Aplicar atualização | `POST /update` | permitido apenas quando o estado for seguro | **lenta** |
+| Agenda de energia | `GET|PUT /power` | configuração de desligamento e religamento | rápida |
 
-> **Atenção**: backup e update são **síncronos** na API v1.5 — o request fica aberto até concluir. A UI precisa de estado "em andamento" com proteção contra duplo clique (ver §5).
+> Backup e update podem permanecer síncronos enquanto a implementação atual não possuir processamento assíncrono com acompanhamento de progresso. A UI deve impedir dupla execução enquanto a operação estiver em andamento.
 
-## 2. Seções da tela (admin)
+## 2. Seções da tela
 
-```
-[rota /admin]  (guarda: só admin — ver navigation.md §5)
+```text
+[rota /admin]  (somente admin)
 
 ├─ 1. Usuários  (GET /users)
-│     data table: username · admin (is-admin) · ações [senha] [excluir]
+│     data table: username · admin · ações [senha] [excluir]
 │     [ + Novo usuário ] → dialog
 │
 ├─ 2. Manutenção
-│     [ 💾 Executar backup agora ]   → POST /backup
-│     [ ⬆️ Verificar atualização ]   → GET /update → dialog resultado
-│     [ Aplicar atualização ]        → POST /update (só se update=true)
+│     [ Executar backup agora ]       → POST /backup
+│     [ Verificar atualização ]       → GET /update → resultado
+│     [ Aplicar atualização ]         → POST /update quando permitido
 │
 └─ 3. Energia (agenda)  (GET /power)
       shutdown HH:MM · wake HH:MM · [Editar] → dialog PUT /power
@@ -39,83 +39,123 @@
 
 ## 3. Fluxo: criar usuário
 
-```
-[+ Novo usuário] → dialog (username obrigatório · senha · e-mail · criar no Gitea?)
+```text
+[+ Novo usuário] → dialog
      │
-     ├─ validação client: username ≥3 chars, sem espaços
-     ├─ POST /users {username, password?, email?, gitea?}
-     │     ├─ 201 → toast sucesso → reload da tabela
-     │     └─ 400/500 → erro inline no dialog (não fecha)
-     └─ botão "Criar" com spinner; bloqueado enquanto em andamento
+     ├─ validação local dos campos necessários
+     ├─ POST /users
+     │     ├─ sucesso → atualizar tabela
+     │     └─ erro → informar no dialog
+     └─ botão bloqueado enquanto em andamento
 ```
 
-- Campo **"criar no Gitea"** (checkbox) reflete `--gitea` da API.
-- Não expor switch de admin (a API não promove admin — nota do wireframe).
+Não expor controles administrativos que não possuam suporte explícito no contrato da API.
 
 ## 4. Fluxo: excluir usuário
 
-```
-[excluir] → dialog de confirmação (ref §3 destrutiva)
-     "Remover 'fulano'?"
-     [ ] também remover pasta de arquivos (danger)   ← DELETE ?folder=1
-     [ Cancelar ] [ Excluir (vermelho) ]
-     → DELETE /users/:username → toast → reload
+```text
+[excluir] → confirmação
+     "Remover este usuário?"
+     [ ] também remover pasta de arquivos
+     [ Cancelar ] [ Excluir ]
+     → DELETE → atualizar tabela
 ```
 
-- Checkbox "remover pasta" é **destrutivo irreversível** — padrão default **desmarcado** + aviso em vermelho.
+A remoção da pasta é uma operação destrutiva e deve permanecer desmarcada por padrão.
 
-## 5. Fluxo: backup e atualização (operações longas)
+## 5. Fluxo: backup e atualização
 
 ### Backup
+
+```text
+[Executar backup] → confirmação quando necessária
+     → POST /backup
+        ├─ operação em andamento → bloquear nova execução
+        ├─ sucesso → informar resultado
+        └─ erro → informar falha e liberar nova tentativa
 ```
-[💾 Executar backup] → confirm dialog ("pode levar alguns minutos")
-     → POST /backup (request aberto)
-        ├─ estado "Backup em andamento…" (spinner + desabilitar botão)
-        ├─ sucesso {ok:true} → toast verde
-        └─ erro (timeout/500) → toast vermelho + botão reativo
-```
-- **Proteção**: botão desabilitado enquanto em andamento; não fechar/reabrir em duplo clique.
-- Ideal futuro: endpoint async com progresso (backlog) — hoje é síncrono.
 
 ### Atualização
+
+```text
+[Verificar] → GET /update
+     ↓
+status recebido
+     │
+     ├─ up_to_date
+     │    → informar que a instalação já está atualizada
+     │
+     ├─ update_available
+     │    → mostrar commits atual e destino
+     │    → permitir [Aplicar atualização]
+     │
+     ├─ modified
+     │    → informar alterações locais
+     │    → não oferecer atualização automática
+     │
+     ├─ ahead
+     │    → informar commits locais
+     │    → não oferecer atualização automática
+     │
+     ├─ diverged
+     │    → informar divergência de histórico
+     │    → não oferecer atualização automática
+     │
+     └─ unavailable
+          → informar indisponibilidade do destino remoto
+          → permitir nova verificação
 ```
-[⬆️ Verificar] → GET /update
-     ├─ update=false → toast "Você está atualizado (v1.5.0)"
-     └─ update=true  → dialog:
-          "Nova versão disponível: X (atual: Y)"
-          [ Aplicar ] (danger-ish) / [Agora não]
-     [Aplicar] → POST /update → spinner longo ("Reiniciando serviços…")
-          → sucesso: toast + revalidar versão
-          → note: redeploy pode derrubar a sessão (o App volta ao login; aceitável)
+
+Quando `update_available`:
+
+```text
+[Aplicar atualização]
+     ↓
+confirmação
+     ↓
+POST /update
+     ↓
+spinner e bloqueio contra dupla execução
+     ↓
+resultado
+     ├─ sucesso → mostrar commit atualizado e ponto de recuperação
+     └─ erro → mostrar motivo sem assumir que a instalação foi alterada
 ```
+
+A interface não deve chamar `POST /update` para tentar resolver estados `modified`, `ahead` ou `diverged`. Esses casos exigem avaliação ou recuperação apropriada fora do fluxo automático.
+
+A atualização atualiza o código por fast-forward seguro. A interface não deve prometer redeploy, reinício de serviços ou rollback completo após a operação.
 
 ## 6. Fluxo: agenda de energia
 
-```
+```text
 [Editar] → dialog (HH:MM)
      shutdown: [22:00]   wake: [07:00]
-     ( ) agendado   ( ) desativado
-     [ Salvar ] → PUT /power {shutdown, wake, enabled}
-        ├─ 200 → toast "Agenda salva" → refresh
-        └─ 400 → erro inline (validação HH:MM)
+     agendado / desativado
+     [ Salvar ]
+        ├─ sucesso → atualizar estado
+        └─ erro → informar validação
 ```
-- Sempre avisar o impacto: "O servidor desligará às 22:00 e religará às 07:00".
-- Desativar agenda usa `{enabled:false}`.
+
+Sempre informar o impacto da agenda antes de salvar.
 
 ## 7. Estados e erros
 
 | Estado | Comportamento |
 |---|---|
-| user tenta /admin | Redireciona `/` + toast (guarda) · 403 real → mesma UX |
-| Backup em andamento | Botão desabilitado + spinner; sem navegação bloqueada |
-| Update aplicando | Modal "Aplicando atualização…" + aviso de possível desconexão |
-| 401 durante operação longa | Intercepta → logout → login (sessão expirada) |
-| Erro validação | Inline no campo do dialog (nunca só toast) |
+| acesso sem permissão | bloquear acesso e tratar resposta de autorização |
+| backup em andamento | bloquear nova execução |
+| update aplicando | mostrar progresso indeterminado e impedir dupla execução |
+| `modified` / `ahead` / `diverged` | não oferecer atualização automática |
+| `unavailable` | informar falha de consulta e permitir nova tentativa |
+| erro de validação | informar próximo ao campo ou operação correspondente |
 
 ## 8. Checklist de validação
 
-- [ ] Só admin acessa /admin (guarda + 403 tratado)
-- [ ] CRUD de usuários com dialogs; excluir tem confirmação + checkbox de pasta (default off)
-- [ ] Backup/update síncronos: estados longos com proteção anti duplo clique
-- [ ] Agenda power com validação HH:MM e aviso de impacto
-- [ ] Erros inline nos dialogs; toasts para sucesso/erro global
+- [ ] Operações administrativas protegidas por autorização
+- [ ] CRUD de usuários com confirmação para remoções destrutivas
+- [ ] Backup e update impedem dupla execução
+- [ ] Cada estado de atualização possui comportamento próprio
+- [ ] `update_available` é o único estado que oferece aplicação automática
+- [ ] A UI não promete redeploy ou rollback completo
+- [ ] Agenda de energia valida horários e informa impacto
