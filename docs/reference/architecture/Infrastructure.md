@@ -1,99 +1,204 @@
-# HomeServer Infrastructure
+# Infrastructure
 
-## Visão Geral
+A Infrastructure reúne capacidades internas que conectam o HomeServer ao seu ambiente de execução.
 
-A Infrastructure é a segunda camada do HomeServer Core.
+Seu objetivo é encapsular detalhes do sistema e fornecer operações reutilizáveis para o restante da plataforma, evitando que cada componente precise conhecer comandos, caminhos, permissões ou mecanismos específicos do ambiente.
 
-Seu objetivo é fornecer uma interface padronizada entre o HomeServer e o sistema operacional, encapsulando operações de baixo nível em módulos reutilizáveis.
+Ela utiliza a Foundation quando necessário, mas possui responsabilidades próprias relacionadas à operação do HomeServer.
 
-A Infrastructure utiliza a Foundation como base e disponibiliza serviços para as camadas superiores.
+## Quando algo pertence à Infrastructure?
+
+Uma capacidade é candidata à Infrastructure quando:
+
+- representa uma operação interna da plataforma;
+- depende do ambiente onde o HomeServer é executado;
+- encapsula detalhes do sistema operacional ou runtime;
+- pode ser reutilizada por diferentes capacidades do HomeServer;
+- não pertence a um serviço externo específico.
+
+A pergunta prática é:
+
+> **Isso é uma capacidade necessária para operar o HomeServer, independentemente de qual interface ou módulo a solicita?**
+
+Se sim, provavelmente pertence à Infrastructure.
+
+---
 
 ## Responsabilidades
 
-A Infrastructure é responsável por executar operações concretas no ambiente, incluindo:
+Dependendo do estado atual do projeto, a Infrastructure pode concentrar capacidades relacionadas a:
 
-- gerenciamento de arquivos;
-- gerenciamento de diretórios;
-- manipulação do ambiente;
-- gerenciamento de containers;
-- gerenciamento de serviços;
-- provisionamento;
-- storage, usuários, dispositivos, hardware, backup, energia e agendamento.
+- ambiente e requisitos de execução;
+- arquivos e diretórios pertencentes à plataforma;
+- serviços internos;
+- containers e Compose;
+- armazenamento;
+- usuários;
+- dispositivos e hardware;
+- backup;
+- energia;
+- agendamento;
+- atualização e manutenção.
 
-A Infrastructure não implementa interface de usuário nem regras específicas de aplicações.
+A lista descreve áreas de responsabilidade, não a obrigação de todas existirem ou possuírem um módulo próprio em qualquer momento.
 
-## Dependências
+---
 
-A dependência entre as camadas segue o sentido:
+## O que não pertence à Infrastructure?
+
+A Infrastructure não deve concentrar:
+
+- lógica de interface;
+- necessidades específicas de Homepage, App ou outra aplicação consumidora;
+- integração detalhada com um serviço externo específico;
+- comportamento exclusivo de um módulo opcional;
+- personalizações particulares de uma instalação, salvo quando forem explicitamente tratadas como parte da plataforma.
+
+Integrações específicas com recursos externos devem permanecer isoladas por fronteiras apropriadas, como Adapters, quando isso reduzir acoplamento e facilitar substituição ou manutenção.
+
+---
+
+## Relação com Foundation e componentes superiores
+
+A direção de dependências preferencial é:
 
 ```text
-Applications
-      │
+Capacidades / consumidores
+        ↓
 Infrastructure
-      │
+        ↓
 Foundation
+        ↓
+Sistema e runtime
 ```
 
-A Infrastructure nunca depende diretamente das Applications ou dos módulos de produto.
-
-Integrações com serviços externos passam pela camada de Adapters.
-
-## Organização
+A Infrastructure pode utilizar a Foundation.
 
 ```text
-core/
-├── foundation/
-├── infrastructure/
-│   ├── environment.sh
-│   ├── docker.sh
-│   ├── compose.sh
-│   ├── service.sh
-│   ├── storage.sh
-│   ├── users.sh
-│   ├── devices.sh
-│   ├── hardware.sh
-│   ├── backup.sh
-│   ├── scheduler.sh
-│   ├── power.sh
-│   └── update.sh
-└── adapters/
+Infrastructure → Foundation     permitido
+Foundation → Infrastructure     evitar
 ```
 
-Cada módulo de Infrastructure expõe uma API pública pequena e utiliza o prefixo definido para sua camada.
+Componentes superiores devem utilizar capacidades da Infrastructure por interfaces ou contratos apropriados, sem depender desnecessariamente de seus detalhes internos.
 
-## Fluxo
+---
+
+## Relação com Adapters
+
+Infrastructure e Adapters possuem responsabilidades diferentes.
 
 ```text
-Application
-      │
-      ▼
 Infrastructure
-      │
-      ▼
-Foundation
-      │
-      ▼
-Sistema Operacional
+→ capacidades do próprio HomeServer e seu ambiente
+
+Adapter
+→ integração com uma ferramenta ou serviço externo específico
 ```
 
-As Applications não executam operações de infraestrutura diretamente.
+Exemplo conceitual:
 
-## Princípios
+```text
+Gerenciar containers em geral
+→ Infrastructure
 
-- responsabilidade única;
-- baixo acoplamento;
-- alta coesão;
-- APIs pequenas;
-- implementação simples;
-- documentação obrigatória;
-- testes independentes.
+Executar uma operação específica do FileBrowser
+→ Adapter do FileBrowser
+```
 
-## Decisões arquiteturais
+A separação evita que detalhes de um fornecedor ou serviço externo se espalhem pela plataforma.
 
-Decisões relevantes são registradas em `docs/reference/architecture/adr/`.
+---
 
-Consulte o [índice de ADRs](adr/README.md).
+## APIs e fronteiras
 
-## Evolução
+Cada capacidade deve expor apenas as operações necessárias para seus consumidores.
 
-Novos módulos devem representar uma responsabilidade claramente identificável. Não se deve transformar um módulo em um componente genérico que concentre múltiplas responsabilidades.
+Evite exigir que componentes superiores conheçam:
+
+- comandos internos;
+- caminhos específicos do ambiente;
+- detalhes de containers;
+- permissões internas;
+- formato de ferramentas utilizadas para implementar uma operação.
+
+Esses detalhes podem mudar sem exigir alterações nos consumidores quando permanecem encapsulados.
+
+---
+
+## Organização interna
+
+A estrutura de arquivos pode evoluir conforme as capacidades amadurecem.
+
+Uma organização possível é:
+
+```text
+core/infrastructure/
+├── environment
+├── runtime
+├── storage
+├── users
+├── devices
+├── hardware
+├── backup
+├── scheduler
+├── power
+└── maintenance
+```
+
+Os nomes e a divisão concreta não são contratos arquiteturais por si só. O importante é que cada componente mantenha uma responsabilidade clara e evite se tornar um módulo genérico para operações sem relação.
+
+---
+
+## Adicionando uma nova capacidade
+
+Antes de criar ou ampliar um componente da Infrastructure, avalie:
+
+1. Qual problema operacional ele resolve?
+2. Essa responsabilidade já existe em outro componente?
+3. Ele depende do ambiente ou runtime do HomeServer?
+4. Poderia ser uma integração isolada com um serviço externo?
+5. Qual API mínima os consumidores realmente precisam?
+6. Como falhas serão apresentadas ou tratadas?
+7. A mudança introduz uma dependência nova no núcleo?
+
+O objetivo é adicionar capacidades claras, não acumular operações apenas porque pertencem ao servidor.
+
+---
+
+## Evolução e estabilidade
+
+Capacidades da Infrastructure podem afetar múltiplos componentes do HomeServer.
+
+Antes de consolidar uma mudança, considere:
+
+- impacto sobre consumidores existentes;
+- compatibilidade de APIs públicas;
+- comportamento em ambientes suportados;
+- tratamento de falhas previsíveis;
+- possibilidade de teste;
+- custo de manutenção;
+- necessidade de documentação ou ADR.
+
+Uma nova capacidade deve permanecer simples até que exista evidência para justificar maior abstração.
+
+---
+
+## Testes
+
+A validação deve ser proporcional ao impacto da mudança.
+
+Capacidades que dependem do sistema operacional, Docker, hardware ou outros recursos reais podem exigir validação além de testes isolados.
+
+Consulte [`../../contribute/TESTING.md`](../../contribute/TESTING.md).
+
+---
+
+## Referências relacionadas
+
+- [`CORE.md`](CORE.md) — papel do núcleo técnico;
+- [`FOUNDATION.md`](FOUNDATION.md) — componentes independentes e reutilizáveis;
+- [`API.md`](API.md) — contratos expostos pela plataforma;
+- [`MODULES.md`](MODULES.md) — capacidades opcionais;
+- [`adr/`](adr/) — decisões arquiteturais específicas.
+
+Voltar para [Referência de arquitetura](README.md).
