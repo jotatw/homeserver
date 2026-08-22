@@ -14,11 +14,12 @@ A proposta é manter a infraestrutura simples, modular e reutilizável: o HomeSe
 ## Filosofia
 
 - Simplicidade antes de complexidade.
-- Evolução incremental.
+- Evolução incremental e validação contínua.
 - Uma responsabilidade por camada.
 - Infraestrutura desacoplada dos serviços externos.
-- Automação sempre que possível.
-- Documentação acompanha o código.
+- Interfaces adequadas ao contexto.
+- Automação quando gera benefício real.
+- Documentação acompanha o código e as decisões.
 - Funcionalidade local não deve depender de nuvem quando não for necessário.
 - Arquitetura estável é mais importante que quantidade de funcionalidades.
 
@@ -28,13 +29,15 @@ O objetivo não é competir com soluções corporativas, mas oferecer uma plataf
 
 ## Estado atual
 
-O projeto possui histórico de versões v1.x e preparação conceitual para uma futura v2.0. O desenvolvimento atual está na etapa de **consolidação após o baseline**, com arquitetura modular planejada, hardening principal implementado e foco nas próximas evoluções de App, UX e validação operacional.
+O projeto está em **evolução contínua**, usando o **Baseline v0.1.0** como referência para comparar o estado observado, limitações, correções e melhorias futuras.
 
-O **Baseline v0.1.0 é conceitual**: ele registra um marco de referência sem apagar ou substituir as tags e versões históricas existentes.
+O baseline não é uma tag nem uma release distribuída. Ele registra o ponto de partida da consolidação atual.
 
-A linha v1.6.x permanece como histórico de manutenção e pequenas melhorias. A evolução posterior ao baseline é organizada pelo roadmap conceitual até uma primeira release estável v1.0.0.
+A evolução é organizada por prioridades, implementação, testes, uso real e novas evidências. Uma solução pode ser consolidada, melhorada, refatorada, permanecer experimental ou ser removida conforme seus resultados.
 
-O projeto possui:
+Tags e Releases não são utilizadas apenas para marcar etapas intermediárias. A primeira publicação oficial planejada é `v1.0.0`, mas será considerada somente após uma decisão explícita e o atendimento dos critérios aplicáveis de release.
+
+O projeto atualmente possui, entre outras capacidades:
 
 - Homepage como portal de acesso;
 - HomeServer App para gerenciamento;
@@ -50,27 +53,29 @@ O projeto possui:
 - agendamento de energia;
 - descoberta e gerenciamento de dispositivos;
 - CLI administrativa `hs`;
-- auto-update por releases;
 - testes automatizados, smoke tests e CI;
 - executor centralizado para operações privilegiadas;
 - validação em camadas para operações de módulos;
-- Design System e documentação arquitetural.
+- documentação de arquitetura, segurança e planejamento;
+- direção inicial para Design System e interfaces Desktop/Mobile.
 
-### Baseline
+### Referências de evolução
 
-O estado de referência é documentado em [`planning/release/baseline-v0.1.0.md`](planning/release/baseline-v0.1.0.md).
-
-Esse documento funciona como referência para comparar correções, regressões e evolução futura. O status operacional das fases posteriores é mantido no roadmap e nas evidências específicas de cada área.
+- [Baseline](planning/release/baseline-v0.1.0.md)
+- [Roadmap de Evolução](planning/roadmap/evolution.md)
+- [Fundamentos](planning/foundations/README.md)
+- [Planejamento do App](planning/app/README.md)
+- [Critérios de Release](planning/release/README.md)
 
 ---
 
 ## Para quem é
 
-O uso cotidiano do HomeServer **não exige programação**.
+O uso cotidiano do HomeServer não deve exigir programação.
 
-A instalação oficial é orientada por um assistente e o objetivo do projeto é que uma pessoa nova consiga chegar de uma máquina Linux limpa a um servidor funcional usando apenas a documentação oficial.
+A instalação oficial é um procedimento técnico documentado, e o objetivo do projeto é que uma pessoa nova consiga chegar de uma máquina Linux limpa a um servidor funcional seguindo a documentação oficial.
 
-Conhecimento de Linux, Docker e programação é necessário apenas para administração avançada, manutenção ou desenvolvimento do projeto.
+Conhecimento de Linux, Docker e programação continua útil para diagnóstico avançado, manutenção, recuperação, automação ou desenvolvimento.
 
 ---
 
@@ -85,11 +90,11 @@ HomeServer
 │   └── hs.sh                # CLI
 │
 ├── api/                     # API oficial da plataforma
-├── modules/                 # serviços implantáveis
+├── modules/                 # componentes e serviços extensíveis
 ├── automation/              # automações e hooks
 ├── scripts/                 # ferramentas auxiliares
 ├── docs/                    # documentação do sistema
-├── planning/                # evolução e planejamento
+├── planning/                # fundamentos e evolução
 └── install.sh               # instalação
 ```
 
@@ -107,28 +112,31 @@ Isolam integrações com serviços externos. A Infrastructure não deve depender
 
 ### API
 
-É a interface oficial da plataforma. O App é apenas um cliente da API e não acessa diretamente FileBrowser, Gitea ou outros serviços.
+É a interface oficial da plataforma. As interfaces utilizam capacidades por contratos apropriados e não devem depender diretamente de detalhes internos dos serviços.
 
 ### Modules
 
-Serviços implantados pelo HomeServer, como Homepage, FileBrowser, Gitea, Caddy e Portainer.
+Componentes opcionais ou independentes podem ampliar capacidades do HomeServer seguindo os contratos arquiteturais do projeto. A instalação ou remoção de um módulo não deve comprometer o Core ou dados fora de sua responsabilidade.
 
 ---
 
-## Homepage e App
+## Interfaces
 
-A **Homepage** é o portal rápido do servidor. Ela organiza as principais ações em quatro grupos:
+O HomeServer utiliza interfaces com papéis diferentes conforme o contexto.
 
-| Grupo | Objetivo |
-|---|---|
-| **Meu espaço** | Arquivos, projetos, downloads e mídia |
-| **Aplicações** | Serviços disponíveis e seus estados |
-| **Administração** | Gestão do HomeServer |
-| **Sistema** | Diagnóstico e informações técnicas |
+### Desktop
 
-O **HomeServer App** é a interface de gerenciamento da plataforma. Ele possui autenticação própria e adapta a navegação conforme o papel do usuário.
+É a interface principal para gerenciamento e operações que exigem mais contexto, configuração, visualização ou controle.
 
-A Homepage continua sendo o ponto de entrada simples; o App concentra operações administrativas e recursos da plataforma.
+### Mobile
+
+Prioriza acesso rápido às ações frequentes. Não precisa reproduzir automaticamente todas as funcionalidades do Desktop.
+
+### CLI
+
+Continua importante para instalação, automação, testes, diagnóstico, recuperação e manutenção técnica avançada.
+
+A direção detalhada das interfaces está em [`planning/app/`](planning/app/README.md).
 
 ---
 
