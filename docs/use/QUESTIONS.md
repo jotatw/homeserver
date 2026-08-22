@@ -120,10 +120,10 @@ Perguntas sobre **por que** uma decisão foi tomada devem ser respondidas pelos 
 
 ## 13. Evolução do projeto
 
-- [O que está sendo desenvolvido na v1.6?](../../planning/roadmap/v1.0.md)
-- [Qual é o objetivo da v2.0?](../../planning/archive/roadmap/v2.0.md)
-- [O que fica para v2.1+?](../../planning/archive/roadmap/v2.0.md)
+- [Qual é o roadmap atual do projeto?](../../planning/roadmap/evolution.md)
+- [Como o projeto evolui e valida novas funcionalidades?](../../planning/foundations/evolution-and-validation.md)
 - [Como funciona o processo de release?](../../planning/release/release-process.md)
+- [Quando a primeira release oficial será publicada?](../../planning/release/v1.0-checklist.md)
 
 ## 14. Dúvidas ainda não respondidas
 
