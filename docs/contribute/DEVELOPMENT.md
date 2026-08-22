@@ -72,101 +72,30 @@ Todos os arquivos da Foundation devem seguir a mesma organização.
 
 # Convenções
 
-## Nomenclatura por camada (v1.5)
+## Nomenclatura por camada
 
 Cada camada usa um prefixo próprio, comunicando sua responsabilidade.
 
 | Camada | Prefixo | Exemplos |
 |--------|---------|----------|
-| Foundation | `hs_*` | `hs_fs_*`, `hs_cfg_*`, `hs_val_*`, `hs_out_*` (constantes via `readonly`) |
+| Foundation | `hs_*` | `hs_fs_*`, `hs_cfg_*`, `hs_val_*`, `hs_out_*` |
 | Infrastructure | prefixo do módulo | `storage_*`, `users_*`, `devices_*`, `hardware_*`, `backup_*`, `scheduler_*`, `power_*`, `compose_*`, `service_*` |
-| Adapters | `filebrowser_*` | `filebrowser_login`, `filebrowser_create_user` |
+| Adapters | prefixo do serviço | `filebrowser_login`, `filebrowser_create_user` |
 | CLI | `hs <comando> <subcomando>` | `hs user create`, `hs system status` |
 
 ## Funções públicas
 
-Todas devem utilizar o prefixo correspondente à camada/módulo.
-
-Exemplos:
-
-```text
-hs_fs_create_directory
-
-storage_init
-
-users_create
-
-filebrowser_create_user
-```
-
----
+Todas devem utilizar o prefixo correspondente à camada ou módulo.
 
 ## Funções privadas
 
-Funções privadas devem iniciar com "_".
-
-Exemplo:
-
-```text
-_hs_storage_validate
-
-_hs_fs_create
-```
-
----
-
-## Logs (formato padrão)
-
-Todos os logs seguem o mesmo formato:
-
-```text
-[DATA] MENSAGEM
-```
-
-Exemplo:
-
-```text
-[2026-08-05 09:45:43] HomeServer startup
-[2026-08-05 03:00:12] Iniciando backup em /srv/backup/daily/2026-08-05
-```
-
-Helper padrão:
-
-```bash
-log() { echo "[$(date '+%F %T')] $*" >> "${LOG_FILE}"; }
-```
-
-Os logs residem em `/var/log/homeserver-*.log`.
-
----
-
-## Variáveis
-
-Utilizar nomes completos.
-
-Correto:
-
-```bash
-directory
-
-file
-
-service
-
-storage
-
-configuration
-```
-
-Evitar abreviações.
+Funções privadas devem iniciar com `_`.
 
 ---
 
 # Responsabilidades
 
-Cada função deve possuir apenas uma responsabilidade.
-
-Evite funções que executem várias operações.
+Cada função deve possuir apenas uma responsabilidade. Evite funções que executem várias operações.
 
 ---
 
@@ -178,7 +107,7 @@ A Foundation:
 - não conhece módulos;
 - não conhece serviços;
 - não conhece Docker;
-- não conhece FileBrowser.
+- não conhece serviços específicos.
 
 A Foundation apenas fornece APIs reutilizáveis.
 
@@ -186,37 +115,31 @@ A Foundation apenas fornece APIs reutilizáveis.
 
 # Testes
 
-Toda nova funcionalidade deve possuir testes.
+Toda nova funcionalidade deve possuir testes aplicáveis.
 
-Fluxo:
+Fluxo mínimo:
 
 Preparação
-
 ↓
-
 Execução
-
 ↓
-
 Validação
-
 ↓
-
 Limpeza
+
+Quando aplicável, testes automatizados devem ser complementados por validação no ambiente real.
 
 ---
 
 # Commits
 
-Os commits devem ser pequenos.
+Os commits devem ser pequenos e representar mudanças coerentes.
 
 Exemplos:
 
 ```text
-feat(foundation): add hs_fs_create_directory
-
-test(foundation): add filesystem create tests
-
+feat(foundation): add filesystem helper
+test(foundation): add filesystem tests
 refactor(foundation): simplify filesystem api
 ```
 
@@ -224,9 +147,9 @@ refactor(foundation): simplify filesystem api
 
 # Documentação
 
-A documentação deve ficar na pasta `docs/`.
+A documentação deve registrar decisões, funcionamento, limitações e evidências relevantes.
 
-Comentários no código devem ser utilizados apenas para organização.
+Comentários no código devem ser utilizados apenas quando ajudam a compreender uma decisão ou organização que não seja evidente pela própria implementação.
 
 ---
 
@@ -236,43 +159,50 @@ Comentários no código devem ser utilizados apenas para organização.
 
 ```text
 HomeServer
-├── core/foundation/      infraestrutura do Core (hs_*)
-├── core/infrastructure/  módulos do Core (prefixo do módulo)
+├── core/foundation/      infraestrutura do Core
+├── core/infrastructure/  capacidades da plataforma
 ├── core/adapters/        integração com serviços externos
-├── api/                  API REST + App (frontend em api/app)
-├── modules/              serviços implantáveis (compose)
-├── scripts/              utilitários (deploy, systemd, testes) — ver scripts/README.md
+├── api/                  API REST + App
+├── modules/              serviços implantáveis
+├── scripts/              utilitários, deploy, systemd e testes
 ├── docs/                 documentação
 ├── design/               design do App
-└── planning/             baseline, roadmap, qualidade, backlog, histórico (archive/)
+└── planning/             fundamentos, arquitetura, módulos, roadmap e qualidade
 ```
 
-- `planning/release/baseline-v0.1.0.md` — estado de referência do projeto.
-- `planning/roadmap/v1.0.md` — evolução por FASEs (0-10) até a v1.0.0.
+Referências principais:
+
+- `planning/foundations/` — princípios gerais de evolução e decisão.
+- `planning/release/baseline-v0.1.0.md` — estado de referência conceitual do projeto.
+- `planning/roadmap/evolution.md` — fases e prioridades de evolução contínua.
+- `planning/release/` — critérios e processo para futuras releases oficiais.
 
 ## Evolução por fases
 
-O desenvolvimento segue o roadmap (`planning/roadmap/v1.0.md`). Regra de evolução:
+O desenvolvimento utiliza o roadmap em `planning/roadmap/evolution.md` como direção operacional.
 
-1. implementação (quando aplicável);
+As fases não representam uma sequência rígida de releases. A evolução deve considerar, conforme aplicável:
+
+1. implementação;
 2. testes;
 3. documentação;
 4. evidência;
-5. validação de uso;
-6. registro das limitações restantes.
+5. validação de uso real;
+6. avaliação de recursos, segurança e manutenção;
+7. registro das limitações restantes.
 
 Uma fase posterior não deve mascarar uma pendência crítica de uma fase anterior.
 
-## Nomenclatura (revisão recente)
+Decisões podem ser revisadas quando novas evidências demonstrarem que existe uma solução mais adequada.
 
-- Módulos de Infrastructure usam **singulares**: `service.sh`, `service_status.sh`,
-  `storage.sh`, `devices.sh`, `users.sh`... (em vez de plural quando referem o módulo).
-- Funções públicas: prefixo do módulo (`get_service_status_json`, `storage_init`...).
-- Scripts em `scripts/`: `test-*` para testes, `homeserver-*` para units systemd;
-  demais são deploy/auxiliares (ver `scripts/README.md`).
+## Nomenclatura
+
+- Módulos de Infrastructure utilizam nomes consistentes com sua responsabilidade.
+- Funções públicas utilizam o prefixo da camada ou módulo correspondente.
+- Scripts em `scripts/` utilizam nomes que indiquem claramente sua finalidade; convenções específicas devem ser documentadas em `scripts/README.md`.
 
 ---
 
 # Objetivo Final
 
-Construir um HomeServer simples, modular, reutilizável e de fácil manutenção.
+Construir um HomeServer simples, modular, reutilizável, seguro e de fácil manutenção.
