@@ -11,7 +11,7 @@ bash core/hs.sh <comando> <subcomando>
 ```text
 system      hostname|os|kernel|architecture|uptime|info|memory|disk|cpu|load|services|backup|events|status
 status      status geral
-version     estado/versionamento atual
+version     commit atualmente instalado
 service     list|enable|disable|start|stop|restart|status|update <serviço>
 user        create|list|info|password|verify|is-admin|rm
 device      list|status|usb|mount <tipo> <rótulo> <dev>|unmount <tipo> <rótulo>|eject <dev>
@@ -20,7 +20,7 @@ automation  list|run <evento>
 scheduler   init|list|enable|disable|run <tarefa>
 power       status|enable|disable|set <desliga HH:MM> <liga HH:MM>
 tls         init|renew|status|info
-update      check|apply [--no-redeploy] | os check|apply
+update      check|apply | os check|apply
 ```
 
 ## Exemplos
@@ -36,13 +36,42 @@ bash core/hs.sh update os check
 
 ## Atualizações
 
-`update check` verifica o estado disponível no repositório remoto e compara a instalação atual com a referência alcançável configurada pelo mecanismo de atualização.
+### HomeServer
 
-`update apply` aplica o fluxo de atualização suportado pelo projeto e pode executar o reimplante quando aplicável. Antes de atualizar, o processo registra um ponto local de recuperação `pre-update-<estado>`.
+`update check` consulta a branch remota configurada e compara o commit local com o destino remoto.
 
-Enquanto não existir uma release oficial consolidada, a disponibilidade de atualização não deve ser interpretada como suporte formal por uma linha de versões. Tags futuras podem ser utilizadas como referências de publicação quando uma política explícita de release estiver em vigor.
+O resultado informa um dos estados:
 
-Para atualizar os pacotes do sistema:
+- `up_to_date` — a instalação está no mesmo commit do destino remoto;
+- `update_available` — existem commits remotos que podem ser aplicados por fast-forward;
+- `modified` — existem alterações locais e a atualização automática é recusada;
+- `ahead` — existem commits locais à frente do remoto;
+- `diverged` — o histórico local e remoto divergiram;
+- `unavailable` — não foi possível consultar o destino remoto.
+
+Uma atualização disponível não significa que qualquer instalação possa ser atualizada automaticamente. O `update apply` só continua quando o estado permite um fast-forward seguro.
+
+```text
+update_available
+        ↓
+registrar ponto de recuperação do código
+        ↓
+fast-forward para o destino remoto
+        ↓
+retornar commit atualizado
+```
+
+O processo não executa `git reset --hard` e não sobrescreve alterações locais. Antes da atualização, o commit anterior é registrado em uma referência local `refs/homeserver/pre-update/<commit>`.
+
+Essa referência permite recuperar o código anterior, mas não representa rollback completo de dados, configurações persistentes ou migrações.
+
+A atualização padrão atualiza apenas o código do HomeServer. Ela não executa automaticamente uma instalação completa ou redeploy. Caso uma mudança futura exija etapas adicionais, essas etapas devem ser explicitamente definidas e validadas.
+
+Enquanto o projeto estiver em desenvolvimento contínuo, a atualização acompanha a branch configurada. Tags e releases não são necessárias para detectar atualizações. Uma futura política de releases poderá definir canais estáveis sem substituir este mecanismo de desenvolvimento.
+
+### Sistema operacional
+
+A atualização do sistema é independente da atualização do HomeServer:
 
 ```bash
 bash core/hs.sh update os check
@@ -59,5 +88,5 @@ O resultado é registrado em:
 
 - `tls init/renew` gerencia a CA interna em `/srv/config/tls`.
 - A CLI é especialmente útil para instalação, diagnóstico, recuperação, automação e manutenção avançada.
-- Para operações cotidianas suportadas pela interface, prefira o App quando ele oferecer o fluxo completo.
+- Interfaces diferentes podem oferecer fluxos próprios para capacidades compartilhadas; a CLI não é substituída por uma interface específica.
 - Uso completo e sintaxe atual: `bash core/hs.sh --help`.
