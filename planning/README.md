@@ -1,6 +1,6 @@
 # Planejamento do HomeServer
 
-Este diretório organiza a evolução do projeto. A documentação aqui descreve decisões, baseline, roadmap, qualidade, segurança e planejamento arquitetural.
+Este diretório organiza a evolução do projeto. A documentação aqui descreve princípios gerais, decisões, baseline, roadmap, qualidade, segurança, interfaces e planejamento arquitetural.
 
 ## Ponto de entrada atual
 
@@ -10,11 +10,17 @@ O caminho operacional até a primeira release estável está no [Roadmap v1.0](r
 
 A base arquitetural para a evolução modular está consolidada em [Arquitetura Modular](architecture/README.md).
 
+Os princípios gerais de evolução e validação estão em [Fundamentos Gerais](foundations/README.md).
+
+A direção inicial das interfaces está em [Planejamento do App](app/README.md).
+
 ## Organização
 
 ```text
 planning/
 ├── README.md                 # índice desta área
+├── foundations/              # princípios gerais e critérios de decisão
+├── app/                      # direção das interfaces e prioridades de uso
 ├── release/                  # baseline e processos de release
 ├── roadmap/                  # evolução até v1.0 e histórico
 ├── architecture/             # arquitetura modular consolidada
@@ -51,6 +57,8 @@ A M1 define contratos e princípios. Formatos concretos, schemas, persistência,
 
 Para evitar duplicação:
 
+- `foundations/` define princípios gerais relativamente estáveis;
+- `app/` define direção e prioridades das interfaces, sem substituir especificações técnicas;
 - documentos de domínio definem regras detalhadas;
 - documentos de decisão consolidam decisões fechadas e pendências;
 - o roadmap organiza a sequência de evolução;
