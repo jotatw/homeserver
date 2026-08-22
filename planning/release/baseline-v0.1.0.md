@@ -3,8 +3,8 @@
 > Baseline conceitual do estado do projeto antes da próxima fase de evolução.
 
 **Status:** 🟢 Concluído (2026-08-11)
-**Versão conceitual:** v0.1.0
-**Tag Git:** não criada — as tags históricas permanecem preservadas.
+**Identificador conceitual:** v0.1.0
+**Tag Git:** não criada.
 
 ---
 
@@ -12,7 +12,9 @@
 
 Este documento registra o estado conhecido do HomeServer antes das próximas mudanças estruturais.
 
-O baseline não representa uma nova release distribuída. Ele funciona como uma fotografia técnica do projeto e como referência para medir a evolução posterior.
+O baseline não representa uma release distribuída, uma versão oficial ou um contrato de estabilidade. Ele funciona como uma fotografia técnica do projeto e como referência para medir evolução posterior.
+
+O identificador `v0.1.0` pertence apenas a este marco documental. Ele não exige a criação de uma tag Git ou GitHub Release.
 
 Regra desta etapa:
 
@@ -26,7 +28,7 @@ São permitidos somente auditoria, documentação, execução de testes e regist
 
 O repositório possui atualmente uma plataforma composta por infraestrutura local, serviços Docker, API, Homepage, HomeServer App, CLI e mecanismos de automação e atualização.
 
-A linha de desenvolvimento anterior possui histórico v1.x e uma preparação de v2.0. Este baseline utiliza **v0.1.0 apenas como referência conceitual**, sem apagar ou renomear o histórico Git existente.
+O histórico anterior pode conter versões, tags e referências de linhas de desenvolvimento antigas. Este baseline não valida esses estados como versões oficiais atuais. Ele utiliza `v0.1.0` apenas como referência conceitual para a fotografia técnica registrada em 2026-08-11.
 
 ### Serviços conhecidos
 
@@ -274,18 +276,18 @@ O Sprint 01 está concluído porque:
 - [x] o Quality Gate completo foi executado;
 - [x] os resultados dos testes estão registrados;
 - [x] o README aponta para este baseline;
-- [x] o roadmap v1.0 está criado;
+- [x] o roadmap de consolidação está criado;
 - [x] nenhuma mudança de código foi introduzida pelo Sprint 01.
 
 ---
 
-## 11. Relação com o roadmap v1.0
+## 11. Relação com o planejamento futuro
 
-O roadmap v1.0 registra retrospectivamente que as Fases 1, 2 e 3 atendem aos critérios mínimos definidos para elas no estado auditado em 2026-08-11.
+Este baseline registra retrospectivamente o estado auditado em 2026-08-11 e serve como referência documental para comparar evolução, regressões e mudanças arquiteturais.
 
-Essa conclusão **não representa trabalho novo realizado pelo Sprint 01**. Ela apenas reconhece que parte da base já existia antes do novo planejamento.
+Os itens 🟡 continuam como limitações e oportunidades de melhoria. Eles não foram ignorados nem considerados automaticamente resolvidos por planejamentos posteriores; cada pendência permanece sujeita à priorização e validação prática.
 
-Os itens 🟡 deste baseline continuam como limitações e oportunidades de melhoria. Eles não foram ignorados nem considerados automaticamente resolvidos pela conclusão retrospectiva das fases; cada pendência permanece sujeita à priorização e validação nas fases seguintes.
+O baseline não determina uma sequência obrigatória de versões. O projeto pode continuar evoluindo, testando e revisando decisões até existir uma decisão explícita de consolidar a primeira release oficial.
 
 ---
 
@@ -293,6 +295,6 @@ Os itens 🟡 deste baseline continuam como limitações e oportunidades de melh
 
 Este documento estabelece o **Baseline v0.1.0 conceitual** do HomeServer.
 
-Ele não cria uma tag Git e não substitui versões históricas.
+Ele não cria uma tag Git, uma GitHub Release ou uma versão oficial.
 
-A partir deste ponto, novas alterações devem poder ser comparadas com este estado para medir evolução, regressão e impacto arquitetural.
+A partir deste ponto, novas alterações podem ser comparadas com este estado para medir evolução, regressão e impacto arquitetural.
