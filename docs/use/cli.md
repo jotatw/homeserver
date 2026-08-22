@@ -12,7 +12,7 @@ bash core/hs.sh <comando> <subcomando>
 system      hostname|os|kernel|architecture|uptime|info|memory|disk|cpu|load|services|backup|events|status
 status      status geral
 version     estado/versionamento atual
-aut service  list|enable|disable|start|stop|restart|status|update <serviço>
+service     list|enable|disable|start|stop|restart|status|update <serviço>
 user        create|list|info|password|verify|is-admin|rm
 device      list|status|usb|mount <tipo> <rótulo> <dev>|unmount <tipo> <rótulo>|eject <dev>
 hardware    status|temp|disks|disk_smart|net|usb
@@ -22,8 +22,6 @@ power       status|enable|disable|set <desliga HH:MM> <liga HH:MM>
 tls         init|renew|status|info
 update      check|apply [--no-redeploy] | os check|apply
 ```
-
-> `aut service` acima deve ser lido como `service`; a referência oficial dos comandos é sempre `bash core/hs.sh --help`.
 
 ## Exemplos
 
