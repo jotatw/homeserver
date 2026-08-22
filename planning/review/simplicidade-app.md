@@ -1,176 +1,196 @@
-# Revisão — Simplicidade e centralização no App
+# Revisão — Simplicidade e interfaces do HomeServer
 
-> Documento central do projeto. Define o objetivo de uso do HomeServer e as
-> restrições de evolução. Referência para as próximas fases (roadmap v1.0).
+> Registro de revisão do projeto. Define princípios de simplicidade, prioridades de uso e restrições observadas no ambiente real.
 
-**Status:** Registrado (2026-08-11) · Revisão sem alteração de código.
+**Status:** Histórico de revisão com princípios ainda relevantes (2026-08-11). A revisão não substitui o roadmap ativo, os fundamentos ou a arquitetura atual.
 
 ---
 
 ## Objetivo central
 
-> **Uma pessoa deve conseguir instalar e operar o HomeServer apenas pelo App —
-> sem digitar nenhum comando além da instalação.**
+O objetivo é reduzir a necessidade de conhecimento técnico para as operações normais do HomeServer, sem eliminar interfaces avançadas que continuam necessárias para instalação, diagnóstico, recuperação, automação e desenvolvimento.
 
-Detalhando:
+A direção atual é:
 
-1. Ninguém precisa de comando além do `install.sh`.
-2. As funções são **centralizadas no App** (única interface).
-3. Cada funcionalidade é **organizada por nível de usuário** (user / admin).
-4. **Tudo que for configurável deve ser configurável pelo App** — nunca por
-   edição manual de arquivo ou comando.
+1. operações normais devem possuir interfaces adequadas ao contexto;
+2. o Desktop é a interface principal para gerenciamento completo;
+3. o Mobile prioriza atalhos e ações frequentes, sem obrigação de reproduzir todo o Desktop;
+4. CLI e terminal continuam disponíveis para instalação e operações avançadas;
+5. nenhuma capacidade é obrigada a existir em todas as interfaces;
+6. uma interface que declara suporte a uma tarefa deve permitir concluir o fluxo sem exigir passos técnicos ocultos.
 
-## Restrição de hardware (gargalo real)
+---
 
-O servidor é **velho, barulhento e esquenta muito**. Toda decisão de evolução
-deve considerar:
+## Restrição de hardware
 
-- adicionar só o **mínimo necessário** que agrega valor;
-- priorizar **qualidade e vida útil** do hardware sobre quantidade de recursos;
-- evitar processos pesados, polling agressivo e serviços ativos sem uso;
+A revisão registrou uma limitação real do ambiente: o servidor é antigo, barulhento e possui restrições térmicas.
+
+Toda evolução deve considerar:
+
+- adicionar apenas o necessário que gera valor real;
+- priorizar estabilidade e vida útil do hardware;
+- evitar processos pesados, polling agressivo e serviços ativos sem necessidade;
 - manter o servidor ocioso quando possível;
-- nenhuma funcionalidade nova entra sem justificativa de valor real.
+- justificar o custo de cada nova funcionalidade.
 
-Regra de evolução aqui:
+Regra de evolução:
 
-> **Simplificar o que existe antes de crescer.**
-> Menos recursos, mais qualidade, mais estabilidade.
+> Simplificar o que existe antes de crescer. Menos recursos, mais qualidade e mais estabilidade.
 
 ---
 
-## Inventário atual (estado v0.1.0)
+## Inventário observado na revisão
 
-### CLI (`hs`) — ~30 operações
+### CLI (`hs`)
 
-```
-system hostname|os|kernel|architecture|uptime|info|memory|disk|cpu|load|
-       services|backup|events|status
-service list|enable|disable|start|stop|restart|status|update <serviço>
+Na revisão, o CLI possuía aproximadamente 30 operações nas áreas:
+
+```text
+system
+service
 status
-user create|list|info|password|verify|is-admin|rm
-device list|status|usb|mount|unmount|eject
-hardware status|temp|disks|disk_smart|net|usb
-automation list|run
-scheduler init|list|enable|disable|run
-power status|enable|disable|set
+user
+device
+hardware
+automation
+scheduler
+power
 version
-update check|apply
+update
 ```
 
-### API — ~34 endpoints (auth, status, system, storage, services, devices,
-events, power, hardware, backup, update, users, tokens, print, app)
+O CLI permanece uma interface operacional avançada e uma fonte importante para diagnóstico, automação, recuperação e desenvolvimento.
 
-### App — 6 telas + login
+### API
 
-Meu espaço · Aplicações · Armazenamento · Sistema · Administração · Impressão
+A revisão identificou aproximadamente 34 endpoints cobrindo áreas como autenticação, status, sistema, storage, serviços, dispositivos, eventos, energia, hardware, backup, atualização, usuários, tokens, impressão e App.
+
+### App/Desktop
+
+A revisão identificou seis áreas principais além do login:
+
+- Meu espaço;
+- Aplicações;
+- Armazenamento;
+- Sistema;
+- Administração;
+- Impressão.
+
+O inventário é um registro de estado observado. A documentação atual de arquitetura e planejamento define a direção futura das interfaces.
 
 ---
 
-## Revisão de simplicidade — o que já dá no App
+## Revisão de simplicidade — estado observado
 
-| Área | App | Observação |
+| Área | Interface visual na revisão | Observação |
 |---|---|---|
-| Autenticação / sessão | ✅ | login/logout, role |
-| Meu espaço | ✅ | stats + atividades |
-| Aplicações | ✅ | abrir serviços |
-| Armazenamento | ✅ | uso + dispositivos (montar/desmontar) |
-| Sistema | ✅ | gauges, checks, energia (editar), temperatura |
-| Usuários | ✅/parcial | listar + criar (faltam: remover, senha) |
-| Tokens de API | ✅ | listar/criar/revogar |
-| Impressão | ✅ | texto/arquivo + fila + cancelar |
+| Autenticação / sessão | Disponível | login/logout, role |
+| Meu espaço | Disponível | estatísticas e atividades |
+| Aplicações | Disponível | abrir serviços |
+| Armazenamento | Parcial | uso e dispositivos |
+| Sistema | Disponível | checks, energia e temperatura conforme fluxo suportado |
+| Usuários | Parcial | havia lacunas de operações administrativas |
+| Tokens de API | Disponível | listar/criar/revogar |
+| Impressão | Disponível | envio e gerenciamento de fila conforme capacidade implementada |
 
-## Gaps — o que ainda exige comando/arquivo (não está no App)
-
-| Funcionalidade | CLI | API existe? | App? | Nível |
-|---|---|---|---|---|
-| Ativar/desativar serviço | `service enable/disable` | ❌ | ❌ | admin |
-| Iniciar/parar/reiniciar serviço | `start/stop/restart` | ❌ | ❌ | admin |
-| Trocar senha de usuário | `user password` | ✅ PUT | ❌ | admin |
-| Remover usuário | `user rm` | ✅ DELETE | ❌ | admin |
-| Verificar/aplicar update | `update check/apply` | ✅ GET/POST | ❌ | admin |
-| Tarefas agendadas (backup/night-off) | `scheduler` | ❌ | ❌ | admin |
-| Automações (hooks) | `automation` | ❌ | ❌ | admin |
-| Hardware completo (discos/smart/consumo) | `hardware` | ✅ | parcial (temp+rede) | admin |
-
-### Config manual que deveria ser App
-
-- `config/services.conf` (ativação de serviços) → mesmo item "ativar/desativar".
-- `config/scheduler.conf` (agenda) → mesmo item "tarefas agendadas".
+Esses dados não devem ser tratados como confirmação permanente de maturidade. O estado atual deve ser validado pelas evidências e documentação correspondentes.
 
 ---
 
-## Níveis de usuário (estado atual vs objetivo)
+## Lacunas registradas na revisão
 
-| Nível | Hoje | Objetivo |
+A revisão identificou capacidades ainda dependentes de CLI, configuração manual ou integração parcial:
+
+| Capacidade | Situação registrada |
+|---|---|
+| Ativação e desativação de serviços | Necessitava consolidação da interface e contrato |
+| Start/stop/restart de serviços | Necessitava integração visual completa |
+| Alteração de senha | API existente; interface precisava evolução na revisão |
+| Remoção de usuário | API existente; interface precisava evolução na revisão |
+| Atualizações | Capacidade em evolução e exigindo validação operacional |
+| Tarefas agendadas | Interface visual ainda não definida como prioridade obrigatória |
+| Automações | Interface visual apenas se houver valor real para o contexto |
+| Hardware avançado | Integração parcial na interface |
+
+As lacunas devem ser reavaliadas conforme a evolução contínua. Não representam automaticamente um backlog obrigatório.
+
+---
+
+## Princípios de decisão
+
+1. **Mínimo funcional com qualidade** — não adicionar por adicionar.
+2. **Simplificar antes de crescer** — revisar o existente antes de expandir.
+3. **Interface adequada ao contexto** — Desktop, Mobile e CLI possuem papéis diferentes.
+4. **Respeitar o hardware** — evitar carga e processos sem benefício proporcional.
+5. **Cada recurso deve resolver um problema real** e justificar seu custo de manutenção e recursos.
+6. **Validar antes de consolidar** — implementação não é confirmação automática de maturidade.
+
+---
+
+## Prioridades de evolução
+
+Esta revisão não cria uma sequência obrigatória de fases. Os itens devem ser priorizados pelo roadmap ativo e pelas evidências disponíveis.
+
+Direções registradas:
+
+- operações de serviços devem ser avaliadas para integração por contratos apropriados;
+- operações administrativas devem evitar exigir edição manual de arquivos quando uma interface suportada fizer sentido;
+- atualizações precisam de validação operacional antes de serem tratadas como fluxo consolidado;
+- scheduler e automações devem receber interface visual apenas quando houver benefício claro;
+- novas capacidades devem considerar custo no hardware e manutenção futura.
+
+Regra:
+
+> Não planejar tudo para implementar de uma vez. Avaliar o que já existe, simplificar quando possível e expandir somente quando houver justificativa.
+
+---
+
+## Saúde do servidor — baseline da revisão (2026-08-11)
+
+Medição registrada com o servidor ocioso:
+
+| Métrica | Valor registrado | Observação |
 |---|---|---|
-| **user** | dashboard · apps · storage · system (leitura) | uso diário (arquivos, apps, status) |
-| **admin** | + users (criar), tokens, impressão, energia, dispositivos | **toda** a operação e configuração |
+| Load (1/5/15) | 0.01 / 0.05 / 0.08 | muito baixo |
+| Memória | 929Mi / 2.7Gi (~34%) | saudável no momento observado |
+| Temperatura | GPU 84-85 °C | alta — ponto térmico relevante |
+| CPU | ~65 °C | normal no momento observado |
+| Containers | ~0% CPU | ociosos no momento observado |
+| Disco | 5% de 290G | disponível no momento observado |
+
+Esses números são evidência histórica do ambiente naquele momento e não devem ser tratados como métricas atuais permanentes.
+
+### Ações registradas
+
+- Health Check ampliado para reportar load, memória e temperatura.
+- Backup e desligamento noturno consolidados no scheduler canônico.
+
+### Incidente 2026-08-14 — timers duplicados
+
+A reativação de timers legados de backup e desligamento noturno causou disparo duplicado junto às tarefas do scheduler. Processos concorrentes interferiam no ciclo de suspensão e wake por RTC.
+
+A correção registrada foi desabilitar os timers legados e manter apenas os timers `hs-task-*` gerenciados pelo scheduler.
+
+A validação registrada incluiu suspend S3 temporário com retorno automático e ajuste do instalador para configurar backup e energia pelo scheduler canônico.
+
+### Decisão de qualidade de vida relacionada ao hardware
+
+- priorizar ociosidade quando possível;
+- evitar polling agressivo e processos sem uso;
+- utilizar desligamento noturno como mitigação operacional;
+- tratar limitações térmicas como restrição de planejamento.
 
 ---
 
-## Princípios de decisão (aplicar em toda fase)
+## Relação com a documentação atual
 
-1. **Mínimo funcional com qualidade** — menos é mais; não adicionar por adicionar.
-2. **Simplificar antes de crescer** — revisar o existente antes de planejar novo.
-3. **App como única interface** — CLI fica para instalação; o App concentra a operação.
-4. **Dançar conforme o hardware** — nada pesado, nada desnecessário ativo.
-5. **Cada resource só é adicionado se resolve um problema real** e mantém o
-   servidor estável por anos.
+Este documento é um registro de revisão e deve ser interpretado junto com:
 
-## Encaixe nas fases (referência — decidir item a item, com calma)
+- `planning/foundations/` — fundamentos gerais de evolução e validação;
+- `planning/roadmap/evolution.md` — prioridades e áreas de evolução;
+- `planning/quality/user-quality-of-life.md` — critérios atuais de qualidade de vida;
+- `planning/app/` — direção das interfaces;
+- `docs/reference/PRINCIPLES.md` — princípios permanentes;
+- `docs/reference/ARCHITECTURE.md` — arquitetura atual.
 
-- **FASE 4 (Serviços)**: ativar/desativar + iniciar/parar/reiniciar no App (novos
-  endpoints). *Com cuidado: start/stop de container é leve; manter mínimo.*
-- **FASE 7 (Segurança)**: remover usuário + trocar senha no App (API já existe).
-- **FASE 9 (UX)**: update no App (API existe); scheduler/automação só se houver
-  valor real e baixo custo de recurso.
-
-> Regra: **não planejar tudo e implementar de uma vez.** Cada item passa primeiro
-> por "o que já existe → o que pode ser simplificado → só então o que cresce".
----
-
-## Saúde do servidor (baseline 2026-08-11)
-
-Medição real (servidor ocioso):
-
-| Métrica | Valor | Observação |
-|---|---|---|
-| Load (1/5/15) | 0.01 / 0.05 / 0.08 | muito baixo — servidor ocioso |
-| Memória | 929Mi / 2.7Gi (~34%) | saudável |
-| Temperatura (GPU) | **84-85 °C** | ⚠ alto — ponto de calor real |
-| CPU (núcleos) | 65 °C | normal |
-| Containers CPU | ~0% (ociosos) | homepage 153Mi · gitea 163Mi · api 96Mi · caddy 27Mi |
-| Disco | 5% de 290G | ok |
-
-### Ações aplicadas (manter saudável, mínimo com qualidade)
-
-- ✅ **Health Check ampliado**: agora reporta load, memória e temperatura
-  (alerta ⚠ >70 °C, falha >85 °C) — `scripts/health-check.sh`.
-- ✅ **Agendamento unificado no scheduler** (canônico): backup diário (03h) e
-  night-off (22h → religa 07:00 via RTC) são gerenciados por
-  `config/scheduler.conf` via `hs scheduler` (units `hs-task-backup` /
-  `hs-task-night-off`). **Não usar timers separados para estas tarefas.**
-
-### Incidente 2026-08-14 — timers duplicados (corrigido)
-
-A reativação dos timers legados `homeserver-night-off.timer` /
-`homeserver-backup.timer` (registrada em 08-11) criou **disparo duplo** com as
-tarefas do scheduler (ambos às 22h/03h). Duas invocações de `power-schedule.sh`
-rodavam em corrida: um processo restaurava os wakes (NIC/USB) **enquanto** o
-outro suspendia → despertava imediato (~5s), consumia o alarme do RTC e o ciclo
-22h/07h deixava de religar sozinho (servidor indisponível até ação manual).
-
-- **Correção (2026-08-14)**: `systemctl disable --now
-  homeserver-night-off.timer homeserver-backup.timer` — ficam ativos apenas os
-  timers `hs-task-*` do scheduler.
-- **Validação**: suspend S3 de 90s (`rtcwake -m mem`) religou em ~91s (exit 0);
-  wakes restaurados e wakealarm consumido.
-- **Regressão**: `install.sh` configura backup/energia via `hs scheduler
-  enable` (sem timers legados).
-
-### Decisões de qualidade de vida (hardware)
-
-- Prioridade: **servidor ocioso quando possível** e **desligado à noite**.
-- Nada de polling agressivo ou processos ativos sem uso.
-- GPU em 84-85 °C mesmo ociosa é característica do hardware; a mitigação é o
-  desligamento noturno + evitar carga desnecessária (limitação sob demanda).
+Quando houver divergência entre este registro histórico e uma decisão posterior consolidada, prevalece a documentação atual de decisão ou arquitetura.
