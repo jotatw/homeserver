@@ -93,7 +93,6 @@ await app.register(moduleRoutes);
 await app.register(printRoutes);
 await app.register(appRoutes);
 await app.register(schedulerRoutes);
-await app.register(authRoutes);
 
 await app.listen({
     host: "0.0.0.0",
