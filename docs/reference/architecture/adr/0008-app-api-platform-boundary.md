@@ -1,4 +1,4 @@
-# ADR-0008 — App como Centro de Operação e API como Fronteira da Plataforma
+# ADR-0008 — Interfaces consumidoras e API como fronteira da plataforma
 
 ## Status
 
@@ -10,72 +10,54 @@ Aceito
 
 ## Decisão
 
-O HomeServer adota o **HomeServer App como interface principal para operações
-normais do usuário final** e a **API como fronteira pública entre interfaces e
-as capacidades internas da plataforma**.
+O HomeServer adota contratos como fronteira entre interfaces consumidoras e capacidades internas da plataforma.
 
-O fluxo arquitetural preferencial passa a ser:
+O HomeServer App é uma interface importante para operações rápidas e focadas do usuário, mas não representa uma camada arquitetural obrigatória nem a única interface principal do projeto.
+
+O fluxo preferencial é:
 
 ```text
-Usuário
-   ↓
-HomeServer App
-   ↓
-API
-   ↓
-Capacidade da Plataforma
-   ↓
-Core / Infrastructure / Adapters
-   ↓
-Serviços / Sistema
+Usuário / Automação
+        ↓
+Interface consumidora
+        ↓
+Contrato apropriado / API
+        ↓
+Capacidade da plataforma
+        ↓
+Infrastructure / Foundation / Adapter
+        ↓
+Sistema ou serviço externo
 ```
 
-O App não deve executar diretamente regras de infraestrutura nem depender de
-detalhes como comandos internos, containers Docker, volumes, caminhos internos
-ou units do systemd.
+Exemplos de interfaces consumidoras incluem:
 
-A API é responsável por fornecer contratos para que clientes utilizem
-capacidades da plataforma sem conhecer esses detalhes.
+- Homepage ou interface web;
+- aplicativo mobile;
+- CLI;
+- automações;
+- integrações futuras.
 
-O CLI permanece uma interface oficial e importante, especialmente para:
-
-- instalação;
-- recuperação;
-- automação;
-- desenvolvimento;
-- testes;
-- diagnóstico e manutenção avançados.
-
-A existência de uma operação no CLI não impede sua futura exposição pela API e
-pelo App. Pelo contrário, capacidades destinadas à operação normal do usuário
-final devem ser avaliadas para esse fluxo.
+Cada interface deve permanecer adequada ao seu contexto. Uma interface não deve executar diretamente regras ou detalhes internos que pertencem à capacidade responsável.
 
 ---
 
 ## Contexto
 
-A base do HomeServer possui capacidades distribuídas entre scripts, CLI,
-Infrastructure, Adapters, serviços Docker e API.
-
-Essa organização permite operar o servidor tecnicamente, mas uma plataforma
-voltada ao usuário final não pode exigir que cada operação normal dependa do
-conhecimento dessas camadas.
-
-O objetivo estratégico da linha v1.0 é aumentar a qualidade de vida do usuário
-e centralizar progressivamente as operações normais no App.
+A base do HomeServer possui capacidades distribuídas entre scripts, CLI, Infrastructure, integrações externas, serviços e API.
 
 Sem uma fronteira explícita, surgem riscos como:
 
-- o App conhecer comandos internos;
-- lógica de negócio duplicada entre App e CLI;
+- interfaces conhecerem comandos internos;
+- lógica da mesma capacidade ser duplicada;
 - dependência de nomes de containers ou serviços específicos;
-- mudanças internas quebrarem a interface;
-- cada nova funcionalidade criar um caminho próprio de integração;
-- aumento do acoplamento entre interface e infraestrutura.
+- mudanças internas quebrarem consumidores;
+- cada nova interface criar um caminho próprio de integração;
+- aumento do acoplamento entre interface e implementação.
 
-A decisão cria uma direção única para evolução da plataforma: primeiro definir
-ou reutilizar uma capacidade, depois expor um contrato quando necessário e, por
-fim, integrá-la à experiência do usuário.
+A arquitetura atual separa o consumidor da implementação por contratos quando essa fronteira é necessária.
+
+Isso permite que uma capacidade evolua sem obrigar todas as interfaces a conhecer detalhes como comandos internos, containers, volumes, caminhos ou mecanismos específicos de integração.
 
 ---
 
@@ -83,41 +65,30 @@ fim, integrá-la à experiência do usuário.
 
 ### Positivas
 
-- reduz o acoplamento entre App e infraestrutura;
-- permite alterar implementações internas com menor impacto nos clientes;
-- favorece contratos reutilizáveis por App, CLI e futuras integrações;
-- centraliza regras e validações em responsabilidades apropriadas;
-- reduz a necessidade de terminal para operações normais ao longo da v1.0;
-- facilita a evolução para módulos e serviços desacoplados;
-- permite medir a maturidade de cada capacidade independentemente da interface;
-- melhora a previsibilidade para novos desenvolvedores e futuros consumidores
-  da plataforma.
+- reduz o acoplamento entre interfaces e implementação interna;
+- permite alterar implementações com menor impacto nos consumidores;
+- favorece contratos reutilizáveis por diferentes interfaces;
+- reduz duplicação de regras e validações;
+- permite experiências diferentes sobre capacidades semelhantes;
+- facilita evolução gradual e integração de novas interfaces;
+- evita transformar uma interface específica em requisito arquitetural para toda a plataforma.
 
 ### Custos e limites
 
-- novas capacidades expostas ao usuário podem exigir trabalho adicional de
-  contrato e integração antes de aparecerem no App;
-- nem toda operação existente no CLI será imediatamente transferida para a API;
-- o App não deve ser tratado como uma camada alternativa para contornar
-  contratos ausentes;
-- capacidades parcialmente implementadas devem permanecer explicitamente
-  marcadas como parciais até possuírem fluxo completo;
-- mudanças em contratos públicos exigem atenção à compatibilidade e à
-  documentação.
+- uma nova fronteira pode exigir trabalho adicional de contrato e integração;
+- nem toda operação precisa ser imediatamente exposta por HTTP;
+- criar uma API ou camada adicional sem consumidores ou necessidade real pode aumentar complexidade;
+- mudanças em contratos compartilhados exigem atenção à compatibilidade e à documentação.
 
 ---
 
 ## Alternativas consideradas
 
-### 1. App acessa diretamente scripts, Docker ou serviços
+### 1. Interfaces acessam diretamente scripts, Docker ou serviços
 
 **Não adotada.**
 
-Essa abordagem reduz o trabalho inicial, mas cria acoplamento direto com a
-implementação. A interface passaria a conhecer detalhes internos e mudanças em
-serviços poderiam exigir alterações no App.
-
-Também aumentaria o risco de duplicação de validações e regras.
+Essa abordagem reduz o trabalho inicial, mas cria acoplamento direto com detalhes de implementação e aumenta o risco de duplicação de regras.
 
 ---
 
@@ -125,35 +96,37 @@ Também aumentaria o risco de duplicação de validações e regras.
 
 **Não adotada.**
 
-Manter implementações separadas no App, API e CLI cria fontes de verdade
-concorrentes e aumenta a chance de comportamentos divergentes.
+Implementações separadas para a mesma capacidade criam fontes de verdade concorrentes e aumentam a chance de comportamentos divergentes.
 
-Interfaces diferentes devem poder oferecer experiências diferentes, mas devem
-reutilizar as capacidades e responsabilidades definidas pela plataforma sempre
-que possível.
+Interfaces diferentes podem oferecer experiências diferentes, mas devem reutilizar responsabilidades e capacidades compartilhadas quando apropriado.
 
 ---
 
-### 3. Eliminar o CLI e centralizar tudo exclusivamente no App
+### 3. Uma interface obrigatória para todas as operações
 
 **Não adotada.**
 
-O terminal continua necessário para instalação, recuperação e administração
-avançada. Eliminá-lo reduziria opções importantes de manutenção e automação.
+O HomeServer possui contextos diferentes de uso. Desktop pode concentrar gerenciamento completo, mobile pode priorizar ações rápidas e CLI pode atender administração, automação, recuperação e desenvolvimento.
 
-A decisão é centralizar o **uso normal**, não eliminar interfaces técnicas.
+Uma única interface não é adequada para todos os contextos.
 
 ---
 
-### 4. Manter a organização atual sem uma fronteira arquitetural explícita
+### 4. Exigir uma API HTTP para toda operação interna
 
 **Não adotada.**
 
-Essa alternativa permite crescimento rápido no curto prazo, mas não fornece
-uma regra clara para futuras integrações e módulos.
+Nem toda operação precisa de exposição HTTP. O contrato deve ser apropriado aos consumidores e à fronteira existente.
 
-A ausência de fronteiras explícitas tende a aumentar o acoplamento conforme o
-número de capacidades cresce.
+Criar interfaces públicas sem necessidade real aumentaria a superfície de manutenção e segurança.
+
+---
+
+### 5. Manter interfaces sem uma fronteira explícita
+
+**Não adotada.**
+
+Essa alternativa facilita integrações locais no curto prazo, mas aumenta o acoplamento e torna a evolução das capacidades menos previsível.
 
 ---
 
@@ -161,29 +134,23 @@ número de capacidades cresce.
 
 A partir desta decisão:
 
-1. O App deve utilizar contratos da API para capacidades da plataforma.
-2. O App não deve depender diretamente de detalhes internos da infraestrutura.
-3. Uma capacidade destinada ao uso normal deve ser avaliada para exposição pela
-   API e pelo App.
-4. CLI e App não devem manter regras de negócio divergentes para a mesma
-   capacidade.
-5. O CLI permanece suportado como interface técnica e avançada.
-6. A maturidade de uma capacidade deve ser avaliada por evidência, não apenas
-   pela existência de código ou endpoint.
-7. Operações declaradas como suportadas pelo App devem buscar um fluxo completo
-   sem exigir terminal para concluir a tarefa normal.
-8. Mudanças relevantes nesta fronteira arquitetural exigem novo ADR ou revisão
-   explícita desta decisão.
+1. Interfaces consumidoras devem utilizar contratos apropriados para capacidades compartilhadas.
+2. Interfaces não devem depender diretamente de detalhes internos sem necessidade justificada.
+3. A mesma capacidade não deve possuir regras de negócio divergentes entre consumidores.
+4. A interface adequada depende do contexto de uso; nenhuma interface é uma camada arquitetural obrigatória por si só.
+5. Contratos compartilhados devem possuir significado claro e comportamento previsível.
+6. Uma API HTTP deve ser utilizada quando houver necessidade real de uma fronteira de rede ou integração externa.
+7. Mudanças relevantes nesta fronteira devem considerar consumidores conhecidos, compatibilidade e documentação.
+8. A maturidade de uma capacidade deve ser avaliada por evidência prática, não apenas pela existência de código ou endpoint.
 
 ---
 
 ## Relação com outros documentos
 
-Esta decisão concretiza:
+Esta decisão está relacionada a:
 
-- `docs/reference/PRINCIPLES.md` — App-First Administration, API como fronteira e
-  evolução por contratos;
-- `docs/reference/ARCHITECTURE.md` — responsabilidades entre App, API e plataforma;
-- `planning/strategy.md` — qualidade de vida e operação centralizada;
-- `planning/quality/user-quality-of-life.md` — critérios de maturidade e
-  necessidade de terminal.
+- [`../../PRINCIPLES.md`](../../PRINCIPLES.md) — princípios de interfaces, contratos e evolução;
+- [`../../ARCHITECTURE.md`](../../ARCHITECTURE.md) — fronteiras atuais da plataforma;
+- [`../APPLICATION_API.md`](../APPLICATION_API.md) — relação entre consumidores e contratos;
+- [`../API.md`](../API.md) — papel arquitetural da API;
+- [`../../api/README.md`](../../api/README.md) — contratos e endpoints concretos.
