@@ -65,6 +65,7 @@ Comandos:
   automation list
   automation run <evento>
   scheduler init|list
+  scheduler status
   scheduler enable|disable|run <tarefa>
   power status|enable|disable
   power set <desliga HH:MM> <liga HH:MM>
@@ -257,6 +258,7 @@ case "${_command}" in
         case "${_subcommand}" in
             init)    scheduler_init ;;
             list)    scheduler_list ;;
+            status)  scheduler_list_json ;;
             enable)  scheduler_enable "${3:?tarefa}" ;;
             disable) scheduler_disable "${3:?tarefa}" ;;
             run)     scheduler_run "${3:?tarefa}" ;;

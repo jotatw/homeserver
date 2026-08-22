@@ -88,5 +88,24 @@ events_recent() {
         fi
     done < <(_event_tail "${HS_LOG_DIR}/homeserver-hooks.log" 2)
 
+    # Watchdog de serviços
+    while read -r line; do
+        [[ -n "${line}" ]] || continue
+        event_str="$(printf '%s\n' "${line}" | grep -oE '\[[0-9-]+ [0-9:]+\]' | tr -d '[]')" || true
+        if printf '%s\n' "${line}" | grep -q "Serviço.*reiniciado com sucesso"; then
+            label="$(printf '%s\n' "${line}" | sed -n 's/.*Serviço \([^ ]*\) reiniciado.*/\1/p')"
+            [[ -n "${label}" ]] || label="serviço"
+            [[ ${first} -eq 0 ]] && printf ','
+            printf '\n  {"time":"%s","type":"watchdog","action":"Serviço %s reiniciado","label":"%s"}' "${event_str}" "${label}" "${label}"
+            first=0
+        elif printf '%s\n' "${line}" | grep -q "FALHA ao reiniciar"; then
+            label="$(printf '%s\n' "${line}" | sed -n 's/.*FALHA ao reiniciar \([^:]*\).*/\1/p')"
+            [[ -n "${label}" ]] || label="serviço"
+            [[ ${first} -eq 0 ]] && printf ','
+            printf '\n  {"time":"%s","type":"watchdog","action":"Falha ao reiniciar %s","label":"%s"}' "${event_str}" "${label}" "${label}"
+            first=0
+        fi
+    done < <(_event_tail "${HS_LOG_DIR}/homeserver-watchdog.log" 3)
+
     printf '\n]'
 }

@@ -1007,6 +1007,73 @@ async function renderAdmin() {
       osBtn.disabled = false;
     }
   });
+
+  // Tarefas agendadas (scheduler)
+  v.appendChild(el("h3", { class: "section" }, "Tarefas agendadas"));
+  const schedFeed = el("div", { class: "feed", id: "scheduler-feed" });
+  v.appendChild(schedFeed);
+  await refreshScheduler();
+}
+
+/* ---------- Scheduler (admin) ---------- */
+
+async function refreshScheduler() {
+  try {
+    const tasks = await api("/api/v1/scheduler");
+    const sfeedEl = document.getElementById("scheduler-feed");
+    if (!sfeedEl) return;
+    sfeedEl.innerHTML = "";
+
+    if (!tasks || !tasks.length) {
+      sfeedEl.innerHTML = '<div class="feed-item">Nenhuma tarefa agendada.</div>';
+      return;
+    }
+
+    tasks.forEach((t) => {
+      const enabled = t.enabled;
+      const meta = el("div", { class: "module-meta" },
+        el("div", { class: "app-name" },
+          t.name,
+          el("span", { class: "badge " + (enabled ? "ok" : "danger"), style: "margin-left:var(--hs-space-2)" }, enabled ? "ativo" : "parado")),
+        el("div", { class: "app-host" }, (t.schedule || "") + (t.next ? " · " + t.next : "")));
+
+      const opsWrap = el("div", { class: "module-ops" });
+
+      const enableBtn = el("button", { class: "btn " + (enabled ? "btn-secondary" : "btn-primary"), style: "height:var(--hs-touch-compact)" }, enabled ? "Desativar" : "Ativar");
+      enableBtn.addEventListener("click", () => runSchedulerOp(t.name, enabled ? "disable" : "enable", enableBtn));
+      opsWrap.appendChild(enableBtn);
+
+      const runBtn = el("button", { class: "btn btn-secondary", style: "height:var(--hs-touch-compact)" }, "Executar agora");
+      runBtn.addEventListener("click", () => runSchedulerOp(t.name, "run", runBtn));
+      opsWrap.appendChild(runBtn);
+
+      const row = el("div", { class: "feed-item module-row" },
+        el("span", { class: "status-dot " + (enabled ? "ok" : "danger") }),
+        meta,
+        opsWrap);
+      sfeedEl.appendChild(row);
+    });
+  } catch (err) {
+    const sfeedEl = document.getElementById("scheduler-feed");
+    if (sfeedEl) sfeedEl.innerHTML = '<div class="feed-item error-msg">Falha ao carregar tarefas.</div>';
+  }
+}
+
+async function runSchedulerOp(name, op, btn) {
+  if (op === "disable" && !confirm("Desativar a tarefa " + name + "?")) return;
+  if (btn) btn.disabled = true;
+  try {
+    await apiOrFail("/api/v1/scheduler/" + name + "/" + op, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
+    });
+    toast(name + ": " + op + " concluído.", "success");
+    await refreshScheduler();
+  } catch (err) {
+    toast(err.message || "Falha em " + op + ".", "error");
+    if (btn) btn.disabled = false;
+  }
 }
 
 /* ---------- Dialog: senha de usuário (admin) ---------- */

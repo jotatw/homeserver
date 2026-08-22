@@ -18,6 +18,7 @@ import { printRoutes } from "./routes/print.js";
 import { appRoutes } from "./routes/app.js";
 import { authRoutes } from "./routes/auth.js";
 import { updateRoutes } from "./routes/update.js";
+import { schedulerRoutes } from "./routes/scheduler.js";
 
 const app = Fastify({
     logger: true
@@ -91,6 +92,8 @@ await app.register(tokenRoutes);
 await app.register(moduleRoutes);
 await app.register(printRoutes);
 await app.register(appRoutes);
+await app.register(schedulerRoutes);
+await app.register(authRoutes);
 
 await app.listen({
     host: "0.0.0.0",

@@ -87,6 +87,14 @@ await expectPassValidation("Aceita update os check válido", async () => runOnHo
 await expectPassValidation("Aceita cancel com jobId válido", async () => runOnHost(["cancel", "MG3110-12"]));
 await expectPassValidation("Aceita lp com caminho e arquivo válidos", async () => runOnHost(["lp", "-d", "MG3110", "-o", "media=A4", "/srv/git/homeserver/api/data/print-job.txt"]));
 
+// Scheduler (Fase 8)
+await expectError("Rejeita scheduler com subcomando desconhecido", async () => runOnHost(["bash", "/srv/git/homeserver/core/hs.sh", "scheduler", "foo"]));
+await expectError("Rejeita scheduler enable sem nome", async () => runOnHost(["bash", "/srv/git/homeserver/core/hs.sh", "scheduler", "enable"]));
+await expectError("Rejeita scheduler com nome malicioso", async () => runOnHost(["bash", "/srv/git/homeserver/core/hs.sh", "scheduler", "run", "backup;reboot"]));
+await expectPassValidation("Aceita scheduler status", async () => runOnHost(["bash", "/srv/git/homeserver/core/hs.sh", "scheduler", "status"]));
+await expectPassValidation("Aceita scheduler enable backup", async () => runOnHost(["bash", "/srv/git/homeserver/core/hs.sh", "scheduler", "enable", "backup"]));
+await expectPassValidation("Aceita scheduler run backup", async () => runOnHost(["bash", "/srv/git/homeserver/core/hs.sh", "scheduler", "run", "backup"]));
+
 console.log();
 console.log("Executor Tests (S3)");
 console.log(`Total : ${passed + failures}`);
