@@ -19,7 +19,8 @@ Você
                            ↓
                     HomeServer
                            │
-          ┌────────────────┼────────────────┐n          ↓                ↓                ↓
+          ┌────────────────┼────────────────┐
+          ↓                ↓                ↓
         App/API         Core            Módulos
           │                │                │
           │         usuários, backup,   FileBrowser,
