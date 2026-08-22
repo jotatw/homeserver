@@ -15,10 +15,8 @@ export async function updateRoutes(fastify: FastifyInstance) {
     });
 
     fastify.post("/api/v1/update", async (request, reply) => {
-        const body = request.body as { noRedeploy?: boolean };
-
         try {
-            const result = await applyUpdate(body?.noRedeploy === true);
+            const result = await applyUpdate();
             return sendOk(reply, result);
         } catch (error) {
             return sendInternalError(reply, request.log, error);
