@@ -1,59 +1,182 @@
-# Contributing — HomeServer
+# Personalizar e contribuir — HomeServer
 
-Este documento descreve como modificar, adaptar e evoluir o HomeServer de forma consistente. O projeto pode ser usado como base para uma instalação própria, e mudanças locais podem utilizar ferramentas adequadas ao objetivo, desde que sejam avaliados segurança, persistência, manutenção e compatibilidade com a arquitetura.
+O HomeServer foi feito para ser uma **base adaptável**, não uma configuração genérica que tenta atender todos os usos possíveis.
 
-O projeto prioriza simplicidade, arquitetura estável, qualidade de vida do usuário e evolução incremental.
+Cada pessoa pode utilizar o projeto de uma forma diferente. Por isso, uma modificação útil para uma instalação não precisa automaticamente virar uma funcionalidade oficial do projeto.
 
-## Antes de alterar o código
+## Primeiro: qual é o seu objetivo?
 
-1. Leia o [`README.md`](../../README.md), o [`QUICKSTART.md`](../install/QUICKSTART.md) e as [`QUESTIONS.md`](../use/QUESTIONS.md).
-2. Consulte `../reference/PRINCIPLES.md`.
-3. Consulte `../reference/ARCHITECTURE.md`.
-4. Consulte os fundamentos em `../../planning/foundations/` quando a mudança envolver evolução, validação ou consolidação de uma nova capacidade.
-5. Verifique se já existe um ADR relacionado em `../reference/architecture/adr/`.
-6. Identifique a camada correta para a alteração.
-7. Evite criar uma nova abstração quando uma camada existente já atende à responsabilidade.
-8. Quando a mudança afetar o usuário final, verifique também `../../planning/quality/user-quality-of-life.md`.
+```text
+Quero adaptar meu próprio servidor
+        ↓
+Personalização local
 
-## Camadas
+Quero criar ou alterar uma capacidade do HomeServer
+        ↓
+Desenvolvimento da plataforma
+
+Quero propor uma mudança para a base principal
+        ↓
+Contribuição ao projeto
+```
+
+Este documento começa pela **personalização**, porque esse é o caminho mais comum para quem utiliza o HomeServer como sua própria base.
+
+Para regras e detalhes de implementação arquitetural, consulte também [`DEVELOPMENT.md`](DEVELOPMENT.md).
+
+---
+
+## 1. Personalize para o seu uso
+
+Você pode adaptar sua instalação conforme sua necessidade.
+
+Exemplos:
+
+- adicionar um serviço que você utiliza;
+- criar uma automação pessoal;
+- ajustar a organização de arquivos;
+- integrar um dispositivo da sua casa;
+- testar uma nova forma de sincronização;
+- criar scripts auxiliares;
+- modificar a interface para o seu fluxo de uso.
+
+A pergunta principal não é **"isso serve para todos?"**. Primeiro pergunte:
+
+> **Isso resolve uma necessidade real da minha instalação?**
+
+Se a resposta for sim, a personalização pode ser válida mesmo que ninguém mais precise dela.
+
+### Um fluxo simples
+
+```text
+Tenho uma necessidade
+        ↓
+Faço uma personalização pequena
+        ↓
+Testo no meu ambiente
+        ↓
+Funciona e vale a manutenção?
+        ├── sim → mantenho como personalização local
+        └── não → ajusto ou removo
+```
+
+Não é necessário tentar transformar uma ideia pessoal em uma solução genérica antes de saber se ela funciona na prática.
+
+---
+
+## 2. Onde devo colocar minha modificação?
+
+Prefira manter personalizações separadas da base sempre que isso for possível.
+
+```text
+HomeServer
+├── base principal
+│   ├── core/
+│   ├── api/
+│   └── componentes oficialmente integrados
+│
+└── personalizações locais
+    ├── serviços pessoais
+    ├── automações experimentais
+    ├── scripts auxiliares
+    └── integrações específicas
+```
+
+A localização concreta pode variar conforme a instalação. O princípio é evitar alterar componentes centrais apenas para atender uma necessidade que pertence exclusivamente ao seu ambiente.
+
+### Antes de alterar o Core
+
+Pergunte:
+
+- isso realmente precisa fazer parte do comportamento central?
+- consigo resolver com um módulo, adapter, automação ou script separado?
+- essa alteração cria dependência entre partes que antes eram independentes?
+- conseguirei atualizar a base sem perder minha personalização?
+
+Se uma solução separada resolver o problema, ela normalmente deve ser preferida inicialmente.
+
+---
+
+## 3. Personalizações podem ficar fora do repositório principal
+
+Uma funcionalidade em teste não precisa entrar imediatamente em `main`.
+
+Isso é especialmente útil para:
+
+- novos serviços;
+- sincronização experimental;
+- automações pessoais;
+- integrações com dispositivos específicos;
+- fluxos que ainda não foram testados por tempo suficiente.
+
+O objetivo é primeiro descobrir:
+
+```text
+É útil?
+Funciona de forma confiável?
+Vale o custo de manutenção?
+Interfere em outros componentes?
+Ainda faz sentido depois de algum tempo de uso?
+```
+
+Somente depois faz sentido avaliar se a capacidade deve ser integrada de forma mais profunda.
+
+---
+
+## 4. Quando considerar levar algo para a base?
+
+Uma personalização pode ser candidata à integração quando seu comportamento estiver mais claro.
+
+Antes de mover uma solução para a base principal, avalie:
+
+- resolve um problema identificável da plataforma?
+- possui responsabilidade clara?
+- funciona sem depender de detalhes pessoais da sua instalação?
+- seus dados e configurações possuem uma fonte de verdade definida?
+- pode ser instalada, removida ou substituída de forma previsível?
+- possui custo de manutenção aceitável?
+- pode ser testada e documentada?
+- adiciona valor suficiente para justificar sua complexidade?
+
+Não é necessário que uma solução seja universal. O importante é que, quando entrar na base, sua responsabilidade e comportamento estejam claros.
+
+---
+
+## 5. Antes de adicionar um serviço ou módulo
+
+Um serviço deve possuir uma responsabilidade identificável. Avalie:
+
+- [ ] O problema que o serviço resolve está definido.
+- [ ] A responsabilidade não pertence a uma capacidade existente.
+- [ ] As dependências necessárias estão documentadas.
+- [ ] A configuração possui localização e fonte de verdade definidas.
+- [ ] Os dados persistentes possuem localização definida.
+- [ ] O lifecycle de instalação, inicialização, parada e atualização está definido.
+- [ ] Existe uma forma de verificar health ou estado quando aplicável.
+- [ ] Falhas do serviço não derrubam componentes independentes sem necessidade.
+- [ ] A integração utiliza uma fronteira ou contrato claro.
+- [ ] O App não depende diretamente de nomes de containers ou comandos internos do serviço.
+- [ ] A remoção ou substituição futura foi considerada.
+- [ ] Se for opcional, sua remoção não compromete o Core ou dados fora de sua responsabilidade.
+- [ ] Testes e documentação necessários foram identificados.
+
+> Este checklist não obriga todo experimento a virar módulo. Ele serve principalmente quando uma solução está sendo considerada para integração mais estável.
+
+---
+
+## 6. Desenvolvimento dentro da arquitetura
+
+Quando uma alteração fizer parte da plataforma, identifique a camada correta:
 
 - `core/foundation/` — componentes básicos e reutilizáveis.
 - `core/infrastructure/` — recursos internos do HomeServer.
 - `core/adapters/` — integração com serviços externos.
 - `api/` — fronteira oficial da plataforma.
-- `modules/` — espaço para componentes e serviços implantáveis conforme os contratos arquiteturais evoluírem.
+- `modules/` — componentes e serviços implantáveis conforme os contratos do projeto.
 - `automation/` — automações e hooks.
 - `scripts/` — ferramentas auxiliares.
-- `docs/` — documentação do sistema.
-- `planning/` — fundamentos, planejamento, qualidade e evolução futura.
-
-## Arquitetura
-
-A arquitetura principal é considerada estável.
-
-Mudanças estruturais devem ser justificadas e documentadas por ADR. Novas funcionalidades devem reutilizar as camadas existentes sempre que possível.
-
-O App utiliza a plataforma pela API oficial. O App não deve acessar diretamente scripts internos, Docker, containers, volumes, paths de configuração ou serviços externos quando existir uma capacidade ou contrato apropriado na plataforma.
-
-Serviços e componentes devem possuir responsabilidade clara, dependências explícitas e integração por contratos. A adição de um novo serviço não deve exigir alterações arbitrárias na Foundation ou Infrastructure apenas para que sua existência seja reconhecida.
-
-## Antes de adicionar uma capacidade
-
-Antes de implementar uma nova capacidade, responda:
-
-- Qual problema ou tarefa do usuário ela resolve?
-- Ela já existe parcialmente em outra camada?
-- Qual componente é responsável pela lógica?
-- Qual é a fonte de verdade para estado e configuração?
-- Existe um contrato reutilizável ou será necessário definir um?
-- Quem consumirá essa capacidade hoje e no futuro?
-- O App precisa conhecer algum detalhe interno para utilizá-la?
-- A implementação pode mudar sem quebrar os consumidores?
-- Como a operação informa sucesso, andamento ou falha?
-- Como o usuário se recupera quando algo falha?
-- A complexidade adicionada é proporcional ao benefício?
-
-Uma nova capacidade não deve duplicar regras existentes apenas porque uma nova interface precisa utilizá-la.
+- `docs/` — documentação.
+- `planning/` — fundamentos, planejamento e evolução futura.
 
 A direção preferencial é:
 
@@ -67,32 +190,11 @@ API, quando exposta externamente
 App / CLI / Integrações
 ```
 
-Nem toda capacidade precisa nascer simultaneamente no App, mas funcionalidades destinadas à operação normal do usuário devem ser avaliadas para integração progressiva.
+Para convenções, responsabilidades e decisões de implementação, consulte [`DEVELOPMENT.md`](DEVELOPMENT.md).
 
-## Antes de adicionar um serviço ou módulo
+---
 
-Um serviço deve possuir uma responsabilidade identificável. Antes de adicioná-lo, avalie:
-
-- [ ] O problema que o serviço resolve está definido.
-- [ ] A responsabilidade não pertence a um serviço ou capacidade existente.
-- [ ] A identidade do serviço é clara e não depende de detalhes da instalação.
-- [ ] As dependências necessárias estão documentadas.
-- [ ] A configuração possui localização e fonte de verdade definidas.
-- [ ] Os dados persistentes possuem localização definida e seguem o modelo oficial de storage.
-- [ ] O lifecycle de instalação, inicialização, parada e atualização está definido.
-- [ ] Existe uma forma de verificar health ou estado quando aplicável.
-- [ ] Falhas do serviço não derrubam componentes independentes sem necessidade.
-- [ ] A integração com a plataforma utiliza uma fronteira ou contrato claro.
-- [ ] O App não depende diretamente de nomes de containers, compose files ou comandos específicos do serviço.
-- [ ] A remoção ou substituição futura foi considerada.
-- [ ] Quando o componente for opcional, sua instalação ou remoção não compromete o Core ou dados fora de sua responsabilidade.
-- [ ] Testes e documentação necessários foram identificados.
-
-Nem todo serviço em experimentação precisa entrar imediatamente no repositório principal. Uma funcionalidade pode permanecer fora da base enquanto sua utilidade, custo, comportamento e impacto arquitetural são avaliados.
-
-A existência desse checklist não cria automaticamente um sistema de módulos ou plugins. O contrato concreto de modularidade deve ser seguido conforme definido e validado pelo projeto.
-
-## Antes de alterar um contrato
+## 7. Antes de alterar um contrato
 
 Quando uma mudança afetar uma API ou outra interface compartilhada:
 
@@ -103,85 +205,66 @@ Quando uma mudança afetar uma API ou outra interface compartilhada:
 5. adicione ou ajuste testes de regressão;
 6. registre um ADR quando a mudança alterar uma decisão arquitetural relevante.
 
-Uma implementação interna pode evoluir livremente desde que preserve o contrato suportado ou que a mudança seja explicitamente planejada e comunicada.
+Uma implementação interna pode evoluir livremente desde que preserve o contrato suportado ou que a mudança seja planejada explicitamente.
 
-## Qualidade de vida do usuário
+---
 
-Para mudanças destinadas ao uso normal, valide:
+## 8. Teste antes de consolidar
 
-- [ ] O usuário consegue encontrar a capacidade.
-- [ ] O objetivo da ação é compreensível.
-- [ ] A tarefa pode ser concluída sem conhecimento técnico desnecessário.
-- [ ] O resultado é apresentado de forma compreensível.
-- [ ] Uma falha fornece orientação ou um caminho de recuperação.
-- [ ] Se o App declara suporte ao fluxo, o terminal não é necessário para concluí-lo normalmente.
+A quantidade de validação deve ser proporcional ao risco da mudança.
 
-A implementação de uma tela ou endpoint não é, por si só, evidência de que a capacidade está pronta para o usuário final.
-
-## Convenções
-
-### Foundation
-
-Funções da Foundation usam o prefixo `hs_*`, por exemplo:
-
-```text
-hs_fs_*
-hs_cfg_*
-hs_val_*
-hs_out_*
-hs_const_*
-hs_registry_*
-```
-
-### Infrastructure
-
-Funções usam o prefixo correspondente ao módulo:
-
-```text
-storage_*
-users_*
-devices_*
-hardware_*
-backup_*
-scheduler_*
-power_*
-compose_*
-```
-
-### Adapters
-
-Integrações utilizam o prefixo do serviço, por exemplo `filebrowser_*`.
-
-Funções sem prefixo pertencentes à Foundation devem ser eliminadas em favor do padrão oficial.
-
-## Testes
-
-Toda alteração deve manter os testes existentes funcionando.
-
-Quando aplicável, execute:
+Para alterações aplicáveis, execute:
 
 ```bash
 bash core/tests/run_all.sh
 bash scripts/health-check.sh
 ```
 
-Alterações na API devem incluir testes de HTTP. Correções de bugs devem, quando possível, incluir um teste de regressão.
+Além dos testes automáticos, mudanças destinadas ao uso diário devem ser usadas e avaliadas na prática quando possível.
 
-Capacidades novas devem possuir evidência proporcional ao seu risco e escopo. Quando alterarem fluxos de usuário, considere testes de integração, smoke tests ou validação manual documentada além dos testes unitários.
+Uma implementação não deve ser considerada consolidada apenas porque um comando executou sem erro. Pergunte também:
 
-## Documentação
+- resolveu o problema original?
+- o fluxo continua simples?
+- uma falha é compreensível?
+- existe um caminho de recuperação?
+- a manutenção futura continua aceitável?
 
-Uma alteração que muda comportamento deve atualizar a documentação correspondente.
+Consulte [`TESTING.md`](TESTING.md) para a estratégia completa.
 
-Dúvidas recorrentes devem ser avaliadas para inclusão em `../use/FAQ.md` e no índice `../use/QUESTIONS.md`.
+---
 
-Decisões arquiteturais devem ser registradas em `../reference/architecture/adr/`.
+## 9. Documente o que muda
 
-Exemplos e documentação devem evitar nomes de usuários, IPs, caminhos pessoais ou outras configurações específicas de uma instalação. Use placeholders como `<USUARIO_ADMIN>` e `<IP_DO_SERVIDOR>` quando necessário.
+Atualize a documentação quando uma alteração mudar o comportamento do HomeServer.
 
-## Commits
+Dúvidas recorrentes podem ser adicionadas à [`FAQ`](../use/FAQ.md) e ao índice [`QUESTIONS.md`](../use/QUESTIONS.md).
 
-Use mensagens curtas e descritivas. O projeto aceita histórico híbrido em português e inglês. Para mudanças com escopo técnico identificável, prefira um formato consistente, por exemplo:
+Decisões arquiteturais relevantes devem ser avaliadas para registro em `../reference/architecture/adr/`.
+
+Evite exemplos com dados pessoais de uma instalação. Use placeholders como:
+
+```text
+<USUARIO_ADMIN>
+<IP_DO_SERVIDOR>
+<NOME_DO_SERVIÇO>
+```
+
+---
+
+## 10. Contribuições para o projeto principal
+
+Se uma modificação estiver madura e você quiser levá-la para a base principal:
+
+1. confirme o problema que ela resolve;
+2. identifique a camada responsável;
+3. avalie dependências e impacto arquitetural;
+4. execute os testes relevantes;
+5. atualize a documentação necessária;
+6. registre um ADR quando aplicável;
+7. descreva claramente o que mudou e por quê.
+
+Mensagens de commit podem seguir, por exemplo:
 
 ```text
 feat(api): adicionar ...
@@ -189,13 +272,16 @@ fix(core): corrigir ...
 docs: atualizar ...
 test(api): adicionar ...
 refactor(core): simplificar ...
-ci: atualizar ...
 ```
 
-## Releases
+---
 
-Durante a fase atual, o projeto evolui continuamente e não utiliza Tags ou Releases intermediárias apenas para marcar etapas de desenvolvimento.
+## Princípio final
 
-O roadmap ativo é `planning/roadmap/evolution.md`. Quando houver uma decisão explícita de publicar uma versão oficial, aplicam-se os critérios e o processo definidos em `planning/release/`.
+```text
+Primeiro resolva a necessidade real.
+Depois valide na prática.
+Só então decida se vale consolidar.
+```
 
-A primeira release oficial planejada será `v1.0.0`, mas ela não possui prazo automático. Antes de sua publicação, o estado candidato deverá ser validado novamente conforme os critérios aplicáveis.
+O HomeServer pode permanecer simples na base justamente porque não exige que toda necessidade individual seja transformada em funcionalidade global.
