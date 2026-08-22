@@ -21,6 +21,9 @@ O Baseline v0.1.0 é a referência conceitual do estado inicial da consolidaçã
 - Health Check ampliado para incluir load, memória e temperatura.
 - Documentação organizada por objetivo em `docs/install/`, `docs/use/`, `docs/contribute/` e `docs/reference/`.
 - Fundamentos de evolução e validação, critérios de qualidade, planejamento de interfaces e arquitetura modular documentados.
+- Recuperação automática de serviços: `scripts/service-watchdog.sh` verifica os serviços habilitados a cada 15 min e reinicia os que não estiverem `running`, registrando no feed de eventos; desabilitável sem quebrar o núcleo.
+- Validação diária de backup: `scripts/backup-check.sh` às 05:30 valida o último backup (`hs system backup validate`), registrando OK/INVÁLIDO no log que alimenta o feed.
+- Scheduler no App (API+UI): `hs scheduler status`, executor com allowlist para `scheduler`, endpoints `GET /api/v1/scheduler` e `POST /api/v1/scheduler/:name/{enable,disable,run}` (admin) e seção "Tarefas agendadas" na Administração.
 
 ### Alterado
 

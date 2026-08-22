@@ -86,7 +86,7 @@ EOF
 }
 
 #
-# Lista as tarefas com estado.
+# Lista as tarefas com estado (texto).
 #
 scheduler_list() {
     local line name schedule command persistent state
@@ -103,6 +103,34 @@ scheduler_list() {
 
         printf "  %-9s %-12s %-22s %-6s %s\n" "${state}" "${name}" "${schedule}" "pers=${persistent}" "${command}"
     done < <(scheduler_tasks)
+}
+
+#
+# Lista as tarefas com estado e próxima execução (JSON — consumido pela API).
+#
+scheduler_list_json() {
+    local line name schedule command persistent enabled next first=1
+
+    printf '['
+    while IFS='|' read -r name schedule command persistent; do
+        [[ -n "${name}" ]] || continue
+        [[ -n "${persistent}" ]] || persistent="true"
+
+        if scheduler_task_enabled "${name}"; then
+            enabled=true
+        else
+            enabled=false
+        fi
+
+        next="$(systemctl show "hs-task-${name}.timer" -p NextElapseUSecRealtime --value 2>/dev/null | sed 's/ *$//')"
+        [[ -n "${next}" ]] || next=""
+
+        [[ ${first} -eq 0 ]] && printf ','
+        printf '\n  {"name":"%s","schedule":"%s","command":"%s","persistent":%s,"enabled":%s,"next":"%s"}' \
+            "${name}" "${schedule}" "${command}" "${persistent}" "${enabled}" "${next}"
+        first=0
+    done < <(scheduler_tasks)
+    printf '\n]\n'
 }
 
 #

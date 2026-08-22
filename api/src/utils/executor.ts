@@ -36,6 +36,7 @@ const POWER_SUBS = ["status", "enable", "disable", "set"] as const;
 const MODULE_SUBS = ["definitions", "instances", "info", "status", "op"] as const;
 const UPDATE_OS_SUBS = ["check", "apply"] as const;
 const DEVICE_SUBS_LIST = ["mount", "unmount", "eject"] as const;
+const SCHEDULER_SUB_RE = /^(status|enable|disable|run|list)$/;
 const PRINTER_OPTS = {
     media: /^media=.+$/,
     color: /^ColorModel=.+$/,
@@ -145,6 +146,47 @@ function validateHsArgs(args: string[]): void {
 }
 
 /**
+ * Valida argumentos para comando `hs` scheduler.
+ */
+function validateSchedulerArgs(args: string[]): void {
+    if (args.length < 1) {
+        throw new ExecutorError("scheduler requer subcomando (list, status, enable, disable, run)");
+    }
+
+    const sub = args[0];
+
+    if (sub === "list" || sub === "status") {
+        if (args.length !== 1) throw new ExecutorError(`${sub} não aceita argumentos`);
+    } else if (sub === "enable" || sub === "disable" || sub === "run") {
+        if (args.length !== 2) throw new ExecutorError(`${sub} requer: <nome da tarefa>`);
+        if (!/^[a-z0-9][a-z0-9-]*$/.test(args[1])) {
+            throw new ExecutorError(`nome de tarefa inválido: ${args[1]}. Use slug [a-z0-9-]`);
+        }
+    } else {
+        throw new ExecutorError(`scheduler subcomando inválido: ${sub}. Use: list, status, enable, disable, run`);
+    }
+}
+
+/**
+ * Executa comando do scheduler no host via nsenter.
+ */
+export async function runHostScheduler(subcmd: "list" | "status" | "enable" | "disable" | "run", ...args: string[]): Promise<string> {
+    if (subcmd === "list" || subcmd === "status") {
+        if (arguments.length !== 1) throw new ExecutorError(`${subcmd} não aceita argumentos`);
+        return runOnHost(["bash", CORE_ON_HOST, "scheduler", subcmd]);
+    }
+    if (subcmd === "enable" || subcmd === "disable") {
+        if (arguments.length !== 2) throw new ExecutorError(`${subcmd} requer <nome da tarefa>`);
+        return runOnHost(["bash", CORE_ON_HOST, "scheduler", subcmd, ...args]);
+    }
+    if (subcmd === "run") {
+        if (arguments.length !== 2) throw new ExecutorError("run requer <tarefa>");
+        return runOnHost(["bash", CORE_ON_HOST, "scheduler", "run", ...args]);
+    }
+    throw new ExecutorError(`scheduler subcomando inválido: ${arguments[0]}`);
+}
+
+/**
  * Valida argumentos para comando `lp` de impressão.
  */
 function validateLpArgs(args: string[]): void {
@@ -225,9 +267,14 @@ export async function runOnHost(
         if (script === "/srv/scripts/backup.sh") {
             if (args.length !== 2) throw new ExecutorError("backup script não aceita argumentos adicionais");
         } else if (script === CORE_ON_HOST) {
-            // hs.sh subcomandos: device, module, power, update
+            // hs.sh subcomandos: device, module, power, update, scheduler
             if (args.length < 3) throw new ExecutorError("hs.sh requer subcomando");
-            validateHsArgs(args.slice(2));
+            const sub = args[2];
+            if (sub === "scheduler") {
+                validateSchedulerArgs(args.slice(3));
+            } else {
+                validateHsArgs(args.slice(2));
+            }
         } else if (script === "-c") {
             // Scripts compostos de lpstat (apenas os dois conhecidos)
             if (args.length < 3) throw new ExecutorError("bash -c requer script");
@@ -239,16 +286,11 @@ export async function runOnHost(
             throw new ExecutorError(`bash script não permitido: ${script}`);
         }
     } else if (cmd === "cancel") {
-        if (args.length !== 2) throw new ExecutorError("cancel requer exatamente 1 argumento: <jobId>");
-        if (!/^[a-zA-Z0-9_-]+-\d+$/.test(args[1])) {
-            throw new ExecutorError(`jobId inválido: ${args[1]}. Formato: <printer>-<número>`);
-        }
+        validateCancelArgs(args.slice(1));
     } else if (cmd === "lp") {
         validateLpArgs(args.slice(1));
     } else if (cmd === "lpstat") {
         validateLpstatArgs(args.slice(1));
-    } else if (cmd === "cancel") {
-        // já tratado acima
     } else {
         throw new ExecutorError(`Comando não permitido: ${cmd}. Permitidos: bash, lp, lpstat, cancel`);
     }
