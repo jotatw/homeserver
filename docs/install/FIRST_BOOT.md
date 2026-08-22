@@ -40,7 +40,7 @@ A API é destinada ao App e a integrações:
 /api/v1/*
 ```
 
-> O Caddy fornece o acesso HTTPS local. Como o certificado é interno à instalação, o navegador pode apresentar um aviso na primeira visita.
+> O Caddy fornece o acesso HTTPS local. Para evitar avisos de certificado, siga o guia de [`TLS local`](tls-local.md) no dispositivo que acessará o servidor.
 
 ## 3. Primeiro acesso ao App
 
@@ -92,7 +92,7 @@ sudo bash core/hs.sh update apply
 
 ## 6. Atualizações
 
-O HomeServer é distribuído por releases. O comando `update check` verifica a disponibilidade de uma versão mais recente e `update apply` executa o fluxo de atualização previsto pelo projeto.
+As atualizações devem ser avaliadas e aplicadas conforme o fluxo atualmente implementado e documentado pelo projeto. O comando `update check` verifica o estado de atualização disponível e `update apply` executa o fluxo suportado.
 
 Antes de uma atualização importante, mantenha uma cópia do backup disponível.
 
@@ -107,4 +107,4 @@ Antes de uma atualização importante, mantenha uma cópia do backup disponível
 | `hs` não é encontrado | Use `sudo bash core/hs.sh ...` a partir do diretório do projeto |
 | Serviço em reinício contínuo | `docker ps` e `docker logs <container>` |
 
-Para um diagnóstico mais completo, consulte `INSTALLATION.md`, `../use/FAQ.md` e `../use/QUESTIONS.md`.
+Para um diagnóstico mais completo, consulte [`INSTALLATION.md`](INSTALLATION.md), [`FAQ.md`](../use/FAQ.md) e [`QUESTIONS.md`](../use/QUESTIONS.md).
