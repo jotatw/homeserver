@@ -35,6 +35,7 @@ Documentos desta seção devem permanecer relativamente estáveis. Mudanças nel
 | Área | Responsabilidade |
 |---|---|
 | `planning/foundations/` | princípios gerais e critérios de decisão |
+| `planning/app/` | direção das interfaces e prioridades de produto |
 | `planning/roadmap/` | fases, objetivos e critérios de evolução |
 | `planning/modules/` | planejamento específico dos módulos |
 | `planning/security/` | segurança, hardening e evidências |
@@ -44,3 +45,5 @@ Documentos desta seção devem permanecer relativamente estáveis. Mudanças nel
 ## Princípio central
 
 O HomeServer evolui com base em planejamento e evidências práticas. Uma decisão pode ser revisada quando testes, uso real ou novas informações demonstrarem que existe uma solução melhor, mais simples, mais adequada ao hardware ou mais sustentável para o futuro.
+
+As direções específicas, como o papel do Desktop e do Mobile, pertencem às áreas de planejamento correspondentes. Os fundamentos definem como essas decisões são avaliadas e evoluem, sem antecipar uma implementação definitiva.
