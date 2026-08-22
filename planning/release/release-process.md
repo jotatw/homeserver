@@ -1,73 +1,110 @@
 # Release Process
 
-> Processo permanente de lançamento do HomeServer — aplicado a **toda versão**
-> (v2.0, v2.1, v3.0...). Complementa o Quality Gate (`planning/quality/`) e a
-> Auditoria de Instalação (`planning/quality/audit-installation.md`).
+> Processo usado quando existir uma decisão explícita de publicar uma **release oficial** do HomeServer.
+>
+> Durante a consolidação normal, o projeto pode evoluir por planejamento, implementação, testes e validação prática sem criar Tags ou GitHub Releases intermediárias.
 >
 > O Quality Gate valida o **código**; este processo valida o **lançamento**.
 
+## Política de versionamento durante a consolidação
+
+Antes da primeira release oficial:
+
+- `main` representa o estado atual em evolução;
+- commits e branches registram e isolam mudanças;
+- documentação registra decisões e aprendizados;
+- testes e validação prática fornecem evidências;
+- baselines podem existir como referências documentais;
+- Tags e Releases não são usadas apenas para marcar progresso.
+
+A primeira Tag e GitHub Release serão criadas somente quando houver uma decisão explícita de publicar uma referência oficial, atualmente planejada como a futura `v1.0.0`.
+
+Depois da primeira release, este processo deve ser aplicado a cada nova versão oficial publicada.
+
 ## Pergunta central
 
-> A versão está pronta quando um usuário consegue **instalar em uma máquina
-> limpa**, utilizar as funcionalidades principais e compreender o sistema
-> usando **apenas a documentação oficial** — sem consultar o código-fonte ou
-> buscar ajuda externa.
+> A versão representa um estado que desejamos preservar como referência e está pronta para que um usuário consiga instalar o HomeServer em uma máquina limpa, utilizar as funcionalidades principais e compreender o sistema usando apenas a documentação oficial — sem consultar o código-fonte ou buscar ajuda externa?
 
 ## Etapas
 
-### 0. Audits (sem escrever código)
+### 0. Decisão de release
+
+Antes de iniciar o processo:
+
+- definir explicitamente qual estado será candidato à release;
+- confirmar que não se trata apenas de um marco intermediário;
+- revisar `definition-of-ready-for-release.md`;
+- criar ou atualizar o checklist específico da versão;
+- definir o freeze e os critérios aplicáveis.
+
+### 1. Audits e validação final
 
 **Release Audit**
 
 | Check | Critério |
 |---|---|
 | Instalação | `install.sh` em servidor limpo → servidor funcional |
-| Upgrade | versão anterior → atual via `hs update` |
+| Upgrade | versão oficial anterior → atual, quando aplicável |
 | Reinicialização | reboot → tudo sobe sozinho (`restart: unless-stopped`) |
-| Logs | sem erros |
-| Docker | sem restart loop |
-| Homepage | abre imediatamente |
+| Logs | sem erros críticos conhecidos |
+| Docker | sem restart loop inesperado |
+| Interface principal | abre e responde conforme esperado |
 
 **Compatibility Audit**
 
-| Navegador | Estado |
+| Ambiente | Estado |
 |---|---|
-| Chrome | testado |
-| Firefox | testado |
-| Edge | testado |
-| Mobile | testado |
-| Safari | registrar (não obrigatório) |
+| Navegadores suportados | testar conforme escopo da release |
+| Desktop | testar conforme escopo da release |
+| Mobile | testar conforme escopo da release |
+| Safari/outros | registrar quando relevante |
 
-### 1. PWA (quando aplicável à versão)
+### 2. Funcionalidades condicionais
 
-- `manifest.json` válido (name, icons 192/512, start_url, display).
-- Service worker mínimo (fetch pass-through) — instalação + base para offline.
-- Validação Lighthouse (pelo menos 1 execução).
-- Teste: instalar → fechar → abrir → continua logado.
+Validar apenas os recursos presentes ou afetados pela release.
 
-### 2. Polling / dados em tempo real (quando aplicável)
+#### PWA
 
-- Intervalo conservador (ex.: 30s) + refresh ao focar a aba.
-- **Sem polling duplicado** (single timer, limpo ao navegar).
+Quando aplicável:
+
+- `manifest.json` válido;
+- comportamento do service worker compatível com o escopo declarado;
+- validação prática de instalação, abertura e sessão quando suportado;
+- auditoria adicional quando necessária.
+
+#### Polling / dados em tempo real
+
+Quando aplicável:
+
+- intervalo conservador;
+- refresh ao retornar ao contexto relevante;
+- sem polling duplicado;
+- timers limpos ao navegar ou desmontar a interface.
 
 ### 3. Contrato App ↔ API
 
-- Mapa de views → endpoints documentado (`api/README.md`).
-- Regra: **toda comunicação entre App e HomeServer ocorre exclusivamente
-  através da API oficial** — o App é apenas mais um cliente.
+- endpoints e contratos relevantes documentados;
+- mudanças incompatíveis avaliadas;
+- regra mantida: **toda comunicação entre App e HomeServer ocorre através da API oficial**, salvo uma exceção arquitetural explicitamente documentada.
 
-### 4. Versão
+### 4. Versão e identificação
 
-- `api/package.json` alinhado à release (`hs version` vem do git tag).
+Quando a versão oficial estiver definida:
+
+- metadados da aplicação alinhados à release;
+- mecanismos que dependem da versão testados no estado final;
+- a Tag Git é criada somente após os critérios definidos para publicação estarem atendidos.
+
+A ausência de uma tag durante a consolidação não deve ser tratada como falha.
 
 ### 5. Acceptance Tests
 
-Matriz com `PASS | Tempo | Observações` (vira histórico):
+Criar uma matriz com `PASS | Tempo | Observações` para os cenários relevantes da versão:
 
 | Item | PASS | Tempo | Observações |
 |---|---|---|---|
 | Login | | | |
-| Dashboard | | | |
+| Interface principal | | | |
 | Arquivos | | | |
 | Usuários | | | |
 | Energia | | | |
@@ -76,58 +113,78 @@ Matriz com `PASS | Tempo | Observações` (vira histórico):
 | Tema | | | |
 | Mobile | | | |
 
-Cenários:
+Os cenários devem ser adaptados ao escopo real da release. Exemplos:
 
-1. **Instalação limpa** — Debian → clone → `install.sh` → homepage (sem abrir docs).
-2. **Administrador** — login → criar usuário → login do usuário → arquivos → logout.
-3. **Upgrade** — versão anterior → atual.
+1. **Instalação limpa** — servidor sem instalação anterior → documentação → sistema funcional.
+2. **Fluxo principal** — executar as funções que representam o uso esperado.
+3. **Upgrade** — versão oficial anterior → versão candidata, quando aplicável.
 4. **Reboot** — tudo continua funcionando.
-5. **Zero Knowledge Test** — máquina limpa, apenas README/QUICKSTART/INSTALLATION:
-   Instalou? Homepage? App? Criou usuário? Login? Entendeu o sistema?
+5. **Zero Knowledge Test** — máquina limpa, usando apenas a documentação oficial.
 
-### 6. Publish + Rollback
+### 6. Freeze e Release Candidate
 
-- Publicação via workflow (tags `v*`).
-- **Plano B** (se a Action falhar) — publish manual:
+Quando a estabilidade justificar uma etapa de freeze:
 
-```bash
-# 1. autenticar no GHCR (precisa de PAT com scope packages:write)
-echo "$GITHUB_TOKEN" | docker login ghcr.io -u <usuario> --password-stdin
+- após o freeze, apenas `fix`/`docs`/`test`/`ci` devem ser aceitos;
+- nenhuma funcionalidade nova entra sem reiniciar a avaliação do escopo;
+- se necessário, uma Release Candidate pode ser criada;
+- RC → bug → correção → nova RC ou nova validação;
+- RC aprovada → versão final.
 
-# 2. build + push
-docker build -t ghcr.io/usuario/homeserver/api:<tag> ./api
-docker push ghcr.io/usuario/homeserver/api:<tag>
+Uma RC é opcional quando o porte da release não justificar essa etapa.
+
+### 7. Publish, Tag e Release
+
+Somente após aprovação final:
+
+1. executar as validações finais;
+2. atualizar documentação, CHANGELOG e Known Issues;
+3. preparar os artefatos aplicáveis;
+4. criar a Tag da versão;
+5. publicar os artefatos necessários;
+6. criar a GitHub Release;
+7. registrar a estratégia de rollback ou recuperação aplicável.
+
+A publicação automatizada pode usar tags `v*` quando o workflow estiver configurado para isso. A automação não substitui os critérios de prontidão.
+
+### 8. Rollback e recuperação
+
+Antes da publicação, registrar como retornar a um estado conhecido quando isso for aplicável:
+
+```text
+Problema após publicação
+        ↓
+Avaliar impacto
+        ↓
+Corrigir e republicar
+        ou
+Restaurar referência oficial anterior
+        ↓
+Registrar a decisão e as consequências
 ```
 
-- **Rollback** (se a RC tiver problema):
+A estratégia concreta depende da arquitetura e dos artefatos da versão.
 
-```bash
-# voltar o código para a versão anterior
-git checkout <tag-anterior>   # ex.: v1.5.0
+### 9. Documentos da release
 
-# reimplantar módulos + API
-bash install.sh
-```
+Para cada release oficial:
 
-### 7. Documentos de release
-
-- CHANGELOG atualizado (com **Known Issues** quando houver).
-- Checklist da versão (ex.: `planning/archive/release-v2.0/v2.0-checklist.md`) — tudo PASS → tag.
-- Release notes (não técnicas, voltadas ao usuário).
-
-### 8. Release Candidata
-
-- **Freeze**: após a RC, apenas `fix`/`docs`/`test`/`ci` — nunca `feat`.
-- Fluxo:
-  - RC → bug → fix → **RC.2** (se necessário).
-  - RC → tudo OK → **versão final**.
+- CHANGELOG atualizado, incluindo Known Issues quando houver;
+- checklist específico da versão;
+- release notes voltadas ao usuário;
+- evidências das validações relevantes;
+- referência para a Tag e GitHub Release após publicação.
 
 ---
 
 ## Definition of Ready for Release
 
-Critérios permanentes — ver `definition-of-ready-for-release.md`.
+Critérios permanentes: `definition-of-ready-for-release.md`.
+
+## Relação com o baseline
+
+Baselines são referências documentais e não criam automaticamente Tags, Releases ou contratos de estabilidade.
 
 ## Política de suporte
 
-Status por versão — ver `planning/support/support-policy.md`.
+Quando existir política de suporte por versão, consultar `planning/support/support-policy.md`.
