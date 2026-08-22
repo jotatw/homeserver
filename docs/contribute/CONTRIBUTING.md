@@ -1,6 +1,6 @@
 # Contributing — HomeServer
 
-Obrigado por contribuir com o HomeServer.
+Este documento descreve como modificar, adaptar e evoluir o HomeServer de forma consistente. O projeto pode ser usado como base para uma instalação própria, e mudanças locais podem utilizar ferramentas adequadas ao objetivo, desde que sejam avaliados segurança, persistência, manutenção e compatibilidade com a arquitetura.
 
 O projeto prioriza simplicidade, arquitetura estável, qualidade de vida do usuário e evolução incremental.
 
@@ -9,10 +9,11 @@ O projeto prioriza simplicidade, arquitetura estável, qualidade de vida do usu�
 1. Leia o [`README.md`](../../README.md), o [`QUICKSTART.md`](../install/QUICKSTART.md) e as [`QUESTIONS.md`](../use/QUESTIONS.md).
 2. Consulte `../reference/PRINCIPLES.md`.
 3. Consulte `../reference/ARCHITECTURE.md`.
-4. Verifique se já existe um ADR relacionado em `../reference/architecture/adr/`.
-5. Identifique a camada correta para a alteração.
-6. Evite criar uma nova abstração quando uma camada existente já atende à responsabilidade.
-7. Quando a mudança afetar o usuário final, verifique também `planning/quality/user-quality-of-life.md`.
+4. Consulte os fundamentos em `../../planning/foundations/` quando a mudança envolver evolução, validação ou consolidação de uma nova capacidade.
+5. Verifique se já existe um ADR relacionado em `../reference/architecture/adr/`.
+6. Identifique a camada correta para a alteração.
+7. Evite criar uma nova abstração quando uma camada existente já atende à responsabilidade.
+8. Quando a mudança afetar o usuário final, verifique também `../../planning/quality/user-quality-of-life.md`.
 
 ## Camadas
 
@@ -24,7 +25,7 @@ O projeto prioriza simplicidade, arquitetura estável, qualidade de vida do usu�
 - `automation/` — automações e hooks.
 - `scripts/` — ferramentas auxiliares.
 - `docs/` — documentação do sistema.
-- `planning/` — planejamento, qualidade e evolução futura.
+- `planning/` — fundamentos, planejamento, qualidade e evolução futura.
 
 ## Arquitetura
 
@@ -50,6 +51,7 @@ Antes de implementar uma nova capacidade, responda:
 - A implementação pode mudar sem quebrar os consumidores?
 - Como a operação informa sucesso, andamento ou falha?
 - Como o usuário se recupera quando algo falha?
+- A complexidade adicionada é proporcional ao benefício?
 
 Uma nova capacidade não deve duplicar regras existentes apenas porque uma nova interface precisa utilizá-la.
 
@@ -67,9 +69,9 @@ App / CLI / Integrações
 
 Nem toda capacidade precisa nascer simultaneamente no App, mas funcionalidades destinadas à operação normal do usuário devem ser avaliadas para integração progressiva.
 
-## Antes de adicionar um serviço
+## Antes de adicionar um serviço ou módulo
 
-Um serviço deve possuir uma responsabilidade identificável. Antes de adicioná-lo, preencha este checklist:
+Um serviço deve possuir uma responsabilidade identificável. Antes de adicioná-lo, avalie:
 
 - [ ] O problema que o serviço resolve está definido.
 - [ ] A responsabilidade não pertence a um serviço ou capacidade existente.
@@ -82,10 +84,13 @@ Um serviço deve possuir uma responsabilidade identificável. Antes de adicioná
 - [ ] Falhas do serviço não derrubam componentes independentes sem necessidade.
 - [ ] A integração com a plataforma utiliza uma fronteira ou contrato claro.
 - [ ] O App não depende diretamente de nomes de containers, compose files ou comandos específicos do serviço.
-- [ ] A remoção ou substituição futura do serviço foi considerada.
+- [ ] A remoção ou substituição futura foi considerada.
+- [ ] Quando o componente for opcional, sua instalação ou remoção não compromete o Core ou dados fora de sua responsabilidade.
 - [ ] Testes e documentação necessários foram identificados.
 
-A existência desse checklist não cria automaticamente um sistema de módulos ou plugins. O contrato concreto de modularidade será definido quando houver necessidade real e decisão arquitetural correspondente.
+Nem todo serviço em experimentação precisa entrar imediatamente no repositório principal. Uma funcionalidade pode permanecer fora da base enquanto sua utilidade, custo, comportamento e impacto arquitetural são avaliados.
+
+A existência desse checklist não cria automaticamente um sistema de módulos ou plugins. O contrato concreto de modularidade deve ser seguido conforme definido e validado pelo projeto.
 
 ## Antes de alterar um contrato
 
@@ -189,8 +194,8 @@ ci: atualizar ...
 
 ## Releases
 
-Releases passam pelo Quality Gate e pelos critérios definidos em `planning/release/`.
+Durante a fase atual, o projeto evolui continuamente e não utiliza Tags ou Releases intermediárias apenas para marcar etapas de desenvolvimento.
 
-A linha atual segue o roadmap `planning/roadmap/v1.0.md`. Roadmaps e versões anteriores permanecem como histórico em `planning/archive/`.
+O roadmap ativo é `planning/roadmap/evolution.md`. Quando houver uma decisão explícita de publicar uma versão oficial, aplicam-se os critérios e o processo definidos em `planning/release/`.
 
-Antes de uma release, mudanças relevantes devem possuir testes, documentação e evidências proporcionais ao seu risco. Depois de uma Release Candidate, somente correções, documentação, testes e CI devem entrar no escopo da release.
+A primeira release oficial planejada será `v1.0.0`, mas ela não possui prazo automático. Antes de sua publicação, o estado candidato deverá ser validado novamente conforme os critérios aplicáveis.
