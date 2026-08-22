@@ -1,18 +1,22 @@
 # Planejamento do HomeServer
 
-Este diretório organiza a evolução do projeto. A documentação aqui descreve princípios gerais, decisões, baseline, roadmap, qualidade, segurança, interfaces e planejamento arquitetural.
+Este diretório organiza fundamentos, decisões, estado de referência, evolução, qualidade, segurança, interfaces e planejamento arquitetural do projeto.
+
+A documentação de planejamento não representa um cronograma rígido. Ela registra a direção atual, decisões consolidadas, hipóteses em avaliação, limitações conhecidas e critérios para decidir quando uma solução pode ser considerada suficientemente consolidada.
 
 ## Ponto de entrada atual
 
 O estado de referência do projeto é o [Baseline v0.1.0](release/baseline-v0.1.0.md).
 
-O caminho operacional até a primeira release estável está no [Roadmap v1.0](roadmap/v1.0.md).
+A evolução operacional contínua está no [Roadmap de Evolução](roadmap/evolution.md).
 
 A base arquitetural para a evolução modular está consolidada em [Arquitetura Modular](architecture/README.md).
 
 Os princípios gerais de evolução e validação estão em [Fundamentos Gerais](foundations/README.md).
 
 A direção inicial das interfaces está em [Planejamento do App](app/README.md).
+
+Os critérios para uma futura publicação oficial estão em [Release](release/README.md).
 
 ## Organização
 
@@ -21,16 +25,16 @@ planning/
 ├── README.md                 # índice desta área
 ├── foundations/              # princípios gerais e critérios de decisão
 ├── app/                      # direção das interfaces e prioridades de uso
-├── release/                  # baseline e processos de release
-├── roadmap/                  # evolução até v1.0 e histórico
+├── release/                  # baseline e critérios/processos de release
+├── roadmap/                  # evolução contínua e prioridades
 ├── architecture/             # arquitetura modular consolidada
 ├── modules/                  # fundamentos e planejamento de módulos
 ├── security/                 # políticas e planejamento de segurança
 ├── quality/                  # qualidade e critérios de validação
 ├── health/                   # histórico e evidências de saúde
 ├── backlog/                  # itens de trabalho
-├── review/                   # revisões planejadas
-│   └── levantamento-servicos.md   # estado atual dos serviços → base da modularização
+├── review/                   # revisões e análises de estado
+│   └── levantamento-servicos.md   # estado dos serviços → base da modularização
 ├── support/                  # políticas de suporte
 └── archive/                  # documentação histórica
 ```
@@ -61,8 +65,9 @@ Para evitar duplicação:
 - `app/` define direção e prioridades das interfaces, sem substituir especificações técnicas;
 - documentos de domínio definem regras detalhadas;
 - documentos de decisão consolidam decisões fechadas e pendências;
-- o roadmap organiza a sequência de evolução;
+- `roadmap/` organiza áreas, prioridades e critérios de evolução;
 - o baseline registra o estado observado;
-- o histórico permanece em `archive/` e não redefine o estado atual.
+- `release/` define critérios para uma publicação oficial;
+- `archive/` preserva documentação histórica e não redefine o estado atual.
 
 Documentação nova deve complementar essa estrutura, sem duplicar ou redefinir silenciosamente contratos já consolidados.
