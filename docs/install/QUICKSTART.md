@@ -16,7 +16,7 @@ Antes de começar, consulte [`QUESTIONS.md`](../use/QUESTIONS.md) se quiser ente
 ### 1. Baixe o HomeServer
 
 ```bash
-git clone https://github.com/usuario/homeserver.git
+git clone https://github.com/jotatw/homeserver.git
 cd homeserver
 ```
 
@@ -73,4 +73,4 @@ Os componentes principais devem aparecer como saudáveis.
 - [FAQ detalhado](../use/FAQ.md)
 - [README](../../README.md)
 
-> **Critério de qualidade da v2.0:** uma pessoa nova deve conseguir instalar e utilizar o HomeServer seguindo apenas a documentação oficial, sem precisar consultar o código-fonte.
+> **Critério de qualidade:** uma pessoa nova deve conseguir instalar e utilizar o HomeServer seguindo apenas a documentação oficial, sem precisar consultar o código-fonte.
