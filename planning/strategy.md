@@ -3,22 +3,18 @@
 > **Como chegaremos lá.**
 >
 > A estratégia define a ordem e os critérios de evolução. Diferente da visão
-> (onde queremos chegar) e do roadmap (o que será feito em uma fase ou versão),
-> a estratégia muda pouco: ela estabelece **como** o HomeServer cresce.
+> (onde queremos chegar) e do roadmap (prioridades e áreas de consolidação), a
+> estratégia muda pouco: ela estabelece **como** o HomeServer cresce.
 
 ---
 
-## Objetivo estratégico da linha v1.0
+## Objetivo estratégico
 
-A linha v1.0 tem como objetivo transformar a base atual em uma plataforma que
-entregue qualidade de vida ao usuário final.
+O objetivo é transformar a base atual em uma plataforma que entregue qualidade de vida ao usuário final sem comprometer simplicidade, segurança, manutenção ou possibilidade de evolução.
 
-O HomeServer deve permitir que uma pessoa instale, compreenda e opere as
-funções normais do servidor sem precisar conhecer programação, Linux, Docker,
-systemd ou comandos de terminal.
+O HomeServer deve permitir que uma pessoa instale, compreenda e opere as funções normais do servidor sem precisar conhecer programação, Linux, Docker, systemd ou comandos de terminal.
 
-A complexidade técnica continua existindo quando necessária, mas deve ser
-encapsulada pela plataforma.
+A complexidade técnica continua existindo quando necessária, mas deve ser encapsulada pela plataforma.
 
 ```text
 Complexidade do servidor
@@ -31,25 +27,19 @@ Docker · systemd · permissões · rede · storage · serviços
                      API / contratos
                             │
                             ▼
-                    HomeServer App
+                    Interfaces adequadas
                             │
                             ▼
                     Experiência simples
 ```
 
-O sucesso não é medido apenas pela quantidade de funcionalidades disponíveis.
-Uma funcionalidade só cumpre plenamente seu objetivo quando o usuário consegue
-entender o que ela faz e utilizá-la sem precisar conhecer sua implementação.
+O sucesso não é medido apenas pela quantidade de funcionalidades disponíveis. Uma funcionalidade só cumpre plenamente seu objetivo quando resolve uma necessidade real com custo técnico e operacional proporcional.
 
 ---
 
 ## Evolução incremental
 
-O HomeServer evolui por etapas. Cada etapa fortalece a plataforma antes da
-próxima, garantindo que novas capacidades sejam construídas sobre uma base
-sólida, simples e organizada.
-
-A evolução deve seguir, em termos estratégicos, a sequência:
+O HomeServer evolui por etapas. Cada etapa fortalece a plataforma antes de ampliar sua complexidade.
 
 ```text
 Base confiável
@@ -64,23 +54,16 @@ Modularidade
      ↓
 Ecossistema
      ↓
-Consolidação
+Consolidação contínua
 ```
 
-1. **Base confiável** — arquitetura, Foundation, Infrastructure, API, testes e
-   documentação precisam possuir responsabilidades claras.
-2. **Capacidades bem definidas** — serviços e operações devem ser auditados,
-   desacoplados e possuir contratos explícitos.
-3. **Contratos de plataforma** — interfaces devem utilizar capacidades estáveis
-   sem depender de detalhes internos da infraestrutura.
-4. **Operação centralizada** — o App passa progressivamente a concentrar as
-   operações normais do usuário final.
-5. **Modularidade** — a plataforma cresce sem aumentar arbitrariamente a
-   complexidade do Core.
-6. **Ecossistema** — dispositivos e integrações passam a utilizar as
-   capacidades da plataforma.
-7. **Consolidação** — estabilidade, documentação, segurança, desempenho e
-   manutenção de longo prazo.
+1. **Base confiável** — arquitetura, Foundation, Infrastructure, API, testes e documentação possuem responsabilidades claras.
+2. **Capacidades bem definidas** — serviços e operações são auditados, desacoplados e possuem contratos explícitos.
+3. **Contratos de plataforma** — interfaces utilizam capacidades estáveis sem depender de detalhes internos da infraestrutura.
+4. **Operação centralizada** — interfaces concentram progressivamente as operações normais adequadas ao contexto do usuário.
+5. **Modularidade** — a plataforma cresce sem aumentar arbitrariamente a complexidade do Core.
+6. **Ecossistema** — dispositivos, sincronização, compartilhamento, automações e serviços distribuídos utilizam capacidades da plataforma quando isso fizer sentido.
+7. **Consolidação contínua** — estabilidade, documentação, segurança, desempenho e manutenção são validados continuamente antes de uma futura decisão de release.
 
 ---
 
@@ -111,16 +94,31 @@ O usuário não deve precisar conhecer, para concluir essas tarefas:
 - permissões técnicas;
 - detalhes da implementação.
 
-Essa diretriz não significa esconder informações técnicas de administradores ou
-desenvolvedores. Ela significa que essas informações não devem ser um pré-
-requisito para a operação normal.
+Essa diretriz não significa esconder informações técnicas de administradores ou desenvolvedores. Ela significa que essas informações não devem ser um pré-requisito para a operação normal.
 
 ---
 
-## App como centro de operação
+## Interfaces conforme o contexto
 
-O objetivo progressivo da linha v1.0 é centralizar no HomeServer App as
-operações normais disponíveis para o usuário final.
+A plataforma não exige que todas as interfaces tenham o mesmo escopo.
+
+A direção atual é:
+
+```text
+Desktop
+→ gerenciamento principal e completo
+
+Mobile
+→ acesso rápido às ações mais frequentes
+```
+
+O Mobile não deve reproduzir automaticamente toda a interface Desktop. Cada funcionalidade deve justificar seu benefício no contexto de uso móvel.
+
+A direção detalhada das interfaces está em `planning/app/`.
+
+---
+
+## Plataforma como centro das capacidades
 
 A direção arquitetural é:
 
@@ -128,19 +126,19 @@ A direção arquitetural é:
 Usuário
    │
    ▼
-HomeServer App
+Interface adequada ao contexto
    │
    ▼
-API
+API / contratos
    │
    ▼
 Capacidade da Plataforma
    │
    ▼
-Infrastructure / Adapters / Serviços
+Infrastructure / Adapters / Módulos
 ```
 
-O App é uma interface da plataforma, não uma segunda implementação dela.
+Uma interface é consumidora da plataforma, não uma segunda implementação dela.
 
 Por isso, a evolução deve preferir:
 
@@ -151,131 +149,84 @@ Contrato apropriado
         ↓
 API, quando exposta a clientes
         ↓
-App / CLI / Integrações
+Desktop / Mobile / CLI / Integrações
 ```
 
-O CLI continua sendo importante para instalação, recuperação, automação,
-testes e diagnóstico avançado.
-
-A existência de uma operação no CLI não significa, entretanto, que essa deva
-permanecer sendo a única forma de executar uma tarefa normal do usuário.
+O CLI continua importante para instalação, recuperação, automação, testes e diagnóstico avançado.
 
 ---
 
 ## Evolução da Plataforma
 
-```text
-Fundação
-   ↓
-Plataforma
-   ↓
-Operação centralizada
-   ↓
-Preparação para modularidade
-   ↓
-Módulos Oficiais
-   ↓
-Ecossistema
-   ↓
-Consolidação
-```
+### Fundação
 
-### Fase 1 — Fundação
+Construir e preservar uma base sólida: arquitetura, Core, sistema de testes, documentação e estrutura de desenvolvimento.
 
-Construir uma base sólida para todo o projeto: arquitetura, Core, sistema de
-testes, documentação e estrutura de desenvolvimento.
+### Plataforma
 
-### Fase 2 — Plataforma
+Disponibilizar capacidades utilizáveis e contratos consistentes para serviços, configuração, gerenciamento e operação do HomeServer.
 
-Disponibilizar capacidades utilizáveis e contratos consistentes para serviços,
-configuração, gerenciamento e operação do HomeServer.
+### Operação centralizada
 
-### Fase 3 — Operação centralizada
+Reduzir progressivamente a necessidade do terminal para tarefas normais por meio de interfaces e APIs adequadas.
 
-Reduzir progressivamente a necessidade do terminal para tarefas normais por
-meio do App e da API.
+### Modularidade
 
-A prioridade é transformar capacidades técnicas em operações compreensíveis e
-orientadas à intenção do usuário.
+Preparar serviços e componentes para evoluírem de forma independente, com responsabilidades claras, dependências explícitas, contratos reutilizáveis e ciclo de instalação/remoção que não comprometa o núcleo ou dados não pertencentes ao módulo.
 
-### Fase 4 — Preparação para modularidade
+### Ecossistema
 
-Preparar serviços e componentes para evoluírem de forma independente, com
-responsabilidades claras, dependências explícitas e contratos reutilizáveis,
-sem criar prematuramente um sistema de plugins ou módulos automáticos.
+Expandir capacidades somente quando necessidades reais justificarem a integração: dispositivos, sincronização, compartilhamento, automações e outros serviços opcionais.
 
-### Fase 5 — Módulos Oficiais
+### Consolidação
 
-Disponibilizar funcionalidades através de módulos independentes somente após o
-contrato de modularidade estar definido, validado e documentado por decisão
-arquitetural. Instalação, atualização, remoção, configuração e versionamento
-fazem parte desse contrato e não devem ser assumidos antes de sua definição.
-
-### Fase 6 — Ecossistema
-
-Transformar o HomeServer em uma plataforma de integração doméstica:
-dispositivos, sincronização, compartilhamento, automações e serviços
-distribuídos.
-
-### Fase 7 — Consolidação
-
-Garantir estabilidade e maturidade: documentação, segurança, desempenho,
-otimizações, manutenção e evolução de longo prazo.
+Validar estabilidade, documentação, segurança, desempenho e manutenção por meio de testes e uso real. A consolidação é contínua e uma release oficial somente ocorre após decisão explícita.
 
 ---
 
-## Critério de sucesso da v1.0
+## Critério de sucesso para uma futura primeira release
 
-Uma pessoa nova deve conseguir:
+Uma pessoa nova deve conseguir, dentro do escopo consolidado:
 
 1. instalar o HomeServer seguindo a documentação;
 2. acessar a plataforma após a instalação;
 3. entender o estado básico do servidor;
 4. localizar e acessar suas principais capacidades;
 5. criar e gerenciar usuários quando autorizado;
-6. utilizar serviços disponíveis;
+6. utilizar serviços e módulos disponíveis;
 7. operar dispositivos e armazenamento nas capacidades suportadas;
-8. executar operações normais pelo App quando essas capacidades estiverem
-   maduras;
+8. executar operações normais pelas interfaces apropriadas;
 9. compreender falhas e receber orientação para recuperação;
-10. realizar essas tarefas sem precisar programar ou utilizar o terminal para
-    operações normais.
+10. realizar essas tarefas sem precisar programar ou utilizar o terminal para operações normais.
 
-O critério prático pode ser resumido como:
-
-> Um novo usuário deve conseguir usar o HomeServer sem precisar abrir o código
-> para descobrir como a plataforma funciona.
-
-A instalação e a administração avançada podem exigir procedimentos técnicos
-explicitamente documentados. A meta é que isso não seja necessário para o uso
-normal após a plataforma estar instalada e configurada.
+A primeira release não possui prazo automático. Ela será considerada quando a base estiver suficientemente consolidada e atender aos critérios definidos em `planning/release/`.
 
 ---
 
 ## Regras de priorização
 
-- Nenhuma nova funcionalidade entra antes que a anterior esteja realmente
-  utilizável.
-- Cada nova fase deve entregar uma melhoria perceptível em confiabilidade,
-  simplicidade ou qualidade de vida.
-- Arquitetura estável é mais importante que quantidade de funcionalidades.
-- Antes de adicionar uma nova capacidade, avaliar se uma capacidade existente
-  já resolve o problema por meio de um contrato que possa ser reutilizado.
-- Uma melhoria técnica deve ser priorizada quando reduz acoplamento, aumenta a
-  confiabilidade ou permite simplificar a experiência futura.
-- Funcionalidades que dependem obrigatoriamente de um serviço externo são
-  tratadas como integrações opcionais, nunca como requisito do núcleo.
-- Operações destrutivas ou de risco devem fornecer confirmação e feedback
-  compreensíveis.
-- Falhas devem priorizar recuperação e orientação antes de expor detalhes
-  técnicos como única resposta.
+- Não adicionar funcionalidades apenas porque podem existir.
+- Priorizar problemas e necessidades observados no uso real.
+- Cada nova capacidade deve entregar melhoria perceptível em confiabilidade, simplicidade ou qualidade de vida.
+- Arquitetura sustentável é mais importante que quantidade de funcionalidades.
+- Antes de adicionar uma nova capacidade, avaliar se uma capacidade existente já resolve o problema.
+- Melhorias técnicas são prioritárias quando reduzem acoplamento, aumentam confiabilidade ou simplificam a evolução futura.
+- Funcionalidades dependentes de serviços externos devem ser opcionais quando não forem necessárias ao núcleo.
+- Módulos opcionais devem poder ser instalados ou removidos sem comprometer o Core ou dados não pertencentes ao módulo.
+- Operações destrutivas ou de risco devem fornecer confirmação e feedback compreensíveis.
+- Falhas devem priorizar recuperação e orientação antes de expor detalhes técnicos como única resposta.
+- Planejamentos podem ser revisados quando novas evidências justificarem a mudança.
 
 ---
 
 ## Relação com outros documentos
 
-- `../docs/reference/PRINCIPLES.md` define os princípios permanentes.
-- `../docs/reference/ARCHITECTURE.md` define as responsabilidades e fronteiras técnicas.
+- `docs/reference/PRINCIPLES.md` define princípios de referência.
+- `docs/reference/ARCHITECTURE.md` define responsabilidades e fronteiras técnicas.
+- `planning/foundations/` registra fundamentos gerais de evolução e validação.
 - `planning/vision.md` define onde o projeto pretende chegar.
-- `planning/roadmap/v1.0.md` define as fases concretas até a v1.0.
+- `planning/roadmap/evolution.md` define fases, prioridades e áreas de consolidação.
+- `planning/app/` registra a direção atual das interfaces Desktop e Mobile.
+- `planning/modules/` define o planejamento dos módulos opcionais.
+- `planning/release/` define critérios e processo para futuras releases oficiais.
 - `planning/quality/` registra critérios e evidências de qualidade.
