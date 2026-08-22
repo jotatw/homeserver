@@ -1,132 +1,160 @@
-# Architecture
-
-## Visão Geral
-
-A Foundation é a biblioteca padrão do HomeServer Core.
-
-Seu objetivo é fornecer funcionalidades genéricas, reutilizáveis e independentes do domínio da aplicação, servindo como base para todas as demais camadas do Core.
-
-A Foundation não implementa regras de negócio e não possui conhecimento sobre aplicações, serviços ou infraestrutura específica do HomeServer.
-
----
-
-# Princípios Arquiteturais
-
-A arquitetura da Foundation é baseada nos seguintes princípios:
-
-- Responsabilidade única.
-- Baixo acoplamento.
-- Alta coesão.
-- Reutilização.
-- Simplicidade.
-- Independência entre camadas.
-- Evolução incremental.
-- Compatibilidade retroativa sempre que possível.
-
----
-
 # Foundation
 
-A Foundation fornece recursos básicos para construção das demais camadas.
+A Foundation reúne componentes básicos e reutilizáveis utilizados para construir outras partes do HomeServer.
 
-Responsabilidades:
+Seu objetivo é reduzir duplicação e fornecer comportamentos comuns sem adquirir conhecimento sobre serviços, módulos ou necessidades específicas da plataforma.
 
-- organização da inicialização do Core;
-- gerenciamento de configuração;
-- constantes do projeto;
+## Quando algo pertence à Foundation?
+
+Uma capacidade é candidata à Foundation quando:
+
+- resolve um problema realmente reutilizável;
+- não depende de um serviço específico;
+- não precisa conhecer uma funcionalidade concreta do HomeServer;
+- possui uma responsabilidade pequena e clara;
+- pode ser usada sem conhecer detalhes da Infrastructure ou de módulos opcionais.
+
+A pergunta prática é:
+
+> **Isso continuaria fazendo sentido se os serviços atuais do HomeServer fossem substituídos?**
+
+Se a resposta for sim, pode ser uma boa candidata à Foundation.
+
+---
+
+## Responsabilidades
+
+Exemplos de responsabilidades adequadas:
+
 - validações genéricas;
-- operações genéricas de arquivos e diretórios;
-- abstrações reutilizáveis.
+- leitura e tratamento comum de configuração;
+- constantes compartilhadas;
+- utilitários reutilizáveis;
+- operações básicas abstraídas quando não dependem do domínio;
+- tratamento comum de resultados e saída.
 
-A Foundation não deve conhecer:
-
-- Docker;
-- Compose;
-- FileBrowser;
-- Homepage;
-- Gitea;
-- Samba;
-- aplicações;
-- serviços específicos do HomeServer.
+Esses exemplos não representam uma lista fixa de diretórios ou arquivos. A organização interna pode evoluir sem alterar a responsabilidade da camada.
 
 ---
 
-# Infrastructure
+## O que não pertence à Foundation?
 
-A Infrastructure é responsável por integrar o Core ao sistema operacional e aos serviços utilizados pelo HomeServer.
+A Foundation não deve conhecer detalhes como:
 
-Responsabilidades:
+- Docker ou Compose;
+- um serviço externo específico;
+- módulos opcionais;
+- regras particulares de Homepage, FileBrowser, Gitea ou outra aplicação;
+- estado específico de uma instalação;
+- lógica de interface;
+- decisões operacionais dependentes do ambiente.
 
-- gerenciamento de serviços;
-- integração com Docker;
-- gerenciamento de ambientes;
-- operações específicas do HomeServer;
-- recursos dependentes da plataforma.
-
-A Infrastructure pode utilizar a Foundation.
-
----
-
-# Applications
-
-A camada Applications implementa as funcionalidades disponibilizadas pelo HomeServer.
-
-Cada aplicação representa um serviço ou funcionalidade construída sobre a Infrastructure.
-
-A camada Applications pode utilizar Infrastructure e Foundation.
+Essas responsabilidades normalmente pertencem à Infrastructure, a uma integração isolada, a um módulo ou a outra capacidade específica.
 
 ---
 
-# Fluxo de Inicialização
+## Relação com outras camadas
 
-A inicialização do Core ocorre em etapas.
+A Foundation pode ser utilizada por componentes superiores, mas deve permanecer independente deles.
 
 ```text
-bootstrap.sh
-        │
-loader.sh
-        │
-Foundation
-        │
-Infrastructure
-        │
-Applications
-```
-
-Cada etapa prepara a próxima camada.
-
----
-
-# Dependências
-
-As dependências devem respeitar a seguinte direção.
-
-```text
-Applications
+Capacidades da plataforma
         ↓
 Infrastructure
         ↓
 Foundation
 ```
 
-Dependências inversas não são permitidas.
+A direção indica dependências preferenciais:
 
-A Foundation nunca deve depender da Infrastructure ou das Applications.
+```text
+Infrastructure → Foundation     permitido
+Módulos → Foundation            permitido quando necessário
+Foundation → Infrastructure     evitar
+Foundation → Módulo             não permitido como dependência
+```
+
+A Foundation não precisa conhecer quem a utiliza.
 
 ---
 
-# Responsabilidade dos Módulos
+## Como evitar uma Foundation genérica demais
 
-Cada módulo deve possuir apenas uma responsabilidade claramente definida.
+Reutilização não significa colocar qualquer código compartilhável na Foundation.
 
-Novas funcionalidades devem ser adicionadas ao módulo correspondente à sua responsabilidade, evitando módulos genéricos ou multifuncionais.
+Antes de adicionar algo, avalie:
+
+1. Existe mais de um uso real ou uma justificativa forte de reutilização?
+2. A responsabilidade é independente do domínio?
+3. A abstração simplifica o restante do código?
+4. A nova dependência reduz ou aumenta a complexidade?
+5. É possível manter uma API pequena e compreensível?
+
+Evite abstrações criadas apenas para uma necessidade hipotética.
+
+Uma solução específica pode permanecer fora da Foundation até que a necessidade de reutilização seja demonstrada.
 
 ---
 
-# Evolução da Arquitetura
+## APIs da Foundation
 
-A arquitetura da Foundation deve permanecer estável.
+Componentes públicos devem fornecer contratos pequenos e previsíveis.
 
-Novas funcionalidades devem ser implementadas preferencialmente por meio da criação de novos módulos, evitando aumentar excessivamente a responsabilidade dos módulos existentes.
+Quando aplicável, o arquivo pode separar sua API pública de detalhes internos:
 
-Alterações arquiteturais devem preservar os princípios definidos neste documento.
+```bash
+#!/usr/bin/env bash
+
+########################################
+# Public API
+########################################
+
+########################################
+# Private
+########################################
+```
+
+Funções internas devem permanecer privadas e não devem ser utilizadas como contrato por outras camadas.
+
+Alterações em uma API pública da Foundation exigem atenção especial porque podem afetar múltiplos consumidores.
+
+---
+
+## Evolução
+
+A Foundation deve crescer lentamente.
+
+O fluxo preferencial é:
+
+```text
+Necessidade específica
+        ↓
+Implementação simples no componente responsável
+        ↓
+Surge reutilização real?
+        ├── não → permanece específica
+        └── sim → avaliar extração para Foundation
+```
+
+Extrair uma capacidade para a Foundation deve simplificar as dependências, não apenas mover código para um local central.
+
+---
+
+## Testes
+
+Componentes reutilizáveis devem possuir validação adequada ao impacto de seus consumidores.
+
+Um erro em uma função compartilhada pode afetar várias capacidades, portanto mudanças em APIs reutilizadas devem considerar regressão e compatibilidade.
+
+Consulte [`../../contribute/TESTING.md`](../../contribute/TESTING.md).
+
+---
+
+## Referências relacionadas
+
+- [`CORE.md`](CORE.md) — papel do núcleo técnico;
+- [`Infrastructure.md`](Infrastructure.md) — capacidades dependentes da plataforma;
+- [`../ARCHITECTURE.md`](../ARCHITECTURE.md) — visão geral;
+- [`../../contribute/DEVELOPMENT.md`](../../contribute/DEVELOPMENT.md) — convenções de implementação.
+
+Voltar para [Referência de arquitetura](README.md).
