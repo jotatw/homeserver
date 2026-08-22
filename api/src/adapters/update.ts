@@ -11,9 +11,21 @@ async function runCore(args: string[]): Promise<string> {
     return stdout.trim();
 }
 
-export interface VersionInfo {
+export type UpdateStatus =
+    | "up_to_date"
+    | "update_available"
+    | "modified"
+    | "ahead"
+    | "diverged"
+    | "unavailable";
+
+export interface UpdateInfo {
+    status: UpdateStatus;
     current: string;
     latest: string;
+    ahead: number;
+    behind: number;
+    dirty: boolean;
     update: boolean;
 }
 
@@ -21,24 +33,26 @@ export async function getVersion(): Promise<string> {
     return runCore(["version"]);
 }
 
-export async function checkUpdate(): Promise<VersionInfo> {
+export async function checkUpdate(): Promise<UpdateInfo> {
     const raw = await runCore(["update", "check"]);
-    return JSON.parse(raw) as VersionInfo;
+    return JSON.parse(raw) as UpdateInfo;
 }
 
-export async function applyUpdate(noRedeploy: boolean): Promise<Record<string, string>> {
-    const args = ["update", "apply"];
-    if (noRedeploy) {
-        args.push("--no-redeploy");
-    }
+export interface UpdateApplyResult {
+    from: string;
+    to: string;
+    recovery: string;
+}
 
+export async function applyUpdate(): Promise<UpdateApplyResult> {
     try {
-        const raw = await runCore(args);
-        const parsed = JSON.parse(raw) as Record<string, string>;
-        return parsed;
+        const raw = await runCore(["update", "apply"]);
+        return JSON.parse(raw) as UpdateApplyResult;
     } catch (error) {
-        const err = error as { stdout?: string };
-        throw new Error(err.stdout?.trim() || "Falha ao aplicar a atualização.");
+        const err = error as { stdout?: string; stderr?: string };
+        throw new Error(
+            err.stderr?.trim() || err.stdout?.trim() || "Falha ao aplicar a atualização."
+        );
     }
 }
 
