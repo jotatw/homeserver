@@ -16,21 +16,13 @@ Cada funcionalidade adicionada deve justificar a complexidade que introduz. A pl
 
 ---
 
-## 2. App-First Administration
+## 2. Interfaces adequadas ao contexto
 
-O HomeServer App é a interface principal de operação e administração da plataforma.
+O HomeServer pode oferecer interfaces com papéis diferentes conforme o contexto de uso.
 
-Funcionalidades destinadas ao uso normal devem possuir um caminho suportado:
+O Desktop é a interface principal para gerenciamento e operações que exigem mais contexto ou controle. O Mobile prioriza acesso rápido às ações frequentes e não precisa reproduzir automaticamente todas as funcionalidades do Desktop.
 
-```text
-Usuário → App → API → Plataforma
-```
-
-O App não substitui a plataforma nem implementa diretamente regras de infraestrutura. Ele utiliza os contratos expostos pela API.
-
-CLI, terminal e acesso direto ao sistema continuam existindo como interfaces avançadas para instalação, recuperação, desenvolvimento, automação, diagnóstico e manutenção técnica.
-
-Nenhuma operação normal destinada ao usuário final deve exigir terminal quando houver uma alternativa razoável para disponibilizá-la pela plataforma.
+As interfaces utilizam capacidades da plataforma por contratos apropriados. Uma capacidade pode ser disponibilizada gradualmente em diferentes interfaces conforme sua utilidade e maturidade.
 
 ---
 
@@ -89,7 +81,7 @@ As camadas internas são responsáveis pelos detalhes técnicos necessários par
 ```text
 Usuário
    ↓
-App
+Interface adequada ao contexto
    ↓
 API
    ↓
@@ -127,11 +119,13 @@ Módulos não devem criar estruturas de dados paralelas fora do modelo oficial.
 
 ---
 
-## 12. Preparação para modularidade
+## 12. Modularidade opcional e preservação de dados
 
 O núcleo da plataforma não deve depender do conhecimento antecipado de todos os módulos que poderão existir no futuro.
 
 Novos módulos devem reutilizar contratos e capacidades existentes sempre que possível. A adição de um módulo não deve exigir alterações arbitrárias em múltiplas camadas apenas para reconhecer sua existência.
+
+Quando um módulo for opcional, sua instalação, indisponibilidade ou remoção não deve comprometer o Core nem dados que não pertençam à responsabilidade declarada do módulo.
 
 O objetivo é evoluir em direção a uma arquitetura onde módulos possam declarar claramente:
 
@@ -141,15 +135,18 @@ O objetivo é evoluir em direção a uma arquitetura onde módulos possam declar
 - seus dados;
 - suas capacidades;
 - seu estado ou health;
-- seus pontos de integração.
+- seus pontos de integração;
+- sua política de instalação, remoção e preservação de dados.
 
-A estrutura concreta para módulos será definida antes de se tornar um contrato oficial da plataforma.
+O contrato concreto de modularidade deve ser definido, validado e documentado antes de novas suposições serem tratadas como comportamento oficial.
 
 ---
 
 ## 13. Automações são desacopladas por hooks
 
 Automações vivem em `automation/hooks/<evento>/`. Cada evento executa os scripts registrados em sua pasta. Novas automações devem poder ser adicionadas sem alterar o código do núcleo.
+
+Automações experimentais podem permanecer fora da base principal enquanto sua utilidade, custo e comportamento ainda estão sendo avaliados.
 
 ---
 
@@ -205,7 +202,7 @@ Sempre que possível, uma falha deve permitir:
 
 O CLI continua sendo uma interface importante do HomeServer, utilizada principalmente para instalação, automação, testes, diagnóstico, recuperação e manutenção avançada.
 
-O CLI pode oferecer capacidades antes da interface visual durante a evolução da plataforma. Porém, funcionalidades consideradas parte da operação normal do usuário final devem ser avaliadas para exposição pela API e pelo App.
+O CLI pode oferecer capacidades antes das interfaces visuais durante a evolução da plataforma. Porém, funcionalidades consideradas parte da operação normal do usuário final devem ser avaliadas para exposição por contratos apropriados e pelas interfaces em que realmente façam sentido.
 
 ---
 
@@ -225,17 +222,19 @@ Mudanças estruturais relevantes devem ser avaliadas e registradas conforme a po
 
 ---
 
-## 20. Maturidade antes de novas funcionalidades
+## 20. Validação antes de consolidação
 
-Nenhuma nova funcionalidade deve ser considerada concluída antes de estar realmente utilizável, validada e documentada.
+Código implementado não é, por si só, evidência de que uma solução está consolidada.
 
-Cada entrega deve priorizar qualidade, estabilidade e coerência antes de ampliar o conjunto de funcionalidades.
+Novas capacidades devem ser avaliadas por implementação, testes, documentação e, quando aplicável, uso no ambiente real. Evidências podem justificar consolidar, melhorar, refatorar, continuar experimentando ou remover uma solução.
 
 ---
 
-## 21. Melhorias perceptíveis
+## 21. Melhorias justificadas
 
-Cada nova versão deve entregar melhorias perceptíveis ao usuário ou à qualidade da plataforma. Uma mudança estrutural sem efeito direto na interface ainda pode ser válida quando aumenta confiabilidade, segurança, manutenção ou capacidade de evolução.
+Cada mudança deve justificar seu custo técnico e operacional. Uma nova funcionalidade pode ser válida quando melhora diretamente a experiência, confiabilidade, segurança, manutenção ou capacidade de evolução.
+
+Funcionalidades não devem ser adicionadas apenas porque poderiam existir.
 
 ---
 
@@ -247,7 +246,7 @@ Arquitetura estável é mais importante que quantidade de funcionalidades. Mudan
 
 ## Definição de módulo
 
-> Um módulo é um componente que pode evoluir de forma independente, reutilizando contratos da plataforma e sem exigir alterações arbitrárias na Foundation ou Infrastructure apenas para existir.
+> Um módulo é um componente opcional ou independente que amplia uma capacidade do HomeServer, reutilizando contratos da plataforma e podendo ser instalado ou removido conforme sua política sem exigir alterações arbitrárias na Foundation ou Infrastructure.
 
 A classificação concreta entre módulos de produto, serviços e outras extensões deve seguir os contratos arquiteturais definidos pelo projeto.
 
@@ -260,11 +259,13 @@ Durante planejamento, implementação e revisão, mudanças relevantes devem ser
 1. Isso reduz ou aumenta a complexidade para o usuário final?
 2. O usuário precisa conhecer detalhes técnicos para concluir a tarefa?
 3. A capacidade possui um contrato claro?
-4. O App depende da API, e não da implementação interna?
+4. A interface depende de contratos, e não da implementação interna?
 5. Existe duplicação de responsabilidade?
 6. Um serviço ou módulo está excessivamente acoplado a outro?
 7. A implementação pode evoluir sem alterar desnecessariamente outras camadas?
 8. Em caso de falha, existe informação e recuperação compreensíveis?
+9. A complexidade adicionada é proporcional ao benefício?
+10. Existe evidência suficiente para consolidar a solução ou ela ainda deve permanecer experimental?
 
 Uma resposta negativa não impede automaticamente uma implementação, mas o compromisso arquitetural e suas consequências devem ser explícitos.
 
@@ -276,6 +277,7 @@ Este documento define os princípios.
 
 - `ARCHITECTURE.md` define a organização das camadas e componentes.
 - ADRs registram decisões arquiteturais específicas e relevantes.
+- `planning/foundations/` registra fundamentos gerais de evolução e validação.
 - `planning/strategy.md` define a direção estratégica do projeto.
-- `planning/roadmap/v1.0.md` define as fases para alcançar os objetivos.
+- `planning/roadmap/evolution.md` define as fases e áreas de evolução.
 - `planning/quality/user-quality-of-life.md` mede como esses princípios se refletem na experiência do usuário.
