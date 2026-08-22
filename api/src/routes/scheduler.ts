@@ -1,11 +1,17 @@
 import type { FastifyInstance } from "fastify";
-import { listScheduler, statusScheduler, enableSchedulerTask, disableSchedulerTask, runSchedulerTask } from "../adapters/scheduler.js";
+import { statusScheduler, enableSchedulerTask, disableSchedulerTask, runSchedulerTask } from "../adapters/scheduler.js";
 import { sendOk, sendError } from "../utils/respond.js";
 import { requireAdmin } from "../plugins/auth.js";
 
 export async function schedulerRoutes(fastify: FastifyInstance) {
+    // GET /api/v1/scheduler — lista em JSON (consumido pelo App)
     fastify.get("/api/v1/scheduler", { preHandler: requireAdmin }, async (request, reply) => {
-        return sendOk(reply, await listScheduler());
+        const raw = await statusScheduler();
+        try {
+            return sendOk(reply, JSON.parse(raw));
+        } catch {
+            return sendOk(reply, raw);
+        }
     });
 
     fastify.get("/api/v1/scheduler/status", { preHandler: requireAdmin }, async (request, reply) => {

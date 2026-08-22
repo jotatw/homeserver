@@ -1,9 +1,5 @@
 import { runHostScheduler } from "../utils/executor.js";
 
-export async function listScheduler() {
-    return runHostScheduler("list");
-}
-
 export async function statusScheduler() {
     return runHostScheduler("status");
 }
