@@ -1,0 +1,7 @@
+server:
+  port: 80
+  sources:
+    - path: /srv
+      name: Storage
+      config:
+        defaultEnabled: true

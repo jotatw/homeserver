@@ -1,0 +1,32 @@
+services:
+  filebrowser:
+
+    # Imagem (FileBrowser Quantum)
+    image: gtstef/filebrowser:stable-slim
+
+    container_name: filebrowser
+    hostname: filebrowser
+
+    restart: unless-stopped
+
+    security_opt:
+      - no-new-privileges:true
+
+    environment:
+      TZ: 
+      FILEBROWSER_ADMIN_PASSWORD: 
+
+    ports:
+      - "8080:80"
+
+    volumes:
+      - /srv/storage:/srv:ro
+      - /srv/services/files/config:/home/filebrowser/data
+      - ./config.yaml:/home/filebrowser/data/config.yaml:ro
+
+    networks:
+      - homeserver
+
+networks:
+  homeserver:
+    external: true
