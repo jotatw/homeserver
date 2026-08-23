@@ -155,11 +155,12 @@ Critérios de aceite da validação:
 - [ ] Caddy servindo `/files` através do novo serviço;
 - [ ] rollback para o FileBrowser atual documentado e testado.
 
+
 ## Evidência da validação prática (2026-08-23)
 
-Ambiente: container  na porta 8081, imagem
- (85,2 MB), montando ,
-banco e cache em .
+Ambiente: container `filebrowser-quantum-test` na porta 8081, imagem
+`gtstef/filebrowser:stable-slim` (85,2 MB), montando `/srv/storage:ro`,
+banco e cache em `/srv/services/filebrowser-quantum/`.
 
 Resultados medidos:
 
@@ -168,23 +169,23 @@ Resultados medidos:
 | RAM em repouso | **36,8 MiB** (original: 35,5 MiB — paridade) |
 | Imagem | 85,2 MB (stable-slim) |
 | Boot + indexação do storage | < 5 s |
-| Login via API () | ✅ JWT |
-| Listagem de arquivos () | ✅ storage real |
-| Gestão de usuários (, Bearer) | ✅ |
+| Login via API (`/api/auth/login`) | ✅ JWT |
+| Listagem de arquivos (`/api/resources`) | ✅ storage real |
+| Gestão de usuários (`/api/users`, Bearer) | ✅ |
 
 Descobertas técnicas importantes:
 
-1. **Bug conhecido [#2317]**: montar um  com bloco 
+1. **Bug conhecido [#2317]**: montar um `config.yaml` com bloco `auth:`
    no primeiro boot quebra a criação da conta admin (401 mesmo com a
    senha correta). Solução: primeiro boot SEM config montado, senha via
-   env ; config mínimo só com
-    e .
-2. **Login**:  com a senha
-   no header  (não vai no body).
-3. **Token de API**: header  — difere do
-   original (). O adapter do Core precisará usar Bearer.
-4. **Endpoints mudaram** em relação ao original:  mantém,
-   mas listagem é .
+   env `FILEBROWSER_ADMIN_PASSWORD`; config mínimo só com
+   `server.port` e `server.sources`.
+2. **Login**: `POST /api/auth/login?username=<u>&recaptcha=` com a senha
+   no header `X-Password` (não vai no body).
+3. **Token de API**: header `Authorization: Bearer <jwt>` — difere do
+   original (`X-Auth`). O adapter do Core precisará usar Bearer.
+4. **Endpoints mudaram** em relação ao original: `/api/users` mantém,
+   mas listagem é `/api/resources?path=&source=Name`.
 
 Critérios de aceite pendentes para decisão final de migração:
 
@@ -193,9 +194,9 @@ Critérios de aceite pendentes para decisão final de migração:
       exige adaptar o adapter para Bearer + novos endpoints;
 - [ ] escopos isolados por usuário funcionando;
 - [ ] upload/download com arquivo > 1 GB;
-- [ ] Caddy servindo  através do novo serviço;
+- [ ] Caddy servindo `/files` através do novo serviço;
 - [ ] rollback para o FileBrowser atual documentado e testado.
 
 Container de teste permanece disponível para avaliação manual da UI:
- (admin / TesteQ2026) — sem restart
+`http://192.168.0.10:8081` (admin / TesteQ2026) — sem restart
 automático; não afeta o FileBrowser atual.
