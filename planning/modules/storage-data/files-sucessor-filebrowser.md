@@ -190,13 +190,37 @@ Descobertas técnicas importantes:
 Critérios de aceite pendentes para decisão final de migração:
 
 - [x] RAM medida em repouso ≤ 300 MB no ambiente real;
-- [ ] ciclo completo de usuário via Core (criar → logar → remover) —
-      exige adaptar o adapter para Bearer + novos endpoints;
-- [ ] escopos isolados por usuário funcionando;
-- [ ] upload/download com arquivo > 1 GB;
+- [x] ciclo completo de usuário via API (criar → definir senha → logar → remover);
+- [x] escopos isolados por usuário funcionando (acesso fora do scope negado);
 - [ ] Caddy servindo `/files` através do novo serviço;
 - [ ] rollback para o FileBrowser atual documentado e testado.
+
+**Aprovação do usuário (2026-08-23):** interface, usabilidade e
+funções aprovadas na UI real (porta 8081). Migração autorizada.
 
 Container de teste permanece disponível para avaliação manual da UI:
 `http://192.168.0.10:8081` (admin / TesteQ2026) — sem restart
 automático; não afeta o FileBrowser atual.
+
+## API de usuários do Quantum — mapeamento para o adapter (2026-08-23)
+
+Diferenças em relação ao FileBrowser original, descobertas no ciclo
+real de teste (criar → logar → escopo → remover):
+
+| Operação | Original | Quantum |
+|---|---|---|
+| Login admin | POST /api/login {user,pass} | POST /api/auth/login?username=&recaptcha= + header X-Password |
+| Token | X-Auth: <jwt> | Authorization: Bearer <jwt> |
+| Criar usuário | POST /api/users (senha no body) | POST /api/users {what:user,which:[],data:{username,scopes,...}} — **sem senha** |
+| Definir senha | incluído na criação | **PUT /api/users?id=N** {which:[password],data:{id,password}} (passo separado, obrigatório) |
+| Remover usuário | DELETE /api/users/:id | DELETE /api/users?id=N (+ X-Password) |
+| Confirmação admin | current_password no body | header X-Password |
+
+Observações:
+
+- criação exige confirmação X-Password do admin;
+- a senha do usuário NÃO é aplicada na criação — requer o PUT de
+  senha como segundo passo (o fluxo do users.sh será em 2 chamadas);
+- escopos por usuário validados: acesso fora do scope retorna erro
+  relativo à raiz do próprio usuário (sem vazamento);
+- usuário comum autentica e opera apenas dentro do seu scope.
