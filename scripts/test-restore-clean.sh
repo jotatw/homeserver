@@ -31,6 +31,7 @@ log() { echo "[restore-test] $*"; }
 
 cleanup() {
     docker rm -f "${CONTAINER}" >/dev/null 2>&1 || true
+    rm -rf "${WORKDIR}" 2>/dev/null || true
 }
 trap cleanup EXIT
 

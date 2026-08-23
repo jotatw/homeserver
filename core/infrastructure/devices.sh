@@ -42,6 +42,97 @@ device_list() {
 }
 
 #
+# Descoberta de dispositivos removíveis conectados (JSON).
+#
+# Lista partições de dispositivos removíveis (pendrive, SD, HD externo)
+# com tudo que o App precisa para montar com 1 clique:
+#   device  -> sdb1            (para hs device mount)
+#   type    -> usb|sdcard|external (sugestão pela origem do transporte)
+#   label   -> rótulo sugerido (LABEL do fs, senão nome da partição)
+#   mounted -> já está montado?
+#   size/fstype/transport/model -> contexto para o usuário decidir
+#
+device_available_json() {
+    python3 - <<'PY' || echo '[]'
+import json, subprocess
+
+try:
+    out = subprocess.run(
+        ["lsblk", "-J", "-o",
+         "NAME,SIZE,TYPE,FSTYPE,MOUNTPOINT,LABEL,TRAN,RM,MODEL"],
+        capture_output=True, text=True, timeout=10
+    ).stdout
+    data = json.loads(out or "{}")
+except Exception:
+    print("[]")
+    raise SystemExit(0)
+
+TRAN_TYPE = {"usb": "usb", "mmc": "sdcard"}
+results = []
+
+def walk(devs, parent_tran="", parent_model=""):
+    for b in devs:
+        removable = bool(b.get("rm"))
+        children = b.get("children") or []
+        tran = (b.get("tran") or parent_tran or "").lower()
+        model = (b.get("model") or parent_model or "").strip()
+
+        # Disco removível SEM tabela de partição (fs direto no disco,
+        # ex.: mídia óptica UDF, alguns pendrives formatados inteiros)
+        if b.get("type") == "disk" and removable and b.get("fstype"):
+            name = b["name"]
+            mountpoint = b.get("mountpoint")
+            dtype = TRAN_TYPE.get(tran, "external")
+            label = (b.get("label") or "").strip().replace(" ", "-").lower()[:32]
+            if not label or not all(c.isalnum() or c in "_-" for c in label):
+                label = name
+            results.append({
+                "device": name,
+                "type": dtype,
+                "label": label,
+                "size": b.get("size", ""),
+                "fstype": (b.get("fstype") or "").lower(),
+                "mounted": bool(mountpoint),
+                "mountpoint": mountpoint,
+                "transport": tran or "unknown",
+                "model": model,
+            })
+
+        # Partição em disco removível
+        if b.get("type") == "part" and removable:
+            name = b["name"]
+            fstype = (b.get("fstype") or "").lower()
+            mountpoint = b.get("mountpoint")
+
+            if tran in TRAN_TYPE:
+                dtype = TRAN_TYPE[tran]
+            else:
+                dtype = "external"
+
+            label = (b.get("label") or "").strip().replace(" ", "-").lower()[:32]
+            if not label or not all(c.isalnum() or c in "_-" for c in label):
+                label = name
+
+            results.append({
+                "device": name,
+                "type": dtype,
+                "label": label,
+                "size": b.get("size", ""),
+                "fstype": fstype,
+                "mounted": bool(mountpoint),
+                "mountpoint": mountpoint,
+                "transport": tran or "unknown",
+                "model": model,
+            })
+
+        walk(children, tran, model)
+
+walk(data.get("blockdevices", []))
+print(json.dumps(results, ensure_ascii=False))
+PY
+}
+
+#
 # Lista dispositivos USB (lsusb).
 #
 device_usb() {
