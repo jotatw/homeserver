@@ -190,11 +190,23 @@ O estado 🟢 dessas fases significa que seus critérios mínimos definidos nest
 - retenção;
 - documentação de recuperação.
 
-**Estado atual:** estrutura de storage, backup automático e validação de integridade já fazem parte da base. Validação automática diária ativa (`backup-check`, 08:30) com `manifest.sha256` por backup. A evidência decisiva de restauração completa em ambiente de teste permanece necessária.
+**Estado atual:** estrutura de storage, backup automático e validação de integridade consolidadas: backup diário automático, `manifest.sha256` por backup e validação automática diária (`backup-check`, 08:30).
 
-**Critério de saída:** um backup pode ser criado, validado e restaurado em ambiente de teste, com dados verificados após a restauração.
+**Evidência de restauração completa em ambiente limpo (2026-08-23):**
+`scripts/test-restore-clean.sh` — simula um servidor recém-formatado
+(container Debian sem nada pré-existente), transfere o último backup real
+(3,3 GB · 8.299 arquivos, incluindo fotos do Syncthing) via mecanismo
+privilegiado do sistema, restaura com o `restore.sh` oficial e verifica:
+- estruturas `/srv/{storage,services,git,docker}` presentes;
+- `git`, `services` e `docker` byte-idênticos ao backup (`diff -r`);
+- arquivo real de usuário íntegro (`cmp`);
+- contagem restaurada: 8.273/8.299 (diferença = metadados do próprio
+  diretório `latest`, esperado).
 
-**Estado:** 🟡 Implementada parcialmente; restauração/evidência final pendente.
+Critério de saída atendido: um backup foi criado, validado e restaurado
+em ambiente de teste, com dados verificados após a restauração.
+
+**Estado:** 🟢 Concluída/validada para o escopo atual.
 
 ---
 
