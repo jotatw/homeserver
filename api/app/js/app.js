@@ -419,52 +419,9 @@ async function renderStorage() {
       el("span", { class: "app-host" }, String(value)))));
   v.appendChild(fgrid);
 
-  // 4. Dispositivos conectados (sempre visível)
-  v.appendChild(el("h3", { class: "section" }, "Dispositivos conectados"));
-  const feed = el("div", { class: "feed" });
-  if (devices && devices.length) {
-    devices.forEach((d) => {
-      const row = el("div", { class: "feed-item" },
-        icon("plug"),
-        el("span", { class: "app-name", style: "overflow:hidden;text-overflow:ellipsis;white-space:nowrap" }, d.label),
-        el("span", { class: "feed-time" }, (d.type || "").toUpperCase()));
-      if (auth.isAdmin()) {
-        const act = el("span", { class: "device-actions" },
-          el("button", { class: "btn btn-secondary", "data-label": d.label, style: "height:var(--hs-touch-compact)" }, "Desmontar"));
-        act.addEventListener("click", async () => {
-          const btn = act.querySelector("button");
-          if (btn.disabled) return;
-          btn.disabled = true;
-          btn.textContent = "…";
-          try {
-            await apiOrFail("/api/v1/devices/unmount", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ type: d.type, label: d.label }),
-            });
-            toast("Dispositivo desmontado: " + d.label, "success");
-            renderStorage();
-          } catch (err) {
-            toast(err.message || "Falha ao desmontar.", "error");
-            btn.disabled = false;
-            btn.textContent = "Desmontar";
-          }
-        });
-        row.appendChild(act);
-      }
-      feed.appendChild(row);
-    });
-  } else {
-    feed.appendChild(el("div", { class: "feed-item" }, "Nenhum dispositivo conectado."));
-  }
-  v.appendChild(feed);
-
-  if (auth.isAdmin()) {
-    const mountBtn = el("button", { class: "btn btn-secondary", style: "margin-top:var(--hs-space-2)" },
-      icon("plug", "ic"), " Montar dispositivo");
-    mountBtn.addEventListener("click", () => openMountDialog());
-    v.appendChild(mountBtn);
-  }
+  // 4. Dispositivos conectados — descoberta automática (montados ou não)
+  v.appendChild(el("h3", { class: "section" }, "Dispositivos"));
+  await renderDevicesSection(devices);
 
   // 5. Navegação de arquivos (FileBrowser)
   v.appendChild(el("div", { class: "empty", style: "padding-top: var(--hs-space-8)" },
@@ -472,6 +429,162 @@ async function renderStorage() {
     "Os arquivos são gerenciados pelo FileBrowser.",
     el("br", {}),
     el("a", { href: "/files/", target: "_blank" }, "Ir para o FileBrowser →")));
+}
+
+/* ---------- Dispositivos (descoberta + 1 clique) ---------- */
+
+async function renderDevicesSection(mountedDevices) {
+  const wrap = el("div");
+  const v = document.getElementById("view");
+  v.appendChild(wrap);
+
+  const feed = el("div", { class: "feed", id: "devices-feed" });
+  wrap.appendChild(feed);
+
+  let available = [];
+  if (auth.isAdmin()) {
+    try {
+      available = await api("/api/v1/devices/available");
+    } catch (_) { /* segue com montados apenas */ }
+  }
+
+  // Índice de removíveis por mountpoint para cruzar com montados
+  const availByMp = {};
+  available.forEach((d) => {
+    if (d.mountpoint) availByMp[d.mountpoint] = d;
+  });
+
+  // --- Removíveis NÃO montados: Conectar com 1 clique ---
+  const unmounted = available.filter((d) => !d.mounted);
+  if (unmounted.length) {
+    feed.appendChild(el("div", { class: "feed-item", style: "background:var(--hs-color-info-soft);font-size:.85rem" },
+      icon("zap"), el("span", {}, "Prontos para conectar")));
+    unmounted.forEach((d) => {
+      const row = el("div", { class: "feed-item module-row" },
+        icon("plug"),
+        el("div", { class: "module-meta" },
+          el("div", { class: "app-name" }, d.label),
+          el("div", { class: "app-host" },
+            `${d.size} · ${d.fstype || "fs?"} · ${d.model || d.transport}`)));
+      if (auth.isAdmin()) {
+        const act = el("span", { class: "device-actions" });
+        const btn = el("button", { class: "btn btn-primary", style: "height:var(--hs-touch-compact)" }, "Conectar");
+        btn.addEventListener("click", async () => {
+          btn.disabled = true;
+          btn.textContent = "Conectando…";
+          try {
+            await apiOrFail("/api/v1/devices/mount", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ type: d.type, label: d.label, device: d.device }),
+            });
+            toast(`${d.label} conectado.`, "success");
+            renderStorage();
+          } catch (err) {
+            toast(err.message || "Falha ao conectar.", "error");
+            btn.disabled = false;
+            btn.textContent = "Conectar";
+          }
+        });
+        act.appendChild(btn);
+        row.appendChild(act);
+      }
+      feed.appendChild(row);
+    });
+  }
+
+  // --- Montados ---
+  if (mountedDevices && mountedDevices.length) {
+    mountedDevices.forEach((d) => {
+      const extra = availByMp[d.mountpoint] || {};
+      const sizeUsed = human(Number(d.size || 0));
+      const modelInfo = extra.model ? ` · ${extra.model}` : "";
+
+      const row = el("div", { class: "feed-item module-row" },
+        el("span", { class: "status-dot ok" }),
+        el("div", { class: "module-meta" },
+          el("div", { class: "app-name" }, d.label),
+          el("div", { class: "app-host" },
+            `${(d.type || "").toUpperCase()}${sizeUsed !== "0 B" ? " · " + sizeUsed : ""}${modelInfo} · ${d.mountpoint}`)));
+
+      if (auth.isAdmin()) {
+        const act = el("span", { class: "device-actions" });
+
+        // Abrir arquivos (FileBrowser hoje; rota do módulo de arquivos no futuro)
+        const openLink = el("a", {
+          href: "/files/" + (d.mountpoint || "").replace(/^\/srv\/storage/, ""),
+          target: "_blank",
+          class: "btn btn-secondary", style: "height:var(--hs-touch-compact);text-decoration:none",
+        }, "Abrir");
+        act.appendChild(openLink);
+
+        // Ejetar (seguro p/ pendrive/SD): desmonta + ejeta em um clique
+        if (extra.device) {
+          const ejBtn = el("button", { class: "btn btn-secondary", style: "height:var(--hs-touch-compact)" }, "Ejetar");
+          ejBtn.addEventListener("click", async () => {
+            if (!confirm(`Ejetar ${d.label}? Aguarde o LED apagar antes de remover.`)) return;
+            ejBtn.disabled = true;
+            ejBtn.textContent = "…";
+            try {
+              await apiOrFail("/api/v1/devices/unmount", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ type: d.type, label: d.label }),
+              });
+              await apiOrFail("/api/v1/devices/eject", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ device: extra.device }),
+              }).catch(() => { }); // eject é best-effort (HD externo sem suporte)
+              toast(`${d.label} pode ser removido com segurança.`, "success");
+              renderStorage();
+            } catch (err) {
+              toast(err.message || "Falha ao ejetar.", "error");
+              ejBtn.disabled = false;
+              ejBtn.textContent = "Ejetar";
+            }
+          });
+          act.appendChild(ejBtn);
+        }
+
+        // Desmontar (sem eject — HD externo que fica conectado)
+        const umBtn = el("button", { class: "btn btn-secondary", style: "height:var(--hs-touch-compact)" }, "Desmontar");
+        umBtn.addEventListener("click", async () => {
+          if (!confirm(`Desmontar ${d.label}?`)) return;
+          umBtn.disabled = true;
+          umBtn.textContent = "…";
+          try {
+            await apiOrFail("/api/v1/devices/unmount", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ type: d.type, label: d.label }),
+            });
+            toast(`${d.label} desmontado.`, "success");
+            renderStorage();
+          } catch (err) {
+            toast(err.message || "Falha ao desmontar.", "error");
+            umBtn.disabled = false;
+            umBtn.textContent = "Desmontar";
+          }
+        });
+        act.appendChild(umBtn);
+
+        row.appendChild(act);
+      }
+      feed.appendChild(row);
+    });
+  } else if (!unmounted.length) {
+    feed.appendChild(el("div", { class: "feed-item" }, "Nenhum dispositivo conectado."));
+  }
+
+  // Dialog manual continua disponível como fallback avançado
+  if (auth.isAdmin()) {
+    const adv = el("details", { class: "ops-menu", style: "margin-top:var(--hs-space-2)" },
+      el("summary", { class: "btn btn-secondary", style: "width:auto;height:var(--hs-touch-compact)" },
+        icon("toolbox", "ic"), " Montagem manual (avançado)"));
+    adv.addEventListener("toggle", () => { if (adv.open && !adv.dataset.ready) { adv.dataset.ready = "1"; openMountDialog(); adv.open = false; } });
+    wrap.appendChild(adv);
+  }
 }
 
 function feedRow(iconName, label, value) {

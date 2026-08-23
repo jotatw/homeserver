@@ -67,8 +67,12 @@ function validateHsArgs(args: string[]): void {
     const sub = args[0];
 
     if (sub === "device") {
-        if (args.length < 2) throw new ExecutorError("device requer subcomando (mount, unmount, eject)");
+        if (args.length < 2) throw new ExecutorError("device requer subcomando (mount, unmount, eject, available)");
         const subSub = args[1];
+        if (subSub === "available") {
+            if (args.length !== 2) throw new ExecutorError("available não aceita argumentos");
+            return; // leitura, sem argumentos
+        }
         if (!["mount", "unmount", "eject"].includes(subSub)) {
             throw new ExecutorError(`device subcomando inválido: ${subSub}. Use: mount, unmount, eject`);
         }
@@ -333,6 +337,13 @@ export async function runHostDevice(subcmd: "mount" | "unmount" | "eject", ...ar
         return runOnHost(["bash", CORE_ON_HOST, "device", "eject", ...args]);
     }
     throw new ExecutorError(`device subcomando inválido: ${subcmd}`);
+}
+
+/**
+ * Descoberta de dispositivos removíveis (device available — leitura via host).
+ */
+export async function runHostDeviceAvailable(): Promise<string> {
+    return runOnHost(["bash", CORE_ON_HOST, "device", "available"], { timeout: 15000 });
 }
 
 export async function runHostModule(subcmd: "definitions" | "instances" | "info" | "status" | "op", ...args: string[]): Promise<string> {

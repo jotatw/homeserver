@@ -43,7 +43,7 @@ Comandos:
   user create <nome> [--password=...] [--gitea]
   user list|info <nome>|password <nome> [--password=...]|verify <nome> <senha>|is-admin <nome>
   user rm <nome> [--remove-folder] [--gitea]
-  device list|status|usb
+  device list|status|usb|available
   device mount <tipo> <rótulo> <dispositivo>
   device unmount <tipo> <rótulo>
   device eject <dispositivo>
@@ -144,13 +144,14 @@ case "${_command}" in
     device)
         _subcommand="${2:-}"
         case "${_subcommand}" in
-            list) device_list ;;
-            status) device_status ;;
-            usb) device_usb ;;
-            mount) mount_device "${3:?tipo}" "${4:?rótulo}" "${5:?dispositivo}" ;;
+            list)    device_list ;;
+            status)  device_status ;;
+            usb)     device_usb ;;
+            available) device_available_json ;;
+            mount)   mount_device "${3:?tipo}" "${4:?rótulo}" "${5:?dispositivo}" ;;
             unmount) unmount_device "${3:?tipo}" "${4:?rótulo}" ;;
-            eject) eject_device "${3:?dispositivo}" ;;
-            *) _usage; exit 1 ;;
+            eject)   eject_device "${3:?dispositivo}" ;;
+            *)       _usage; exit 1 ;;
         esac
         ;;
     module)

@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { getDevices, mountDevice, unmountDevice, ejectDevice } from "../adapters/devices.js";
+import { getDevices, getAvailableDevices, mountDevice, unmountDevice, ejectDevice } from "../adapters/devices.js";
 import { sendOk, sendError, sendInternalError } from "../utils/respond.js";
 import { requireAdmin } from "../plugins/auth.js";
 
@@ -17,6 +17,15 @@ export async function devicesRoutes(fastify: FastifyInstance) {
     fastify.get("/api/v1/devices", async (request, reply) => {
         try {
             return sendOk(reply, await getDevices());
+        } catch (error) {
+            return sendInternalError(reply, request.log, error);
+        }
+    });
+
+    // Descoberta de removíveis conectados (montados ou não) — admin
+    fastify.get("/api/v1/devices/available", { preHandler: requireAdmin }, async (request, reply) => {
+        try {
+            return sendOk(reply, await getAvailableDevices());
         } catch (error) {
             return sendInternalError(reply, request.log, error);
         }

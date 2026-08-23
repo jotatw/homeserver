@@ -1,8 +1,17 @@
 import { cachedRunCore } from "../utils/cache.js";
-import { runHostDevice } from "../utils/executor.js";
+import { runHostDevice, runHostDeviceAvailable } from "../utils/executor.js";
 
 export async function getDevices() {
     const raw = await cachedRunCore("devices", 10000, ["device", "status"]);
+    return JSON.parse(raw);
+}
+
+/**
+ * Descoberta de dispositivos removíveis conectados (montados ou não).
+ * lsblk roda no HOST via nsenter — o container não vê os /dev do host.
+ */
+export async function getAvailableDevices() {
+    const raw = await runHostDeviceAvailable();
     return JSON.parse(raw);
 }
 
