@@ -154,3 +154,48 @@ Critérios de aceite da validação:
 - [ ] upload/download com arquivo > 1 GB;
 - [ ] Caddy servindo `/files` através do novo serviço;
 - [ ] rollback para o FileBrowser atual documentado e testado.
+
+## Evidência da validação prática (2026-08-23)
+
+Ambiente: container  na porta 8081, imagem
+ (85,2 MB), montando ,
+banco e cache em .
+
+Resultados medidos:
+
+| Item | Resultado |
+|---|---|
+| RAM em repouso | **36,8 MiB** (original: 35,5 MiB — paridade) |
+| Imagem | 85,2 MB (stable-slim) |
+| Boot + indexação do storage | < 5 s |
+| Login via API () | ✅ JWT |
+| Listagem de arquivos () | ✅ storage real |
+| Gestão de usuários (, Bearer) | ✅ |
+
+Descobertas técnicas importantes:
+
+1. **Bug conhecido [#2317]**: montar um  com bloco 
+   no primeiro boot quebra a criação da conta admin (401 mesmo com a
+   senha correta). Solução: primeiro boot SEM config montado, senha via
+   env ; config mínimo só com
+    e .
+2. **Login**:  com a senha
+   no header  (não vai no body).
+3. **Token de API**: header  — difere do
+   original (). O adapter do Core precisará usar Bearer.
+4. **Endpoints mudaram** em relação ao original:  mantém,
+   mas listagem é .
+
+Critérios de aceite pendentes para decisão final de migração:
+
+- [x] RAM medida em repouso ≤ 300 MB no ambiente real;
+- [ ] ciclo completo de usuário via Core (criar → logar → remover) —
+      exige adaptar o adapter para Bearer + novos endpoints;
+- [ ] escopos isolados por usuário funcionando;
+- [ ] upload/download com arquivo > 1 GB;
+- [ ] Caddy servindo  através do novo serviço;
+- [ ] rollback para o FileBrowser atual documentado e testado.
+
+Container de teste permanece disponível para avaliação manual da UI:
+ (admin / TesteQ2026) — sem restart
+automático; não afeta o FileBrowser atual.
