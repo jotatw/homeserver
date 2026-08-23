@@ -19,7 +19,9 @@ fi
 LOG_FILE="${HS_LOG_DIR}/homeserver-backup.log"
 
 log() {
-    printf '[%s] %s\n' "$(date '+%F %T')" "$*" >> "${LOG_FILE}"
+    # Tolerante a falha de permissão (execução como usuário comum não
+    # deve abortar a validação — o timer roda como root e consegue gravar).
+    printf '[%s] %s\n' "$(date '+%F %T')" "$*" >> "${LOG_FILE}" 2>/dev/null || true
 }
 
 log "[backup-check] Validando backup"

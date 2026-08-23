@@ -54,8 +54,9 @@ backup_validate_json() {
     fi
 
     if [[ -d "${latest}/storage" ]]; then
+        # -print -quit: para no primeiro arquivo (sem SIGPIPE com pipefail)
         local cnt
-        cnt="$(find "${latest}/storage" -type f 2>/dev/null | head -n 1 | wc -l)"
+        cnt="$(find "${latest}/storage" -type f -print -quit 2>/dev/null | wc -l)"
         if [[ "${cnt}" -gt 0 ]]; then
             checks="${checks} \"storage\":\"ok\","
         else

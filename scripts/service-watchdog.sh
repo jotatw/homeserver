@@ -21,7 +21,9 @@ LOG_FILE="${HS_LOG_DIR}/homeserver-watchdog.log"
 CONF="${HS_PROJECT_ROOT}/config/services.conf"
 
 log() {
-    printf '[%s] %s\n' "$(date '+%F %T')" "$*" >> "${LOG_FILE}"
+    # Tolerante a falha de permissão (execução como usuário comum não
+    # deve abortar a verificação — o timer roda como root e consegue gravar).
+    printf '[%s] %s\n' "$(date '+%F %T')" "$*" >> "${LOG_FILE}" 2>/dev/null || true
 }
 
 # Serviços habilitados (config/services.conf, linhas não-comentadas).
