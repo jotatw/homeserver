@@ -190,7 +190,7 @@ O estado 🟢 dessas fases significa que seus critérios mínimos definidos nest
 - retenção;
 - documentação de recuperação.
 
-**Estado atual:** estrutura de storage, backup automático e validação de integridade já fazem parte da base. A evidência decisiva de restauração completa em ambiente de teste permanece necessária.
+**Estado atual:** estrutura de storage, backup automático e validação de integridade já fazem parte da base. Validação automática diária ativa (`backup-check`, 08:30) com `manifest.sha256` por backup. A evidência decisiva de restauração completa em ambiente de teste permanece necessária.
 
 **Critério de saída:** um backup pode ser criado, validado e restaurado em ambiente de teste, com dados verificados após a restauração.
 
@@ -236,11 +236,32 @@ O estado 🟢 dessas fases significa que seus critérios mínimos definidos nest
 - tarefas recorrentes;
 - recuperação automática quando apropriado.
 
-**Estado atual:** já existem automações, backup automático, scheduler e fluxos de energia. Pequenas automações adicionais podem permanecer em experimentação fora da base principal até que sua utilidade, custo e impacto sejam avaliados. A validação completa de falhas, recuperação e possibilidade de desabilitar automações opcionais sem impacto no núcleo deve ser consolidada.
+**Estado atual:** automações consolidadas e validadas em uso real (2026-08-23):
+backup automático diário, validação diária de backup (`backup-check`),
+watchdog de serviços a cada 15 min (`service-watchdog`), fluxos de energia
+(night-off S3 + religamento por RTC) e scheduler gerenciável pelo App.
 
-**Critério de saída:** automações possuem execução previsível, logs e tratamento de falhas quando aplicável; automações opcionais podem ser desabilitadas ou removidas sem quebrar o núcleo do sistema.
+Evidência do primeiro ciclo completo (2026-08-22 → 2026-08-23):
 
-**Estado:** 🟡 Implementada parcialmente; consolidação operacional pendente.
+```text
+22:00  night-off suspendeu o servidor (S3) com religamento agendado
+08:00  servidor acordou sozinho via alarme RTC
+08:00  backup executado automaticamente (catch-up do timer 07:30,
+       Persistent=true — o horário 07:30 cai dentro da janela de S3)
+08:30  backup-check validou o último backup (após correções de SIGPIPE
+       e permissão de log encontradas nesse primeiro ciclo)
+12:00  watchdog executando a cada 15 min sem reinícios indevidos
+```
+
+Correções geradas pela evidência: `find | head` recebia SIGPIPE com
+pipefail e abortava a validação; `log()` dos scripts abortava o script
+quando executado sem permissão de gravação. Ambos corrigidos.
+
+Critério de saída atendido: execução previsível (timers ativos), logs
+(`homeserver-{backup,watchdog,power}.log`) e tratamento de falhas;
+automações opcionais podem ser desabilitadas sem impacto no núcleo.
+
+**Estado:** 🟢 Concluída/validada para o escopo atual.
 
 ---
 
