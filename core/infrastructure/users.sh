@@ -93,8 +93,17 @@ hs_user_create() {
         chmod 755 "${user_dir}" 2>/dev/null || true
     fi
 
+    # Quantum: criação em 2 passos (conta + senha)
     token="$(filebrowser_login)"
-    filebrowser_create_user "${token}" "${username}" "${password}" "${scope}"
+    filebrowser_create_user "${token}" "${username}" "${scope}"
+
+    local uid
+    uid="$(filebrowser_user_id "${username}")"
+    if [[ -z "${uid}" ]]; then
+        echo "Falha ao obter id do usuário criado: ${username}" >&2
+        return 1
+    fi
+    filebrowser_update_password "${token}" "${uid}" "${password}"
 
     if [[ ${gitea} -eq 1 ]]; then
         hs_user_create_gitea "${username}" "${password}" "${email}"
@@ -193,6 +202,7 @@ hs_user_password() {
 
     token="$(filebrowser_login)"
     filebrowser_update_password "${token}" "${id}" "${password}"
+    # (PUT do Quantum já substitui a senha — sem mudança de fluxo aqui)
 
     echo "Senha alterada para: ${username}" >&2
     printf '{"username":"%s","password":"%s"}\n' "${username}" "${password}"
