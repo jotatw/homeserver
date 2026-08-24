@@ -93,17 +93,8 @@ hs_user_create() {
         chmod 755 "${user_dir}" 2>/dev/null || true
     fi
 
-    # Quantum: criação em 2 passos (conta + senha)
     token="$(filebrowser_login)"
-    filebrowser_create_user "${token}" "${username}" "${scope}"
-
-    local uid
-    uid="$(filebrowser_user_id "${username}")"
-    if [[ -z "${uid}" ]]; then
-        echo "Falha ao obter id do usuário criado: ${username}" >&2
-        return 1
-    fi
-    filebrowser_update_password "${token}" "${uid}" "${password}"
+    filebrowser_create_user "${token}" "${username}" "${password}" "${scope}"
 
     if [[ ${gitea} -eq 1 ]]; then
         hs_user_create_gitea "${username}" "${password}" "${email}"
@@ -202,7 +193,6 @@ hs_user_password() {
 
     token="$(filebrowser_login)"
     filebrowser_update_password "${token}" "${id}" "${password}"
-    # (PUT do Quantum já substitui a senha — sem mudança de fluxo aqui)
 
     echo "Senha alterada para: ${username}" >&2
     printf '{"username":"%s","password":"%s"}\n' "${username}" "${password}"
@@ -285,12 +275,38 @@ hs_user_verify() {
 #   1 -> não é admin / não encontrado
 #
 hs_user_is_admin() {
-    local username="${1:?nome do usuário}"
+    local username="${1:?nome do usuario}"
 
-    local entry
-    entry="$(filebrowser_list_users | grep -oE "\"username\":\"${username}\",[^}]*" | head -1)"
+    # Container da API nao tem python3: tenta node primeiro.
+    if command -v node >/dev/null 2>&1; then
+        filebrowser_list_users | node -e '
+const name = process.argv[1];
+let d = "";
+process.stdin.on("data", c => d += c);
+process.stdin.on("end", () => {
+  try {
+    const users = JSON.parse(d);
+    const u = users.find(x => x.username === name);
+    const admin = u && ((u.permissions && u.permissions.admin) ||
+                        (u.perm && u.perm.admin));
+    process.exit(admin ? 0 : 1);
+  } catch (e) { process.exit(1); }
+});' "$username"
+        return $?
+    fi
 
-    [[ -n "${entry}" ]] || return 1
-
-    printf '%s' "${entry}" | grep -qE '"admin":true'
+    # Host (CLI): python3 disponivel.
+    filebrowser_list_users | python3 -c "
+import json, sys
+name = '$username'
+try:
+    users = json.load(sys.stdin)
+except Exception:
+    raise SystemExit(1)
+for u in users:
+    if u.get('username') == name:
+        p = (u.get('permissions') or u.get('perm') or {})
+        raise SystemExit(0 if p.get('admin') else 1)
+raise SystemExit(1)
+" 2>/dev/null
 }
