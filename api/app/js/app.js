@@ -428,7 +428,7 @@ async function renderStorage() {
     icon("folder", "empty-icon"),
     "Os arquivos são gerenciados pelo FileBrowser.",
     el("br", {}),
-    el("a", { href: "/files/", target: "_blank" }, "Ir para o FileBrowser →")));
+    el("a", { href: "http://" + window.location.hostname + ":8080", target: "_blank" }, "Abrir FileBrowser →")));
 }
 
 /* ---------- Dispositivos (descoberta + 1 clique) ---------- */
@@ -512,7 +512,7 @@ async function renderDevicesSection(mountedDevices) {
 
         // Abrir arquivos (FileBrowser hoje; rota do módulo de arquivos no futuro)
         const openLink = el("a", {
-          href: "/files/" + (d.mountpoint || "").replace(/^\/srv\/storage/, ""),
+          href: "http://" + window.location.hostname + ":8080",
           target: "_blank",
           class: "btn btn-secondary", style: "height:var(--hs-touch-compact);text-decoration:none",
         }, "Abrir");
