@@ -27,6 +27,7 @@ export async function appRoutes(fastify: FastifyInstance) {
     };
 
     fastify.get("/app", serve("index.html"));
+    fastify.get("/app/", (req, reply) => { reply.code(301).redirect("/app"); });
 
     // Serve os estáticos do App (html/css/js/assets) em /app/<caminho>.
     fastify.get("/app/*", (req, reply) => {
