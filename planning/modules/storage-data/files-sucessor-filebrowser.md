@@ -156,7 +156,12 @@ Critérios de aceite da validação:
       integridade md5 OK, RAM pico ~51 MiB, upload 6,6 MB/s, download
       26,9 MB/s);
 - [x] acesso via porta dedicada 8080 (substitui a rota `/files`, removida do Caddy);
-- [ ] rollback para o FileBrowser atual documentado e testado (pendente).
+- [x] **rollback para o FileBrowser original** documentado e testado (2026-08-25):
+      `docker compose down modules/files` → `docker compose up modules/filebrowser`
+      → container legado healthy + DB original preservado;
+      `docker compose down modules/filebrowser` → `docker compose up modules/files`
+      → Quantum healthy + login OK. As senhas do ambiente legado são as
+      **pré-migração** (o DB legado permanece em `/srv/services/filebrowser/database/`).
 
 
 ## Evidência da validação prática (2026-08-23)
@@ -246,11 +251,19 @@ Pendências honestas (não resolvidas, registradas para não mascarar):
       de dependências corrigida (herestring em vez de stdin vazio).
       NOPASSWD restrito configurado em `/etc/sudoers.d/hs-modules`
       para automação.
-- [ ] **Rollback para o FileBrowser original** documentado e testado.
+- [x] **Rollback para o FileBrowser original** documentado e testado
+      (2026-08-25): `docker compose down modules/files` →
+      `up modules/filebrowser` (legado healthy, DB preservado) →
+      retorno ao Quantum (healthy, login OK). Senhas do legado são as
+      pré-migração; DB legado permanece em
+      `/srv/services/filebrowser/database/`.
 - [x] **Upload/download com arquivo > 1 GB** validado no ambiente real
       (2026-08-25, 1,5 GB — detalhes na seção de critérios de aceite;
       exigiu corrigir o volume `:ro` e usar o formato de upload de corpo
       cru com `X-File-Total-Size`).
-- [ ] Limpeza do módulo antigo `modules/filebrowser/` (EOL) quando a
-      instância antiga (`filebrowser`) for removida e o rollback
-      estiver documentado.
+- [~] **Limpeza do módulo antigo `modules/filebrowser/` (EOL)** — módulo
+      removido do repo e referências atualizadas (`services.conf`,
+      install, testes) em 2026-08-25. Falta remover a instância antiga
+      (`filebrowser`) no servidor via novo comando
+      `hs module instance remove filebrowser`. Artefatos de rollback
+      preservados fora do repo (`/srv/docker/compose/filebrowser/`).

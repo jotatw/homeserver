@@ -410,6 +410,30 @@ module_instance_add() {
 }
 
 #
+# Remove a instância registrada de um módulo.
+#
+# Remove o registro (instances/) e o último estado (state/).
+# Não toca no container nem nos dados — é apenas administrativo.
+#
+module_instance_remove() {
+    local name="${1:?nome da instância}"
+    local file state
+
+    module_instance_exists "${name}" || {
+        echo "Instância não encontrada: ${name}" >&2
+        return 1
+    }
+
+    file="${HS_MODULES_STATE}/instances/${name}.json"
+    state="${HS_MODULES_STATE}/state/${name}.json"
+
+    _module_sdo rm -f "${file}" || return 1
+    _module_sdo rm -f "${state}" || return 1
+
+    printf '{"name":"%s","removed":true}\n' "${name}"
+}
+
+#
 # Garante os diretórios de estado do Module Core.
 #
 _module_ensure_state() {

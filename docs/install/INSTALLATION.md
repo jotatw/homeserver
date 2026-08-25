@@ -21,7 +21,7 @@
 3. **Cria** a estrutura `/srv` (storage, backup, scripts).
 4. **Gera** o `api/.env` (senha do FileBrowser + token de serviço).
 5. **Implanta** os módulos ativos (`config/services.conf`):
-   `filebrowser`, `gitea`, `homepage`, `caddy` (padrão).
+   `files`, `gitea`, `homepage`, `caddy` (padrão).
 6. **Implanta** a API (`api/compose.yaml`).
 7. **Inicializa** o Core (`core/hs.sh`).
 8. **Configura** firewall (UFW), backup (diário 03h) e agenda de energia
@@ -43,7 +43,7 @@ sudo bash install.sh
 
 | Flag | Efeito |
 |---|---|
-| `--modules=filebrowser,gitea` | Implanta só os módulos listados |
+| `--modules=files,gitea` | Implanta só os módulos listados |
 | `--assume-yes` | Responde "sim" a todas as perguntas |
 | `--non-interactive` | Sem perguntas — usa valores detectados e senhas geradas |
 | `--dry-run` | Mostra o que seria feito sem executar deploys |
@@ -84,7 +84,7 @@ sudo bash install.sh
 
 ### Portas ocupadas
 
-Os serviços usam: `3000` (homepage), `3001` (gitea), `8080` (filebrowser),
+Os serviços usam: `3000` (homepage), `3001` (gitea), `8080` (files),
 `8000` (api), `2222` (gitea ssh). Verifique se estão livres antes de instalar.
 
 ### Rede diferente de `192.168.x.0/24`
