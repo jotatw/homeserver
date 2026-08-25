@@ -25,6 +25,8 @@ O Baseline v0.1.0 é a referência conceitual do estado inicial da consolidaçã
 - Validação diária do último backup.
 - Scheduler integrado à API e à interface administrativa conforme a capacidade implementada.
 - Migração do FileBrowser para o **FileBrowser Quantum** (`gtstef/filebrowser:stable-slim`) como módulo `files`: porta dedicada 8080 (rota `/files` do Caddy removida), adapter com cache de token JWT (evita rate limit 429), criação de usuário em 2 passos (conta + senha) e parse estrutural de JSON; ver `planning/modules/storage-data/files-sucessor-filebrowser.md`.
+- Acesso ao FileBrowser Quantum via subpath `/files/` (HTTPS pelo Caddy): `server.baseURL=/files` nativo do Quantum, sem `handle_path`; a porta 8080 permanece para acesso direto em LAN.
+- Comando `hs module instance remove <nome>` no Core (antes só existia `add`; remoção era manual com sudo).
 
 ### Alterado
 
@@ -36,6 +38,13 @@ O Baseline v0.1.0 é a referência conceitual do estado inicial da consolidaçã
 - O roadmap ativo passou a ser `planning/roadmap/evolution.md`.
 - O modelo de interfaces passou a distinguir Desktop como interface principal, Mobile como acesso rápido e CLI como interface avançada.
 - Tags e Releases deixaram de ser utilizadas apenas para marcar etapas intermediárias de desenvolvimento.
+
+### Corrigido
+
+- `service_directory()` no Core passou a resolver módulos declarativos em `modules/<id>/` antes do fallback legado `/srv/docker/compose/<id>/`; sem isso, `hs module status/op` reportava `observed: desconhecido` para módulos novos.
+- Validação de dependências de módulos lia JSON de stdin vazio (`python3 - <<PY` consumia o próprio script como stdin), abortando toda operação com `JSONDecodeError`; corrigida para herestring.
+- Storage do Quantum estava montado `:ro` (herdado do container de teste do piloto), tornando uploads impossíveis por configuração; corrigido para leitura e escrita. Upload/download > 1 GB validado no ambiente real (integridade md5, RAM pico ~51 MiB).
+- Tela em branco ao abrir `/files/`: o frontend do Quantum usa caminhos absolutos e 404ava atrás de subpath; resolvido com `server.baseURL=/files` + `handle` (sem strip) no Caddy. Adapter e health-check alinhados ao novo caminho da API.
 
 ### Segurança e privacidade
 
