@@ -115,7 +115,7 @@ hs_user_create() {
     printf '  "username": "%s",\n' "${username}"
     printf '  "scope": "%s",\n' "${scope}"
     printf '  "password": "%s",\n' "${password}"
-    printf '  "filebrowser": true,\n'
+    printf '  "files": true,\n'
     printf '  "gitea": %s\n' "$([ "${gitea}" -eq 1 ] && echo true || echo false)"
     printf '}\n'
 }
