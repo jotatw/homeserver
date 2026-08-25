@@ -55,7 +55,7 @@ hs_user_create() {
     local username="${1:?nome do usuário}"
     shift
     local password="" email="" gitea=0
-    local token scope
+    local token id scope
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
@@ -94,7 +94,15 @@ hs_user_create() {
     fi
 
     token="$(filebrowser_login)"
-    filebrowser_create_user "${token}" "${username}" "${password}" "${scope}"
+    filebrowser_create_user "${token}" "${username}" "${scope}"
+
+    # Quantum: a criacao NAO define senha. O 2o passo (PUT) aplica.
+    id="$(filebrowser_user_id "${username}")"
+    if [[ -z "${id}" ]]; then
+        echo "Falha ao localizar usuário recém-criado: ${username}" >&2
+        return 1
+    fi
+    filebrowser_update_password "${token}" "${id}" "${password}"
 
     if [[ ${gitea} -eq 1 ]]; then
         hs_user_create_gitea "${username}" "${password}" "${email}"
@@ -143,18 +151,45 @@ hs_user_list() {
 #
 hs_user_info() {
     local username="${1:?nome do usuário}"
+    local out
+    out="$(filebrowser_list_users)" || return 1
 
-    if command -v python3 >/dev/null 2>&1; then
-        filebrowser_list_users | python3 -c "
-import sys, json
-users = json.load(sys.stdin)
-u = next((x for x in users if x['username'] == '${username}'), None)
+    # Container da API nao tem python3: node primeiro; host usa python3.
+    if command -v node >/dev/null 2>&1; then
+        printf '%s' "${out}" | node -e '
+const name = process.argv[1];
+let d = "";
+process.stdin.on("data", c => d += c);
+process.stdin.on("end", () => {
+  try {
+    const users = JSON.parse(d);
+    const u = users.find(x => x.username === name);
+    if (!u) process.exit(1);
+    const scopes = (u.scopes || []).map(s => s.scope).join(", ") || u.scope || "";
+    const p = u.permissions || u.perm || {};
+    console.log("username:", u.username);
+    console.log("scope   :", scopes);
+    console.log("admin   :", p.admin === true);
+    console.log("locale  :", u.locale || "");
+  } catch { process.exit(1); }
+});' "${username}"
+    elif command -v python3 >/dev/null 2>&1; then
+        printf '%s' "${out}" | HS_USERNAME="${username}" python3 -c "
+import json, os, sys
+try:
+    users = json.load(sys.stdin)
+except Exception:
+    raise SystemExit(1)
+name = os.environ['HS_USERNAME']
+u = next((x for x in users if x.get('username') == name), None)
 if not u:
     raise SystemExit(1)
+scopes = ', '.join(s.get('scope', '') for s in (u.get('scopes') or [])) or u.get('scope', '')
+p = u.get('permissions') or u.get('perm') or {}
 print('username:', u['username'])
-print('scope   :', u['scope'])
-print('admin   :', u['perm']['admin'])
-print('locale  :', u['locale'])
+print('scope   :', scopes)
+print('admin   :', p.get('admin') is True)
+print('locale  :', u.get('locale', ''))
 "
     else
         filebrowser_list_users | grep -oE "\"username\":\"${username}\"[^}]*" | head -1
