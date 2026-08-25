@@ -1,11 +1,16 @@
 /* ============================================================
- * HomeServer App — Design Tokens (v2.0)
- * Fonte: design/app/tokens/ (dark padrão, light completo)
+ * HomeServer App — Design Tokens (Sprint UX-01: Fundação visual)
+ * Fonte da verdade: design/app/tokens/*.md
+ * Este arquivo É a implementação dos tokens documentados lá.
+ * Qualquer token novo nasce no .md e chega aqui.
  * ============================================================ */
 
+/* ------------------------------------------------------------
+ * 1. TEMA DARK (padrão)
+ * ------------------------------------------------------------ */
 :root,
 [data-theme="dark"] {
-  /* Neutros — fundos e superfícies */
+  /* Cores — neutros (fundo/superfícies) */
   --hs-bg: #0f172a;
   --hs-surface: #1e293b;
   --hs-surface-raised: #263449;
@@ -15,13 +20,13 @@
   --hs-border: #334155;
   --hs-border-strong: #475569;
 
-  /* Texto */
+  /* Cores — texto */
   --hs-text: #e2e8f0;
   --hs-text-muted: #94a3b8;
   --hs-text-faint: #64748b;
   --hs-text-inverse: #0f172a;
 
-  /* Ação (primária) */
+  /* Cores — ação (primária) */
   --hs-primary: #2563eb;
   --hs-primary-hover: #3b82f6;
   --hs-primary-active: #1d4ed8;
@@ -29,7 +34,7 @@
   --hs-primary-focus: #93c5fd;
   --hs-on-primary: #ffffff;
 
-  /* Estado (status) */
+  /* Cores — estado (semânticos) */
   --hs-color-ok: #22c55e;
   --hs-color-ok-soft: rgba(34, 197, 94, 0.16);
   --hs-color-warn: #eab308;
@@ -40,12 +45,16 @@
   --hs-color-info-soft: rgba(56, 189, 248, 0.16);
 
   /* Elevação */
+  --hs-shadow-none: none;
   --hs-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
   --hs-shadow-md: 0 2px 8px rgba(0, 0, 0, 0.35);
   --hs-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.45);
   --hs-shadow-focus: 0 0 0 3px var(--hs-primary-focus);
 }
 
+/* ------------------------------------------------------------
+ * 2. TEMA LIGHT
+ * ------------------------------------------------------------ */
 [data-theme="light"] {
   --hs-bg: #f8fafc;
   --hs-surface: #ffffff;
@@ -59,7 +68,7 @@
   --hs-text: #0f172a;
   --hs-text-muted: #475569;
   --hs-text-faint: #64748b;
-  --hs-text-inverse: #0f172a;
+  --hs-text-inverse: #f8fafc;
 
   --hs-primary: #2563eb;
   --hs-primary-hover: #1d4ed8;
@@ -68,61 +77,110 @@
   --hs-primary-focus: #2563eb;
   --hs-on-primary: #ffffff;
 
-  --hs-color-ok: #22c55e;
-  --hs-color-ok-soft: rgba(34, 197, 94, 0.14);
-  --hs-color-warn: #eab308;
-  --hs-color-warn-soft: rgba(234, 179, 8, 0.14);
-  --hs-color-danger: #ef4444;
-  --hs-color-danger-soft: rgba(239, 68, 68, 0.14);
-  --hs-color-info: #38bdf8;
-  --hs-color-info-soft: rgba(56, 189, 248, 0.14);
+  --hs-color-ok: #16a34a;
+  --hs-color-ok-soft: rgba(22, 163, 74, 0.14);
+  --hs-color-warn: #ca8a04;
+  --hs-color-warn-soft: rgba(202, 138, 4, 0.14);
+  --hs-color-danger: #dc2626;
+  --hs-color-danger-soft: rgba(220, 38, 38, 0.14);
+  --hs-color-info: #0284c7;
+  --hs-color-info-soft: rgba(2, 132, 199, 0.14);
 
+  --hs-shadow-none: none;
   --hs-shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.1);
   --hs-shadow-md: 0 4px 12px rgba(15, 23, 42, 0.12);
   --hs-shadow-lg: 0 10px 30px rgba(15, 23, 42, 0.18);
   --hs-shadow-focus: 0 0 0 3px var(--hs-primary-focus);
 }
 
-/* Tipografia e espaçamento (herança v1.4) */
+/* ------------------------------------------------------------
+ * 3. TIPOGRAFIA — família + escala semântica
+ *    (tokens/typography.md; pesos acompanham o uso)
+ * ------------------------------------------------------------ */
 :root {
   --hs-font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --hs-font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 
+  --hs-display: 1.5rem;      /* marca / título de tela (mobile)   · 700 */
+  --hs-heading-lg: 1.25rem;  /* título de tela (desktop)          · 700 */
+  --hs-heading: 1.05rem;     /* título de seção/card principal    · 600 */
+  --hs-title: 0.95rem;       /* título de grupo                   · 600 */
+  --hs-body: 0.95rem;        /* texto padrão                      · 400 */
+  --hs-card-name: 1.05rem;   /* nome do card de aplicação         · 600 */
+  --hs-card-desc: 0.82rem;   /* descrição de card                 · 400 */
+  --hs-label: 0.8rem;        /* cabeçalho de tabela, label        · 600 */
+  --hs-meta: 0.75rem;        /* rodapé, versão, hints             · 400 */
+  --hs-code: 0.85rem;        /* paths, containers (mono)          · 400 */
+  --hs-button: 0.9rem;       /* labels de botão                   · 600 */
+  --hs-input: 1rem;          /* valor de input (≥16px iOS)        · 400 */
+}
+
+/* ------------------------------------------------------------
+ * 4. ESPAÇAMENTO E LAYOUT
+ *    (tokens/spacing.md + layout.md)
+ * ------------------------------------------------------------ */
+:root {
   --hs-space-1: 0.25rem;
   --hs-space-2: 0.5rem;
   --hs-space-3: 0.75rem;
   --hs-space-4: 1rem;
+  --hs-space-5: 1.25rem;
   --hs-space-6: 1.5rem;
   --hs-space-8: 2rem;
+  --hs-space-10: 2.5rem;
+  --hs-space-12: 3rem;
 
-  --hs-touch: 3rem;
-  --hs-touch-compact: 2.5rem;
+  --hs-touch: 3rem;          /* alvo mínimo de toque */
+  --hs-touch-compact: 2.5rem;/* ação secundária compacta */
   --hs-sidebar-w: 15rem;
   --hs-bottomnav-h: 3.5rem;
   --hs-topbar-h: 3.5rem;
   --hs-max-content: 72rem;
-
-  --hs-radius-sm: 0.25rem;
-  --hs-radius-md: 0.5rem;
-  --hs-radius-lg: 0.625rem;
-  --hs-radius-xl: 0.75rem;
-  --hs-radius-full: 9999px;
-
-  --hs-motion-fast: 120ms;
-  --hs-motion-base: 200ms;
-  --hs-motion-slow: 300ms;
 }
 
-/* Modo compacto (html.compact) — densidade maior sem perder toque.
- * Só troca tokens: nenhum componente precisa de regra própria.
- * Persistido por usuário em localStorage("hs_density"). */
+/* ------------------------------------------------------------
+ * 5. RAIOS DE BORDA
+ *    (tokens/radius.md)
+ * ------------------------------------------------------------ */
+:root {
+  --hs-radius-sm: 0.25rem;   /* chips, badges */
+  --hs-radius-md: 0.5rem;    /* tabelas, inputs técnicos */
+  --hs-radius-lg: 0.625rem;  /* cards padrão */
+  --hs-radius-xl: 0.75rem;   /* dialogs, destaques */
+  --hs-radius-full: 9999px;  /* dots, avatares, chips redondos */
+}
+
+/* ------------------------------------------------------------
+ * 6. MOVIMENTO — duração + easing
+ *    (tokens/motion.md)
+ * ------------------------------------------------------------ */
+:root {
+  --hs-motion-instant: 0ms;
+  --hs-motion-fast: 120ms;   /* hover/focus/pressed */
+  --hs-motion-base: 200ms;   /* toasts, badges, fade */
+  --hs-motion-slow: 300ms;   /* dialog/sheet/menu */
+  --hs-motion-slower: 400ms; /* transições maiores */
+
+  --hs-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --hs-ease-emphasized: cubic-bezier(0.3, 0, 0, 1);
+  --hs-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ------------------------------------------------------------
+ * 7. DENSIDADE — modo compacto (html.compact)
+ *    Só troca tokens: nenhum componente tem regra própria.
+ *    Persistido por usuário em localStorage("hs_density").
+ * ------------------------------------------------------------ */
 html.compact {
   --hs-space-1: 2px;
   --hs-space-2: 4px;
   --hs-space-3: 6px;
   --hs-space-4: 8px;
+  --hs-space-5: 10px;
   --hs-space-6: 12px;
   --hs-space-8: 18px;
+  --hs-space-10: 22px;
+  --hs-space-12: 26px;
 
   --hs-touch: 40px;          /* ainda ≥ 40px, limite mínimo de toque */
   --hs-topbar-h: 48px;
@@ -130,4 +188,17 @@ html.compact {
   --hs-sidebar-w: 12.5rem;
 
   font-size: 14px;           /* base 16px → 14px encolhe tudo que é rem */
+}
+
+/* ------------------------------------------------------------
+ * 8. ACESSIBILIDADE — movimento reduzido respeitado globalmente
+ * ------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --hs-motion-instant: 0ms;
+    --hs-motion-fast: 0ms;
+    --hs-motion-base: 0ms;
+    --hs-motion-slow: 0ms;
+    --hs-motion-slower: 0ms;
+  }
 }
