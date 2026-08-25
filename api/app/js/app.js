@@ -271,26 +271,6 @@ async function router() {
  * Mantido clearDashboardPolling como compat.
  */
 
-function statCard(label, value, pct) {
-  const bar = pct > 0
-    ? el("div", { class: "stat-bar" },
-        el("div", { style: `width:${Math.min(100, pct)}%`, background: pct > 85 ? "var(--hs-color-danger)" : pct > 60 ? "var(--hs-color-warn)" : "var(--hs-color-ok)" }))
-    : null;
-  return el("div", { class: "stat-card" },
-    el("div", { class: "stat-label" }, label),
-    el("div", { class: "stat-value" }, value),
-    bar);
-}
-
-function actionCard(iconName, title, href) {
-  const isHash = href.startsWith("#");
-  const a = el("a", { href, class: "app-card", target: isHash ? "_self" : "_blank" },
-    icon(iconName, "ic"),
-    el("span", { class: "app-name" }, title),
-    el("span", {}, "→"));
-  return a;
-}
-
 /* ---------- Aplicações ---------- */
 
 const APP_MAP = {
@@ -384,11 +364,12 @@ async function renderApps() {
     list.forEach((s) => {
       const meta = getAppMeta(s);
       const up = s.status === "running";
+      const st = serviceState(s.status);
       const card = el("div", { class: "app-card" },
         icon(meta.icon, "ic"),
-        el("span", { class: "status-dot " + (up ? "ok" : "danger") }),
+        statusDot(st),
         el("span", { class: "app-name" }, meta.title),
-        el("span", { class: "app-host" }, up ? "Ativo" : "Offline"));
+        el("span", { class: "app-host" }, st.label));
 
       if (meta.host && up) {
         card.addEventListener("click", () => window.open(meta.host, "_blank"));
@@ -642,13 +623,6 @@ async function renderDevicesSection(mountedDevices) {
   }
 }
 
-function feedRow(iconName, label, value) {
-  return el("div", { class: "feed-item" },
-    icon(iconName),
-    el("span", { class: "app-name" }, label),
-    el("span", { class: "feed-time" }, value));
-}
-
 /* ---------- Sistema ---------- */
 
 async function renderSystem() {
@@ -669,10 +643,9 @@ async function renderSystem() {
   v.appendChild(el("h3", { class: "section" }, "Checks"));
   const checks = el("div", { class: "feed" });
   (status.services || []).forEach((s) => checks.appendChild(el("div", { class: "feed-item" },
-    el("span", { class: "status-dot " + (s.status === "running" ? "ok" : "danger") }),
+    statusDot(serviceState(s.status)),
     el("span", {}, s.name),
-    el("span", { class: "feed-time" }, badge(s.status === "running" ? "● Ativo" : "✕ Offline",
-      s.status === "running" ? "ok" : "danger")))));
+    el("span", { class: "feed-time" }, stateBadge(s.status)))));
   v.appendChild(checks);
 
   // Admin: energia + hardware
@@ -786,10 +759,6 @@ function openPowerDialog(power) {
   dialog.showModal();
 }
 
-function badge(text, kind) {
-  return el("span", { class: "badge " + kind }, text);
-}
-
 async function runModuleOp(m, op, btn) {
   if (op === "stop" && !confirm("Parar o módulo " + m.id + "?")) return;
   btn.disabled = true;
@@ -838,11 +807,12 @@ async function refreshServices() {
     }
     services.forEach((s) => {
       const up = s.status === "running";
+      const st = serviceState(s.status);
 
       const meta = el("div", { class: "module-meta" },
         el("div", { class: "app-name" },
           s.name,
-          el("span", { class: "badge " + (up ? "ok" : "danger"), style: "margin-left:var(--hs-space-2)" }, up ? "ativo" : "parado")),
+          el("span", { style: "margin-left:var(--hs-space-2)" }, stateBadge(s.status))),
         el("div", { class: "app-host" }, s.description || "Serviço do sistema"));
 
       const opsWrap = el("div", { class: "module-ops" });
@@ -872,7 +842,7 @@ async function refreshServices() {
       opsWrap.appendChild(more);
 
       const row = el("div", { class: "feed-item module-row" },
-        el("span", { class: "status-dot " + (up ? "ok" : "danger") }),
+        statusDot(st),
         meta,
         opsWrap);
       sfeedEl.appendChild(row);
@@ -1257,7 +1227,8 @@ async function refreshScheduler() {
       const meta = el("div", { class: "module-meta" },
         el("div", { class: "app-name" },
           t.name,
-          el("span", { class: "badge " + (enabled ? "ok" : "danger"), style: "margin-left:var(--hs-space-2)" }, enabled ? "ativo" : "parado")),
+          el("span", { style: "margin-left:var(--hs-space-2)" },
+            enabled ? badge("Ativa", "ok") : badge("Inativa", "warn"))),
         el("div", { class: "app-host" }, (t.schedule || "") + (t.next ? " · " + t.next : "")));
 
       const opsWrap = el("div", { class: "module-ops" });
@@ -1271,7 +1242,7 @@ async function refreshScheduler() {
       opsWrap.appendChild(runBtn);
 
       const row = el("div", { class: "feed-item module-row" },
-        el("span", { class: "status-dot " + (enabled ? "ok" : "danger") }),
+        el("span", { class: "status-dot " + (enabled ? "ok" : ""), "aria-hidden": "true" }),
         meta,
         opsWrap);
       sfeedEl.appendChild(row);
