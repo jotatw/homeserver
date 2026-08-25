@@ -121,7 +121,6 @@ function getDragAfterElement(container, y) {
 async function renderDashboard() {
   var v = document.getElementById("view");
   v.innerHTML = "";
-  clearDashboardPolling();
 
   var cfg = getDashboardConfig();
   var editMode = !!cfg.editMode;
@@ -258,8 +257,7 @@ function openAddWidgetDialog() {
 /* ---------- Renderers ---------- */
 
 async function renderServerStatusWidget(container) {
-  try {
-    var status = await api("/api/v1/status");
+  var paint = function (status) {
     var cpu = status.cpu || {}, mem = status.memory || {}, disk = status.disk || {};
     container.innerHTML = "";
     container.appendChild(el("div", { class: "widget-grid" },
@@ -269,7 +267,10 @@ async function renderServerStatusWidget(container) {
       statCardWidget("Uptime", status.uptime || "—", 0)
     ));
     container.appendChild(el("a", { href: "#/system", class: "widget-link" }, "Saúde completa em Sistema →"));
-  } catch (_) { container.innerHTML = '<div class="widget-error">Sem dados do servidor</div>'; }
+  };
+  hsStore.subscribe("status", function (d) {
+    try { paint(d); } catch (_) { container.innerHTML = '<div class="widget-error">Sem dados do servidor</div>'; }
+  });
 }
 
 async function renderQuickActionsWidget(container) {
@@ -304,8 +305,7 @@ async function renderActivityFeedWidget(container) {
 }
 
 async function renderServicesWidget(container) {
-  try {
-    var services = await api("/api/v1/services");
+  var paint = function (services) {
     container.innerHTML = "";
     if (!services || !services.length) { container.innerHTML = '<div class="empty">Nenhum serviço</div>'; return; }
     var total = services.length;
@@ -316,7 +316,8 @@ async function renderServicesWidget(container) {
       el("span", { class: "summary-value" }, up + "/" + total),
       el("span", { class: "app-name" }, allOk ? "todos no ar" : "no ar")));
     container.appendChild(el("a", { href: "#/apps", class: "widget-link" }, "Ver aplicações e controlar →"));
-  } catch (_) { container.innerHTML = '<div class="widget-error">Sem dados de serviços</div>'; }
+  };
+  hsStore.subscribe("services", function (d) { paint(d); });
 }
 
 async function renderModulesWidget(container) {
@@ -336,20 +337,21 @@ async function renderModulesWidget(container) {
 }
 
 async function renderStorageWidget(container) {
-  try {
-    var st = await api("/api/v1/status");
-    var disk = st.disk || {};
+  var paint = function (st) {
+    var disk = (st && st.disk) || {};
     container.innerHTML = "";
     container.appendChild(el("div", { class: "storage-summary" },
       statCardWidget("Usado", human(disk.used || 0), 0),
       statCardWidget("Livre", human(disk.available || 0), 0)));
     container.appendChild(el("a", { href: "#/storage", class: "widget-link" }, "Armazenamento e dispositivos →"));
-  } catch (_) { container.innerHTML = '<div class="widget-error">Sem dados de disco</div>'; }
+  };
+  hsStore.subscribe("status", function (d) {
+    try { paint(d); } catch (_) { container.innerHTML = '<div class="widget-error">Sem dados de disco</div>'; }
+  });
 }
 
 async function renderSystemHealthWidget(container) {
-  try {
-    var hw = await api("/api/v1/hardware");
+  var paint = function (hw) {
     container.innerHTML = "";
     var temps = (hw && hw.temperature) ? hw.temperature : [];
     var maxTemp = temps.reduce(function (mx, t) { return Math.max(mx, t.temp || 0); }, 0);
@@ -358,7 +360,10 @@ async function renderSystemHealthWidget(container) {
       el("span", { class: "summary-value" }, maxTemp ? maxTemp + "°C" : "—"),
       el("span", { class: "app-name" }, "temperatura máxima")));
     container.appendChild(el("a", { href: "#/system", class: "widget-link" }, "Hardware em Sistema →"));
-  } catch (_) { container.innerHTML = '<div class="widget-error">Sem hardware</div>'; }
+  };
+  hsStore.subscribe("hardware", function (d) {
+    try { paint(d); } catch (_) { container.innerHTML = '<div class="widget-error">Sem hardware</div>'; }
+  });
 }
 
 async function renderBackupWidget(container) {

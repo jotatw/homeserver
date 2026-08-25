@@ -214,17 +214,9 @@ function renderUser() {
 
 /* ---------- Router ---------- */
 
-let dashboardTimer = null;
-
-function clearDashboardPolling() {
-  if (dashboardTimer) {
-    clearInterval(dashboardTimer);
-    dashboardTimer = null;
-  }
-}
+// vazio — o store centralizado (hsStore) controla o polling do dashboard
 
 async function router() {
-  clearDashboardPolling();
   const route = currentRoute();
   highlightNav();
   setTitle();
