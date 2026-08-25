@@ -112,3 +112,22 @@
   --hs-motion-base: 200ms;
   --hs-motion-slow: 300ms;
 }
+
+/* Modo compacto (html.compact) — densidade maior sem perder toque.
+ * Só troca tokens: nenhum componente precisa de regra própria.
+ * Persistido por usuário em localStorage("hs_density"). */
+html.compact {
+  --hs-space-1: 2px;
+  --hs-space-2: 4px;
+  --hs-space-3: 6px;
+  --hs-space-4: 8px;
+  --hs-space-6: 12px;
+  --hs-space-8: 18px;
+
+  --hs-touch: 40px;          /* ainda ≥ 40px, limite mínimo de toque */
+  --hs-topbar-h: 48px;
+  --hs-bottomnav-h: 48px;
+  --hs-sidebar-w: 12.5rem;
+
+  font-size: 14px;           /* base 16px → 14px encolhe tudo que é rem */
+}
