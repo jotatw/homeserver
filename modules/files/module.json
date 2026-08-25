@@ -9,11 +9,10 @@
   "dependencies": ["storage.persistent"],
   "resources": [
     {"kind": "volume", "ref": "config", "path": "/srv/services/files/config"},
-    {"kind": "volume", "ref": "database", "path": "/srv/services/files/database"},
     {"kind": "mount", "ref": "storage", "path": "/srv/storage"}
   ],
   "integrations": [
-    {"kind": "route", "path": "/files"},
+    {"kind": "port", "ref": "http", "port": 8080},
     {"kind": "adapter", "ref": "filebrowser"}
   ],
   "operations": ["start", "stop", "restart", "enable", "disable", "update", "status"],
