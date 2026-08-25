@@ -164,14 +164,19 @@ function createWidgetElement(def, item, editMode) {
   var header = el("div", { class: "widget-header" },
     el("h3", { class: "widget-title" }, icon(def.icon, "ic"), el("span", {}, def.title)),
     el("div", { class: "widget-actions" },
+      editMode ? el("button", { class: "widget-action-btn", title: "Mover para cima", "aria-label": "Mover " + def.title + " para cima" }, icon("up", "ic")) : null,
+      editMode ? el("button", { class: "widget-action-btn", title: "Mover para baixo", "aria-label": "Mover " + def.title + " para baixo" }, icon("down", "ic")) : null,
       editMode ? el("button", { class: "widget-action-btn", title: "Alterar tamanho" }, icon("maximize", "ic")) : null,
       editMode && def.removable ? el("button", { class: "widget-action-btn danger", title: "Remover" }, icon("x", "ic")) : null,
-      editMode ? el("span", { class: "widget-drag-handle", title: "Arrastar" }, icon("grip", "ic")) : null
+      editMode ? el("span", { class: "widget-drag-handle", title: "Arrastar (desktop)" }, icon("grip", "ic")) : null
     )
   );
-  // bind tamanho/remover
+  // bind tamanho/mover/remover
   if (editMode) {
-    var sizeBtn = header.querySelectorAll(".widget-action-btn")[0];
+    var btns = header.querySelectorAll(".widget-action-btn");
+    var upBtn = btns[0], downBtn = btns[1], sizeBtn = btns[2];
+    if (upBtn) upBtn.addEventListener("click", function () { moveWidgetByButtons(wEl, -1); });
+    if (downBtn) downBtn.addEventListener("click", function () { moveWidgetByButtons(wEl, +1); });
     if (sizeBtn) sizeBtn.addEventListener("click", function () { setWidgetSize(def.id, getNextSize(item.size)); });
     var rmBtn = header.querySelector(".widget-action-btn.danger");
     if (rmBtn) rmBtn.addEventListener("click", function () { removeWidgetFromDashboard(def.id); });
@@ -183,6 +188,19 @@ function createWidgetElement(def, item, editMode) {
   wEl.appendChild(content);
   setTimeout(function () { try { def.render(content, item); } catch (err) { content.innerHTML = '<div class="widget-error">Falha ao carregar</div>'; } }, 0);
   return wEl;
+}
+
+/** Move um widget ↑/↓ no grid por botões — funciona em touch e teclado. */
+function moveWidgetByButtons(widgetEl, delta) {
+  var grid = document.getElementById("dashboard-grid");
+  if (!grid || !widgetEl) return;
+  var widgets = Array.prototype.slice.call(grid.querySelectorAll(".dashboard-widget"));
+  var idx = widgets.indexOf(widgetEl);
+  var target = idx + delta;
+  if (idx < 0 || target < 0 || target >= widgets.length) return;
+  if (delta < 0) grid.insertBefore(widgetEl, widgets[target]);
+  else grid.insertBefore(widgets[target], widgetEl);
+  saveWidgetOrder();
 }
 
 function initDashboardDragAndDrop() {
