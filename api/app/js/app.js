@@ -39,6 +39,7 @@ const ICONS = {
   printer: '<polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>',
   sun: '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>',
   moon: '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
+  rows: '<rect x="3" y="3" width="18" height="7" rx="1"/><rect x="3" y="14" width="18" height="7" rx="1"/>',
   power: '<path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/>',
   plus: '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
   user: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
@@ -134,6 +135,21 @@ function toggleTheme() {
   toast(cur === "light" ? "Tema claro ativado." : "Tema escuro ativado.", "info");
 }
 
+/* ---------- Densidade (confortável / compacto) ---------- */
+
+function applyDensity(mode) {
+  document.documentElement.classList.toggle("compact", mode === "compact");
+  try {
+    localStorage.setItem("hs_density", mode);
+  } catch (_) {}
+}
+
+function toggleDensity() {
+  const compact = !document.documentElement.classList.contains("compact");
+  applyDensity(compact ? "compact" : "cozy");
+  toast(compact ? "Modo compacto ativado." : "Modo confortável ativado.", "info");
+}
+
 /* ---------- Build da navegação (sidebar + bottom nav) ---------- */
 
 function buildNav() {
@@ -176,6 +192,8 @@ function openOverflowSheet() {
         icon("printer", "ic"), el("span", {}, "Impressão")),
       el("button", { class: "sheet-item", id: "sheet-theme" },
         icon("moon", "ic"), el("span", {}, "Tema")),
+      el("button", { class: "sheet-item", id: "sheet-density" },
+        icon("rows", "ic"), el("span", { id: "sheet-density-label" }, "Modo compacto")),
       el("button", { class: "sheet-item sheet-danger", id: "sheet-sair" },
         icon("power", "ic"), el("span", {}, "Sair")));
     document.body.appendChild(sheet);
@@ -1807,6 +1825,10 @@ document.addEventListener("click", (e) => {
     toggleTheme();
     const sheet = document.getElementById("overflow-sheet");
     if (sheet && sheet.open) sheet.close();
+  } else if (btn.id === "sheet-density") {
+    toggleDensity();
+    const sheet = document.getElementById("overflow-sheet");
+    if (sheet && sheet.open) sheet.close();
   } else if (btn.id === "btn-sair" || btn.id === "sheet-sair") {
     auth.logout().then(() => {
       window.location.href = "/app/login.html";
@@ -1820,6 +1842,7 @@ document.addEventListener("click", (e) => {
 
 async function init() {
   applyTheme(localStorage.getItem("hs_theme") || "dark");
+  applyDensity(localStorage.getItem("hs_density") || "cozy");
 
   if (!(await auth.check())) {
     window.location.href = "/app/login.html";
