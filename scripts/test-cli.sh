@@ -50,30 +50,36 @@ report() {
 # version retorna o identificador do estado git (hash curto do commit).
 VERSION=$(bash "${HS}" version 2>/dev/null)
 [[ "${VERSION}" =~ ^[0-9a-f]{7,}$ ]]
-report "hs version -> ${VERSION}" $?
+rc=$?
+report "hs version -> ${VERSION}" ${rc}
 
 # update check retorna JSON válido com ok/data (via CLI raw)
 CHECK=$(bash "${HS}" update check 2>/dev/null)
 echo "${CHECK}" | python3 -c "import json,sys; d=json.load(sys.stdin); assert 'current' in d and 'latest' in d; assert d['update'] in (True, False)" >/dev/null 2>&1
-report "hs update check -> JSON válido" $?
+rc=$?
+report "hs update check -> JSON válido" ${rc}
 
 # user verify: credenciais corretas (exit 0)
 bash "${HS}" user verify "${ADMIN_USER}" "${ADMIN_PASS}" >/dev/null 2>&1
-report "hs user verify (admin) -> 0" $?
+rc=$?
+report "hs user verify (admin) -> 0" ${rc}
 
 # user verify: senha errada (exit 1)
 bash "${HS}" user verify "${ADMIN_USER}" "senha-errada-xyz" >/dev/null 2>&1
 [[ $? -eq 1 ]]
-report "hs user verify (senha errada) -> 1" $?
+rc=$?
+report "hs user verify (senha errada) -> 1" ${rc}
 
 # user is-admin: admin é admin (exit 0)
 bash "${HS}" user is-admin "${ADMIN_USER}" >/dev/null 2>&1
-report "hs user is-admin (admin) -> 0" $?
+rc=$?
+report "hs user is-admin (admin) -> 0" ${rc}
 
 # user is-admin: usuário inexistente (exit 1)
 bash "${HS}" user is-admin "nao-existe-xyz" >/dev/null 2>&1
 [[ $? -eq 1 ]]
-report "hs user is-admin (inexistente) -> 1" $?
+rc=$?
+report "hs user is-admin (inexistente) -> 1" ${rc}
 
 echo
 echo "----------------------------------------"

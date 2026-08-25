@@ -27,7 +27,7 @@ rsync -a "${SRC}/storage/" "${TARGET}/storage/" >/dev/null
 rsync -a "${SRC}/docker/" "${TARGET}/docker/" >/dev/null
 rsync -a "${SRC}/git/" "${TARGET}/git/" >/dev/null
 ln -sf "${TARGET}" "${LATEST}"
-find "${TARGET}" -type f ! -name "manifest.sha256" | xargs sha256sum > "${TARGET}/manifest.sha256" 2>/dev/null || true
+find "${TARGET}" -type f ! -name "manifest.sha256" -print0 | xargs -0 sha256sum > "${TARGET}/manifest.sha256" 2>/dev/null || true
 
 # Valida estrutura (simula backup_validate_json)
 check() {
