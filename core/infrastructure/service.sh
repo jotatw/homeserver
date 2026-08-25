@@ -40,9 +40,21 @@
 #
 # Retorna o diretório de um serviço.
 #
+# Resolução (M1): módulos declarativos em modules/<id>/ têm
+# precedência; serviços legados permanecem em HS_SERVICES_DIR
+# (fallback). Assim um módulo novo (ex.: files) é operável pelo
+# Core sem duplicar o compose no diretório legado.
+#
 service_directory() {
 
     local service="$1"
+
+    if [[ -d "${HS_MODULES_ROOT:-${HS_PROJECT_ROOT}/modules}/${service}" ]]; then
+        printf "%s/%s\n" \
+            "${HS_MODULES_ROOT:-${HS_PROJECT_ROOT}/modules}" \
+            "${service}"
+        return 0
+    fi
 
     printf "%s/%s\n" \
         "${HS_SERVICES_DIR}" \

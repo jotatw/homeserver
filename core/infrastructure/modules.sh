@@ -227,8 +227,8 @@ _module_validate_dependencies() {
     local deps
     deps="$(_module_get_dependencies "${id}")" || return 1
 
-    python3 - "${deps}" <<'PY' || return 1
-import json, sys, os
+    python3 -c '
+import json, sys
 deps = json.load(sys.stdin)
 if not deps:
     sys.exit(0)
@@ -238,7 +238,7 @@ for dep in deps:
     # verificaríamos se a capability/dependency está satisfeita.
     sys.stderr.write(f"Verificando dependência: {dep}\n")
 sys.exit(0)
-PY
+' <<< "${deps}" || return 1
 }
 
 #
