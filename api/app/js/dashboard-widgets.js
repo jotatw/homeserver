@@ -256,6 +256,7 @@ function openAddWidgetDialog() {
 }
 
 /* ---------- Renderers ---------- */
+
 async function renderServerStatusWidget(container) {
   try {
     var status = await api("/api/v1/status");
@@ -267,6 +268,7 @@ async function renderServerStatusWidget(container) {
       statCardWidget("Disco", (disk.percent ?? 0) + "%", disk.percent ?? 0),
       statCardWidget("Uptime", status.uptime || "—", 0)
     ));
+    container.appendChild(el("a", { href: "#/system", class: "widget-link" }, "Saúde completa em Sistema →"));
   } catch (_) { container.innerHTML = '<div class="widget-error">Sem dados do servidor</div>'; }
 }
 
@@ -306,17 +308,14 @@ async function renderServicesWidget(container) {
     var services = await api("/api/v1/services");
     container.innerHTML = "";
     if (!services || !services.length) { container.innerHTML = '<div class="empty">Nenhum serviço</div>'; return; }
-    var feed = el("div", { class: "feed" });
-    services.slice(0, 5).forEach(function (s) {
-      var up = s.status === "running";
-      feed.appendChild(el("div", { class: "feed-item" },
-        el("span", { class: "status-dot " + (up ? "ok" : "danger") }),
-        el("span", { class: "app-name" }, s.name),
-        el("span", { class: "badge " + (up ? "ok" : "danger"), style: "margin-left:auto" }, up ? "ativo" : "parado")
-      ));
-    });
-    feed.appendChild(el("a", { href: "#/admin", class: "widget-link" }, "Gerenciar serviços →"));
-    container.appendChild(feed);
+    var total = services.length;
+    var up = services.filter(function (s) { return s.status === "running"; }).length;
+    var allOk = up === total;
+    container.appendChild(el("div", { class: "services-summary" },
+      el("span", { class: "status-dot " + (allOk ? "ok" : "danger") }),
+      el("span", { class: "summary-value" }, up + "/" + total),
+      el("span", { class: "app-name" }, allOk ? "todos no ar" : "no ar")));
+    container.appendChild(el("a", { href: "#/apps", class: "widget-link" }, "Ver aplicações e controlar →"));
   } catch (_) { container.innerHTML = '<div class="widget-error">Sem dados de serviços</div>'; }
 }
 
@@ -327,13 +326,12 @@ async function renderModulesWidget(container) {
     var map = {}; (inst || []).forEach(function (i) { map[i.definition] = true; });
     container.innerHTML = "";
     if (!mods || !mods.length) { container.innerHTML = '<div class="empty">Nenhum módulo</div>'; return; }
-    var feed = el("div", { class: "feed" });
-    mods.slice(0, 4).forEach(function (m) {
-      var active = !!map[m.id];
-      feed.appendChild(el("div", { class: "feed-item" }, icon("box"), el("span", { class: "app-name" }, m.title || m.id), el("span", { class: "badge " + (active ? "ok" : ""), style: "margin-left:auto" }, active ? "ativo" : "ocioso")));
-    });
-    feed.appendChild(el("a", { href: "#/admin", class: "widget-link" }, "Ver módulos →"));
-    container.appendChild(feed);
+    var activeCount = mods.filter(function (m) { return !!map[m.id]; }).length;
+    container.appendChild(el("div", { class: "services-summary" },
+      el("span", { class: "status-dot ok" }),
+      el("span", { class: "summary-value" }, activeCount + "/" + mods.length),
+      el("span", { class: "app-name" }, "instâncias ativas")));
+    container.appendChild(el("a", { href: "#/admin", class: "widget-link" }, "Gerenciar módulos →"));
   } catch (_) { container.innerHTML = '<div class="widget-error">Sem módulos</div>'; }
 }
 
@@ -342,11 +340,10 @@ async function renderStorageWidget(container) {
     var st = await api("/api/v1/status");
     var disk = st.disk || {};
     container.innerHTML = "";
-    container.appendChild(el("div", { class: "widget-grid" },
+    container.appendChild(el("div", { class: "storage-summary" },
       statCardWidget("Usado", human(disk.used || 0), 0),
-      statCardWidget("Livre", human(disk.available || 0), 0),
-      statCardWidget("Total", human(disk.total || 0), 0)
-    ));
+      statCardWidget("Livre", human(disk.available || 0), 0)));
+    container.appendChild(el("a", { href: "#/storage", class: "widget-link" }, "Armazenamento e dispositivos →"));
   } catch (_) { container.innerHTML = '<div class="widget-error">Sem dados de disco</div>'; }
 }
 
@@ -354,16 +351,13 @@ async function renderSystemHealthWidget(container) {
   try {
     var hw = await api("/api/v1/hardware");
     container.innerHTML = "";
-    if (!hw || !hw.temperature || !hw.temperature.length) { container.innerHTML = '<div class="empty">Sem dados de hardware</div>'; return; }
-    var grid = el("div", { class: "widget-grid" });
-    hw.temperature.slice(0, 4).forEach(function (t) {
-      var hot = t.temp >= 80;
-      grid.appendChild(el("div", { class: "stat-card", style: hot ? "border-color:var(--hs-color-danger)" : "" },
-        el("div", { class: "stat-label" }, t.label || t.chip || "Sensor"),
-        el("div", { class: "stat-value" }, t.temp + "°C")
-      ));
-    });
-    container.appendChild(grid);
+    var temps = (hw && hw.temperature) ? hw.temperature : [];
+    var maxTemp = temps.reduce(function (mx, t) { return Math.max(mx, t.temp || 0); }, 0);
+    container.appendChild(el("div", { class: "services-summary" },
+      el("span", { class: "status-dot " + (maxTemp >= 80 ? "danger" : maxTemp >= 65 ? "" : "ok") }),
+      el("span", { class: "summary-value" }, maxTemp ? maxTemp + "°C" : "—"),
+      el("span", { class: "app-name" }, "temperatura máxima")));
+    container.appendChild(el("a", { href: "#/system", class: "widget-link" }, "Hardware em Sistema →"));
   } catch (_) { container.innerHTML = '<div class="widget-error">Sem hardware</div>'; }
 }
 
@@ -384,7 +378,8 @@ async function renderMyStorageWidget(container) {
     var st = await api("/api/v1/storage");
     container.innerHTML = "";
     var total = st && st.total_size_human ? st.total_size_human : "—";
-    container.appendChild(el("div", { class: "feed" }, el("div", { class: "feed-item" }, icon("harddrive"), el("span", { class: "app-name" }, "Total em uso"), el("span", { class: "feed-time" }, total))));
+    container.appendChild(el("div", { class: "feed" }, el("div", { class: "feed-item" }, icon("harddrive"), el("span", { class: "app-name" }, "Total em uso"), el("span", { class: "feed-time" }, total)),
+      el("a", { href: "#/storage", class: "widget-link" }, "Meu armazenamento →")));
   } catch (_) { container.innerHTML = '<div class="widget-error">Sem dados</div>'; }
 }
 
