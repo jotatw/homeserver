@@ -4,8 +4,8 @@ homeserver.local {$LAN_IP:192.168.0.10} {
     # Certificado da CA interna (gerado por `hs tls init` em /srv/config/tls).
     tls /etc/tls/server.pem /etc/tls/server.key
 
-    # Files (FileBrowser Quantum — porta dedicada; rota /files removida)
-    handle_path /files/* {
+    # Files (FileBrowser Quantum) — baseURL /files no próprio app
+    handle /files/* {
         reverse_proxy files:80
     }
 

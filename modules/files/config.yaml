@@ -1,5 +1,6 @@
 server:
   port: 80
+  baseURL: /files
   sources:
     - path: /srv
       name: Storage

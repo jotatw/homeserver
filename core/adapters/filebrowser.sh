@@ -48,7 +48,7 @@
 #
 # ==========================================================
 
-FILEBROWSER_URL="${FILEBROWSER_URL:-http://localhost:8080}"
+FILEBROWSER_URL="${FILEBROWSER_URL:-http://localhost:8080/files}"
 FILEBROWSER_ADMIN_USER="${FILEBROWSER_ADMIN_USER:-admin}"
 FILEBROWSER_TOKEN_TTL="${FILEBROWSER_TOKEN_TTL:-300}"
 _FB_TOKEN_CACHE="${TMPDIR:-/tmp}/hs-filebrowser-token"
