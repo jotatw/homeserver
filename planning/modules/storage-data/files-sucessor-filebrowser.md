@@ -152,7 +152,9 @@ Critérios de aceite da validação:
 - [x] RAM medida em repouso ≤ 300 MB no ambiente real (36,8 MiB);
 - [x] ciclo completo de usuário via Core (criar → logar → remover);
 - [x] escopos isolados por usuário funcionando;
-- [ ] upload/download com arquivo > 1 GB (pendente);
+- [x] upload/download com arquivo > 1 GB (1,5 GB validado 2026-08-25:
+      integridade md5 OK, RAM pico ~51 MiB, upload 6,6 MB/s, download
+      26,9 MB/s);
 - [x] acesso via porta dedicada 8080 (substitui a rota `/files`, removida do Caddy);
 - [ ] rollback para o FileBrowser atual documentado e testado (pendente).
 
@@ -245,7 +247,10 @@ Pendências honestas (não resolvidas, registradas para não mascarar):
       NOPASSWD restrito configurado em `/etc/sudoers.d/hs-modules`
       para automação.
 - [ ] **Rollback para o FileBrowser original** documentado e testado.
-- [ ] **Upload/download com arquivo > 1 GB** validado no ambiente real.
+- [x] **Upload/download com arquivo > 1 GB** validado no ambiente real
+      (2026-08-25, 1,5 GB — detalhes na seção de critérios de aceite;
+      exigiu corrigir o volume `:ro` e usar o formato de upload de corpo
+      cru com `X-File-Total-Size`).
 - [ ] Limpeza do módulo antigo `modules/filebrowser/` (EOL) quando a
       instância antiga (`filebrowser`) for removida e o rollback
       estiver documentado.
