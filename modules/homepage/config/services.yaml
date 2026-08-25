@@ -37,11 +37,11 @@
         server: homeserver
         container: homepage
 
-    - FileBrowser:
+    - Files:
         icon: mdi-folder-open
         href: /files/
         server: homeserver
-        container: filebrowser
+        container: files
 
     - Gitea:
         icon: sh-gitea

@@ -4,8 +4,8 @@ services:
     # Imagem (FileBrowser Quantum)
     image: gtstef/filebrowser:stable-slim
 
-    container_name: filebrowser
-    hostname: filebrowser
+    container_name: files
+    hostname: files
 
     restart: unless-stopped
 

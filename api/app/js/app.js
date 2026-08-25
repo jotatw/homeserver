@@ -284,7 +284,7 @@ function actionCard(iconName, title, href) {
 const APP_MAP = {
   homepage: { title: "Homepage", host: "/", icon: "home" },
   api: { title: "HomeServer App", host: "/app", icon: "monitor" },
-  filebrowser: { title: "FileBrowser", host: "/files/", icon: "folder" },
+  files: { title: "Arquivos (FileBrowser)", host: "/files/", icon: "folder" },
   gitea: { title: "Gitea", host: "/git/", icon: "code" },
   caddy: { title: "Proxy (Caddy)", host: "", icon: "shield" },
   portainer: { title: "Portainer", host: "", icon: "layers" },
@@ -428,7 +428,7 @@ async function renderStorage() {
     icon("folder", "empty-icon"),
     "Os arquivos são gerenciados pelo FileBrowser.",
     el("br", {}),
-    el("a", { href: "http://" + window.location.hostname + ":8080", target: "_blank" }, "Abrir FileBrowser →")));
+    el("a", { href: "/files/", target: "_blank" }, "Abrir Arquivos →")));
 }
 
 /* ---------- Dispositivos (descoberta + 1 clique) ---------- */
@@ -510,9 +510,9 @@ async function renderDevicesSection(mountedDevices) {
       if (auth.isAdmin()) {
         const act = el("span", { class: "device-actions" });
 
-        // Abrir arquivos (FileBrowser hoje; rota do módulo de arquivos no futuro)
+        // Abrir arquivos (rota /files/ via Caddy — HTTPS)
         const openLink = el("a", {
-          href: "http://" + window.location.hostname + ":8080",
+          href: "/files/",
           target: "_blank",
           class: "btn btn-secondary", style: "height:var(--hs-touch-compact);text-decoration:none",
         }, "Abrir");

@@ -4,9 +4,9 @@ homeserver.local {$LAN_IP:192.168.0.10} {
     # Certificado da CA interna (gerado por `hs tls init` em /srv/config/tls).
     tls /etc/tls/server.pem /etc/tls/server.key
 
-    # FileBrowser (remove /files)
+    # Files (FileBrowser Quantum — porta dedicada; rota /files removida)
     handle_path /files/* {
-        reverse_proxy filebrowser:80
+        reverse_proxy files:80
     }
 
     # Gitea (remove /git)

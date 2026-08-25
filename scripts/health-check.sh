@@ -49,7 +49,7 @@ fi
 # Módulos (HTTP)
 check_http "homepage"   "http://localhost:3000/"            "html"
 check_http "api"        "http://localhost:8000/api/v1/version" "ok"
-check_http "filebrowser" "http://localhost:8080/"           "html"
+check_http "files"      "http://localhost:8080/"           "html"
 check_http "gitea"      "http://localhost:3001/"            "html"
 
 # Core (CLI)
