@@ -236,12 +236,16 @@ retorna o hash curto do commit, não mais `vX.Y.Z`).
 
 Pendências honestas (não resolvidas, registradas para não mascarar):
 
-- [ ] **Instância do Module Core**: a instância registrada é
-      `filebrowser` (definition antiga, EOL); o módulo novo é `files`.
-      `hs module status files` retorna `observed: desconhecido`.
-      Migrar/recriar a instância do módulo de arquivos para `files` e
-      validar `hs module status files` refletindo o estado real.
+- [x] **Instância do Module Core** (resolvida 2026-08-25): instância
+      `files` registrada (`desired: enabled`), `module status files`
+      refletindo o estado real (observed: healthy). Requisitos de
+      fundo corrigidos: `service_directory` resolve módulos
+      declarativos (`modules/<id>/`) com fallback legado; validação
+      de dependências corrigida (herestring em vez de stdin vazio).
+      NOPASSWD restrito configurado em `/etc/sudoers.d/hs-modules`
+      para automação.
 - [ ] **Rollback para o FileBrowser original** documentado e testado.
 - [ ] **Upload/download com arquivo > 1 GB** validado no ambiente real.
 - [ ] Limpeza do módulo antigo `modules/filebrowser/` (EOL) quando a
-      instância for migrada e o rollback estiver documentado.
+      instância antiga (`filebrowser`) for removida e o rollback
+      estiver documentado.
