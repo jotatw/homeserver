@@ -21,8 +21,9 @@ services:
 
     volumes:
       - /srv/storage:/srv
+      # Config de runtime: o config.yaml versionado (modules/files/config.yaml)
+      # é a referência; copie para /srv/services/files/config/ ao implantar.
       - /srv/services/files/config:/home/filebrowser/data
-      - ./config.yaml:/home/filebrowser/data/config.yaml:ro
 
     networks:
       - homeserver

@@ -14,6 +14,22 @@ mkdir -p "${TARGET}"
 
 log "Iniciando backup em ${TARGET}"
 
+# Snapshot pontual do database.db do FileBrowser Quantum.
+# É um BoltDB (não SQLite): sem API de backup online, a cópia é feita
+# direto do arquivo. Transações do BoltDB são atômicas (meta-page dupla),
+# e o conteúdo é recriável em minutos (usuários/config) — o rsync de
+# /srv/services/ segue como segunda cópia.
+mkdir -p "${TARGET}/dumps/files"
+# Magic do BoltDB: bytes 16-19 = 0xED0CDAED (little-endian)
+if cp "/srv/services/files/config/database.db" \
+      "${TARGET}/dumps/files/database.db" 2>>"${LOG_FILE}" \
+   && [[ "$(head -c 20 "${TARGET}/dumps/files/database.db" | tail -c 4 | od -An -tx4 | tr -d " ")" == "ed0cdaed" ]] \
+   && [[ -s "${TARGET}/dumps/files/database.db" ]]; then
+    log "Snapshot files/database.db: OK ($(wc -c < "${TARGET}/dumps/files/database.db") bytes)"
+else
+    log "AVISO: snapshot do database.db falhou ou inválido (rsync mantém cópia)"
+fi
+
 set +e
 
 rsync -a --delete \
