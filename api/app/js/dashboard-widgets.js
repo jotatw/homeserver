@@ -330,7 +330,7 @@ async function renderServicesWidget(container) {
     var up = services.filter(function (s) { return s.status === "running"; }).length;
     var allOk = up === total;
     container.appendChild(el("div", { class: "services-summary" },
-      el("span", { class: "status-dot " + (allOk ? "ok" : "danger") }),
+      statusDot(serviceState(allOk ? "running" : "warning")),
       el("span", { class: "summary-value" }, up + "/" + total),
       el("span", { class: "app-name" }, allOk ? "todos no ar" : "no ar")));
     container.appendChild(el("a", { href: "#/apps", class: "widget-link" }, "Ver aplicações e controlar →"));
@@ -373,10 +373,16 @@ async function renderSystemHealthWidget(container) {
     container.innerHTML = "";
     var temps = (hw && hw.temperature) ? hw.temperature : [];
     var maxTemp = temps.reduce(function (mx, t) { return Math.max(mx, t.temp || 0); }, 0);
+    var tempSt = SERVICE_STATES.unknown;
+    if (maxTemp >= 80) tempSt = SERVICE_STATES.danger;
+    else if (maxTemp >= 65) tempSt = SERVICE_STATES.warning;
+    else if (maxTemp > 0) tempSt = SERVICE_STATES.running;
     container.appendChild(el("div", { class: "services-summary" },
-      el("span", { class: "status-dot " + (maxTemp >= 80 ? "danger" : maxTemp >= 65 ? "" : "ok") }),
+      statusDot(tempSt),
       el("span", { class: "summary-value" }, maxTemp ? maxTemp + "°C" : "—"),
-      el("span", { class: "app-name" }, "temperatura máxima")));
+      el("span", { class: "app-name" },
+        tempSt === SERVICE_STATES.danger ? "crítica" :
+        tempSt === SERVICE_STATES.warning ? "atenção" : "normal")));
     container.appendChild(el("a", { href: "#/system", class: "widget-link" }, "Hardware em Sistema →"));
   };
   hsStore.subscribe("hardware", function (d) {
@@ -407,6 +413,5 @@ async function renderMyStorageWidget(container) {
 }
 
 function statCardWidget(label, value, pct) {
-  var bar = pct > 0 ? el("div", { class: "stat-bar" }, el("div", { style: "width:" + Math.min(100, pct) + "%;background:" + (pct > 85 ? "var(--hs-color-danger)" : pct > 60 ? "var(--hs-color-warn)" : "var(--hs-color-ok)") })) : null;
-  return el("div", { class: "stat-card" }, el("div", { class: "stat-label" }, label), el("div", { class: "stat-value" }, value), bar);
+  return statCard(label, value, pct || 0); // componente único (components.js)
 }

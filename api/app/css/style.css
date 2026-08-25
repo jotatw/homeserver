@@ -267,6 +267,11 @@ input:focus-visible {
   gap: var(--hs-space-4);
 }
 
+.badge-glyph {
+  font-weight: 700;
+  line-height: 1;
+}
+
 .stat-card {
   background: var(--hs-surface);
   border: 1px solid var(--hs-border);
@@ -736,6 +741,7 @@ dialog::backdrop {
 .badge {
   display: inline-flex;
   align-items: center;
+  gap: var(--hs-space-1);
   padding: 2px 10px;
   border-radius: var(--hs-radius-full);
   font-size: var(--hs-meta);
