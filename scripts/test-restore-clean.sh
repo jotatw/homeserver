@@ -79,7 +79,7 @@ docker exec "${CONTAINER}" bash -c "
 log "6/6 Verificação dos dados restaurados"
 
 # Verificação 1: estrutura esperada existe
-for dir in storage/users storage/shared services/gitea services/filebrowser git/homeserver; do
+for dir in storage/users storage/shared services/gitea services/files git/homeserver; do
     if docker exec "${CONTAINER}" test -d "/srv/${dir}" 2>/dev/null; then
         log "   ✓ /srv/${dir} presente"
     else

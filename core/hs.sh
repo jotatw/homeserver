@@ -38,7 +38,7 @@ Comandos:
   system memory|disk|cpu|load|services|backup|events|status
   service list
   service enable|disable|start|stop|restart|status|update <serviço>
-  module definitions|instances|instance add <id> [nome]|info <id>|status <id>|op <id> <operação>
+  module definitions|instances|instance add <id> [nome]|instance remove <nome>|info <id>|status <id>|op <id> <operação>
   status
   user create <nome> [--password=...] [--gitea]
   user list|info <nome>|password <nome> [--password=...]|verify <nome> <senha>|is-admin <nome>
@@ -162,7 +162,8 @@ case "${_command}" in
             instance)
                 case "${3:-}" in
                     add) module_instance_add "${4:?id do módulo}" "${5:-}" ;;
-                    *) echo "Uso: hs module instance add <id> [nome]" >&2; exit 1 ;;
+                    remove) module_instance_remove "${4:?nome da instância}" ;;
+                    *) echo "Uso: hs module instance add <id> [nome] | remove <nome>" >&2; exit 1 ;;
                 esac
                 ;;
             info) module_definition_read "${3:?id do módulo}" ;;

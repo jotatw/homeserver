@@ -226,9 +226,7 @@ _prepare_service_dirs() {
         return 0
     fi
     mkdir -p \
-        /srv/services/filebrowser/database \
-        /srv/services/filebrowser/config \
-        /srv/services/filebrowser/backups \
+        /srv/services/files/config \
         /srv/services/gitea
 
     # O container roda como UID 1000 — dono padrão das pastas de serviço.

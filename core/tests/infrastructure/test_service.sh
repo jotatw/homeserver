@@ -19,7 +19,7 @@ echo
 echo "available_services..."
 
 LIST="$(available_services)"
-for s in caddy filebrowser gitea homepage portainer; do
+for s in caddy files gitea homepage portainer; do
     echo "${LIST}" | grep -qx "${s}" \
         && ok "available_services: ${s}" \
         || fail "available_services não inclui ${s}"
