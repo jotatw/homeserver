@@ -357,10 +357,33 @@ async function renderApps() {
         el("span", { class: "status-dot " + (up ? "ok" : "danger") }),
         el("span", { class: "app-name" }, meta.title),
         el("span", { class: "app-host" }, up ? "Ativo" : "Offline"));
+
       if (meta.host && up) {
         card.addEventListener("click", () => window.open(meta.host, "_blank"));
         card.style.cursor = "pointer";
       }
+
+      // Controle de serviços (admin) — casa canônica: Aplicações
+      if (auth.isAdmin()) {
+        const ops = el("div", { class: "app-card-ops" });
+        if (up) {
+          const stopBtn = el("button", {
+            class: "btn btn-secondary", style: "height:var(--hs-touch-compact)",
+            title: "Parar " + (meta.title || s.name),
+          }, "Parar");
+          stopBtn.addEventListener("click", (e) => { e.stopPropagation(); runServiceOp(s.name, "stop", stopBtn); });
+          ops.appendChild(stopBtn);
+        } else {
+          const startBtn = el("button", {
+            class: "btn btn-primary", style: "height:var(--hs-touch-compact)",
+            title: "Iniciar " + (meta.title || s.name),
+          }, "Iniciar");
+          startBtn.addEventListener("click", (e) => { e.stopPropagation(); runServiceOp(s.name, "start", startBtn); });
+          ops.appendChild(startBtn);
+        }
+        card.appendChild(ops);
+      }
+
       grid.appendChild(card);
     });
   }
@@ -762,7 +785,9 @@ async function runServiceOp(name, op, btn) {
       body: JSON.stringify({}),
     });
     toast(name + ": " + op + " concluído.", "success");
-    await refreshServices();
+    // O catálogo de Aplicações é a casa canônica do controle de serviços
+    if (document.getElementById("apps-grid")) await renderApps();
+    else if (document.getElementById("services-feed")) await refreshServices();
   } catch (err) {
     toast(err.message || "Falha em " + op + ".", "error");
     if (btn) btn.disabled = false;
@@ -879,27 +904,67 @@ function openMountDialog() {
 
 /* ---------- Administração (admin) ---------- */
 
+/* ---------- Administração (em abas) ---------- */
+
+let adminActiveTab = "users";
+
+function adminTabBar() {
+  const tabs = [
+    ["users", "Usuários", "user"],
+    ["tokens", "Tokens", "key"],
+    ["modules", "Módulos", "box"],
+    ["updates", "Atualizações", "download"],
+  ];
+  const bar = el("div", { class: "admin-tabs", role: "tablist", "aria-label": "Seções da administração" });
+  tabs.forEach(([id, label, ic]) => {
+    const b = el("button", {
+      class: "admin-tab" + (adminActiveTab === id ? " active" : ""),
+      role: "tab",
+      "aria-selected": String(adminActiveTab === id),
+      "data-tab": id,
+    }, icon(ic, "ic"), el("span", {}, label));
+    b.addEventListener("click", () => {
+      if (adminActiveTab === id) return;
+      adminActiveTab = id;
+      renderAdmin();
+    });
+    bar.appendChild(b);
+  });
+  return bar;
+}
+
 async function renderAdmin() {
-  const [users, tokens, mods, instances] = await Promise.all([
-    api("/api/v1/users"),
-    api("/api/v1/tokens"),
-    api("/api/v1/modules"),
-    api("/api/v1/modules/instances"),
-  ]);
+  // Carrega só os dados da aba ativa — menos requisições por troca de aba
+  if (adminActiveTab === "users") return renderAdminUsers();
+  if (adminActiveTab === "tokens") return renderAdminTokens();
+  if (adminActiveTab === "modules") return renderAdminModules();
+  if (adminActiveTab === "updates") return renderAdminUpdates();
+}
+
+async function renderAdminUsers() {
+  const [users] = await Promise.all([api("/api/v1/users")]);
   const v = document.getElementById("view");
   v.innerHTML = "";
 
-  // Usuários
-  v.appendChild(el("h3", { class: "section" }, "Usuários"));
+  v.appendChild(el("h3", { class: "section" }, "Administração"));
+  v.appendChild(adminTabBar());
+
+  const createUserBtn = el("button", { class: "btn btn-primary", style: "margin-bottom:var(--hs-space-3)" },
+    icon("plus", "ic"), " Novo usuário");
+  createUserBtn.addEventListener("click", openUserDialog);
+  v.appendChild(createUserBtn);
+
   if (users && users.length) {
     const t = el("table", { class: "table" });
     const head = el("tr");
-    ["Usuário", "Admin", "Ações"].forEach((c) => head.appendChild(el("th", {}, c)));
+    ["Usuário", "Papel", "Ações"].forEach((c) => head.appendChild(el("th", {}, c)));
     t.appendChild(el("thead", {}, head));
     const body = el("tbody");
     users.forEach((u) => {
       const tr = el("tr");
-      tr.appendChild(el("td", {}, u.username || u.id));
+      tr.appendChild(el("td", {},
+        el("strong", {}, u.username || u.id),
+        el("div", { class: "app-host" }, u.perm && u.perm.scope ? "/" + u.perm.scope : "/")));
       tr.appendChild(el("td", {}, u.perm && u.perm.admin ? el("span", { class: "badge ok" }, "Admin") : "padrão"));
       const actions = el("td");
       const btns = el("span", { style: "display:inline-flex;gap:var(--hs-space-2)" });
@@ -923,14 +988,21 @@ async function renderAdmin() {
   } else {
     v.appendChild(el("p", { class: "empty" }, "Nenhum usuário encontrado."));
   }
+}
 
-  const createUserBtn = el("button", { class: "btn btn-secondary", style: "margin-top:var(--hs-space-2)" },
-    icon("plus", "ic"), " Novo usuário");
-  createUserBtn.addEventListener("click", openUserDialog);
-  v.appendChild(createUserBtn);
+async function renderAdminTokens() {
+  const [tokens] = await Promise.all([api("/api/v1/tokens")]);
+  const v = document.getElementById("view");
+  v.innerHTML = "";
 
-  // Tokens de API
-  v.appendChild(el("h3", { class: "section" }, "Tokens de API"));
+  v.appendChild(el("h3", { class: "section" }, "Administração"));
+  v.appendChild(adminTabBar());
+
+  const createBtn = el("button", { class: "btn btn-primary", style: "margin-bottom:var(--hs-space-3)" },
+    icon("key", "ic"), " Criar token");
+  createBtn.addEventListener("click", () => openTokenDialog());
+  v.appendChild(createBtn);
+
   const tfeed = el("div", { class: "feed" });
   if (tokens && tokens.length) {
     tokens.forEach((tk) => {
@@ -955,14 +1027,19 @@ async function renderAdmin() {
     tfeed.appendChild(el("div", { class: "feed-item" }, "Nenhum token criado."));
   }
   v.appendChild(tfeed);
+}
 
-  const createBtn = el("button", { class: "btn btn-secondary", style: "margin-top:var(--hs-space-2)" },
-    icon("key", "ic"), " Criar token");
-  createBtn.addEventListener("click", () => openTokenDialog());
-  v.appendChild(createBtn);
+async function renderAdminModules() {
+  const [mods, instances] = await Promise.all([
+    api("/api/v1/modules"),
+    api("/api/v1/modules/instances"),
+  ]);
+  const v = document.getElementById("view");
+  v.innerHTML = "";
 
-  // Módulos (arquitetura modular — M1)
-  v.appendChild(el("h3", { class: "section" }, "Módulos"));
+  v.appendChild(el("h3", { class: "section" }, "Administração"));
+  v.appendChild(adminTabBar());
+
   const mfeed = el("div", { class: "feed" });
   if (mods && mods.length) {
     const instMap = {};
@@ -1017,14 +1094,21 @@ async function renderAdmin() {
   }
   v.appendChild(mfeed);
 
-  // Serviços (Fase 4: gerenciamento de serviços)
-  v.appendChild(el("h3", { class: "section" }, "Serviços"));
-  const sfeed = el("div", { class: "feed", id: "services-feed" });
-  v.appendChild(sfeed);
-  await refreshServices();
+  // Tarefas agendadas — mesma natureza de gestão que módulos
+  v.appendChild(el("h3", { class: "section" }, "Tarefas agendadas"));
+  const schedFeed = el("div", { class: "feed", id: "scheduler-feed" });
+  v.appendChild(schedFeed);
+  await refreshScheduler();
+}
+
+async function renderAdminUpdates() {
+  const v = document.getElementById("view");
+  v.innerHTML = "";
+
+  v.appendChild(el("h3", { class: "section" }, "Administração"));
+  v.appendChild(adminTabBar());
 
   // Atualização do sistema
-  v.appendChild(el("h3", { class: "section" }, "Atualização"));
   const upBox = el("div", { class: "print-card" });
   const upBtn = el("button", { class: "btn btn-secondary", id: "up-check" },
     icon("refresh", "ic"), " Verificar atualização");
@@ -1072,8 +1156,8 @@ async function renderAdmin() {
     }
   });
 
-  // Pacotes do sistema (apt)
-  v.appendChild(el("h3", { class: "section" }, "Pacotes do sistema"));
+  // Pacotes do sistema (apt) — fundido na aba Atualizações
+  v.appendChild(el("h4", { class: "section", style: "margin-top:var(--hs-space-6)" }, "Pacotes do sistema"));
   const osBox = el("div", { class: "print-card" });
   const osBtn = el("button", { class: "btn btn-secondary", id: "up-os-check" },
     icon("toolbox", "ic"), " Verificar pacotes (apt)");
@@ -1120,12 +1204,6 @@ async function renderAdmin() {
       osBtn.disabled = false;
     }
   });
-
-  // Tarefas agendadas (scheduler)
-  v.appendChild(el("h3", { class: "section" }, "Tarefas agendadas"));
-  const schedFeed = el("div", { class: "feed", id: "scheduler-feed" });
-  v.appendChild(schedFeed);
-  await refreshScheduler();
 }
 
 /* ---------- Scheduler (admin) ---------- */
