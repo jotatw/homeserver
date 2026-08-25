@@ -302,6 +302,26 @@ const APP_MAP = {
   portainer: { title: "Portainer", host: "", icon: "layers" },
 };
 
+/** Retorna os metadados amigáveis de um serviço, derivando do APP_MAP estático
+ *  ou gerando dinamicamente para novos serviços/módulos não mapeados. */
+function getAppMeta(s) {
+  if (!s) return { title: "Aplicação", host: "", icon: "box" };
+  const known = APP_MAP[s.name];
+  if (known) return known;
+
+  // Fallback dinâmico gracioso
+  const title = s.title || s.name.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  let icon = "box";
+  const n = s.name.toLowerCase();
+  if (n.includes("media") || n.includes("jelly") || n.includes("plex")) icon = "monitor";
+  else if (n.includes("net") || n.includes("dns") || n.includes("pihole")) icon = "shield";
+  else if (n.includes("store") || n.includes("drive") || n.includes("cloud")) icon = "folder";
+  else if (n.includes("db") || n.includes("sql") || n.includes("postgres")) icon = "database";
+
+  const host = s.url || s.host || (s.port ? "http://" + window.location.hostname + ":" + s.port : "");
+  return { title, host, icon };
+}
+
 async function renderApps() {
   const services = await api("/api/v1/services");
   const v = document.getElementById("view");
@@ -350,7 +370,7 @@ async function renderApps() {
   function renderGrid() {
     grid.innerHTML = "";
     const list = services
-      .filter((s) => matches(s, APP_MAP[s.name] || { title: s.name, host: "", icon: "filetext" }))
+      .filter((s) => matches(s, getAppMeta(s)))
       .sort((a, b) => (a.status === "running" ? -1 : 1) - (b.status === "running" ? -1 : 1));
 
     if (!list.length) {
@@ -362,7 +382,7 @@ async function renderApps() {
     }
 
     list.forEach((s) => {
-      const meta = APP_MAP[s.name] || { title: s.name, host: "", icon: "filetext" };
+      const meta = getAppMeta(s);
       const up = s.status === "running";
       const card = el("div", { class: "app-card" },
         icon(meta.icon, "ic"),
