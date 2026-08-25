@@ -1242,7 +1242,28 @@ dialog::backdrop {
 .widget-content .widget-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: var(--hs-space-3); }
 .widget-content .action-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: var(--hs-space-3); }
 .widget-error { color: var(--hs-text-muted); font-size: 0.85rem; padding: var(--hs-space-4); text-align: center; }
-.widget-link { display: block; margin-top: var(--hs-space-3); font-size: 0.85rem; color: var(--hs-primary); }
+.widget-link {
+  display: inline-block;
+  margin-top: var(--hs-space-2);
+  color: var(--hs-primary);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.services-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--hs-space-3);
+  padding: var(--hs-space-2) 0;
+}
+
+.summary-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
 .widget-picker { display: flex; flex-direction: column; gap: var(--hs-space-2); margin: var(--hs-space-3) 0; }
 .widget-option {
   display: flex; align-items: center; gap: var(--hs-space-3);
