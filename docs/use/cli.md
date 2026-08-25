@@ -1,5 +1,10 @@
 # CLI `hs`
 
+> **Opcional.** Toda a administração do dia a dia — usuários, senhas, serviços,
+> módulos, atualizações e diagnósticos — está disponível no App (`/app`,
+> página *Administração*), sem terminal. Esta página é para administradores
+> avançados que precisam de acesso direto ao Core (automação, scripts, SSH).
+
 A CLI `hs` concentra operações administrativas, diagnóstico, manutenção e automação do HomeServer.
 
 ```bash

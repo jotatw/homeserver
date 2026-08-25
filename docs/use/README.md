@@ -16,7 +16,7 @@ Se é a primeira vez usando o HomeServer:
 |---|---|
 | Quero entender o funcionamento geral | [`HOW_IT_WORKS.md`](HOW_IT_WORKS.md) |
 | Quero acessar e gerenciar pelo navegador | [`app.md`](app.md) |
-| Preciso administrar pelo terminal | [`cli.md`](cli.md) |
+| Preciso de acesso técnico avançado (opcional) | [`cli.md`](cli.md) |
 | Quero imprimir ou acompanhar impressões | [`PRINTING.md`](PRINTING.md) |
 | Tenho uma dúvida comum | [`FAQ.md`](FAQ.md) |
 | Não sei onde encontrar uma resposta | [`QUESTIONS.md`](QUESTIONS.md) |
@@ -41,9 +41,9 @@ Use o **App** em `/app` para as operações que o HomeServer expõe através de 
 https://homeserver.local/app
 ```
 
-### 3. CLI `hs` — administração técnica
+### 3. CLI `hs` — administração técnica (opcional)
 
-Use a CLI quando precisar diagnosticar, automatizar, recuperar ou executar operações administrativas mais avançadas.
+O App cobre toda a administração do dia a dia. Use a CLI apenas quando precisar diagnosticar, automatizar, recuperar ou executar operações avançadas fora da interface.
 
 ```bash
 bash core/hs.sh --help

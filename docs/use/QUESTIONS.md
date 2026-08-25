@@ -10,7 +10,7 @@
 | Como instalar | [`QUICKSTART.md`](../install/QUICKSTART.md) |
 | O que fazer depois de instalar | [`FIRST_BOOT.md`](../install/FIRST_BOOT.md) |
 | Como usar Homepage e App | [`app.md`](app.md) |
-| Como usar o terminal | [`cli.md`](cli.md) |
+| Acesso técnico avançado (opcional) | [`cli.md`](cli.md) |
 | Dúvidas frequentes | [`FAQ.md`](FAQ.md) |
 
 ---
