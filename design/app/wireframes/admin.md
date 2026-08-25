@@ -46,7 +46,7 @@ Gerenciar usuários do sistema (via API `/users` → `hs user`), agenda de energ
 │                              │
 │  Usuário                     │
 │  ┌────────────────────────┐  │
-│  │ jota                   │  │
+│  │ usuario                │  │
 │  └────────────────────────┘  │
 │  Senha (8+ caracteres)       │
 │  ┌────────────────────────┐  │
