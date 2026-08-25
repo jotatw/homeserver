@@ -44,67 +44,45 @@ A API é destinada ao App e a integrações:
 
 ## 3. Primeiro acesso ao App
 
-O usuário principal é definido durante a instalação. Não é necessário assumir um nome específico.
+O usuário principal é definido durante a instalação (o instalador pergunta nome e senha). Não é necessário usar o terminal.
 
-Para verificar os usuários existentes pelo CLI:
-
-```bash
-sudo bash core/hs.sh user list
-```
-
-Se precisar criar ou administrar um usuário:
-
-```bash
-sudo bash core/hs.sh user create <usuario> --password=<senha>
-sudo bash core/hs.sh user is-admin <usuario>
-```
+Para administrar usuários, abra **App → Administração** (`/app`): lá é possível
+criar e remover usuários, trocar senhas e gerenciar tokens de API.
 
 O HomeServer App utiliza a API para autenticação e gerenciamento. O App não acessa o FileBrowser diretamente.
 
 ## 4. Verifique os serviços
 
-```bash
-sudo bash core/hs.sh system status
-sudo bash core/hs.sh service list
-```
+Acompanhe e controle os serviços pela interface: **App → Sistema** mostra o estado geral, e **App → Administração** permite iniciar, parar e reiniciar cada serviço.
 
-Também é possível verificar os containers diretamente:
+## 5. Operações comuns
 
-```bash
-docker ps
-```
+Todas as operações abaixo são feitas pelo App, sem terminal:
 
-## 5. Comandos úteis do CLI
+| Operação | Onde no App |
+|---|---|
+| Criar / remover usuário | Administração → Usuários |
+| Trocar senha | Administração → Usuários → Senha |
+| Iniciar / parar / reiniciar serviço | Administração → Serviços |
+| Verificar atualização do sistema | Administração → Atualização |
+| Atualizar pacotes (apt) | Administração → Pacotes do sistema |
+| Montar / ejetar dispositivos | Armazenamento |
 
-```bash
-sudo bash core/hs.sh version
-sudo bash core/hs.sh system status
-sudo bash core/hs.sh service list
-sudo bash core/hs.sh user list
-sudo bash core/hs.sh update check
-```
-
-Para aplicar uma atualização:
-
-```bash
-sudo bash core/hs.sh update apply
-```
+A CLI `hs` permanece disponível para automação e diagnóstico avançado — veja [`cli.md`](../use/cli.md).
 
 ## 6. Atualizações
 
-As atualizações devem ser avaliadas e aplicadas conforme o fluxo atualmente implementado e documentado pelo projeto. O comando `update check` verifica o estado de atualização disponível e `update apply` executa o fluxo suportado.
+As atualizações do HomeServer e dos pacotes do sistema são verificadas e aplicadas pelo App (**Administração → Atualização** / **Pacotes do sistema**).
 
 Antes de uma atualização importante, mantenha uma cópia do backup disponível.
 
 ## Solução de problemas
 
-| Sintoma | Verificação inicial |
+| Sintoma | O que fazer pelo App |
 |---|---|
-| Homepage não abre | `docker ps` e `docker logs caddy` |
-| API não responde | `docker ps` e `docker logs api` |
-| Acesso bloqueado | `sudo ufw status` e verifique a rede detectada durante a instalação |
-| FileBrowser recusa login | Verifique o usuário e a senha configurados durante a instalação |
-| `hs` não é encontrado | Use `sudo bash core/hs.sh ...` a partir do diretório do projeto |
-| Serviço em reinício contínuo | `docker ps` e `docker logs <container>` |
+| Homepage não abre | Administração → Serviços: reinicie `homepage`; se persistir, reinicie `caddy` |
+| API não responde | Administração → Serviços: reinicie a API (módulo `api`) |
+| FileBrowser recusa login | Use o usuário e a senha definidos na instalação; troque em Administração → Usuários |
+| Serviço em reinício contínuo | Administração → Módulos → Status mostra o último erro registrado |
 
-Para um diagnóstico mais completo, consulte [`INSTALLATION.md`](INSTALLATION.md), [`FAQ.md`](../use/FAQ.md) e [`QUESTIONS.md`](../use/QUESTIONS.md).
+Para diagnóstico avançado (logs de container, firewall), consulte [`cli.md`](../use/cli.md), [`INSTALLATION.md`](INSTALLATION.md) e [`FAQ.md`](../use/FAQ.md).
