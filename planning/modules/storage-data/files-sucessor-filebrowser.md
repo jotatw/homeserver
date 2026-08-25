@@ -141,19 +141,20 @@ Plano de baixo risco, aproveitando o piloto M1:
 3. adaptar `core/adapters/filebrowser.sh` (ou novo adapter quantum) e
    validar criação/remoção de usuário pelo Core;
 4. se aprovado: criar `modules/<sucessor>/module.json` + compose,
-   trocar a implementation do módulo de arquivos na porta 8080,
-   manter Caddy `/files` inalterado;
+   trocar a implementation do módulo de arquivos na porta 8080;
+   a decisão final foi **porta dedicada 8080** (rota `/files` do Caddy
+   removida — o Quantum gera URLs absolutas que quebram atrás de subpath);
 5. registrar evidências e encerrar o aceite final do piloto FileBrowser
    (troca de implementation sem alterar Definition/consumidores).
 
 Critérios de aceite da validação:
 
-- [ ] RAM medida em repouso ≤ 300 MB no ambiente real;
-- [ ] ciclo completo de usuário via Core (criar → logar → remover);
-- [ ] escopos isolados por usuário funcionando;
-- [ ] upload/download com arquivo > 1 GB;
-- [ ] Caddy servindo `/files` através do novo serviço;
-- [ ] rollback para o FileBrowser atual documentado e testado.
+- [x] RAM medida em repouso ≤ 300 MB no ambiente real (36,8 MiB);
+- [x] ciclo completo de usuário via Core (criar → logar → remover);
+- [x] escopos isolados por usuário funcionando;
+- [ ] upload/download com arquivo > 1 GB (pendente);
+- [x] acesso via porta dedicada 8080 (substitui a rota `/files`, removida do Caddy);
+- [ ] rollback para o FileBrowser atual documentado e testado (pendente).
 
 
 ## Evidência da validação prática (2026-08-23)
@@ -192,15 +193,14 @@ Critérios de aceite pendentes para decisão final de migração:
 - [x] RAM medida em repouso ≤ 300 MB no ambiente real;
 - [x] ciclo completo de usuário via API (criar → definir senha → logar → remover);
 - [x] escopos isolados por usuário funcionando (acesso fora do scope negado);
-- [ ] Caddy servindo `/files` através do novo serviço;
+- [x] acesso via porta dedicada 8080 (rota `/files` removida do Caddy);
 - [ ] rollback para o FileBrowser atual documentado e testado.
 
 **Aprovação do usuário (2026-08-23):** interface, usabilidade e
 funções aprovadas na UI real (porta 8081). Migração autorizada.
 
-Container de teste permanece disponível para avaliação manual da UI:
-`http://192.168.0.10:8081` (admin / TesteQ2026) — sem restart
-automático; não afeta o FileBrowser atual.
+> O container de teste (porta 8081) foi removido após a migração para
+> produção na porta 8080 (2026-08-24).
 
 ## API de usuários do Quantum — mapeamento para o adapter (2026-08-23)
 
@@ -224,3 +224,24 @@ Observações:
 - escopos por usuário validados: acesso fora do scope retorna erro
   relativo à raiz do próprio usuário (sem vazamento);
 - usuário comum autentica e opera apenas dentro do seu scope.
+
+---
+
+## Pendências registradas (2026-08-25)
+
+Validado no ambiente real (Quality Gate no servidor, 2026-08-25):
+Smoke 7/7, CLI 6/6, Session 19/19, API 31/31 — **ALL PASSED**. A
+suíte CLI foi alinhada à estratégia de estado git (`hs version`
+retorna o hash curto do commit, não mais `vX.Y.Z`).
+
+Pendências honestas (não resolvidas, registradas para não mascarar):
+
+- [ ] **Instância do Module Core**: a instância registrada é
+      `filebrowser` (definition antiga, EOL); o módulo novo é `files`.
+      `hs module status files` retorna `observed: desconhecido`.
+      Migrar/recriar a instância do módulo de arquivos para `files` e
+      validar `hs module status files` refletindo o estado real.
+- [ ] **Rollback para o FileBrowser original** documentado e testado.
+- [ ] **Upload/download com arquivo > 1 GB** validado no ambiente real.
+- [ ] Limpeza do módulo antigo `modules/filebrowser/` (EOL) quando a
+      instância for migrada e o rollback estiver documentado.

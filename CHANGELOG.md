@@ -24,6 +24,7 @@ O Baseline v0.1.0 é a referência conceitual do estado inicial da consolidaçã
 - Recuperação automática de serviços por watchdog configurável.
 - Validação diária do último backup.
 - Scheduler integrado à API e à interface administrativa conforme a capacidade implementada.
+- Migração do FileBrowser para o **FileBrowser Quantum** (`gtstef/filebrowser:stable-slim`) como módulo `files`: porta dedicada 8080 (rota `/files` do Caddy removida), adapter com cache de token JWT (evita rate limit 429), criação de usuário em 2 passos (conta + senha) e parse estrutural de JSON; ver `planning/modules/storage-data/files-sucessor-filebrowser.md`.
 
 ### Alterado
 

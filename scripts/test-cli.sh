@@ -47,9 +47,9 @@ report() {
     fi
 }
 
-# version retorna vX.Y.Z
+# version retorna o identificador do estado git (hash curto do commit).
 VERSION=$(bash "${HS}" version 2>/dev/null)
-[[ "${VERSION}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+ ]]
+[[ "${VERSION}" =~ ^[0-9a-f]{7,}$ ]]
 report "hs version -> ${VERSION}" $?
 
 # update check retorna JSON válido com ok/data (via CLI raw)

@@ -28,8 +28,10 @@
 - [x] `hs module op filebrowser restart` executa e registra no journal.
 - [x] `hs module status filebrowser` reflete observed após a operação.
 - [x] Serviço continua saudável e `/files` respondendo após o ciclo.
-- [ ] *Futuro:* substituição da implementation (novo serviço) sem alterar os
-      consumidores (Core/API/App) — aceite final do piloto.
+- [x] *Aceite final (2026-08-24):* substituição da implementation (FileBrowser
+      original → Quantum, módulo `files`) sem alterar os consumidores
+      (Core/API/App) — o aceite deste piloto. Ver
+      [`storage-data/files-sucessor-filebrowser.md`](../modules/storage-data/files-sucessor-filebrowser.md).
 
 ## Sequência executada (servidor)
 
