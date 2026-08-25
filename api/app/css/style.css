@@ -326,6 +326,13 @@ input:focus-visible {
   min-width: 0;
 }
 
+.app-card-ops {
+  flex-basis: 100%;
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--hs-space-2);
+}
+
 .app-card:hover {
   background: var(--hs-surface-hover);
   box-shadow: var(--hs-shadow-md);
@@ -846,6 +853,52 @@ dialog::backdrop {
 
 .ops-pop-item:hover {
   background: var(--hs-surface-hover);
+}
+
+/* ---------- Abas da Administração ---------- */
+
+.admin-tabs {
+  display: flex;
+  gap: var(--hs-space-1);
+  border-bottom: 1px solid var(--hs-border);
+  margin-bottom: var(--hs-space-4);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.admin-tab {
+  appearance: none;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--hs-space-2);
+  color: var(--hs-text-muted);
+  font: inherit;
+  font-weight: 500;
+  padding: var(--hs-space-3) var(--hs-space-4);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.admin-tab:hover { color: var(--hs-text); }
+
+.admin-tab.active {
+  color: var(--hs-primary);
+  border-bottom-color: var(--hs-primary);
+}
+
+.admin-tab:focus-visible {
+  outline: 2px solid var(--hs-primary);
+  outline-offset: -2px;
+  border-radius: 0.4rem;
+}
+
+@media (max-width: 480px) {
+  .admin-tab span { display: none; } /* só ícones em telas muito estreitas */
+  .admin-tab { padding: var(--hs-space-3); }
 }
 
 /* ---------- Responsivo ---------- */
