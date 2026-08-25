@@ -3,6 +3,7 @@
 > Uma plataforma modular para transformar um computador comum em um servidor doméstico simples, organizado e fácil de expandir.
 
 [![CI](https://img.shields.io/github/actions/workflow/status/jotatw/homeserver/ci.yml?branch=main&label=CI)](https://github.com/jotatw/homeserver/actions/workflows/ci.yml)
+![Release](https://img.shields.io/github/v/release/jotatw/homeserver)
 [![Licença](https://img.shields.io/github/license/jotatw/homeserver)](LICENSE)
 
 O **HomeServer** nasceu para dar uma nova vida a computadores antigos e evoluiu para uma plataforma local capaz de integrar armazenamento, usuários, serviços, automações e aplicações em uma única experiência.
@@ -29,31 +30,30 @@ O objetivo não é competir com soluções corporativas, mas oferecer uma plataf
 
 ## Estado atual
 
-O projeto está em **evolução contínua**, usando o **Baseline v0.1.0** como referência para comparar o estado observado, limitações, correções e melhorias futuras.
+**v1.0.0** — primeira release estável, publicada em 2026-08-25.
 
-O baseline não é uma tag nem uma release distribuída. Ele registra o ponto de partida da consolidação atual.
-
-A evolução é organizada por prioridades, implementação, testes, uso real e novas evidências. Uma solução pode ser consolidada, melhorada, refatorada, permanecer experimental ou ser removida conforme seus resultados.
-
-Tags e Releases não são utilizadas apenas para marcar etapas intermediárias. A primeira publicação oficial planejada é `v1.0.0`, mas será considerada somente após uma decisão explícita e o atendimento dos critérios aplicáveis de release.
+O projeto passou por consolidação completa: migração do FileBrowser para o
+Quantum (módulo `files`), Core modular operável pelo App, instalação guiada
+validada ponta a ponta e administração do dia a dia 100% pela interface web —
+sem necessidade de terminal após a instalação.
 
 O projeto atualmente possui, entre outras capacidades:
 
 - Homepage como portal de acesso;
-- HomeServer App para gerenciamento;
+- HomeServer App para gerenciamento completo (usuários, serviços, módulos,
+  dispositivos, energia, atualizações e impressão);
 - autenticação e sessões próprias;
-- gerenciamento de usuários;
+- gerenciamento de usuários com escopos isolados;
 - API REST oficial;
-- armazenamento centralizado;
-- FileBrowser;
+- armazenamento centralizado com upload/download validados acima de 1 GB;
+- FileBrowser Quantum (módulo `files`) com backup diário do banco;
 - Gitea;
-- Samba;
-- Caddy e acesso unificado na LAN;
-- backup automático e validação de integridade implementada;
+- Caddy e acesso unificado HTTPS na LAN;
+- backup automático com verificação de integridade;
 - agendamento de energia;
-- descoberta e gerenciamento de dispositivos;
-- CLI administrativa `hs`;
-- testes automatizados, smoke tests e CI;
+- descoberta e gerenciamento de dispositivos (USB/SD);
+- CLI administrativa `hs` (opcional, para automação e diagnóstico avançado);
+- testes automatizados, smoke tests, integração e CI;
 - executor centralizado para operações privilegiadas;
 - validação em camadas para operações de módulos;
 - documentação de arquitetura, segurança e planejamento;
@@ -71,11 +71,16 @@ O projeto atualmente possui, entre outras capacidades:
 
 ## Para quem é
 
-O uso cotidiano do HomeServer não deve exigir programação.
+O uso cotidiano do HomeServer **não exige programação nem terminal**: usuários,
+serviços, arquivos, dispositivos, energia e atualizações são administrados pelo
+App (`/app`) e pelos serviços acessíveis pela Homepage.
 
-A instalação oficial é um procedimento técnico documentado, e o objetivo do projeto é que uma pessoa nova consiga chegar de uma máquina Linux limpa a um servidor funcional seguindo a documentação oficial.
+A instalação é um procedimento técnico único e guiado (assistente), documentado
+para que uma pessoa nova consiga chegar de uma máquina Linux limpa a um servidor
+funcional seguindo a documentação oficial.
 
-Conhecimento de Linux, Docker e programação continua útil para diagnóstico avançado, manutenção, recuperação, automação ou desenvolvimento.
+Conhecimento de Linux, Docker e programação continua útil para diagnóstico
+avançado, manutenção, recuperação, automação ou desenvolvimento.
 
 ---
 
@@ -134,7 +139,9 @@ Prioriza acesso rápido às ações frequentes. Não precisa reproduzir automati
 
 ### CLI
 
-Continua importante para instalação, automação, testes, diagnóstico, recuperação e manutenção técnica avançada.
+Opcional para o dia a dia (o App cobre toda a administração), mas continua
+importante para automação, testes, diagnóstico, recuperação e manutenção
+técnica avançada.
 
 A direção detalhada das interfaces está em [`planning/app/`](planning/app/README.md).
 
@@ -154,8 +161,8 @@ Rotas principais:
 |---|---|
 | `/` | Homepage |
 | `/app` | HomeServer App |
-| `/files` | FileBrowser |
-| `/git` | Gitea |
+| `/files/` | Arquivos (FileBrowser Quantum) |
+| `/git/` | Gitea |
 | `/api/v1` | API |
 
 O mDNS/Avahi permite resolver `homeserver.local` na LAN quando disponível. O endereço IP continua sendo uma alternativa de acesso.
@@ -272,3 +279,15 @@ sudo bash install.sh
 ```
 
 O instalador funciona como um assistente: verifica o sistema, instala o Docker quando necessário, detecta a rede, configura o usuário principal, gera as configurações, implanta os serviços e executa o Health Check.
+
+> Guia passo a passo completo: [`docs/install/QUICKSTART.md`](docs/install/QUICKSTART.md)
+
+### Depois de instalar
+
+Ao final da instalação, acesse `https://homeserver.local/`:
+
+1. **Homepage** (`/`) — portal para abrir os serviços;
+2. **App** (`/app`) — administração completa (usuários, serviços, atualizações);
+3. **Arquivos** (`/files/`) — armazenamento com escopos por usuário.
+
+Nenhuma operação do dia a dia exige terminal. O guia do primeiro acesso está em [`docs/install/FIRST_BOOT.md`](docs/install/FIRST_BOOT.md).
