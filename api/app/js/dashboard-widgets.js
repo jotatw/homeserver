@@ -74,7 +74,7 @@ function toggleDashboardEditMode() {
   renderDashboard();
 }
 
-function addWidgetToDashboard(widgetId) {
+function addWidgetToDashboard(widgetId, silent) {
   var cfg = getDashboardConfig();
   if (cfg.layout.some(function (w) { return w.widgetId === widgetId; })) return false;
   var def = WIDGET_REGISTRY.find(function (w) { return w.id === widgetId; });
@@ -82,17 +82,17 @@ function addWidgetToDashboard(widgetId) {
   var maxOrder = cfg.layout.length ? Math.max.apply(null, cfg.layout.map(function (w) { return w.order; })) : -1;
   cfg.layout.push({ widgetId: widgetId, size: def.defaultSize, order: maxOrder + 1 });
   saveDashboardConfig(cfg);
-  renderDashboard();
+  if (!silent) renderDashboard();
   return true;
 }
 
-function removeWidgetFromDashboard(widgetId) {
+function removeWidgetFromDashboard(widgetId, silent) {
   var cfg = getDashboardConfig();
   var def = WIDGET_REGISTRY.find(function (w) { return w.id === widgetId; });
-  if (def && !def.removable) { toast("Este widget não pode ser removido.", "warn"); return; }
+  if (def && !def.removable && !silent) { toast("Este widget não pode ser removido.", "warn"); return; }
   cfg.layout = cfg.layout.filter(function (w) { return w.widgetId !== widgetId; });
   saveDashboardConfig(cfg);
-  renderDashboard();
+  if (!silent) renderDashboard();
 }
 
 function setWidgetSize(widgetId, size) {
@@ -125,6 +125,22 @@ async function renderDashboard() {
   var cfg = getDashboardConfig();
   var editMode = !!cfg.editMode;
 
+  // Resumo de saúde — "como está meu servidor" em uma linha (UX-03)
+  var health = el("div", { class: "health-summary", id: "dashboard-health" },
+    el("span", { class: "status-dot", "aria-hidden": "true" }),
+    el("span", { class: "health-text" }, "Verificando servidor…"));
+  v.appendChild(health);
+  hsStore.subscribe("status", function (st) {
+    try {
+      var cpu = st.cpu || {}, mem = st.memory || {}, disk = st.disk || {};
+      var worst = Math.max(cpu.percent ?? 0, mem.percent ?? 0, disk.percent ?? 0);
+      var dot = health.querySelector(".status-dot");
+      dot.className = "status-dot " + (worst > 85 ? "danger" : worst > 60 ? "" : "ok");
+      health.querySelector(".health-text").textContent =
+        "Tudo normal · CPU " + Math.round(cpu.percent ?? 0) + "% · Memória " + Math.round(mem.percent ?? 0) + "% · Disco " + Math.round(disk.percent ?? 0) + "%";
+    } catch (_) {}
+  });
+
   // header com ações — limpo, sem poluição
   var header = el("div", { class: "dashboard-header" },
     el("div", { class: "dashboard-title-wrap" },
@@ -132,15 +148,16 @@ async function renderDashboard() {
       el("span", { class: "dashboard-subtitle" }, auth.isAdmin() ? "Visão de administrador" : "Visão pessoal")
     ),
     el("div", { class: "dashboard-actions" },
-      el("button", { class: "btn " + (editMode ? "btn-primary" : "btn-secondary"), id: "btn-edit-dashboard" },
-        icon(editMode ? "check" : "pencil", "ic"), editMode ? " Concluir" : " Personalizar"),
-      editMode ? el("button", { class: "btn btn-secondary", id: "btn-add-widget" }, icon("plus", "ic"), " Adicionar") : null
+      el("button", { class: "btn btn-secondary", id: "btn-customize-dashboard" },
+        icon("settings", "ic"), " Personalizar"),
+      editMode ? el("button", { class: "btn btn-primary", id: "btn-edit-done" },
+        icon("check", "ic"), " Concluir") : null
     )
   );
   v.appendChild(header);
-  document.getElementById("btn-edit-dashboard").addEventListener("click", toggleDashboardEditMode);
-  var addBtn = document.getElementById("btn-add-widget");
-  if (addBtn) addBtn.addEventListener("click", openAddWidgetDialog);
+  document.getElementById("btn-customize-dashboard").addEventListener("click", openCustomizeDialog);
+  var doneBtn = document.getElementById("btn-edit-done");
+  if (doneBtn) doneBtn.addEventListener("click", toggleDashboardEditMode);
 
   // grid
   var grid = el("div", { class: "dashboard-grid", id: "dashboard-grid", "data-edit-mode": editMode ? "1" : "0" });
@@ -231,42 +248,98 @@ function saveWidgetOrder() {
   saveDashboardConfig(cfg);
 }
 
-/* ---------- Dialog adicionar ---------- */
-function openAddWidgetDialog() {
-  var old = document.getElementById("add-widget-dialog");
+/* ---------- Dialog Personalizar (widgets + densidade + reset) ---------- */
+function openCustomizeDialog() {
+  var old = document.getElementById("customize-dialog");
   if (old) old.remove();
   var cfg = getDashboardConfig();
-  var added = {};
-  cfg.layout.forEach(function (w) { added[w.widgetId] = true; });
-  var available = getAvailableWidgets().filter(function (w) { return !added[w.id]; });
-  var dialog = el("dialog", { id: "add-widget-dialog" },
-    el("form", { method: "dialog", id: "add-widget-form" },
-      el("h3", { style: "margin-bottom:var(--hs-space-2)" }, "Adicionar widget"),
-      el("p", { class: "power-hint", style: "margin-bottom:var(--hs-space-4)" }, available.length ? "Escolha o conteúdo que deseja ver no seu espaço." : "Todos os widgets já foram adicionados."),
-      el("div", { class: "widget-picker" },
-        available.length ? available.map(function (w) {
-          return el("label", { class: "widget-option" },
-            el("input", { type: "checkbox", value: w.id }),
-            el("span", { class: "widget-option-icon" }, icon(w.icon, "ic")),
-            el("span", { class: "widget-option-meta" },
-              el("strong", {}, w.title),
-              el("small", {}, w.description)
-            )
-          );
-        }) : [el("p", { class: "empty", style: "padding:var(--hs-space-4)" }, "Nada a adicionar.")]
-      ),
+  // estado de trabalho: cópia do que está ativo agora
+  var working = {};
+  cfg.layout.forEach(function (w) { working[w.widgetId] = true; });
+  var available = getAvailableWidgets();
+
+  function updateCount() {
+    var n = available.filter(function (w) { return working[w.id]; }).length;
+    var elc = document.getElementById("cz-count");
+    if (elc) elc.textContent = n + " ativo" + (n === 1 ? "" : "s");
+  }
+
+  var listEl = el("div", { class: "widget-list", id: "cz-list" });
+  available.forEach(function (w) {
+    var cb = el("input", { type: "checkbox", value: w.id });
+    if (working[w.id]) cb.checked = true;
+    cb.addEventListener("change", function () {
+      if (cb.checked) {
+        // server-status é o coração do painel — sempre presente
+        working[w.id] = true;
+      } else {
+        delete working[w.id];
+      }
+      updateCount();
+    });
+    listEl.appendChild(el("label", { class: "widget-option" },
+      cb,
+      el("span", { class: "widget-option-meta" },
+        el("strong", {}, w.title),
+        el("small", {}, w.description))));
+  });
+
+  var cozyBtn = el("button", { type: "button", class: "density-opt active", "data-density": "cozy" }, "Confortável");
+  var compactBtn = el("button", { type: "button", class: "density-opt", "data-density": "compact" }, "Compacta");
+  var currentDensity = document.documentElement.classList.contains("compact") ? "compact" : "cozy";
+  [cozyBtn, compactBtn].forEach(function (b) {
+    b.classList.toggle("active", b.getAttribute("data-density") === currentDensity);
+    b.addEventListener("click", function () {
+      cozyBtn.classList.toggle("active", b === cozyBtn);
+      compactBtn.classList.toggle("active", b === compactBtn);
+    });
+  });
+
+  var dialog = el("dialog", { id: "customize-dialog" },
+    el("form", { method: "dialog", id: "customize-form" },
+      el("h3", { class: "dialog-title" }, "Personalizar"),
+      el("p", { class: "power-hint", style: "margin-bottom:var(--hs-space-2)" }, "Escolha o que aparece no seu espaço e como."),
+      el("div", { class: "group-label" },
+        "Widgets ",
+        el("span", { class: "count", id: "cz-count" })),
+      listEl,
+      el("div", { class: "group-label" }, "Densidade"),
+      el("div", { class: "density-row", role: "radiogroup", "aria-label": "Densidade" }, cozyBtn, compactBtn),
+      el("button", { type: "button", class: "reset-link", id: "cz-reset" }, "↺ Restaurar layout padrão"),
       el("div", { class: "dialog-actions" },
-        el("button", { type: "button", class: "btn btn-secondary", id: "add-widget-cancel" }, "Cancelar"),
-        el("button", { type: "submit", class: "btn btn-primary" }, "Adicionar")
-      )
-    )
-  );
+        el("button", { type: "button", class: "btn btn-secondary", id: "cz-reorder" }, "Reordenar"),
+        el("button", { type: "button", class: "btn btn-secondary", id: "cz-cancel" }, "Cancelar"),
+        el("button", { type: "submit", class: "btn btn-primary" }, "Salvar"))));
   document.body.appendChild(dialog);
-  dialog.querySelector("#add-widget-cancel").addEventListener("click", function () { dialog.close(); });
-  dialog.querySelector("#add-widget-form").addEventListener("submit", function (e) {
+  updateCount();
+
+  dialog.querySelector("#cz-cancel").addEventListener("click", function () { dialog.close(); });
+  dialog.querySelector("#cz-reorder").addEventListener("click", function () {
+    dialog.close();
+    if (!getDashboardConfig().editMode) toggleDashboardEditMode();
+  });
+  dialog.querySelector("#cz-reset").addEventListener("click", function () {
+    working = {};
+    getDefaultDashboardConfig().layout.forEach(function (w) { working[w.widgetId] = true; });
+    cozyBtn.classList.add("active");
+    compactBtn.classList.remove("active");
+    listEl.querySelectorAll('input[type="checkbox"]').forEach(function (cb) {
+      cb.checked = !!working[cb.value];
+    });
+    updateCount();
+  });
+  dialog.querySelector("#customize-form").addEventListener("submit", function (e) {
     e.preventDefault();
-    var checks = dialog.querySelectorAll('input[type="checkbox"]:checked');
-    Array.prototype.forEach.call(checks, function (cb) { addWidgetToDashboard(cb.value); });
+    // 1) widgets: adicionar novos, remover desmarcados
+    var toAdd = available.filter(function (w) { return working[w.id] && !cfg.layout.some(function (l) { return l.widgetId === w.id; }); });
+    var toRemove = cfg.layout.filter(function (l) { return !working[l.widgetId]; }).map(function (l) { return l.widgetId; });
+    toAdd.forEach(function (w) { addWidgetToDashboard(w.id, true); });
+    toRemove.forEach(function (id) { removeWidgetFromDashboard(id, true); });
+    // 2) densidade
+    applyDensity(compactBtn.classList.contains("active") ? "compact" : "cozy");
+    saveDashboardConfig(cfg);
+    renderDashboard();
+    toast("Preferências salvas.", "success");
     dialog.close();
   });
   dialog.showModal();
