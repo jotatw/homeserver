@@ -330,11 +330,26 @@ function openCustomizeDialog() {
   });
   dialog.querySelector("#customize-form").addEventListener("submit", function (e) {
     e.preventDefault();
-    // 1) widgets: adicionar novos, remover desmarcados
-    var toAdd = available.filter(function (w) { return working[w.id] && !cfg.layout.some(function (l) { return l.widgetId === w.id; }); });
-    var toRemove = cfg.layout.filter(function (l) { return !working[l.widgetId]; }).map(function (l) { return l.widgetId; });
-    toAdd.forEach(function (w) { addWidgetToDashboard(w.id, true); });
-    toRemove.forEach(function (id) { removeWidgetFromDashboard(id, true); });
+    // 1) widgets: atualizar cfg.layout sem usar addWidgetToDashboard/removeWidgetFromDashboard (evita render duplicado)
+    var newLayout = [];
+    // primeiro, manter os que ainda estão marcados
+    cfg.layout.forEach(function (l) {
+      if (working[l.widgetId]) newLayout.push(l);
+    });
+    // depois, acrescentar os que foram marcados mas ainda não existiam
+    available.forEach(function (w) {
+      if (working[w.id] && !newLayout.some(function (it) { return it.widgetId === w.id; })) {
+        var maxOrder = newLayout.length ? Math.max.apply(null, newLayout.map(function (it) { return it.order; })) : -1;
+        newLayout.push({ widgetId: w.id, size: w.defaultSize || "medium", order: maxOrder + 1 });
+      }
+    });
+    cfg.layout = newLayout;
+    // 2) densidade
+    applyDensity(compactBtn.classList.contains("active") ? "compact" : "cozy");
+    saveDashboardConfig(cfg);
+    renderDashboard();
+    toast("Preferências salvas.", "success");
+    dialog.close();
     // 2) densidade
     applyDensity(compactBtn.classList.contains("active") ? "compact" : "cozy");
     saveDashboardConfig(cfg);
