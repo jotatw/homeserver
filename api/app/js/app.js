@@ -523,6 +523,30 @@ async function renderDevicesSection(mountedDevices) {
           }
         });
         act.appendChild(btn);
+        // Formatar (apenas disco inteiro, ex.: sdb — não sdb1)
+        if (!/[0-9]+$/.test(d.device)) {
+          const fmtBtn = el("button", { class: "btn btn-secondary btn-danger-ghost", style: "height:var(--hs-touch-compact)" }, "Formatar");
+          fmtBtn.addEventListener("click", async () => {
+            if (!confirm(`Formatar ${d.device} (${d.label})?`)) return;
+            if (!confirm(`APAGARÁ TODOS OS DADOS de ${d.device}. Tem certeza?`)) return;
+            fmtBtn.disabled = true;
+            fmtBtn.textContent = "Formatando…";
+            try {
+              await apiOrFail("/api/v1/devices/format", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ device: d.device }),
+              });
+              toast(`${d.device} formatado (FAT32).`, "success");
+              renderStorage();
+            } catch (err) {
+              toast(err.message || "Falha ao formatar.", "error");
+              fmtBtn.disabled = false;
+              fmtBtn.textContent = "Formatar";
+            }
+          });
+          act.appendChild(fmtBtn);
+        }
         row.appendChild(act);
       }
       feed.appendChild(row);
