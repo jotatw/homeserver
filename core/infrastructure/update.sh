@@ -29,11 +29,26 @@
 #
 # ==========================================================
 
-HS_REMOTE="${HS_REMOTE:-origin}"
+HS_REMOTE="${HS_REMOTE:-}"
 HS_UPDATE_BRANCH="${HS_UPDATE_BRANCH:-main}"
 
 _hs_git() {
     git -C "${HS_PROJECT_ROOT}" "$@"
+}
+
+# Resolve o remote usado para atualizar o código.
+# Regra: se existir um remote chamado "github" (publicação real no servidor),
+# usa ele; senão cai para "origin" (casa canônica no desenvolvimento local).
+_hs_update_remote() {
+    if [[ -n "${HS_REMOTE}" ]]; then
+        printf '%s' "${HS_REMOTE}"
+        return 0
+    fi
+    if _hs_git remote get-url github >/dev/null 2>&1; then
+        printf 'github'
+    else
+        printf 'origin'
+    fi
 }
 
 # Retorna o identificador curto do commit atualmente instalado.
@@ -48,16 +63,17 @@ _hs_update_worktree_dirty() {
 
 # Atualiza as referências remotas sem alterar o código local.
 _hs_update_fetch() {
-    _hs_git fetch --quiet "${HS_REMOTE}" "${HS_UPDATE_BRANCH}"
+    _hs_git fetch --quiet "$(_hs_update_remote)" "${HS_UPDATE_BRANCH}"
 }
 
 # Calcula o estado do repositório em relação ao destino remoto.
 # Saída: status\tcurrent\tlatest\tahead\tbehind\tdirty
 _hs_update_state() {
-    local current latest counts ahead behind dirty status
+    local current latest counts ahead behind dirty status remote
 
+    remote="$(_hs_update_remote)"
     current="$(_hs_git rev-parse --short HEAD 2>/dev/null || printf '%s' 'desconhecida')"
-    latest="$(_hs_git rev-parse --short "${HS_REMOTE}/${HS_UPDATE_BRANCH}" 2>/dev/null || true)"
+    latest="$(_hs_git rev-parse --short "${remote}/${HS_UPDATE_BRANCH}" 2>/dev/null || true)"
     dirty=false
     _hs_update_worktree_dirty && dirty=true
 
@@ -66,7 +82,7 @@ _hs_update_state() {
         return 0
     fi
 
-    counts="$(_hs_git rev-list --left-right --count HEAD..."${HS_REMOTE}/${HS_UPDATE_BRANCH}" 2>/dev/null || true)"
+    counts="$(_hs_git rev-list --left-right --count HEAD..."${remote}/${HS_UPDATE_BRANCH}" 2>/dev/null || true)"
     read -r ahead behind <<< "${counts:-0 0}"
 
     if [[ "${dirty}" == true ]]; then
@@ -115,13 +131,16 @@ hs_update_check() {
 #   2 -> Não foi possível atualizar com segurança
 #   3 -> Falha operacional
 hs_update_apply() {
+    local remote
+    remote="$(_hs_update_remote)"
+
     if [[ $# -gt 0 ]]; then
         echo "Argumento desconhecido: $1" >&2
         return 2
     fi
 
     if ! _hs_update_fetch; then
-        error "Não foi possível consultar ${HS_REMOTE}/${HS_UPDATE_BRANCH}."
+        error "Não foi possível consultar ${remote}/${HS_UPDATE_BRANCH}."
         return 3
     fi
 
@@ -167,7 +186,7 @@ hs_update_apply() {
         return 3
     }
 
-    if ! _hs_git merge --ff-only "${HS_REMOTE}/${HS_UPDATE_BRANCH}"; then
+    if ! _hs_git merge --ff-only "${remote}/${HS_UPDATE_BRANCH}"; then
         error "Fast-forward falhou. Nenhum reset automático será executado."
         return 3
     fi

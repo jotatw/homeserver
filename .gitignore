@@ -48,4 +48,5 @@ graphify-out/
 
 # Runtime do Homepage (gerado pelo container)
 modules/homepage/config/kubernetes.yaml
+modules/homepage/config/proxmox.yaml
 

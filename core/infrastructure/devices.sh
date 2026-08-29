@@ -173,7 +173,7 @@ device_mounted_json() {
             size="$(df -B1 "${dir}" 2>/dev/null | awk 'NR==2 {print $3}')"
 
             [[ ${first} -eq 0 ]] && printf ','
-            printf '\n  {"type":"%s","label":"%s","mountpoint":"%s","size":%s}' \
+            printf '\n  {"type":"%s","label":"%s","mountpoint":"%s","size":%s,"managed":true}' \
                 "${type}" "${label}" "${mountpoint}" "${size:-0}"
             first=0
         done
@@ -182,8 +182,77 @@ device_mounted_json() {
 }
 
 #
-# Estado dos dispositivos montados (JSON).
+# Lista dispositivos removíveis montados fora do diretório gerenciado
+# (ex.: /media, /mnt — montagem manual/automática do desktop/udev).
+# Inclui "managed":false para a UI distinguir da montagem gerenciada.
+#
+device_mounted_unmanaged_json() {
+    local root
+    root="$(_devices_root_read)"
+
+    HS_DEVICES_ROOT="${HS_DEVICES_ROOT}" MANAGED_ROOT="${root}" python3 - <<'PY' || true
+import json, os, subprocess
+
+try:
+    out = subprocess.run(
+        ["lsblk", "-J", "-o",
+         "NAME,SIZE,TYPE,FSTYPE,MOUNTPOINT,LABEL,TRAN,RM,MODEL"],
+        capture_output=True, text=True, timeout=10
+    ).stdout
+    data = json.loads(out or "{}")
+except Exception:
+    raise SystemExit(0)
+
+managed_root = os.environ.get("MANAGED_ROOT", "/srv/storage/devices").rstrip("/")
+TRAN_TYPE = {"usb": "usb", "mmc": "sdcard"}
+results = []
+
+def walk(devs, parent_tran="", parent_model=""):
+    for b in devs:
+        removable = bool(b.get("rm"))
+        children = b.get("children") or []
+        tran = (b.get("tran") or parent_tran or "").lower()
+        model = (b.get("model") or parent_model or "").strip()
+
+        if removable:
+            mountpoint = b.get("mountpoint") or ""
+            # Montado, mas FORA da pasta gerenciada (managed)
+            if mountpoint and not mountpoint.startswith(managed_root + "/"):
+                name = b["name"]
+                dtype = TRAN_TYPE.get(tran, "external")
+                label = (b.get("label") or "").strip()
+                results.append({
+                    "device": name,
+                    "type": dtype,
+                    "label": label or name,
+                    "size": b.get("size", ""),
+                    "fstype": (b.get("fstype") or "").lower(),
+                    "mounted": True,
+                    "mountpoint": mountpoint,
+                    "transport": tran or "unknown",
+                    "model": model,
+                    "managed": False,
+                })
+        walk(children, tran, model)
+
+walk(data.get("blockdevices", []))
+print(json.dumps(results, ensure_ascii=False))
+PY
+}
+
+#
+# Estado dos dispositivos montados (JSON): gerenciados + não gerenciados.
 #
 device_status() {
-    device_mounted_json
+    local managed unmanaged
+    managed="$(device_mounted_json)"
+    unmanaged="$(device_mounted_unmanaged_json)"
+
+    # Concatena [a,b] + [c,d] => [a,b,c,d] via python3
+    printf '%s\n%s\n' "${managed}" "${unmanaged}" | python3 -c "
+import json, sys
+managed = json.loads(sys.stdin.readline().strip() or '[]')
+unmanaged = json.loads(sys.stdin.readline().strip() or '[]')
+print(json.dumps(managed + unmanaged, ensure_ascii=False))
+" 2>/dev/null || printf '%s' "${managed}"
 }
