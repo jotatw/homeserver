@@ -173,12 +173,12 @@ flowchart TD
 ## Próximos passos
 - [x] Validar plano com usuário (este doc)
 - [x] Protótipo HTML das abas do Admin (validado antes de codificar)
-- [x] Implementar item 1 (abas no Admin — commit `ec8ce24`)
-- [x] Implementar item 2 (widgets-resumo com link — commit `e120af6`)
-- [x] Polling centralizado + pausa em aba oculta (`store.js` — commit `e62da7b`)
-- [x] Reordenação de widgets por botões ↑↓ touch/acessível (`f19aaae`)
-- [x] Modo compacto de densidade persistido (`5e9844b`)
-- [x] APP_MAP dinâmico via `getAppMeta` (`cab757a`)
+- [x] Implementar item 1 (abas no Admin — commit `349b542`)
+- [x] Implementar item 2 (widgets-resumo com link — commit `349b542`)
+- [x] Polling centralizado + pausa em aba oculta (`store.js` — commit `349b542`)
+- [x] Reordenação de widgets por botões ↑↓ touch/acessível (`349b542`)
+- [x] Modo compacto de densidade persistido (`349b542`)
+- [x] APP_MAP dinâmico via `getAppMeta` (`349b542`)
 
 ## Melhorias futuras (backlog, sem data)
 - [ ] Armazenamento: tamanho real por pasta na API (hoje só contagem/total)

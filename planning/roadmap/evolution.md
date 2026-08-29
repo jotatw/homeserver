@@ -289,20 +289,20 @@ automações opcionais podem ser desabilitadas sem impacto no núcleo.
 - funcionalidades mobile devem justificar seu benefício e não reproduzir automaticamente toda a interface Desktop.
 
 **Próximos pontos de evolução:**
-- fundamentos visuais e Design System;
-- temas e cores;
-- iconografia;
-- navegação;
-- componentes básicos;
-- experiência Desktop;
-- experiência Mobile;
-- mensagens de erro e estados vazios;
-- acessibilidade;
-- testes com uso real.
+- fundamentos visuais e Design System ✅
+- temas e cores ✅
+- iconografia ✅
+- navegação ✅
+- componentes básicos ✅
+- experiência Desktop ✅
+- experiência Mobile ✅
+- mensagens de erro e estados vazios ✅
+- acessibilidade ✅
+- testes com uso real ✅
 
 **Critério de saída:** uma pessoa que não participou do desenvolvimento consegue encontrar e utilizar as funções principais sem precisar compreender a implementação interna.
 
-**Estado:** 🟡 Em preparação e evolução de direção; implementação e validação prática pendentes.
+**Estado:** 🟢 Concluída — Design System aplicado a todas as telas (desktop + mobile), v1.0.0 publicada.
 
 ---
 
