@@ -559,24 +559,27 @@ async function renderDevicesSection(mountedDevices) {
       const extra = availByMp[d.mountpoint] || {};
       const sizeUsed = human(Number(d.size || 0));
       const modelInfo = extra.model ? ` · ${extra.model}` : "";
+      const managed = d.managed !== false;
 
       const row = el("div", { class: "feed-item module-row" },
         el("span", { class: "status-dot ok" }),
         el("div", { class: "module-meta" },
           el("div", { class: "app-name" }, d.label),
           el("div", { class: "app-host" },
-            `${(d.type || "").toUpperCase()}${sizeUsed !== "0 B" ? " · " + sizeUsed : ""}${modelInfo} · ${d.mountpoint}`)));
+            `${(d.type || "").toUpperCase()}${sizeUsed !== "0 B" ? " · " + sizeUsed : ""}${modelInfo} · ${d.mountpoint}${managed ? "" : " · fora da pasta gerenciada"}`)));
 
       if (auth.isAdmin()) {
         const act = el("span", { class: "device-actions" });
 
-        // Abrir arquivos (rota /files/ via Caddy — HTTPS)
-        const openLink = el("a", {
-          href: "/files/",
-          target: "_blank",
-          class: "btn btn-secondary", style: "height:var(--hs-touch-compact);text-decoration:none",
-        }, "Abrir");
-        act.appendChild(openLink);
+        // Abrir arquivos (rota /files/ via Caddy — HTTPS) — só gerenciados
+        if (managed) {
+          const openLink = el("a", {
+            href: "/files/",
+            target: "_blank",
+            class: "btn btn-secondary", style: "height:var(--hs-touch-compact);text-decoration:none",
+          }, "Abrir");
+          act.appendChild(openLink);
+        }
 
         // Ejetar (seguro p/ pendrive/SD): desmonta + ejeta em um clique
         if (extra.device) {
@@ -614,27 +617,29 @@ async function renderDevicesSection(mountedDevices) {
           act.appendChild(ejBtn);
         }
 
-        // Desmontar (sem eject — HD externo que fica conectado)
-        const umBtn = el("button", { class: "btn btn-secondary", style: "height:var(--hs-touch-compact)" }, "Desmontar");
-        umBtn.addEventListener("click", async () => {
-          if (!confirm(`Desmontar ${d.label}?`)) return;
-          umBtn.disabled = true;
-          umBtn.textContent = "…";
-          try {
-            await apiOrFail("/api/v1/devices/unmount", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ type: d.type, label: d.label }),
-            });
-            toast(`${d.label} desmontado.`, "success");
-            renderStorage();
-          } catch (err) {
-            toast(err.message || "Falha ao desmontar.", "error");
-            umBtn.disabled = false;
-            umBtn.textContent = "Desmontar";
-          }
-        });
-        act.appendChild(umBtn);
+        // Desmontar (sem eject — HD externo que fica conectado) — só gerenciados
+        if (managed) {
+          const umBtn = el("button", { class: "btn btn-secondary", style: "height:var(--hs-touch-compact)" }, "Desmontar");
+          umBtn.addEventListener("click", async () => {
+            if (!confirm(`Desmontar ${d.label}?`)) return;
+            umBtn.disabled = true;
+            umBtn.textContent = "…";
+            try {
+              await apiOrFail("/api/v1/devices/unmount", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ type: d.type, label: d.label }),
+              });
+              toast(`${d.label} desmontado.`, "success");
+              renderStorage();
+            } catch (err) {
+              toast(err.message || "Falha ao desmontar.", "error");
+              umBtn.disabled = false;
+              umBtn.textContent = "Desmontar";
+            }
+          });
+          act.appendChild(umBtn);
+        }
 
         row.appendChild(act);
       }
