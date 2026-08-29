@@ -78,7 +78,7 @@ Outros assuntos possuem seus próprios locais:
 ```text
 Princípios duradouros        → ../PRINCIPLES.md
 Planejamento e evolução      → ../../../planning/
-Endpoints concretos da API   → ../../../api/README.md
+Endpoints concretos da API   → ../../../../api/README.md
 Instalação e operação        → ../../install/ e ../../use/
 Personalização e contribuição→ ../../contribute/
 ```

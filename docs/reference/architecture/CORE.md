@@ -105,7 +105,7 @@ Interfaces consumidoras não devem depender diretamente de detalhes internos qua
 
 A API define operações e comportamentos expostos pela plataforma. A implementação interna pode evoluir preservando o contrato suportado.
 
-Consulte [`API.md`](API.md) e a [referência da API](../../api/README.md).
+Consulte [`API.md`](API.md) e a [referência da API](../../../api/README.md).
 
 ---
 

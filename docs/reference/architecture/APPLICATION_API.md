@@ -141,7 +141,7 @@ O contrato deve ser mais estável que detalhes internos, mas não precisa ser im
 
 ## Relação com a API do HomeServer
 
-A referência concreta de endpoints e contratos expostos fica em [`../../api/README.md`](../../api/README.md).
+A referência concreta de endpoints e contratos expostos fica em [`../../../api/README.md`](../../../api/README.md).
 
 Este documento descreve o princípio arquitetural da fronteira entre aplicações consumidoras e capacidades da plataforma.
 
@@ -179,7 +179,7 @@ Interfaces diferentes podem consumir capacidades semelhantes sem duplicar a lóg
 - [`API.md`](API.md) — fronteira geral da API;
 - [`CORE.md`](CORE.md) — capacidades compartilhadas da plataforma;
 - [`Infrastructure.md`](Infrastructure.md) — operações internas e ambiente;
-- [`../../api/README.md`](../../api/README.md) — referência concreta da API;
+- [`../../../api/README.md`](../../../api/README.md) — referência concreta da API;
 - [`../../reference/ARCHITECTURE.md`](../ARCHITECTURE.md) — visão geral.
 
 Voltar para [Referência de arquitetura](README.md).

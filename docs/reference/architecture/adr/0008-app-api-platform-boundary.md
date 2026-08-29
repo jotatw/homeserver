@@ -153,4 +153,4 @@ Esta decisão está relacionada a:
 - [`../../ARCHITECTURE.md`](../../ARCHITECTURE.md) — fronteiras atuais da plataforma;
 - [`../APPLICATION_API.md`](../APPLICATION_API.md) — relação entre consumidores e contratos;
 - [`../API.md`](../API.md) — papel arquitetural da API;
-- [`../../api/README.md`](../../api/README.md) — contratos e endpoints concretos.
+- [`../../../../api/README.md`](../../../../api/README.md) — contratos e endpoints concretos.

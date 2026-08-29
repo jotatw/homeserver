@@ -4,7 +4,7 @@ A API é a fronteira oficial para clientes externos e interfaces que precisam ac
 
 Seu objetivo é oferecer contratos previsíveis sem expor detalhes internos da implementação.
 
-Este documento descreve **o papel arquitetural da API**. Endpoints, autenticação concreta, variáveis de ambiente e exemplos de uso ficam na [referência da API](../../api/README.md).
+Este documento descreve **o papel arquitetural da API**. Endpoints, autenticação concreta, variáveis de ambiente e exemplos de uso ficam na [referência da API](../../../api/README.md).
 
 ## Papel da API
 
@@ -168,7 +168,7 @@ security/
 Referências:
 
 - [`APPLICATION_API.md`](APPLICATION_API.md);
-- [`../../api/README.md`](../../api/README.md);
+- [`../../../api/README.md`](../../../api/README.md);
 - [`../../security/`](../security/);
 - [`adr/`](adr/).
 
