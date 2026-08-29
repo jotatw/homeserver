@@ -567,12 +567,19 @@ async function renderDevicesSection(mountedDevices) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ type: d.type, label: d.label }),
               });
-              await apiOrFail("/api/v1/devices/eject", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ device: extra.device }),
-              }).catch(() => { }); // eject é best-effort (HD externo sem suporte)
-              toast(`${d.label} pode ser removido com segurança.`, "success");
+              try {
+                await apiOrFail("/api/v1/devices/eject", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ device: extra.device }),
+                });
+                toast(`${d.label} pode ser removido com segurança.`, "success");
+              } catch (ejectErr) {
+                // eject é best-effort (alguns HDs externos não suportam)
+                // o desmontamento já foi feito com segurança
+                console.warn("Falha ao ejectar dispositivo (mas desmontamento OK):", ejectErr);
+                toast(`${d.label} desmontado com segurança. Eject falhou (normal para alguns dispositivos).`, "warning");
+              }
               renderStorage();
             } catch (err) {
               toast(err.message || "Falha ao ejetar.", "error");
