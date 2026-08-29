@@ -8,6 +8,11 @@
 # Meu espaço — tarefas do usuário (cards principais, destacados)
 - Meu espaço:
 
+    - Assistente IA:
+        icon: mdi-robot
+        href: http://100.118.148.55:3002
+        description: Hermes Remote (chat + dashboard)
+
     - Arquivos:
         icon: mdi-folder
         href: /files/
@@ -48,6 +53,11 @@
         href: /git/
         server: homeserver
         container: gitea
+
+    - Hermes Remote:
+        icon: mdi-robot-outline
+        href: http://100.118.148.55:3002
+        description: Assistente IA
 
     - HomeServer App:
         icon: mdi-monitor-dashboard
