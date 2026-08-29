@@ -163,13 +163,14 @@ sys.stdout.write(str(u['id']) if u else '')
 }
 
 # Cria um usuario (conta SEM senha; aplicar depois via update_password).
+# Scopes: pasta pessoal + pasta compartilhada (onde ficam os dispositivos).
 filebrowser_create_user() {
     local token="$1" username="$2" scope="$3"
     curl -fsS -m 10 -X POST "${FILEBROWSER_URL}/api/users" \
         -H "Authorization: Bearer ${token}" \
         -H "X-Password: ${FILEBROWSER_ADMIN_PASS}" \
         -H "Content-Type: application/json" \
-        -d "{\"what\":\"user\",\"which\":[],\"data\":{\"username\":\"${username}\",\"scopes\":[{\"name\":\"Storage\",\"scope\":\"${scope}\"}],\"lockPassword\":false,\"permissions\":{\"api\":false,\"admin\":false,\"modify\":true,\"share\":true,\"realtime\":false,\"delete\":true,\"create\":true,\"download\":true},\"locale\":\"ptBR\",\"viewMode\":\"normal\",\"singleClick\":false}}" >/dev/null
+        -d "{\"what\":\"user\",\"which\":[],\"data\":{\"username\":\"${username}\",\"scopes\":[{\"name\":\"Storage\",\"scope\":\"${scope}\"},{\"name\":\"Compartilhado\",\"scope\":\"/shared\"}],\"lockPassword\":false,\"permissions\":{\"api\":false,\"admin\":false,\"modify\":true,\"share\":true,\"realtime\":false,\"delete\":true,\"create\":true,\"download\":true},\"locale\":\"ptBR\",\"viewMode\":\"normal\",\"singleClick\":false}}" >/dev/null
 }
 
 # Define/altera a senha de um usuario.

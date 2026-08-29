@@ -88,6 +88,11 @@ storage_init() {
         "${HS_STORAGE_ROOT}/media" \
         "${HS_STORAGE_ROOT}/documents" 2>/dev/null || true
 
+    # Symlink devices na pasta compartilhada (visível no FileBrowser)
+    if [[ ! -L "${HS_STORAGE_ROOT}/shared/devices" ]]; then
+        ln -s "../devices" "${HS_STORAGE_ROOT}/shared/devices" 2>/dev/null || true
+    fi
+
     return 0
 }
 
