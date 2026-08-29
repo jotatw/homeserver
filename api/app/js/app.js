@@ -1881,6 +1881,58 @@ function setupMobileSidebar() {
   });
 }
 
+/* ---------- Device watcher (notificações de conexão/desconexão) ---------- */
+
+const deviceWatchState = { devices: new Set(), enabled: false, timer: null };
+
+function deviceWatchKey(d) {
+  // Chave estável: device + mountpoint (o mountpoint muda quando monta/desmonta)
+  return (d.device || "") + "|" + (d.mountpoint || "");
+}
+
+async function deviceWatchPoll() {
+  if (!auth.isAdmin()) return;
+  let available = [];
+  try {
+    available = await api("/api/v1/devices/available");
+  } catch (_) {
+    return; // API indisponível — tenta de novo no próximo ciclo
+  }
+  if (!Array.isArray(available)) return;
+
+  const now = new Set(available.map(deviceWatchKey));
+  const prev = deviceWatchState.devices;
+  if (prev.size > 0) {
+    // Conectados (novos): estavam fora, agora estão dentro
+    const added = available.filter((d) => !prev.has(deviceWatchKey(d)));
+    // Desconectados: estavam dentro, agora fora
+    const removed = [...prev].filter((k) => !now.has(k));
+
+    added.forEach((d) => {
+      const label = d.label || d.device || "dispositivo";
+      if (d.mounted) {
+        toast("🔌 " + label + " conectado" + (d.mountpoint ? " em " + d.mountpoint : ""), "success");
+      } else {
+        toast("🔌 " + label + " detectado — pronto para conectar", "info");
+      }
+    });
+    removed.forEach((k) => {
+      const dev = k.split("|")[0] || "dispositivo";
+      toast("⏏️ " + dev + " desconectado", "warn");
+    });
+  }
+  deviceWatchState.devices = now;
+}
+
+function startDeviceWatch() {
+  if (deviceWatchState.enabled) return;
+  deviceWatchState.enabled = true;
+  // Primeira passada só popula o baseline (sem notificações)
+  deviceWatchPoll().then(() => {
+    deviceWatchState.timer = setInterval(deviceWatchPoll, 15000);
+  });
+}
+
 async function init() {
   applyTheme(localStorage.getItem("hs_theme") || "dark");
   applyDensity(localStorage.getItem("hs_density") || "cozy");
@@ -1894,6 +1946,7 @@ async function init() {
   buildNav();
   renderUser();
   setupMobileSidebar();
+  startDeviceWatch();
   router();
 }
 

@@ -530,6 +530,7 @@ input:focus-visible {
 .device-actions {
   margin-left: var(--hs-space-2);
   display: inline-flex;
+  gap: var(--hs-space-1);
 }
 
 .device-actions .btn {
