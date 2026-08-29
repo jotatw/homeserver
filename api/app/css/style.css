@@ -748,6 +748,16 @@ input:focus-visible {
   color: var(--hs-text-inverse);
 }
 
+.btn-danger-ghost {
+  background: transparent;
+  color: var(--hs-color-danger);
+  border: 1px solid var(--hs-color-danger);
+}
+.btn-danger-ghost:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 .btn-secondary {
   background: var(--hs-surface);
   color: var(--hs-text);

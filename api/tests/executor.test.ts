@@ -48,6 +48,9 @@ await expectError("Rejeita subcomando desconhecido no hs", async () => runOnHost
 await expectError("Rejeita device mount com type inválido", async () => runOnHost(["bash", "/srv/git/homeserver/core/hs.sh", "device", "mount", "invalid_type", "LABEL", "sdb1"]));
 await expectError("Rejeita device mount com label malicioso (;)", async () => runOnHost(["bash", "/srv/git/homeserver/core/hs.sh", "device", "mount", "usb", "LABEL; rm -rf /", "sdb1"]));
 await expectError("Rejeita device mount com device malicioso (/dev/sdb1)", async () => runOnHost(["bash", "/srv/git/homeserver/core/hs.sh", "device", "mount", "usb", "LABEL", "/dev/sdb1"]));
+await expectError("Rejeita device format com device malicioso (/dev/sdb)", async () => runOnHost(["bash", "/srv/git/homeserver/core/hs.sh", "device", "format", "/dev/sdb"]));
+await expectError("Rejeita device format sem device", async () => runOnHost(["bash", "/srv/git/homeserver/core/hs.sh", "device", "format"]));
+await expectError("Rejeita device format com device injetado (sdb; reboot)", async () => runOnHost(["bash", "/srv/git/homeserver/core/hs.sh", "device", "format", "sdb; reboot"]));
 
 // 3. Validação de argumentos no `module`
 await expectError("Rejeita module op com ID inválido", async () => runOnHost(["bash", "/srv/git/homeserver/core/hs.sh", "module", "op", "Module_Invalid!", "start"]));
@@ -81,6 +84,7 @@ async function expectPassValidation(label: string, fn: () => Promise<unknown>) {
 
 await expectPassValidation("Aceita backup script válido", async () => runOnHost(["bash", "/srv/scripts/backup.sh"]));
 await expectPassValidation("Aceita device mount válido", async () => runOnHost(["bash", "/srv/git/homeserver/core/hs.sh", "device", "mount", "usb", "KINGSTON", "sdb1"]));
+await expectPassValidation("Aceita device format válido", async () => runOnHost(["bash", "/srv/git/homeserver/core/hs.sh", "device", "format", "sdb"]));
 await expectPassValidation("Aceita module op válido", async () => runOnHost(["bash", "/srv/git/homeserver/core/hs.sh", "module", "op", "caddy", "start"]));
 await expectPassValidation("Aceita power set válido", async () => runOnHost(["bash", "/srv/git/homeserver/core/hs.sh", "power", "set", "23:30", "07:00"]));
 await expectPassValidation("Aceita update os check válido", async () => runOnHost(["bash", "/srv/git/homeserver/core/hs.sh", "update", "os", "check"]));

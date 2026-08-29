@@ -36,3 +36,8 @@ export async function ejectDevice(device: string): Promise<{ ok: boolean }> {
     await runHostDevice("eject", device);
     return { ok: true };
 }
+
+export async function formatDevice(device: string): Promise<{ ok: boolean }> {
+    await runHostDevice("format", device);
+    return { ok: true };
+}

@@ -28,14 +28,14 @@ const DEVICE_TYPE_RE = /^(usb|sdcard|external|temporary)$/;
 const MODULE_OP_RE = /^(start|stop|restart|enable|disable|update|status)$/;
 const POWER_SUB_RE = /^(status|enable|disable|set)$/;
 const UPDATE_OS_SUB_RE = /^(check|apply)$/;
-const DEVICE_SUB_RE = /^(mount|unmount|eject)$/;
+const DEVICE_SUB_RE = /^(mount|unmount|eject|format)$/;
 const MODULE_OP_LIST = ["start", "stop", "restart", "enable", "disable", "update", "status"];
 const MODULE_INFO_SUBS = ["definitions", "instances", "info", "status", "op"] as const;
-const DEVICE_SUBS = ["mount", "unmount", "eject"] as const;
+const DEVICE_SUBS = ["mount", "unmount", "eject", "format"] as const;
 const POWER_SUBS = ["status", "enable", "disable", "set"] as const;
 const MODULE_SUBS = ["definitions", "instances", "info", "status", "op"] as const;
 const UPDATE_OS_SUBS = ["check", "apply"] as const;
-const DEVICE_SUBS_LIST = ["mount", "unmount", "eject"] as const;
+const DEVICE_SUBS_LIST = ["mount", "unmount", "eject", "format"] as const;
 const SCHEDULER_SUB_RE = /^(status|enable|disable|run|list)$/;
 const PRINTER_OPTS = {
     media: /^media=.+$/,
@@ -73,8 +73,8 @@ function validateHsArgs(args: string[]): void {
             if (args.length !== 2) throw new ExecutorError("available não aceita argumentos");
             return; // leitura, sem argumentos
         }
-        if (!["mount", "unmount", "eject"].includes(subSub)) {
-            throw new ExecutorError(`device subcomando inválido: ${subSub}. Use: mount, unmount, eject`);
+        if (!["mount", "unmount", "eject", "format"].includes(subSub)) {
+            throw new ExecutorError(`device subcomando inválido: ${subSub}. Use: mount, unmount, eject, format`);
         }
         if (subSub === "mount") {
             if (args.length !== 5) throw new ExecutorError("device mount requer: <type> <label> <device>");
@@ -97,6 +97,11 @@ function validateHsArgs(args: string[]): void {
             }
         } else if (subSub === "eject") {
             if (args.length !== 3) throw new ExecutorError("device eject requer: <device>");
+            if (!/^[a-zA-Z0-9]+$/.test(args[2])) {
+                throw new ExecutorError(`device inválido: ${args[2]}. Use apenas letras e números`);
+            }
+        } else if (subSub === "format") {
+            if (args.length !== 3) throw new ExecutorError("device format requer: <device>");
             if (!/^[a-zA-Z0-9]+$/.test(args[2])) {
                 throw new ExecutorError(`device inválido: ${args[2]}. Use apenas letras e números`);
             }
@@ -323,7 +328,7 @@ export async function runHostBackup(): Promise<{ ok: boolean }> {
     return { ok: true };
 }
 
-export async function runHostDevice(subcmd: "mount" | "unmount" | "eject", ...args: string[]): Promise<string> {
+export async function runHostDevice(subcmd: "mount" | "unmount" | "eject" | "format", ...args: string[]): Promise<string> {
     if (subcmd === "mount") {
         if (arguments.length !== 4) throw new ExecutorError("device mount requer: <type> <label> <device>");
         return runOnHost(["bash", CORE_ON_HOST, "device", "mount", ...args]);
@@ -335,6 +340,10 @@ export async function runHostDevice(subcmd: "mount" | "unmount" | "eject", ...ar
     if (subcmd === "eject") {
         if (arguments.length !== 2) throw new ExecutorError("device eject requer <device>");
         return runOnHost(["bash", CORE_ON_HOST, "device", "eject", ...args]);
+    }
+    if (subcmd === "format") {
+        if (arguments.length !== 2) throw new ExecutorError("device format requer <device>");
+        return runOnHost(["bash", CORE_ON_HOST, "device", "format", ...args], { timeout: 120000 });
     }
     throw new ExecutorError(`device subcomando inválido: ${subcmd}`);
 }

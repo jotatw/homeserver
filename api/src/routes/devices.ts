@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { getDevices, getAvailableDevices, mountDevice, unmountDevice, ejectDevice } from "../adapters/devices.js";
+import { getDevices, getAvailableDevices, mountDevice, unmountDevice, ejectDevice, formatDevice } from "../adapters/devices.js";
 import { sendOk, sendError, sendInternalError } from "../utils/respond.js";
 import { requireAdmin } from "../plugins/auth.js";
 
@@ -68,6 +68,21 @@ export async function devicesRoutes(fastify: FastifyInstance) {
 
         try {
             return sendOk(reply, await ejectDevice(body.device!));
+        } catch (error) {
+            return sendInternalError(reply, request.log, error);
+        }
+    });
+
+    // Formatação (mkfs FAT32) — destrutiva, exige confirm() duplo no App
+    fastify.post("/api/v1/devices/format", { preHandler: requireAdmin }, async (request, reply) => {
+        const body = request.body as DeviceActionBody | null;
+
+        if (!body || !isNonEmptyString(body.device)) {
+            return sendError(reply, 400, "device é obrigatório.");
+        }
+
+        try {
+            return sendOk(reply, await formatDevice(body.device!));
         } catch (error) {
             return sendInternalError(reply, request.log, error);
         }

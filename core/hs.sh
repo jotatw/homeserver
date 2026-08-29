@@ -47,6 +47,7 @@ Comandos:
   device mount <tipo> <rótulo> <dispositivo>
   device unmount <tipo> <rótulo>
   device eject <dispositivo>
+  device format <dispositivo>
   hardware status|temp|disks|disk_smart|net|usb
   automation list|run <evento>
   scheduler init|list|status|enable <tarefa>|disable <tarefa>|run <tarefa>
@@ -151,6 +152,7 @@ case "${_command}" in
             mount)   mount_device "${3:?tipo}" "${4:?rótulo}" "${5:?dispositivo}" ;;
             unmount) unmount_device "${3:?tipo}" "${4:?rótulo}" ;;
             eject)   eject_device "${3:?dispositivo}" ;;
+            format)  format_device "${3:?dispositivo}" ;;
             *)       _usage; exit 1 ;;
         esac
         ;;

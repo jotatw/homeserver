@@ -143,3 +143,58 @@ eject_device() {
 
     sudo eject "${dev}"
 }
+
+# Formata um dispositivo removível com FAT32 (padrão USB/SD) e relê a tabela.
+#
+# Uso: format_device <dispositivo>   (ex.: sdb)
+#
+# Segurança:
+#   - Exige confirmação explícita no App (segunda etapa já é confirm())
+#   - Recusa formatar o disco do sistema ou qualquer dispositivo não removível
+#   - Nunca formata uma partição individual (evita wipe da tabela por engano)
+#
+format_device() {
+    local device="$1"
+    local dev syspath removable
+
+    _mounts_validate_device "${device}" || {
+        echo "Dispositivo inválido: ${device}." >&2
+        return 1
+    }
+
+    dev="/dev/${device}"
+
+    # Bloqueia formatar o disco do sistema (resolvido dinamicamente)
+    local root_dev
+    root_dev="$(lsblk -n -o PKNAME "$(findmnt -n -o SOURCE / 2>/dev/null)" 2>/dev/null || echo '')"
+    if [[ -n "${root_dev}" && "${device}" == "${root_dev}" ]]; then
+        echo "Recusado: ${dev} é o disco do sistema." >&2
+        return 1
+    fi
+
+    # Verifica removível (lsblk -d -o RM) antes de permitir mkfs
+    removable="$(lsblk -d -n -o RM "/dev/${device}" 2>/dev/null || echo '')"
+    if [[ "${removable}" != "1" ]]; then
+        echo "Recusado: ${dev} não é um dispositivo removível." >&2
+        return 1
+    fi
+
+    # Nunca formatar partição (ex.: sdb1) — só o bloco inteiro
+    if [[ "${device}" =~ [0-9]+$ ]]; then
+        echo "Recusado: formate o dispositivo inteiro (ex.: sdb), não a partição (ex.: sdb1)." >&2
+        return 1
+    fi
+
+    # Desmonta qualquer ponto de montagem sob o dispositivo antes de formatar
+    sudo umount "/dev/${device}"* 2>/dev/null || true
+
+    # mkfs.vfat -I ignora warnings de tabela existente
+    if ! sudo mkfs.vfat -F 32 -I -n "USB" "/dev/${device}"; then
+        echo "Falha ao formatar ${dev} com FAT32." >&2
+        return 1
+    fi
+
+    sudo partprobe "/dev/${device}" 2>/dev/null || true
+
+    echo "Dispositivo ${dev} formatado com FAT32."
+}
