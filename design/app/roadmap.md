@@ -10,10 +10,10 @@ Evoluir o design do App de forma incremental, validando uma tela por vez e evita
 - [x] Definir mobile como prioridade de experiência.
 - [x] Separar composição mobile e desktop sem duplicar a aplicação.
 - [x] Definir os dois perfis iniciais.
-- [ ] Consolidar tokens visuais.
-- [ ] Definir navegação mobile.
-- [ ] Definir navegação desktop.
-- [ ] Definir componentes base.
+- [x] Consolidar tokens visuais.
+- [x] Definir navegação mobile.
+- [x] Definir navegação desktop.
+- [x] Definir componentes base.
 
 ## Fase 1 — Navegação
 
