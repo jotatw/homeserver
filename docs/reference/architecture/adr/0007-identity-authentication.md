@@ -125,5 +125,5 @@ Preserva contratos estáveis para consumidores e mantém liberdade para a implem
 - [ADR-0001](0001-authentication.md) — solução inicial substituída;
 - [`../API.md`](../API.md) — papel arquitetural da API;
 - [`../APPLICATION_API.md`](../APPLICATION_API.md) — consumidores e contratos;
-- [`../../api/README.md`](../../api/README.md) — autenticação e contratos concretos;
+- [`../../../../api/README.md`](../../../../api/README.md) — autenticação e contratos concretos;
 - [`../../security/`](../../security/) — referências e requisitos de segurança.
