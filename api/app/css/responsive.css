@@ -284,6 +284,45 @@
   .bottomnav .nav-item span:last-child {
     font-size: 0.68rem;
   }
+
+  /* Dashboard mobile: 1 coluna */
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: var(--hs-space-3);
+  }
+
+  .dashboard-widget {
+    min-height: auto;
+  }
+
+  .widget-size-small,
+  .widget-size-medium,
+  .widget-size-large {
+    grid-column: span 1;
+  }
+
+  /* Touch targets 44px min */
+  .btn,
+  .btn-primary,
+  .btn-secondary,
+  .btn-danger,
+  .chip,
+  .admin-tab,
+  .nav-item,
+  .search-field,
+  select,
+  input[type="text"],
+  input[type="password"],
+  input[type="search"],
+  input[type="email"],
+  textarea {
+    min-height: 44px;
+  }
+
+  .nav-item {
+    width: 44px;
+    height: 44px;
+  }
 }
 
 /* ---------- Telefones pequenos ---------- */
@@ -308,6 +347,51 @@
 
   .avatar {
     max-width: 100px;
+  }
+}
+
+/* ---------- Mobile Sidebar Overlay ---------- */
+@media (max-width: 767px) {
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(2px);
+    z-index: 25;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--hs-motion);
+  }
+
+  .sidebar-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform var(--hs-motion);
+    z-index: 30;
+    box-shadow: var(--hs-shadow-xl);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+}
+
+/* Hamburger button visible only on mobile */
+#btn-hamburger {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  #btn-hamburger {
+    display: inline-flex;
   }
 }
 

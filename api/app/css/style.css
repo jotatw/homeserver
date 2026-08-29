@@ -226,7 +226,67 @@ input:focus-visible {
   padding: 0 var(--hs-space-1);
 }
 
-/* ---------- Status banner ---------- */
+/* ---------- Mobile Dashboard ---------- */
+@media (max-width: 767px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: var(--hs-space-3);
+  }
+  
+  .dashboard-widget {
+    min-height: auto;
+  }
+  
+  .widget-content .widget-grid,
+  .widget-content .action-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Touch targets mínimos 44px */
+  .btn,
+  .nav-item,
+  .chip,
+  .widget-action-btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Admin tabs scroll horizontal */
+  .admin-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    padding-bottom: var(--hs-space-1);
+    gap: var(--hs-space-1);
+  }
+  
+  .admin-tab {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+  
+  /* Tables -> Cards on mobile */
+  .table-container {
+    overflow-x: auto;
+  }
+  
+  .table-container table {
+    min-width: 600px;
+  }
+}
+
+/* ---------- Mobile Dashboard - very small phones ---------- */
+@media (max-width: 380px) {
+  .dashboard-widget .widget-header {
+    flex-wrap: wrap;
+  }
+  
+  .widget-actions {
+    width: 100%;
+    justify-content: flex-end;
+    margin-top: var(--hs-space-2);
+  }
+}
 
 .banner {
   display: flex;

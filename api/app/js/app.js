@@ -957,43 +957,32 @@ async function renderAdminUsers() {
   v.appendChild(createUserBtn);
 
   if (users && users.length) {
-    const t = el("table", { class: "table" });
-    const head = el("tr");
-    ["Usuário", "Papel", "Ações"].forEach((c) => head.appendChild(el("th", {}, c)));
-    t.appendChild(el("thead", {}, head));
-    const body = el("tbody");
+    const cards = el("div", { class: "feed" });
     users.forEach((u) => {
-      const tr = el("tr");
-      tr.appendChild(el("td", {},
-        el("strong", {}, u.username || u.id),
-        el("div", { class: "app-host" }, u.perm && u.perm.scope ? "/" + u.perm.scope : "/")));
-      tr.appendChild(el("td", {}, u.perm && u.perm.admin ? el("span", { class: "badge ok" }, "Admin") : "padrão"));
-      const actions = el("td");
-      const btns = el("span", { style: "display:inline-flex;gap:var(--hs-space-2)" });
-
-      const pwBtn = el("button", { class: "btn btn-secondary", style: "height:var(--hs-touch-compact)" }, "Senha");
-      pwBtn.addEventListener("click", () => openPasswordDialog(u.username || u.id));
-      btns.appendChild(pwBtn);
-
-      if ((u.username || u.id) !== auth.user.username) {
-        const rmBtn = el("button", { class: "btn btn-danger", style: "height:var(--hs-touch-compact)" }, "Excluir");
-        rmBtn.addEventListener("click", () => confirmDeleteUser(u.username || u.id));
-        btns.appendChild(rmBtn);
-      }
-
-      actions.appendChild(btns);
-      tr.appendChild(actions);
-      body.appendChild(tr);
+      const card = el("div", { class: "feed-item" },
+        el("div", { class: "module-meta" },
+          el("div", { class: "app-name" },
+            el("strong", {}, u.username || u.id),
+            u.perm && u.perm.admin ? el("span", { class: "badge ok", style: "margin-left:var(--hs-space-2)" }, "Admin") : el("span", { class: "badge", style: "margin-left:var(--hs-space-2)" }, "padrão")),
+          el("div", { class: "app-host" }, u.perm && u.perm.scope ? "/" + u.perm.scope : "/")),
+        el("div", { class: "module-ops" },
+          el("button", { class: "btn btn-secondary", style: "height:var(--hs-touch-compact)" }, "Senha"),
+          (u.username || u.id) !== auth.user.username ? el("button", { class: "btn btn-danger", style: "height:var(--hs-touch-compact)" }, "Excluir") : null));
+      cards.appendChild(card);
+      // Bind buttons after append
+      const pwBtn = card.querySelector(".btn-secondary");
+      if (pwBtn) pwBtn.addEventListener("click", () => openPasswordDialog(u.username || u.id));
+      const rmBtn = card.querySelector(".btn-danger");
+      if (rmBtn) rmBtn.addEventListener("click", () => confirmDeleteUser(u.username || u.id));
     });
-    t.appendChild(body);
-    v.appendChild(t);
+    v.appendChild(cards);
   } else {
     v.appendChild(el("p", { class: "empty" }, "Nenhum usuário encontrado."));
   }
 }
 
 async function renderAdminTokens() {
-  const [tokens] = await Promise.all([api("/api/v1/tokens")]);
+  const tokens = await api("/api/v1/tokens");
   const v = document.getElementById("view");
   v.innerHTML = "";
 
@@ -1001,20 +990,24 @@ async function renderAdminTokens() {
   v.appendChild(adminTabBar());
 
   const createBtn = el("button", { class: "btn btn-primary", style: "margin-bottom:var(--hs-space-3)" },
-    icon("key", "ic"), " Criar token");
+    icon("plus", "ic"), " Novo token");
   createBtn.addEventListener("click", () => openTokenDialog());
   v.appendChild(createBtn);
 
-  const tfeed = el("div", { class: "feed" });
+  const cards = el("div", { class: "feed" });
   if (tokens && tokens.length) {
     tokens.forEach((tk) => {
-      const row = el("div", { class: "feed-item" },
-        icon("key"),
-        el("span", { class: "app-name" }, tk.name),
-        el("span", { class: "app-host" },
-          tk.prefix + "… · " + (tk.lastUsedAt ? "usado" : "novo")));
-      const rev = el("button", { class: "btn btn-secondary", style: "height:var(--hs-touch-compact)" }, "Revogar");
-      rev.addEventListener("click", async () => {
+      const card = el("div", { class: "feed-item" },
+        el("div", { class: "module-meta" },
+          el("div", { class: "app-name" },
+            el("strong", {}, tk.name),
+            el("span", { class: "badge", style: "margin-left:var(--hs-space-2)" }, tk.lastUsedAt ? "usado" : "novo")),
+          el("div", { class: "app-host" }, tk.prefix + "…")),
+        el("div", { class: "module-ops" },
+          el("button", { class: "btn btn-secondary", style: "height:var(--hs-touch-compact)" }, "Revogar")));
+      cards.appendChild(card);
+      const revBtn = card.querySelector(".btn-secondary");
+      if (revBtn) revBtn.addEventListener("click", async () => {
         if (!confirm("Revogar o token \"" + tk.name + "\"?")) return;
         try {
           await apiOrFail("/api/v1/tokens/" + tk.id, { method: "DELETE" });
@@ -1022,13 +1015,11 @@ async function renderAdminTokens() {
           renderAdmin();
         } catch (_) {}
       });
-      row.appendChild(rev);
-      tfeed.appendChild(row);
     });
   } else {
-    tfeed.appendChild(el("div", { class: "feed-item" }, "Nenhum token criado."));
+    cards.appendChild(el("div", { class: "feed-item" }, "Nenhum token criado."));
   }
-  v.appendChild(tfeed);
+  v.appendChild(cards);
 }
 
 async function renderAdminModules() {
@@ -1042,7 +1033,7 @@ async function renderAdminModules() {
   v.appendChild(el("h3", { class: "section" }, "Administração"));
   v.appendChild(adminTabBar());
 
-  const mfeed = el("div", { class: "feed" });
+  const cards = el("div", { class: "feed" });
   if (mods && mods.length) {
     const instMap = {};
     (instances || []).forEach((i) => { instMap[i.definition] = i; });
@@ -1053,48 +1044,35 @@ async function renderAdminModules() {
       const primaryOp = active ? (ops.includes("stop") ? "stop" : null) : (ops.includes("start") ? "start" : null);
       const rest = ops.filter((op) => op !== primaryOp);
 
-      const row = el("div", { class: "feed-item module-row" },
-        icon("box", "ic"),
+      const card = el("div", { class: "feed-item module-row" },
         el("div", { class: "module-meta" },
           el("div", { class: "app-name" },
-            (m.title || m.id),
-            active
-              ? el("span", { class: "badge ok", style: "margin-left:var(--hs-space-2)" }, "ativa")
-              : el("span", { class: "badge", style: "margin-left:var(--hs-space-2)" }, "ocioso")),
-          el("div", { class: "app-host" }, m.id + " · v" + m.version)));
-
-      const opsWrap = el("div", { class: "module-ops" });
-
+            el("strong", {}, m.title || m.id),
+            active ? el("span", { class: "badge ok", style: "margin-left:var(--hs-space-2)" }, "ativa") : el("span", { class: "badge", style: "margin-left:var(--hs-space-2)" }, "ocioso")),
+          el("div", { class: "app-host" }, m.id + " · v" + m.version)),
+        el("div", { class: "module-ops" },
+          primaryOp ? el("button", { class: "btn btn-secondary", style: "height:var(--hs-touch-compact)" }, labels[primaryOp]) : null,
+          rest.length ? el("details", { class: "ops-menu" },
+            el("summary", { class: "btn btn-secondary ops-menu-btn", "aria-label": "Mais operações de " + m.id }, icon("dots", "ic")),
+            el("div", { class: "ops-pop" },
+              ...rest.map((op) => {
+                const b = el("button", { type: "button", class: "ops-pop-item" },
+                  icon(({ start: "play", stop: "square", restart: "refresh", enable: "check", disable: "x", update: "download", status: "eye" }[op] || "dots"), "ic"),
+                  el("span", {}, labels[op] || op));
+                b.addEventListener("click", () => runModuleOp(m, op, b));
+                return b;
+              }))) : null));
+      cards.appendChild(card);
+      // Bind primary button
       if (primaryOp) {
-        const primary = el("button", {
-          class: "btn btn-secondary", style: "height:var(--hs-touch-compact)",
-        }, labels[primaryOp]);
-        primary.addEventListener("click", () => runModuleOp(m, primaryOp, primary));
-        opsWrap.appendChild(primary);
+        const btn = card.querySelector(".btn-secondary");
+        if (btn) btn.addEventListener("click", () => runModuleOp(m, primaryOp, btn));
       }
-
-      if (rest.length) {
-        const more = el("details", { class: "ops-menu" },
-          el("summary", { class: "btn btn-secondary ops-menu-btn", "aria-label": "Mais operações de " + m.id },
-            icon("dots", "ic")),
-          el("div", { class: "ops-pop" },
-            ...rest.map((op) => {
-              const b = el("button", { type: "button", class: "ops-pop-item" },
-                icon(({ start: "play", stop: "square", restart: "refresh", enable: "check", disable: "x", update: "download", status: "eye" }[op] || "dots"), "ic"),
-                el("span", {}, labels[op] || op));
-              b.addEventListener("click", () => runModuleOp(m, op, b));
-              return b;
-            })));
-        opsWrap.appendChild(more);
-      }
-
-      row.appendChild(opsWrap);
-      mfeed.appendChild(row);
     });
   } else {
-    mfeed.appendChild(el("div", { class: "feed-item" }, "Nenhum módulo encontrado."));
+    cards.appendChild(el("div", { class: "feed-item" }, "Nenhum módulo instalado."));
   }
-  v.appendChild(mfeed);
+  v.appendChild(cards);
 
   // Tarefas agendadas — mesma natureza de gestão que módulos
   v.appendChild(el("h3", { class: "section" }, "Tarefas agendadas"));
@@ -1831,6 +1809,42 @@ document.addEventListener("click", (e) => {
   }
 });
 
+/* ---------- Mobile Sidebar ---------- */
+function setupMobileSidebar() {
+  const hamburger = document.getElementById("btn-hamburger");
+  const overlay = document.getElementById("sidebar-overlay");
+  const sidebar = document.querySelector(".sidebar");
+
+  if (!hamburger || !overlay || !sidebar) return;
+
+  function openSidebar() {
+    sidebar.classList.add("open");
+    overlay.classList.add("open");
+    hamburger.setAttribute("aria-expanded", "true");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeSidebar() {
+    sidebar.classList.remove("open");
+    overlay.classList.remove("open");
+    hamburger.setAttribute("aria-expanded", "false");
+    document.body.style.overflow = "";
+  }
+
+  hamburger.addEventListener("click", openSidebar);
+  overlay.addEventListener("click", closeSidebar);
+
+  // Fechar ao clicar em link de navegação
+  sidebar.querySelectorAll("a.nav-item").forEach((link) => {
+    link.addEventListener("click", closeSidebar);
+  });
+
+  // Fechar com ESC
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && sidebar.classList.contains("open")) closeSidebar();
+  });
+}
+
 async function init() {
   applyTheme(localStorage.getItem("hs_theme") || "dark");
   applyDensity(localStorage.getItem("hs_density") || "cozy");
@@ -1843,6 +1857,7 @@ async function init() {
   document.getElementById("app").hidden = false;
   buildNav();
   renderUser();
+  setupMobileSidebar();
   router();
 }
 
