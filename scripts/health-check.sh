@@ -69,7 +69,13 @@ mem_pct="$(awk '/Mem:/{printf "%.0f", $3/$2*100}' <(free -m) 2>/dev/null || echo
 ok_mem="$(awk -v m="${mem_pct}" 'BEGIN{print (m < 85) ? 1 : 0}')"
 [[ "${ok_mem}" == "1" ]] && ok "memória" "${mem_pct}%" || fail "memória" "${mem_pct}%"
 
-temp_max="$(for t in /sys/class/hwmon/hwmon*/temp*_input; do [ -f "$t" ] && cat "$t"; done 2>/dev/null | sort -n | tail -1)"
+# Temperatura do CPU (coretemp). Ignora outros hwmon (ex.: nouveau/GPU
+# reporta valores irreais ~98°C nesse host) — medir só o processador.
+temp_max="$(for t in /sys/class/hwmon/hwmon*/temp*_input; do
+    hw="${t%/temp*_input}"
+    [ "$(cat "$hw/name" 2>/dev/null)" = "coretemp" ] || continue
+    [ -f "$t" ] && cat "$t"
+done 2>/dev/null | sort -n | tail -1)"
 if [[ -n "${temp_max}" ]]; then
     temp_c="$(awk -v v="${temp_max}" 'BEGIN{printf "%.0f", v/1000}')"
     if [[ "${temp_c}" -gt 85 ]]; then
