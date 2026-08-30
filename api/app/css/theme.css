@@ -3,6 +3,8 @@
  * Fonte da verdade: design/app/tokens/*.md
  * Este arquivo É a implementação dos tokens documentados lá.
  * Qualquer token novo nasce no .md e chega aqui.
+ * Contrato de camadas (open-design): A1-identity / A1-structure / A2 / B-slot / C-ext.
+ *   A1 = identidade+estrutura (obrigatório) · A2 = com fallback · B-slot = alias nível 2 · C = específico.
  * ============================================================ */
 
 /* ------------------------------------------------------------
@@ -10,7 +12,7 @@
  * ------------------------------------------------------------ */
 :root,
 [data-theme="dark"] {
-  /* Cores — neutros (fundo/superfícies) */
+  /* Cores — neutros (fundo/superfícies) · A1-STRUCTURE */
   --hs-bg: #0f172a;
   --hs-surface: #1e293b;
   --hs-surface-raised: #263449;
@@ -20,13 +22,13 @@
   --hs-border: #334155;
   --hs-border-strong: #475569;
 
-  /* Cores — texto */
+  /* Cores — texto · A1-IDENTITY + B-SLOT */
   --hs-text: #e2e8f0;
   --hs-text-muted: #94a3b8;
   --hs-text-faint: #64748b;
   --hs-text-inverse: #0f172a;
 
-  /* Cores — ação (primária) */
+  /* Cores — ação (primária) · A1-IDENTITY */
   --hs-primary: #2563eb;
   --hs-primary-hover: #3b82f6;
   --hs-primary-active: #1d4ed8;
@@ -34,7 +36,7 @@
   --hs-primary-focus: #93c5fd;
   --hs-on-primary: #ffffff;
 
-  /* Cores — estado (semânticos) */
+  /* Cores — estado (semânticos) · A2 (fallback) */
   --hs-color-ok: #22c55e;
   --hs-color-ok-soft: rgba(34, 197, 94, 0.16);
   --hs-color-warn: #eab308;
@@ -44,7 +46,7 @@
   --hs-color-info: #38bdf8;
   --hs-color-info-soft: rgba(56, 189, 248, 0.16);
 
-  /* Elevação */
+  /* Elevação · A2 */
   --hs-shadow-none: none;
   --hs-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
   --hs-shadow-md: 0 2px 8px rgba(0, 0, 0, 0.35);
@@ -94,7 +96,7 @@
 }
 
 /* ------------------------------------------------------------
- * 3. TIPOGRAFIA — família + escala semântica
+ * 3. TIPOGRAFIA — família + escala semântica · A1-STRUCTURE (escala de tipo)
  *    (tokens/typography.md; pesos acompanham o uso)
  * ------------------------------------------------------------ */
 :root {
@@ -116,7 +118,7 @@
 }
 
 /* ------------------------------------------------------------
- * 4. ESPAÇAMENTO E LAYOUT
+ * 4. ESPAÇAMENTO E LAYOUT · A1-STRUCTURE + A2 (escala 8px)
  *    (tokens/spacing.md + layout.md)
  * ------------------------------------------------------------ */
 :root {
@@ -139,7 +141,7 @@
 }
 
 /* ------------------------------------------------------------
- * 5. RAIOS DE BORDA
+ * 5. RAIOS DE BORDA · A2 (raio)
  *    (tokens/radius.md)
  * ------------------------------------------------------------ */
 :root {
@@ -151,7 +153,7 @@
 }
 
 /* ------------------------------------------------------------
- * 6. MOVIMENTO — duração + easing
+ * 6. MOVIMENTO — duração + easing · A2 (motion)
  *    (tokens/motion.md)
  * ------------------------------------------------------------ */
 :root {
@@ -167,7 +169,7 @@
 }
 
 /* ------------------------------------------------------------
- * 7. DENSIDADE — modo compacto (html.compact)
+ * 7. DENSIDADE — modo compacto (html.compact) · C-EXT — modo compacto (só tokens)
  *    Só troca tokens: nenhum componente tem regra própria.
  *    Persistido por usuário em localStorage("hs_density").
  * ------------------------------------------------------------ */
@@ -191,7 +193,7 @@ html.compact {
 }
 
 /* ------------------------------------------------------------
- * 8. ACESSIBILIDADE — movimento reduzido respeitado globalmente
+ * 8. ACESSIBILIDADE — movimento reduzido · C-EXT — prefers-reduced-motion (zera duração) respeitado globalmente
  * ------------------------------------------------------------ */
 @media (prefers-reduced-motion: reduce) {
   :root {
