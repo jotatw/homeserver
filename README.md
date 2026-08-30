@@ -49,14 +49,16 @@ O HomeServer existe para transformar um computador comum num servidor doméstico
 
 | Área | Stack |
 |------|-------|
-| **Sistema Operacional** | Linux (Debian 12) |
-| **Interface Principal** | Web App (React/Vue/Angular - baseado no projeto) |
-| **Backend** | Node.js/Python/Go (baseado no projeto) |
-| **Banco de Dados** | PostgreSQL, SQLite (baseado no projeto) |
-| **Gerenciamento de Serviços** | Docker, systemd (baseado no projeto) |
-| **Automação** | Ansible, Shell scripts, GitHub Actions |
-| **Monitoramento** | Prometheus, Grafana, Health checks |
-| **Segurança** | HTTPS, SSL, autenticação, firewall |
+| **Sistema Operacional** | Linux (Debian 12 validado) |
+| **API** | Node.js + Fastify (cors, helmet, rate-limit) |
+| **Gerenciamento de Serviços** | Docker + Docker Compose (por módulo) |
+| **Proxy / TLS** | Caddy (HTTPS local, roteamento) |
+| **Módulos de serviços** | Gitea, Portainer, FileBrowser (`files`), Homepage |
+| **Interface de administração** | HomeServer App (web, `/app`) + Homepage (`/`) |
+| **Automação e manutenção** | Shell scripts (`scripts/`) |
+| **Energia** | Scripts power-save / power-restore / auto-suspend, systemd timers |
+| **CI/CD** | GitHub Actions |
+| **Segurança** | HTTPS, autenticação própria, rate-limit, firewall |
 
 ---
 
