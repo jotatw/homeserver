@@ -64,26 +64,36 @@ O HomeServer existe para transformar um computador comum num servidor doméstico
 
 ```
 homeserver/
-├── apps/              # Interfaces web e aplicativos móveis
-├── modules/           # Contêineres de serviços independentes
-├── scripts/           # Instalador, restore, backup e utilitários
 ├── core/              # Núcleo do sistema (usuários, autenticação, API)
-├── services/          # Serviços do sistema (arquivo, git, monitoring)
-├── docs/              # Documentação completa (install, use, reference)
+├── modules/           # Contêineres de serviços independentes (Caddy, Gitea, etc.)
+├── services/          # Serviços do sistema (arquivo, git, monitoramento)
+├── api/               # API REST oficial
+├── scripts/           # Instalador, restore, backup e utilitários
 ├── config/            # Configurações do sistema (nginx, TLS, etc.)
+├── docs/              # Documentação completa (install, use, reference)
+├── planning/          # Planejamento, roadmap e decisões
+├── design/            # Design do App e protótipos
+├── data/              # Dados persistentes
 ├── logs/              # Logs estruturados e métricas
+├── automation/        # Automações e scripts de manutenção
+├── templates/         # Templates de configuração
+├── backup/            # Scripts e dados de backup
 ├── .github/           # Workflows de CI/CD
-├── gradle/            # Wrapper Gradle (se aplicável)
-├── settings.gradle.kts # Configuração multi-projeto (se aplicável)
+├── install.sh         # Script de instalação
+├── CHANGELOG.md       # Histórico de versões
+├── CONTRIBUTING.md    # Guia de contribuição
+├── SECURITY.md        # Política de segurança
 └── README.md          # Este arquivo
 ```
 
 **Módulos principais:**
-- `apps/` — Interface web principal, painel de administração
-- `modules/` — serviços Docker que formam a plataforma (Caddy, Gitea, Portainer, etc.)
-- `scripts/` — scripts de instalação, backup, restauração, manutenção
-- `core/` — núcleo do sistema (usuários, autenticação JWT, permissões, API)
-- `services/` — serviços integrados (arquivo, git, monitoramento)
+- `core/` — Núcleo do sistema: usuários, autenticação JWT, permissões, API REST
+- `modules/` — Serviços Docker independentes (Caddy, Gitea, Portainer, files, homepage)
+- `services/` — Serviços integrados (arquivo, git, monitoramento, energia)
+- `scripts/` — Scripts de instalação, backup, restauração, manutenção e CI
+- `api/` — API REST oficial para integração e automação externa
+- `config/` — Configurações do sistema: Caddyfile, TLS, env vars
+- `docs/` — Documentação técnica: guias, arquitetura, referência
 
 ---
 

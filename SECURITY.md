@@ -84,5 +84,5 @@ Mudanças que afetem autenticação, autorização, sessões, execução de oper
 
 A política detalhada de hardening e as evidências técnicas do projeto estão em:
 
-- `planning/security/hardening-plan.md`
-- `planning/security/validation.md`
+- [`planning/security/hardening-plan.md`](planning/security/hardening-plan.md)
+- [`planning/security/validation.md`](planning/security/validation.md)
