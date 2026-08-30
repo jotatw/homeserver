@@ -56,7 +56,7 @@ fi
 
 # 4. Horário crítico (06:00-22:00): sempre acordado
 if [[ "${FORCE}" != "--force" ]]; then
-    hora_num="$(date +%H%M)"
+    hora_num="$((10#$(date +%H%M)))"
     if [[ "${hora_num}" -ge 600 && "${hora_num}" -le 2200 ]]; then
         # Silêncio: horário comercial, normal estar acordado
         exit 0
@@ -86,10 +86,43 @@ if [[ "${MODE}" == "--dry-run" ]]; then
     exit 0
 fi
 
+# ── Desabilitar wakes (USB + rede) antes de suspender ─────────
+# Igual ao power-schedule.sh: sem isso, USB/câmera/impressora
+# acordam o servidor em segundos após suspender.
+USB_WAKE_DEVICES="USB0 US15 US12"
+
+_disable_wakes() {
+    # USB wake off
+    for dev in ${USB_WAKE_DEVICES}; do
+        echo "${dev}" > /proc/acpi/wakeup 2>/dev/null || true
+    done
+    # Rede: WOL off durante o sono (evita wake por tráfego)
+    if command -v ethtool >/dev/null 2>&1; then
+        ethtool -s enp7s0 wol d 2>/dev/null >> "${LOG_FILE}" || true
+    fi
+    log "Wakes desabilitados (USB + NIC)"
+}
+
+_restore_wakes() {
+    # USB wake on (volta ao padrão)
+    for dev in ${USB_WAKE_DEVICES}; do
+        echo "${dev}" > /proc/acpi/wakeup 2>/dev/null || true
+    done
+    # Rede: WOL magic packet on (permite acordar via WOL depois)
+    if command -v ethtool >/dev/null 2>&1; then
+        ethtool -s enp7s0 wol g 2>/dev/null >> "${LOG_FILE}" || true
+    fi
+    log "Wakes restaurados (USB + NIC)"
+}
+
+_disable_wakes
+
 # Acorda às 08:00 via RTC (segurança)
 WAKE_EPOCH="$(date -d 'tomorrow 08:00' +%s)"
 rtcwake -m mem -t "${WAKE_EPOCH}" 2>> "${LOG_FILE}" || {
     log "rtcwake falhou — tentando systemctl suspend"
     systemctl suspend
 }
+
+_restore_wakes
 log "Suspenso (wake RTC $(date -d "@${WAKE_EPOCH}" '+%F %T'))"
