@@ -1,0 +1,29 @@
+{
+  "id": "homeserver-app",
+  "name": "HomeServer App Design System",
+  "version": "2.0.0",
+  "description": "Design tokens do HomeServer App — dark-first, estados semânticos, densidade compacta, mobile-first.",
+  "provenance": {
+    "source": "design/app/tokens/*.md",
+    "sprint": "UX-01 (fundação visual)"
+  },
+  "layers": {
+    "A1-identity": ["--hs-bg", "--hs-text", "--hs-primary", "--hs-on-primary"],
+    "A1-structure": ["--hs-surface", "--hs-border", "--hs-font-sans", "--hs-display", "--hs-space-*", "--hs-max-content"],
+    "A2": ["--hs-color-ok", "--hs-color-warn", "--hs-color-danger", "--hs-color-info", "--hs-shadow-*", "--hs-radius-*", "--hs-motion-*"],
+    "B-slot": ["--hs-text-muted", "--hs-text-faint", "--hs-text-inverse", "--hs-surface-raised", "--hs-surface-hover", "--hs-surface-active", "--hs-primary-hover", "--hs-primary-active", "--hs-primary-soft", "--hs-primary-focus"],
+    "C-ext": ["html.compact", "prefers-reduced-motion"]
+  },
+  "files": {
+    "tokens_css": "api/app/css/theme.css",
+    "docs": "design/app/tokens/README.md"
+  },
+  "themes": ["dark", "light"],
+  "default_theme": "dark",
+  "density": {
+    "default": "comfortable",
+    "compact": "html.compact"
+  },
+  "status": "base-estabilizada",
+  "next": "validar tokens em wireframe mobile/desktop do Dashboard"
+}

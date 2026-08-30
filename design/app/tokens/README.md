@@ -39,6 +39,22 @@ Componentes devem referenciar tokens semânticos em vez de valores hexadecimais 
 | Elevação | `elevation.md` | sombras e foco |
 | Movimento | `motion.md` | duração, easing e redução de movimento |
 
+## Camadas (contrato open-design)
+
+Cada token responde a 2 perguntas: *quem decide o valor?* (autor da marca ou schema)
+e *o que acontece se omitido?* (required, fallback, alias). Isso define as camadas:
+
+| Camada | Quem decide | Se omitido | Exemplos (--hs-*) |
+|---|---|---|---|
+| **A1-identity** | marca | quebra | `bg`, `text`, `primary`, `on-primary` |
+| **A1-structure** | marca | quebra | `surface`, `border`, escala de tipo (`display`…`meta`), `space-*`, `max-content`, `sidebar-w` |
+| **A2** | marca (com fallback) | derive preenche | `color-ok/warn/danger/info`, `shadow-*`, `radius-*`, `motion-*`, `ease-*`, `touch` |
+| **B-slot** | marca ou alias nível 2 | quebra — declara `var(--sibling)` ou valor independente | `text-muted/faint/inverse`, `surface-raised/hover/active`, `primary-hover/active/soft/focus`, `*-soft` |
+| **C-ext** | específico do app | — | `html.compact` (densidade), `prefers-reduced-motion` |
+
+**Quando NÃO adicionar token:** component-internal (inline no componente), one-off (um layout só),
+especulativo, ou já-expressível via `color-mix()`.
+
 ## Estado atual
 
 Os tokens existentes são uma **base de design**, não uma implementação final. Antes de alterar o CSS da aplicação, os tokens serão revisados em conjunto com os wireframes mobile e desktop.
