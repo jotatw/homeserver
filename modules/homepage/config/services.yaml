@@ -175,6 +175,19 @@
             name: time
             label: action
 
+    - Hermes IA:
+        icon: mdi-robot
+        widget:
+          type: customapi
+          url: http://172.19.0.1:8642/v1/models
+          headers:
+            Authorization: Bearer {{HOMEPAGE_VAR_HERMES_KEY}}
+          refreshInterval: 60000
+          mappings:
+            - field: data.data
+              label: Modelos
+            - field: data.object
+              label: API
     - Servidor:
         id: server-status
         icon: mdi-server
