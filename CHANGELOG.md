@@ -41,6 +41,7 @@ O Baseline v0.1.0 é a referência conceitual do estado inicial da consolidaçã
 
 ### Corrigido
 
+- Health-check media a temperatura do sensor `nouveau` (GPU C79 ION), que reporta ~98 °C irreais nesse host; agora filtra por `hwmon` `name=coretemp` (só CPU). Validado: PASS 10/FAIL 0.
 - `service_directory()` no Core passou a resolver módulos declarativos em `modules/<id>/` antes do fallback legado `/srv/docker/compose/<id>/`; sem isso, `hs module status/op` reportava `observed: desconhecido` para módulos novos.
 - Validação de dependências de módulos lia JSON de stdin vazio (`python3 - <<PY` consumia o próprio script como stdin), abortando toda operação com `JSONDecodeError`; corrigida para herestring.
 - Storage do Quantum estava montado `:ro` (herdado do container de teste do piloto), tornando uploads impossíveis por configuração; corrigido para leitura e escrita. Upload/download > 1 GB validado no ambiente real (integridade md5, RAM pico ~51 MiB).
