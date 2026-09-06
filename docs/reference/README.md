@@ -70,6 +70,12 @@ A documentação técnica da API fica em [`api/README.md`](../../api/README.md).
 
 Ela deve ser consultada quando for necessário conhecer os contratos expostos pela plataforma ou desenvolver uma integração.
 
+### Hardware
+
+[`hardware.md`](hardware.md) documenta a especificação real do servidor onde o HomeServer roda em produção (CPU, RAM, discos, rede) e as particularidades verificadas do host (sensores, suspensão, limites práticos).
+
+Use ao avaliar performance, capacidade e compatibilidade de novas funcionalidades com o ambiente real.
+
 ## Como usar esta documentação
 
 O caminho recomendado é:
