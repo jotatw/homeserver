@@ -12,10 +12,10 @@
 set -euo pipefail
 
 DRY_RUN="${1:-}"
-HOST="joao@homeserver"
+HOST="usuario@homeserver"
 SSH_OPTS=(-o ConnectTimeout=15 -o BatchMode=yes)
 NOTEBOOK_HERMES="$HOME/.hermes"
-SERVER_HERMES="/home/joao/.hermes"
+SERVER_HERMES="/home/usuario/.hermes"
 
 log() { echo "[$(date '+%H:%M:%S')] $*"; }
 

@@ -64,7 +64,7 @@ if [[ "${FORCE}" != "--force" ]]; then
 fi
 
 # 5. Atividade de arquivos recente (últimos 10 min)?
-recentes="$(find /srv /home/joao -newermt '-10 minutes' -type f \
+recentes="$(find /srv /home/usuario -newermt '-10 minutes' -type f \
   -not -path '*/\.git/*' -not -path '*/node_modules/*' -not -path '*/venv/*' \
   -not -path '*cache*' -not -path '*/public/*' -not -path '*/\.next/*' \
   \( -name '*.log' -o -name '*.sh' -o -name '*.py' -o -name '*.yaml' -o -name '*.yml' \

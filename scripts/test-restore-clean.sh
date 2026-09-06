@@ -53,14 +53,14 @@ log "4/6 Puxando o último backup real do homeserver"
 # via o container da API no servidor (root, /host:ro) — mesmo mecanismo
 # privilegiado que o sistema usa — com o tar streamado por SSH.
 if [ "${SAMPLE}" -eq 1 ]; then
-    TAR_EXCLUDE="--exclude=./storage/users/joao/fotos/* --exclude=./storage/media/*"
+    TAR_EXCLUDE="--exclude=./storage/users/usuario/fotos/* --exclude=./storage/media/*"
     log "   modo amostra (sem fotos/mídia grandes)"
 else
     TAR_EXCLUDE=""
 fi
 
 mkdir -p "$WORKDIR"
-ssh joao@homeserver "docker exec api-api-1 tar cf - -C /host/srv/backup/daily/latest ${TAR_EXCLUDE} ." \
+ssh usuario@homeserver "docker exec api-api-1 tar cf - -C /host/srv/backup/daily/latest ${TAR_EXCLUDE} ." \
     | tar xf - -C "$WORKDIR"
 
 BACKUP_BYTES=$(du -sh "$WORKDIR" | cut -f1)

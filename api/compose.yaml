@@ -5,7 +5,7 @@ services:
     env_file:
       - .env
     environment:
-      - GIT_SSH_COMMAND=ssh -i /root/.ssh/id_ed25519 -o User=git -o StrictHostKeyChecking=accept-new
+      - GIT_SSH_COMMAND=ssh -i /root/.ssh/id_ed25519 -o User=git -o StrictHostKeyChecking=yes
     cap_add:
       - SYS_RAWIO
     volumes:
@@ -20,6 +20,7 @@ services:
       - /srv/storage:/srv/storage:ro
       - /srv/backup:/srv/backup:ro
       - ${HS_SSH_KEY:-/nonexistent}:/root/.ssh/id_ed25519:ro
+      - ./ssh/known_hosts:/root/.ssh/known_hosts:ro
     restart: unless-stopped
     command: npm run dev
     ports:
