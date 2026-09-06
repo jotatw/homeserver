@@ -146,6 +146,22 @@ dialog input {
 }
 
 /* ---------- Rodapé ---------- */
+/* Rodapé nativo (ícone de revalidate + versão) */
+#footer {
+  color: #62666d !important;
+}
+
+#footer svg {
+  color: #62666d !important;
+  opacity: 0.6;
+  transition: opacity 0.15s ease;
+}
+
+#footer svg:hover {
+  opacity: 1;
+}
+
+/* Rodapé custom (versão + saúde) */
 .hs-footer {
   color: #62666d !important;
   font-size: 0.72rem;

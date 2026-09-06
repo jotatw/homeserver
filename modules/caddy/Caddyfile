@@ -4,6 +4,13 @@ homeserver.local {$LAN_IP:192.168.0.10} {
     # Certificado da CA interna (gerado por `hs tls init` em /srv/config/tls).
     tls /etc/tls/server.pem /etc/tls/server.key
 
+    # Assets de config da Homepage sempre revalidados (sem cache heurístico
+    # no navegador — custom.css/js editados aparecem sem hard-refresh).
+    handle /api/config/custom.* {
+        header Cache-Control "no-cache"
+        reverse_proxy homepage:3000
+    }
+
     # Files (FileBrowser Quantum) — baseURL /files no próprio app
     handle /files/* {
         reverse_proxy files:80

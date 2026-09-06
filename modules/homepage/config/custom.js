@@ -12,30 +12,6 @@
       ? ""
       : `http://${window.location.hostname}:8000`;
 
-  /* ---------- Botão do Power Editor ---------- */
-  function buildPowerButton() {
-    if (document.getElementById("hs-power-btn")) return;
-
-    const btn = document.createElement("button");
-    btn.id = "hs-power-btn";
-    btn.textContent = "Agendar energia";
-    btn.title = "Agendamento liga/desliga";
-    btn.addEventListener("click", () => window.hsOpenPower());
-    btn.style.cssText =
-      "position:fixed;top:.9rem;right:.9rem;z-index:1000;border:1px solid rgba(255,255,255,.08);" +
-      "background:rgba(255,255,255,.04);color:#8a8f98;font-size:.72rem;font-weight:500;" +
-      "padding:6px 14px;border-radius:8px;cursor:pointer;transition:all .15s ease;";
-    btn.addEventListener("mouseenter", () => {
-      btn.style.color = "#f7f8f8";
-      btn.style.borderColor = "rgba(255,255,255,.16)";
-    });
-    btn.addEventListener("mouseleave", () => {
-      btn.style.color = "#8a8f98";
-      btn.style.borderColor = "rgba(255,255,255,.08)";
-    });
-    document.body.appendChild(btn);
-  }
-
   /* ---------- Toast de feedback ---------- */
   function showToast(message) {
     let toast = document.getElementById("hs-toast");
@@ -105,8 +81,26 @@
     });
   }
 
+  /* Abre o Power Editor a partir do card "Agendamentos"
+     (tab Administração — âncora id="power-schedule"). */
+  function wirePowerCard() {
+    const card =
+      document.getElementById("power-schedule") ||
+      [...document.querySelectorAll(".service-card")].find((c) =>
+        /Agendamentos/i.test(c.textContent || "")
+      );
+    if (!card || card.dataset.hsPowerWired) return;
+    card.dataset.hsPowerWired = "1";
+    const link = card.querySelector("a");
+    const target = link || card;
+    if (!link) card.style.cursor = "pointer";
+    target.addEventListener("click", (e) => {
+      e.preventDefault();
+      window.hsOpenPower();
+    });
+  }
+
   function init() {
-    buildPowerButton();
     buildFooter();
   }
 
@@ -115,6 +109,7 @@
     const observer = new MutationObserver(() => {
       if (document.querySelectorAll(".services-group .service-group-name").length > 0) {
         attachClickFeedback();
+        wirePowerCard();
       }
     });
     observer.observe(target, { childList: true, subtree: true });
