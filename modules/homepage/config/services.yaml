@@ -1,17 +1,17 @@
 ---
-# HomeServer v1.4 — Homepage como portal
+# HomeServer v2 — Homepage como portal com tabs nativas.
 #
-# Grupos: Meu espaço · Aplicações · Administração · Sistema
-# Cards como ações: título = tarefa, descrição = o que fazer.
-# Widgets técnicos ficam apenas em Sistema.
+# Tabs: Meu espaço · Aplicações · Administração · Sistema
+# (mapeadas em settings.yaml via layout.<grupo>.tab)
+#
+# Personalização: reordenar/ocultar blocos editando este arquivo —
+# a ordem das entradas define a ordem na página. Ver ADR-005
+# (docs/design/ADR-005-design-system-minimal.md).
+#
+# Hermes Remote é complemento externo e NÃO aparece no portal (ADR-005).
 
-# Meu espaço — tarefas do usuário (cards principais, destacados)
+# Meu espaço — atalhos do usuário (tab inicial)
 - Meu espaço:
-
-    - Assistente IA:
-        icon: mdi-robot
-        href: http://100.118.148.55:3002
-        description: Hermes Remote (chat + dashboard)
 
     - Arquivos:
         icon: mdi-folder
@@ -33,7 +33,72 @@
         href: /files/#/media
         description: Assistir e ouvir
 
-# Aplicações — destinos do usuário (apenas status)
+    - Servidor:
+        id: dash-server
+        icon: mdi-server
+        widget:
+          type: customapi
+          url: http://api:8000/api/v1/status
+          headers:
+            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
+          refreshInterval: 30000
+          mappings:
+            - field: data.uptime
+              label: Uptime
+            - field: data.cpu.percent
+              label: CPU
+              format: percent
+            - field: data.memory.percent
+              label: Memória
+              format: percent
+
+    - Armazenamento:
+        id: dash-storage
+        icon: mdi-harddisk
+        widget:
+          type: customapi
+          url: http://api:8000/api/v1/status
+          headers:
+            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
+          refreshInterval: 30000
+          mappings:
+            - field: data.disk.percent
+              label: Disco
+              format: percent
+            - field: data.storage.total_size_human
+              label: Utilizado
+
+    - Backups:
+        id: dash-backup
+        icon: mdi-backup-restore
+        widget:
+          type: customapi
+          url: http://api:8000/api/v1/status
+          headers:
+            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
+          refreshInterval: 60000
+          mappings:
+            - field: data.backup
+              label: Último
+
+    - Energia:
+        id: dash-power
+        icon: mdi-power-settings
+        widget:
+          type: customapi
+          url: http://api:8000/api/v1/power
+          headers:
+            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
+          refreshInterval: 60000
+          mappings:
+            - field: data.shutdown
+              label: Desligar
+            - field: data.wake
+              label: Ligar
+            - field: data.enabled
+              label: Ativo
+
+# Aplicações — serviços oficiais com status Docker (tab 2)
 - Aplicações:
 
     - Homepage:
@@ -54,11 +119,6 @@
         server: homeserver
         container: gitea
 
-    - Hermes Remote:
-        icon: mdi-robot-outline
-        href: http://100.118.148.55:3002
-        description: Assistente IA
-
     - HomeServer App:
         icon: mdi-monitor-dashboard
         href: /app
@@ -66,23 +126,22 @@
         container: api-api-1
         description: Abrir o App
 
-# Administração — gestão (modo Administrador)
+# Administração — destinos de gestão (tab 3)
 - Administração:
 
     - Usuários:
         icon: mdi-account-group
-        href: /app
+        href: /app/#/admin
         description: Gerenciar pessoas
 
     - Storage:
-        id: storage-status
         icon: mdi-harddisk
-        href: /files/
+        href: /app/#/storage
         description: Ver armazenamento
 
     - Backups:
         icon: mdi-backup-restore
-        href: /app
+        href: /app/#/admin
         description: Cópias de segurança
 
     - Agendamentos:
@@ -90,7 +149,7 @@
         icon: mdi-power-settings
         description: Liga e desliga automático
 
-# Sistema — diagnóstico técnico (modo Sistema)
+# Sistema — widgets técnicos (tab 4)
 - Sistema:
 
     - Serviços:
@@ -135,7 +194,7 @@
             name: label
             label: type
 
-    - Armazenamento:
+    - Armazenamento detalhado:
         icon: mdi-harddisk
         widget:
           type: customapi
@@ -175,19 +234,6 @@
             name: time
             label: action
 
-    - Hermes IA:
-        icon: mdi-robot
-        widget:
-          type: customapi
-          url: http://172.19.0.1:8642/v1/models
-          headers:
-            Authorization: Bearer {{HOMEPAGE_VAR_HERMES_KEY}}
-          refreshInterval: 60000
-          mappings:
-            - field: data.data
-              label: Modelos
-            - field: data.object
-              label: API
     - Servidor:
         id: server-status
         icon: mdi-server

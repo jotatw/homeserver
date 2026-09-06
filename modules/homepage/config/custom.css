@@ -1,257 +1,198 @@
 /* ==========================================================
-   HomeServer — v1.4.1 Layout
+   HomeServer — custom.css v2 (tema Minimal)
+   Especificação: DESIGN.md (raiz do repo) · ADR-005
+   Base: superfícies por luminância sobre #08090a, bordas
+   translúcidas, um acento (violeta #7170ff).
+   Observação: este arquivo é injetado ANTES do CSS compilado
+   do homepage — nos pontos críticos usamos !important.
    ========================================================== */
 
-/* Modos de exibição */
-.hs-mode-selector {
-  position: fixed;
-  top: 0.9rem;
-  right: 0.9rem;
-  z-index: 1000;
-  display: flex;
-  gap: 2px;
-  padding: 3px;
-  background: rgba(2, 6, 23, 0.7);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  border-radius: 10px;
-  backdrop-filter: blur(6px);
+/* ---------- Base da página ---------- */
+body,
+#page_wrapper,
+#inner_wrapper {
+  background: #08090a !important;
 }
 
-.hs-mode-btn {
-  border: none;
-  background: transparent;
-  color: #94a3b8;
-  font-size: 0.72rem;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  padding: 5px 12px;
-  border-radius: 7px;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+#page_wrapper {
+  color: #d0d6e0 !important;
 }
 
-.hs-mode-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: #e2e8f0;
+/* Títulos e textos das áreas de informação */
+#information-widgets span,
+#information-widgets div {
+  color: #d0d6e0 !important;
 }
 
-.hs-mode-btn.active {
-  background: #2563eb;
-  color: #ffffff;
+#information-widgets .border-b-2 {
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
-/* Atalho "Abrir App" (v1.4.3) — destaque no seletor de modos */
-.hs-mode-btn.hs-app-shortcut {
-  background: rgba(37, 99, 235, 0.18);
-  border: 1px solid rgba(37, 99, 235, 0.5);
-  color: #93c5fd;
-  font-weight: 600;
-  text-decoration: none;
-  margin-left: 4px;
-  padding: 5px 14px;
-}
-
-.hs-mode-btn.hs-app-shortcut:hover {
-  background: rgba(37, 99, 235, 0.35);
-  color: #dbeafe;
-}
-
-/* Card do HomeServer App como ação principal (v1.4.3) */
-.service-card.hs-app-cta {
-  border: 1px solid rgba(37, 99, 235, 0.55) !important;
-  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.25), 0 4px 18px rgba(37, 99, 235, 0.15) !important;
-}
-
-.service-card.hs-app-cta:hover {
-  box-shadow: 0 8px 28px rgba(37, 99, 235, 0.3) !important;
-}
-
-/* Navegação */
-.service-card {
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-}
-
-.service-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-}
-
-.service-card a {
-  cursor: pointer;
-}
-
-/* Feedback de clique (toast) */
-.hs-toast {
-  position: fixed;
-  bottom: 1.5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(2, 6, 23, 0.92);
-  color: #e2e8f0;
-  padding: 8px 18px;
-  border-radius: 8px;
-  font-size: 0.8rem;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  pointer-events: none;
-  z-index: 2000;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-}
-
-.hs-toast.show {
-  opacity: 1;
-}
-
-/* ==========================================================
-   v1.4.1 — Layout compacto
-   ========================================================== */
-
-/* Header mais baixo */
-.header-bar {
-  padding-top: 0.5rem !important;
-  padding-bottom: 0.5rem !important;
-}
-
-.widget-container {
-  margin: 0 !important;
-}
-
-/* Reduz altura dos cards */
+/* ---------- Cards de serviço ---------- */
 .services-group .service-card,
-.group-card,
-[class*="group"] [class*="card"] {
-  min-height: 0 !important;
+.service-card {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 10px !important;
+  transition: border-color 0.15s ease, background 0.15s ease !important;
 }
 
-/* Espaçamento entre grupos: maior; dentro dos cards: menor */
-main [class*="section"],
-.services-group,
-.section-wrapper,
-[class*="group"] {
-  margin-bottom: 1.5rem !important;
+.services-group .service-card:hover,
+.service-card:hover {
+  background: rgba(255, 255, 255, 0.045) !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
 }
 
-/* ==========================================================
-   v1.4.2 — Hierarquia visual
-   ========================================================== */
-
-/* Grupo principal (Meu espaço): cards maiores, título em destaque */
-.hs-group-primary .service-group-name {
-  font-size: 1.15rem !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.01em !important;
-  margin-bottom: 0.9rem !important;
+/* Título e descrição do card */
+.service-card .service-card-name,
+.service-card .name,
+.service-card [class*="name"] {
+  color: #f7f8f8 !important;
 }
 
-.hs-group-primary .service-card {
-  border-radius: 12px !important;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25) !important;
+.service-card .description,
+.service-card p {
+  color: #8a8f98 !important;
 }
 
-.hs-group-primary .service-card .text-lg {
-  font-size: 1.05rem !important;
+/* Nome do grupo: micro-caps */
+.service-group-name {
+  color: #8a8f98 !important;
+  font-size: 0.72rem !important;
   font-weight: 600 !important;
-}
-
-.hs-group-primary .service-card .text-sm {
-  font-size: 0.82rem !important;
-}
-
-/* Grupo secundário (Aplicações, Administração): padrão */
-.hs-group-secondary .service-group-name {
-  font-size: 0.95rem !important;
-  font-weight: 600 !important;
-  text-transform: uppercase;
-  letter-spacing: 0.06em !important;
-  color: #94a3b8 !important;
-}
-
-/* Grupo terciário (Sistema): compacto, técnico */
-.hs-group-tertiary .service-group-name {
-  font-size: 0.85rem !important;
-  font-weight: 500 !important;
-  text-transform: uppercase;
   letter-spacing: 0.08em !important;
-  color: #64748b !important;
+  text-transform: uppercase !important;
 }
 
-.hs-group-tertiary .service-card {
-  border-radius: 8px !important;
-  font-size: 0.85rem !important;
+/* ---------- Tabs nativas (layout.tab) ---------- */
+/* Estilização conservadora: underline fino no item ativo,
+   mesmo vocabulário do resto do tema. */
+[class*="tab-"] {
+  color: #8a8f98 !important;
 }
 
-/* Estados dos dots (online / atenção / indisponível) */
+/* ---------- Widgets de informação ---------- */
+.widget-container {
+  background: transparent !important;
+}
+
+.resource-usage {
+  background: rgba(255, 255, 255, 0.07) !important;
+}
+
+.resource-usage > div {
+  background: #7170ff !important;
+}
+
+/* ---------- Dots de status (Docker) ---------- */
 .status-indicator .status-green {
-  color: #22c55e !important;
+  background: #3fb968 !important;
+  box-shadow: 0 0 0 3px rgba(63, 185, 104, 0.18) !important;
 }
 
 .status-indicator .status-yellow {
-  color: #eab308 !important;
+  background: #d9a53f !important;
+  box-shadow: 0 0 0 3px rgba(217, 165, 63, 0.18) !important;
 }
 
 .status-indicator .status-red {
-  color: #ef4444 !important;
+  background: #e0565a !important;
+  box-shadow: 0 0 0 3px rgba(224, 86, 90, 0.18) !important;
 }
 
-/* Rodapé */
+/* ---------- Busca (quicklaunch) ---------- */
+dialog input {
+  background: #101111 !important;
+  color: #f7f8f8 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* ---------- Modal de energia (Power Editor) ---------- */
+#hs-power-modal > div {
+  background: #191a1b !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 10px !important;
+  color: #d0d6e0 !important;
+}
+
+#hs-power-modal h3 {
+  color: #f7f8f8 !important;
+}
+
+#hs-power-modal input {
+  background: #101111 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #f7f8f8 !important;
+  border-radius: 7px !important;
+}
+
+#hs-power-save {
+  background: #5e6ad2 !important;
+  color: #ffffff !important;
+  border-radius: 7px !important;
+}
+
+#hs-power-disable {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #d0d6e0 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 7px !important;
+}
+
+#hs-power-close {
+  background: rgba(255, 255, 255, 0.04) !important;
+  color: #8a8f98 !important;
+  border-radius: 7px !important;
+}
+
+/* ---------- Rodapé ---------- */
 .hs-footer {
-  margin-top: 2.5rem;
-  padding: 1rem 1.5rem 1.5rem;
-  text-align: center;
-  color: #64748b;
-  font-size: 0.75rem;
-  border-top: 1px solid rgba(148, 163, 184, 0.15);
+  color: #62666d !important;
+  font-size: 0.72rem;
+  padding-bottom: 1.5rem;
 }
 
 .hs-footer .hs-footer-line {
-  display: inline-flex;
+  display: flex;
+  gap: 8px;
   align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-end;
 }
 
 .hs-footer .hs-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
   display: inline-block;
+}
+
+.hs-footer .hs-dot.ok { background: #3fb968; }
+.hs-footer .hs-dot.warn { background: #d9a53f; }
+.hs-footer .hs-dot.err { background: #e0565a; }
+
+.hs-footer a {
+  color: #8a8f98 !important;
+  text-decoration: none;
+}
+
+.hs-footer a:hover {
+  color: #f7f8f8 !important;
+}
+
+/* ---------- Scrollbar ---------- */
+#inner_wrapper::-webkit-scrollbar {
   width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  margin-right: 4px;
-  vertical-align: middle;
 }
 
-.hs-footer .hs-dot.ok {
-  background: #22c55e;
+#inner_wrapper::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
 }
 
-.hs-footer .hs-dot.warn {
-  background: #eab308;
-}
-
-.hs-footer .hs-dot.err {
-  background: #ef4444;
-}
-
-/* Responsivo */
-@media (max-width: 640px) {
-  .hs-mode-btn {
-    font-size: 0.65rem;
-    padding: 4px 8px;
-  }
-}
-
-@media (max-width: 480px) {
-  .hs-mode-selector {
-    top: 0.4rem;
-    right: 0.4rem;
-    gap: 1px;
-    padding: 2px;
-  }
-  .hs-mode-btn {
-    font-size: 0.58rem;
-    padding: 3px 7px;
-  }
-  .hs-footer {
-    padding: 0.75rem 1rem 1rem;
+/* ---------- Movimento reduzido ---------- */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
   }
 }

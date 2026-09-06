@@ -22,16 +22,22 @@ quicklaunch:
   hideVisitURL: true
   provider: duckduckgo
 
+# Tabs nativas (gethomepage >= 0.6.30): cada grupo vive na sua tab.
+# Ordem das tabs = ordem deste bloco. Acesso direto: /#meu-espaco etc.
 layout:
   Meu espaço:
+    tab: Meu espaço
     style: row
     columns: 4
   Aplicações:
+    tab: Aplicações
     style: row
     columns: 4
   Administração:
+    tab: Administração
     style: row
     columns: 4
   Sistema:
+    tab: Sistema
     style: row
     columns: 4

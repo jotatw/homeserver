@@ -23,6 +23,11 @@
 
 5. **Confiança na rede local** — dispositivos na LAN são considerados
    parcialmente confiáveis; ainda assim, a API exige autenticação.
+   **Homepage sem login (2026-09-06)**: o portal (`/`) abre sem
+   autenticação para quem já está na LAN ou tailnet; a proteção é de rede
+   (UFW + Tailscale). Conteúdo exposto é de baixa sensibilidade (atalhos,
+   status de serviços, temperatura). Se assumptions (1) ou (8) falharem,
+   reavaliar basic auth no Caddy.
 
 6. **Docker sem privileged** — containers rodam sem privilégios elevados;
    a API usa apenas `CAP_SYS_RAWIO` (leitura de hardware/smartmontools).
