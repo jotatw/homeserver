@@ -1,7 +1,9 @@
 # ADR-004 — Design System aplicado a todas as telas do App
 
 ## Status
-Aceito
+
+Aceito — valores da paleta **superseded por `DESIGN.md` / ADR-005** (a
+aplicação do sistema a todas as telas permanece válida).
 
 ## Data
 2026-08-29

@@ -180,6 +180,33 @@ flowchart TD
 - [x] Modo compacto de densidade persistido (`349b542`)
 - [x] APP_MAP dinâmico via `getAppMeta` (`349b542`)
 
+## Navegação e pesos das telas (v2 — base para o app mobile+desktop)
+
+Padrão de navegação (referências: NN/g "Mobile Navigation Patterns",
+Android Developers "Layout and navigation patterns"):
+
+- **Desktop**: sidebar fixa com as 5 telas do usuário + Impressão no
+  grupo admin. Sidebar é o índice completo; nada fica só no sheet.
+- **Mobile**: bottom bar fixa com **4 destinos** (limite recomendado
+  para tocável confortável): Meu espaço · Aplicações · Armazenamento ·
+  Sistema — e sheet "+ Mais" com Administração (admin) e Impressão.
+  Nunca usar drawer + bottom bar juntos.
+
+**Peso de cada tela** (frequência de uso × urgência de ação — define
+posição na navegação e prioridade de carregamento):
+
+| Tela | Peso | Papel na navegação |
+|---|---|---|
+| Meu espaço | alta | Ponto de entrada; resumo + atalhos; widgets com polling |
+| Aplicações | alta | Catálogo com status; única casa de controle de serviços |
+| Armazenamento | média | Tarefas de disco/dispositivos, caso de uso esporádico |
+| Sistema | média | Saúde técnica; leitura mais que ação |
+| Administração | baixa (admin) | Abas internas; abre a aba Usuários por padrão |
+| Impressão | rara | Fora da barra; acesso via Mais/sheet |
+
+A especificação visual de todas as telas segue `DESIGN.md` (raiz do
+repositório) e o ADR-005 (`docs/design/ADR-005-design-system-minimal.md`).
+
 ## Melhorias futuras (backlog, sem data)
 - [ ] Armazenamento: tamanho real por pasta na API (hoje só contagem/total)
 - [ ] Sistema: checks viram linha compacta "Serviços: 3/4 no ar → Aplicações"

@@ -12,6 +12,7 @@ O Baseline v0.1.0 é a referência conceitual do estado inicial da consolidaçã
 
 ### Adicionado
 
+- Design System "Minimal" unificado para App, portal e futuras interfaces: especificação formal `DESIGN.md` (formato google-labs-code/design.md, lint WCAG 0 erros), decisão no ADR-005 (`docs/design/`) e navegação/pesos de telas v2 no screen-map — base para o app mobile+desktop.
 - HTTPS local com CA interna: `hs tls` gera CA e certificados em `/srv/config/tls`, com SANs para `homeserver.local` e IP; Caddy utiliza o certificado gerado; renovação automática por tarefa `tls-renew`; guia `docs/install/tls-local.md`.
 - Atualização de pacotes do sistema: `hs update os check|apply`, API `GET/POST /api/v1/update/os` e fluxo correspondente no App; execução via `systemd-run` para reduzir impacto de reinicializações de serviços durante atualizações.
 - Executor centralizado para operações privilegiadas com allowlist e validação de argumentos.
