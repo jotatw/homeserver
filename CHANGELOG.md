@@ -42,6 +42,7 @@ O Baseline v0.1.0 é a referência conceitual do estado inicial da consolidaçã
 
 ### Corrigido
 
+- `hs update check` executado dentro do container do API não grava mais no `.git` do host (o fetch como root tornava objetos root-owned e quebrava o `git pull` do usuário no host com "insufficient permission"). O check no container compara via clone descartável em `/tmp` com alternates somente-leitura; o `hs update apply` restaura o dono original do `.git` após fetch e merge. Validado: caminhos host e container (estado correto, 0 objetos root-owned), 86/86 testes da API.
 - Health-check media a temperatura do sensor `nouveau` (GPU C79 ION), que reporta ~98 °C irreais nesse host; agora filtra por `hwmon` `name=coretemp` (só CPU). Validado: PASS 10/FAIL 0.
 - `service_directory()` no Core passou a resolver módulos declarativos em `modules/<id>/` antes do fallback legado `/srv/docker/compose/<id>/`; sem isso, `hs module status/op` reportava `observed: desconhecido` para módulos novos.
 - Validação de dependências de módulos lia JSON de stdin vazio (`python3 - <<PY` consumia o próprio script como stdin), abortando toda operação com `JSONDecodeError`; corrigida para herestring.

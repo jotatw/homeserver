@@ -101,24 +101,109 @@ _hs_update_state() {
         "${status}" "${current}" "${latest}" "${ahead}" "${behind}" "${dirty}"
 }
 
+# Estado via clone bare descartável — usado DENTRO do container.
+# Motivo: o repo do host é bind-mount e o container roda como root;
+# um fetch normal gravaria objetos como root e quebraria o git do host
+# (permissão "insufficient permission" no pull seguinte).
+# Aqui nada é gravado no repositório: o clone vai para /tmp e o
+# histórico local é lido via GIT_ALTERNATE_OBJECT_DIRECTORIES.
+# Saída: status\tcurrent\tlatest\tahead\tbehind\tdirty (mesmo formato
+# de _hs_update_state). Falha (rede/URL) => retorno != 0.
+_hs_update_state_container() {
+    local tmp remote url local_sha remote_tip counts ahead behind dirty status
+    local current latest
+
+    tmp="$(mktemp -d 2>/dev/null)" || return 1
+    remote="$(_hs_update_remote)"
+    url="$(_hs_git remote get-url "${remote}" 2>/dev/null)"
+    if [[ -z "${url}" ]] || ! git clone --quiet --bare "${url}" "${tmp}/check.git" 2>/dev/null; then
+        rm -rf "${tmp}"
+        return 1
+    fi
+
+    local_sha="$(_hs_git --no-optional-locks rev-parse HEAD 2>/dev/null)"
+    remote_tip="$(git --git-dir="${tmp}/check.git" rev-parse HEAD 2>/dev/null)"
+    if [[ -z "${local_sha}" || -z "${remote_tip}" ]]; then
+        rm -rf "${tmp}"
+        return 1
+    fi
+
+    dirty=false
+    [[ -n "$(_hs_git --no-optional-locks status --porcelain 2>/dev/null)" ]] && dirty=true
+
+    counts="$(GIT_ALTERNATE_OBJECT_DIRECTORIES="${HS_PROJECT_ROOT}/.git/objects" \
+        git --git-dir="${tmp}/check.git" \
+        rev-list --left-right --count "${local_sha}...${remote_tip}" 2>/dev/null || true)"
+    rm -rf "${tmp}"
+    # Shas iguais retornam "0\t0"; vazio = falha do rev-list => indisponível.
+    if [[ -z "${counts}" ]]; then
+        return 1
+    fi
+    read -r ahead behind <<< "${counts}"
+
+    current="$(_hs_git --no-optional-locks rev-parse --short HEAD 2>/dev/null)"
+    latest="${remote_tip:0:7}"
+
+    if [[ "${dirty}" == true ]]; then
+        status="modified"
+    elif [[ "${ahead:-0}" -eq 0 && "${behind:-0}" -eq 0 ]]; then
+        status="up_to_date"
+    elif [[ "${ahead:-0}" -eq 0 && "${behind:-0}" -gt 0 ]]; then
+        status="update_available"
+    elif [[ "${ahead:-0}" -gt 0 && "${behind:-0}" -eq 0 ]]; then
+        status="ahead"
+    else
+        status="diverged"
+    fi
+
+    printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
+        "${status}" "${current}" "${latest}" "${ahead:-0}" "${behind:-0}" "${dirty}"
+}
+
 # Verifica o estado da atualização sem alterar o código.
+# No host: fetch normal (é seguro — o usuário local é o dono do repo).
+# No container: nunca grava no repo do host (ver _hs_update_state_container).
 # Saída JSON:
 # {"status":"...","current":"...","latest":"...", "ahead":N,"behind":N,"dirty":bool,"update":bool}
 hs_update_check() {
-    if ! _hs_update_fetch 2>/dev/null; then
-        local current
+    local status current latest ahead behind dirty update=false
+
+    if _update_in_container; then
+        if ! IFS=$'\t' read -r status current latest ahead behind dirty <<< "$(_hs_update_state_container)"; then
+            status="unavailable"
+        fi
+    else
+        if ! _hs_update_fetch 2>/dev/null; then
+            status="unavailable"
+        else
+            IFS=$'\t' read -r status current latest ahead behind dirty <<< "$(_hs_update_state)"
+        fi
+    fi
+
+    if [[ "${status}" == "unavailable" ]]; then
         current="$(hs_version)"
         printf '{"status":"unavailable","current":"%s","latest":"%s","ahead":0,"behind":0,"dirty":false,"update":false}\n' \
             "${current}" "${current}"
         return 0
     fi
 
-    local status current latest ahead behind dirty update=false
-    IFS=$'\t' read -r status current latest ahead behind dirty <<< "$(_hs_update_state)"
     [[ "${status}" == "update_available" ]] && update=true
 
     printf '{"status":"%s","current":"%s","latest":"%s","ahead":%s,"behind":%s,"dirty":%s,"update":%s}\n' \
         "${status}" "${current}" "${latest}" "${ahead}" "${behind}" "${dirty}" "${update}"
+}
+
+# Restaura o dono original do banco de objetos do repositório.
+# Dentro do container as escritas git acontecem como root sobre o
+# bind-mount do host; sem isto, o usuário dono perde o acesso ao repo
+# ("insufficient permission" no próximo pull do host). O dono de
+# referência é o de .git/config. Idempotente; não roda no host.
+_hs_update_restore_owner() {
+    _update_in_container || return 0
+    local owner
+    owner="$(stat -c '%u:%g' "${HS_PROJECT_ROOT}/.git/config" 2>/dev/null)" || return 0
+    [[ "${owner}" == "0:0" ]] && return 0
+    chown -R "${owner}" "${HS_PROJECT_ROOT}/.git" 2>/dev/null || true
 }
 
 # Aplica uma atualização apenas quando ela puder ser feita por fast-forward.
@@ -140,9 +225,11 @@ hs_update_apply() {
     fi
 
     if ! _hs_update_fetch; then
+        _hs_update_restore_owner
         error "Não foi possível consultar ${remote}/${HS_UPDATE_BRANCH}."
         return 3
     fi
+    _hs_update_restore_owner
 
     local status current latest ahead behind dirty
     IFS=$'\t' read -r status current latest ahead behind dirty <<< "$(_hs_update_state)"
@@ -186,7 +273,12 @@ hs_update_apply() {
         return 3
     }
 
-    if ! _hs_git merge --ff-only "${remote}/${HS_UPDATE_BRANCH}"; then
+    local merge_ok=0
+    if _hs_git merge --ff-only "${remote}/${HS_UPDATE_BRANCH}"; then
+        merge_ok=1
+    fi
+    _hs_update_restore_owner
+    if [[ "${merge_ok}" -eq 0 ]]; then
         error "Fast-forward falhou. Nenhum reset automático será executado."
         return 3
     fi
