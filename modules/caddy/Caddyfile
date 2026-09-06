@@ -6,7 +6,10 @@ homeserver.local {$LAN_IP:192.168.0.10} {
 
     # Assets de config da Homepage sempre revalidados (sem cache heurístico
     # no navegador — custom.css/js editados aparecem sem hard-refresh).
-    handle /api/config/custom.* {
+    # Obs: o path matcher do Caddy não aceita wildcard no meio ("custom.*");
+    # usar matcher nomeado com os paths exatos.
+    @homepage_custom path /api/config/custom.css /api/config/custom.js
+    handle @homepage_custom {
         header Cache-Control "no-cache"
         reverse_proxy homepage:3000
     }
