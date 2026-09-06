@@ -65,6 +65,13 @@ A seção de desenvolvimento registra evidências históricas de execução, inc
 
 As entradas abaixo preservam versões, sprints, correções e estados anteriores para rastreabilidade. Elas não definem o estado atual, o roadmap ativo ou suporte formal.
 
+### v1.0.0 (2026-08-25) — primeira release estável
+
+- Tag anotada `v1.0.0` publicada no GitHub, apontando para `61f4ac4` (linha principal).
+- Conteúdo consolidado: plataforma local completa (App + API + Core), Design System aplicado a todas as telas (desktop + mobile), HTTPS local com CA interna, atualização do código via git (`update check|apply`), gestão de usuários com FileBrowser, impressão, energia (night-off/WOL) e backup diário.
+- Notas para usuário: `planning/release/release-notes-v1.0.md` (a finalizar como documento oficial).
+- Mudanças posteriores ficam registradas na seção "Em desenvolvimento" acima.
+
 ### v2.0.0-rc.1 (2026-08-05) — experimental
 
 #### Fixed (acceptance tests)

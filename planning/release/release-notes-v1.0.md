@@ -1,52 +1,42 @@
-# HomeServer v1.0.0 — Rascunho de Release Notes
+# HomeServer v1.0.0 — Release Notes
 
-> Documento preparatório para as futuras notas voltadas ao usuário.
->
-> **Status:** rascunho. A `v1.0.0` ainda não está em processo ativo de release e este documento não representa uma promessa de escopo ou publicação.
+> **Status:** publicada (2026-08-25). Tag anotada `v1.0.0` disponível no
+> GitHub, apontando para `61f4ac4`. Este documento resume a release para o
+> usuário; o detalhe técnico completo fica no `CHANGELOG.md` (seção
+> "Histórico") e na documentação oficial.
 
-## Objetivo futuro
+## O que é o HomeServer
 
-Quando a primeira release oficial for consolidada, este documento deverá explicar de forma simples:
+Plataforma local para reutilizar um computador comum como servidor doméstico,
+com foco em simplicidade, controle, manutenção e evolução modular.
 
-- o que é o HomeServer;
-- o que está incluído na `v1.0.0`;
-- as principais mudanças e capacidades;
-- como instalar ou atualizar, quando aplicável;
-- limitações e Known Issues relevantes.
+## O que está incluído na v1.0.0
 
-Detalhes técnicos deverão permanecer no `CHANGELOG.md` e na documentação correspondente.
+| Área | Capacidade |
+|---|---|
+| HomeServer App | Dashboard, Aplicações, Armazenamento, Sistema, Administração, Impressão — Design System unificado em desktop e mobile |
+| API | Fastify com autenticação por sessão e token, executor privilegiado com allowlist, rate limit, CSP/HSTS |
+| Core CLI (`hs`) | Status, usuários, dispositivos (montar/ejetar), módulos, energia, scheduler, TLS, update |
+| Arquivos | FileBrowser (Quantum) com escopos por usuário e pasta compartilhada |
+| Homepage | Painel inicial com widgets e atalhos |
+| HTTPS | CA local (`hs tls`) com renovação automática, redireção para HTTPS |
+| Atualização | `hs update check/apply` via git (fast-forward seguro) + pacotes do sistema (`hs update os`) |
+| Energia | Night-off agendado (S3 + RTC), Wake-on-LAN, economia automática |
+| Backup | Diário com manifest SHA256 e verificação |
 
-## Rascunho de posicionamento
+## Instalação
 
-A futura **v1.0.0** deverá representar a primeira referência oficial consolidada da linha atual do HomeServer: uma plataforma local para reutilizar um computador como servidor doméstico, com foco em simplicidade, controle, manutenção e evolução modular.
+Ver [`docs/install/INSTALLATION.md`](../../docs/install/INSTALLATION.md) e o
+[QUICKSTART](../../docs/install/QUICKSTART.md).
 
-O conteúdo final será definido somente após o escopo da release estar consolidado.
+## Limitações e Known Issues
 
-## Conteúdo ainda não confirmado
-
-As seguintes áreas podem fazer parte da evolução até a primeira release, mas não estão confirmadas como conteúdo da `v1.0.0`:
-
-- interface Desktop e HomeServer App;
-- experiência Mobile para ações rápidas;
-- gerenciamento de arquivos;
-- módulos opcionais;
-- TLS/HTTPS local;
-- atualização de pacotes e do sistema;
-- backup e recuperação;
-- impressão;
-- PWA;
-- integrações e serviços atualmente em avaliação.
-
-Cada área dependerá do escopo final, dos testes práticos e da decisão de consolidação.
-
-## Como este documento será finalizado
-
-No início do processo de release:
-
-1. remover o status de rascunho;
-2. registrar somente funcionalidades realmente incluídas;
-3. descrever mudanças relevantes para o usuário;
-4. adicionar instruções de instalação/atualização aplicáveis;
-5. registrar Known Issues relevantes;
-6. revisar junto do CHANGELOG e da documentação oficial;
-7. publicar junto da Tag e GitHub Release da `v1.0.0`.
+- Sensor de temperatura da GPU (`nouveau`) reporta valores irreais neste
+  host — leituras usam apenas `coretemp` (ver
+  [`docs/reference/hardware.md`](../../docs/reference/hardware.md)).
+- Usuários do FileBrowser criados antes da v1.0.0 não recebem o escopo
+  `/shared` automaticamente (limitação da API do Quantum; usuários novos
+  já nascem com ele).
+- Validações de instalação limpa/repetida da
+  [pre-release-test-matrix](../quality/pre-release-test-matrix.md) seguem
+  como trabalho contínuo pós-release.
