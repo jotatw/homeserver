@@ -13,12 +13,6 @@ homeserver.local {$LAN_IP:192.168.0.10} {
     # Certificado da CA interna (gerado por `hs tls init` em /srv/config/tls).
     tls /etc/tls/server.pem /etc/tls/server.key
 
-    # Log de acesso (diagnóstico de chamadas dos widgets).
-    log {
-        output stdout
-        format console
-    }
-
     # Assets de config da Homepage sempre revalidados (sem cache heurístico
     # no navegador — custom.css/js editados aparecem sem hard-refresh).
     # Obs: o path matcher do Caddy não aceita wildcard no meio ("custom.*");
