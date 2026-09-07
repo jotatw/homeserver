@@ -195,7 +195,7 @@
         icon: mdi-thermometer
         widget:
           type: customapi
-          url: http://api:8000/api/v1/hardware
+          url: http://api:8000/api/v1/hardware/sensors
           headers:
             Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
           refreshInterval: 60000
