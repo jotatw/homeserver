@@ -1,8 +1,9 @@
 services:
   filebrowser:
 
-    # Imagem (FileBrowser Quantum)
-    image: gtstef/filebrowser:stable-slim
+    # Imagem (FileBrowser Quantum) — pinada; atualizar com
+    # `hs service update files` após bumpar a tag aqui.
+    image: gtstef/filebrowser:1.5.6-stable-slim
 
     container_name: files
     hostname: files

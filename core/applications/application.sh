@@ -108,8 +108,11 @@ _application_execute() {
 
         update)
 
-            compose_pull "${service}"      || return 1
-            compose_restart "${service}"   || return 1
+            compose_pull "${service}"   || return 1
+            # 'restart' mantém o container velho (imagem antiga em memória);
+            # 'up -d' recria apenas o que mudou de imagem — é o que aplica
+            # a atualização puxada acima.
+            compose_up "${service}"     || return 1
             compose_check "${service}"
             ;;
 
