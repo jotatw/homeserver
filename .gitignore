@@ -50,3 +50,6 @@ graphify-out/
 modules/homepage/config/kubernetes.yaml
 modules/homepage/config/proxmox.yaml
 
+
+# Mockups/experimentos locais de design
+/tmp/
