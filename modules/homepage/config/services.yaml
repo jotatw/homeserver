@@ -18,7 +18,9 @@
         icon: mdi-speedometer
         widget:
           type: customapi
-          url: /api/v1/status
+          url: http://api:8000/api/v1/status
+          headers:
+            Authorization: Bearer $(HOMEPAGE_VAR_API_TOKEN)
           refreshInterval: 30000
           mappings:
             - field: data.cpu.percent
@@ -56,7 +58,9 @@
         icon: mdi-server
         widget:
           type: customapi
-          url: /api/v1/status
+          url: http://api:8000/api/v1/status
+          headers:
+            Authorization: Bearer $(HOMEPAGE_VAR_API_TOKEN)
           refreshInterval: 30000
           mappings:
             - field: data.uptime
@@ -73,7 +77,9 @@
         icon: mdi-harddisk
         widget:
           type: customapi
-          url: /api/v1/status
+          url: http://api:8000/api/v1/status
+          headers:
+            Authorization: Bearer $(HOMEPAGE_VAR_API_TOKEN)
           refreshInterval: 30000
           mappings:
             - field: data.disk.percent
@@ -87,7 +93,9 @@
         icon: mdi-backup-restore
         widget:
           type: customapi
-          url: /api/v1/status
+          url: http://api:8000/api/v1/status
+          headers:
+            Authorization: Bearer $(HOMEPAGE_VAR_API_TOKEN)
           refreshInterval: 60000
           mappings:
             - field: data.backup
@@ -98,7 +106,9 @@
         icon: mdi-power-settings
         widget:
           type: customapi
-          url: /api/v1/power/status
+          url: http://api:8000/api/v1/power/status
+          headers:
+            Authorization: Bearer $(HOMEPAGE_VAR_API_TOKEN)
           refreshInterval: 60000
           mappings:
             - field: data.shutdown
@@ -171,7 +181,9 @@
         icon: mdi-server-network
         widget:
           type: customapi
-          url: /api/v1/status
+          url: http://api:8000/api/v1/status
+          headers:
+            Authorization: Bearer $(HOMEPAGE_VAR_API_TOKEN)
           refreshInterval: 30000
           display: dynamic-list
           mappings:
@@ -183,7 +195,9 @@
         icon: mdi-thermometer
         widget:
           type: customapi
-          url: /api/v1/hardware
+          url: http://api:8000/api/v1/hardware
+          headers:
+            Authorization: Bearer $(HOMEPAGE_VAR_API_TOKEN)
           refreshInterval: 60000
           display: dynamic-list
           mappings:
@@ -196,7 +210,9 @@
         icon: mdi-usb
         widget:
           type: customapi
-          url: /api/v1/devices
+          url: http://api:8000/api/v1/devices
+          headers:
+            Authorization: Bearer $(HOMEPAGE_VAR_API_TOKEN)
           refreshInterval: 15000
           display: dynamic-list
           mappings:
@@ -207,7 +223,9 @@
         icon: mdi-harddisk
         widget:
           type: customapi
-          url: /api/v1/storage
+          url: http://api:8000/api/v1/storage
+          headers:
+            Authorization: Bearer $(HOMEPAGE_VAR_API_TOKEN)
           refreshInterval: 30000
           mappings:
             - field: data.ready
@@ -232,7 +250,9 @@
         icon: mdi-calendar-today
         widget:
           type: customapi
-          url: /api/v1/events
+          url: http://api:8000/api/v1/events
+          headers:
+            Authorization: Bearer $(HOMEPAGE_VAR_API_TOKEN)
           refreshInterval: 30000
           display: dynamic-list
           mappings:
@@ -244,7 +264,9 @@
         icon: mdi-server
         widget:
           type: customapi
-          url: /api/v1/status
+          url: http://api:8000/api/v1/status
+          headers:
+            Authorization: Bearer $(HOMEPAGE_VAR_API_TOKEN)
           refreshInterval: 30000
           mappings:
             - field: data.hostname
