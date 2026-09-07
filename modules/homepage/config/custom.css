@@ -65,10 +65,43 @@ body,
 }
 
 /* ---------- Tabs nativas (layout.tab) ---------- */
-/* Estilização conservadora: underline fino no item ativo,
-   mesmo vocabulário do resto do tema. */
-[class*="tab-"] {
+/* Botões gerados pelo homepage: id "<grupo>-tab", role=tab.
+   Estilo Minimal: pílula translúcida no acento para a ativa. */
+[id$="-tab"] {
+  background: transparent !important;
   color: #8a8f98 !important;
+  border: none !important;
+  border-radius: 7px !important;
+  font-size: 0.8rem !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.02em !important;
+  padding: 6px 14px !important;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease !important;
+}
+
+[id$="-tab"]:hover {
+  background: rgba(255, 255, 255, 0.04) !important;
+  color: #f7f8f8 !important;
+}
+
+[id$="-tab"][aria-selected="true"] {
+  background: rgba(113, 112, 255, 0.13) !important;
+  color: #a5a4ff !important;
+  font-weight: 600 !important;
+}
+
+/* ---------- Ícones dos cards ---------- */
+/* iconStyle: theme remove o gradiente nativo; a caixinha dim
+   recria o padrão do mockup (ícone sobre fundo do acento). */
+.service-card img[class*="icon"],
+.service-card img[src*="/api/icon"] {
+  background: rgba(113, 112, 255, 0.13) !important;
+  border-radius: 8px !important;
+  padding: 5px !important;
+  width: 32px !important;
+  height: 32px !important;
+  object-fit: contain !important;
 }
 
 /* ---------- Widgets de informação ---------- */
@@ -145,8 +178,7 @@ dialog input {
   border-radius: 7px !important;
 }
 
-/* ---------- Rodapé ---------- */
-/* Rodapé nativo (ícone de revalidate + versão) */
+/* ---------- Rodapé nativo (revalidate + versão) ---------- */
 #footer {
   color: #62666d !important;
 }
@@ -159,50 +191,6 @@ dialog input {
 
 #footer svg:hover {
   opacity: 1;
-}
-
-/* Rodapé custom (versão + saúde) */
-.hs-footer {
-  color: #62666d !important;
-  font-size: 0.72rem;
-  padding-bottom: 1.5rem;
-}
-
-.hs-footer .hs-footer-line {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  justify-content: flex-end;
-}
-
-.hs-footer .hs-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  display: inline-block;
-}
-
-.hs-footer .hs-dot.ok { background: #3fb968; }
-.hs-footer .hs-dot.warn { background: #d9a53f; }
-.hs-footer .hs-dot.err { background: #e0565a; }
-
-.hs-footer a {
-  color: #8a8f98 !important;
-  text-decoration: none;
-}
-
-.hs-footer a:hover {
-  color: #f7f8f8 !important;
-}
-
-/* ---------- Scrollbar ---------- */
-#inner_wrapper::-webkit-scrollbar {
-  width: 8px;
-}
-
-#inner_wrapper::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
 }
 
 /* ---------- Movimento reduzido ---------- */

@@ -11,6 +11,7 @@ fullWidth: true
 statusStyle: dot
 showStats: true
 useEqualHeights: true
+iconStyle: theme
 
 hideVersion: true
 disableUpdateCheck: true

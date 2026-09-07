@@ -1,9 +1,16 @@
 import type { FastifyInstance } from "fastify";
 import { getPower, setPower } from "../adapters/power.js";
 import { sendOk, sendError, sendInternalError } from "../utils/respond.js";
-import { requireAdmin } from "../plugins/auth.js";
+import { requireAdmin, requireAuth } from "../plugins/auth.js";
 
 export async function powerRoutes(fastify: FastifyInstance) {
+    // Leitura resumida para dashboards (homepage/App): autenticado
+    // (sessão OU token de serviço), sem exigir admin. Os horários da
+    // agenda não são sensíveis; a escrita continua restrita abaixo.
+    fastify.get("/api/v1/power/status", { preHandler: requireAuth }, async (_req, reply) => {
+        return sendOk(reply, await getPower());
+    });
+
     fastify.addHook("preHandler", requireAdmin);
 
     fastify.get("/api/v1/power", async (_req, reply) => {

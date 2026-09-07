@@ -70,6 +70,7 @@ function isPollingPath(url: string): boolean {
         "/api/v1/storage/status",
         "/api/v1/hardware",
         "/api/v1/power",
+        "/api/v1/power/status",
         "/api/v1/devices",
         "/api/v1/print",
         "/api/v1/print/jobs",

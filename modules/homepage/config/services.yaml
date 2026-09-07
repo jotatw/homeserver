@@ -86,7 +86,7 @@
         icon: mdi-power-settings
         widget:
           type: customapi
-          url: http://api:8000/api/v1/power
+          url: http://api:8000/api/v1/power/status
           headers:
             Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
           refreshInterval: 60000
@@ -97,6 +97,11 @@
               label: Ligar
             - field: data.enabled
               label: Ativo
+              remap:
+                - value: true
+                  to: Sim
+                - value: false
+                  to: Não
 
 # Aplicações — serviços oficiais com status Docker (tab 2)
 - Aplicações:
