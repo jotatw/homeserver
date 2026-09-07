@@ -1,6 +1,9 @@
 services:
   caddy:
-    image: caddy:2
+    # Pinada na versão em uso (2.11.4). Nota: o Caddyfile força HTTP/1.1
+    # (workaround p/ streams h2 concorrentes derrubados no 2.11) — ao
+    # subir versão, revalidar os widgets do portal antes de remover o bloco.
+    image: caddy:2.11.4
 
     container_name: caddy
 
