@@ -54,7 +54,7 @@
 
   /* ---------- DIAGNÓSTICO TEMPORÁRIO (remover após) ---------- */
   function hsDiag() {
-    const url = '/api/services/proxy?group=Meu+espa%C3%A7o&service=Recursos&index=0&query=%7B%22refreshInterval%22%3A30000%7D';
+    const url = '/api/v1/status';
     const put = (txt) => {
       let d = document.getElementById('hs-diag');
       if (!d) {
@@ -66,7 +66,7 @@
       d.textContent = 'DIAG ' + txt;
     };
     put('fetching...');
-    fetch(url, { headers: { Accept: '*/*' } })
+    fetch(url, { headers: { Accept: 'application/json' } })
       .then((r) => r.text().then((t) => {
         let cpu = 'ERR';
         try { cpu = JSON.parse(t).data.cpu.percent; } catch (e) { cpu = 'parse:' + e.message; }
