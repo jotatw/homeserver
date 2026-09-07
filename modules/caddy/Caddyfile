@@ -1,5 +1,14 @@
 # Serviço único para homeserver.local e o IP da LAN.
 # O IP pode ser configurado via LAN_IP (compose) — default 192.168.0.10.
+
+# HTTP/1.1 apenas: Caddy 2.11 (Go net/http2 novo) derruba streams h2
+# concorrentes do browser (status 0 no log de acesso) — widgets ficam "-".
+{
+    servers {
+        protocols h1
+    }
+}
+
 homeserver.local {$LAN_IP:192.168.0.10} {
     # Certificado da CA interna (gerado por `hs tls init` em /srv/config/tls).
     tls /etc/tls/server.pem /etc/tls/server.key
