@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# ==========================================================
+# pre-commit — trava de dados pessoais (repo público)
+#
+# Bloqueia:
+#   1. Autor/committer com Gmail pessoal (usar noreply do GitHub)
+#   2. E-mail pessoal ou nomes de terceiros no CONTEÚDO staged
+#   3. Nome pessoal ("joao", "rosangela") na MENSAGEM do commit
+#      (convenção: usar "usuario" / "usuario2" em exemplos)
+#
+# NAO bloqueia: /home/joao e IPs da LAN em conteúdo — são caminhos
+# funcionais da infra (ver skill public-repo-secrets-audit).
+#
+# Instalação por repo:  git config core.hooksPath .githooks
+# Global (novos repos): git config --global init.templateDir ~/.git-templates
+# ==========================================================
+set -u
+
+GMAIL="joaobiel2004@gmail.com"
+TERCEIROS="rosangela"
+
+fail=0
+die() { echo "pre-commit: $*" >&2; fail=1; }
+
+# 1. identidade do autor
+email=$(git config user.email || echo "")
+if [[ "$email" == *"$GMAIL"* ]]; then
+    die "autor usa Gmail pessoal ($email). Para repo público: git config user.email \"129410759+jotatw@users.noreply.github.com\""
+fi
+
+# 2. conteúdo staged (exceto os próprios hooks, que contêm os padrões)
+staged=$(git diff --cached -U0 -- . ':(exclude).githooks' 2>/dev/null || true)
+if printf '%s' "$staged" | grep -qiE "$GMAIL"; then
+    die "Gmail pessoal encontrado no conteúdo staged."
+fi
+if printf '%s' "$staged" | grep -qiE "$TERCEIROS"; then
+    die "nome de terceiro ('$TERCEIROS') no conteúdo — usar 'usuario2'."
+fi
+
+exit $fail

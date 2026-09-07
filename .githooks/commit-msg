@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# ==========================================================
+# commit-msg — dados pessoais na MENSAGEM do commit (repo público)
+# Convenção: exemplos usam "usuario"/"usuario2", nunca nomes reais.
+# Instalação: git config core.hooksPath .githooks
+# ==========================================================
+set -u
+
+GMAIL="joaobiel2004@gmail.com"
+TERCEIROS="rosangela"
+msgfile="${1:?arquivo de mensagem não informado}"
+
+[[ -f "$msgfile" ]] || exit 0
+
+if grep -qiE "\bjoao\b|\bjoão\b" "$msgfile"; then
+    echo "commit-msg: nome pessoal na mensagem — usar 'usuario' em exemplos." >&2
+    exit 1
+fi
+if grep -qiE "$TERCEIROS|$GMAIL" "$msgfile"; then
+    echo "commit-msg: dado pessoal na mensagem de commit." >&2
+    exit 1
+fi
+exit 0
