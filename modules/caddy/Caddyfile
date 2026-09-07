@@ -14,6 +14,15 @@ homeserver.local {$LAN_IP:192.168.0.10} {
         reverse_proxy homepage:3000
     }
 
+    # Documento HTML da raiz sempre revalidado — o Next manda
+    # s-maxage=31536000, e o navegador guardava o HTML antigo sem
+    # revalidar (a tab bar e os cards novos não apareciam).
+    @homepage_root path /
+    handle @homepage_root {
+        header Cache-Control "no-cache"
+        reverse_proxy homepage:3000
+    }
+
     # Files (FileBrowser Quantum) — baseURL /files no próprio app
     handle /files/* {
         reverse_proxy files:80
