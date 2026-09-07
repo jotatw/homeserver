@@ -9,40 +9,39 @@
 (() => {
   /* ---------- Toast de feedback ---------- */
   function showToast(message) {
-    let toast = document.getElementById("hs-toast");
+    let toast = document.getElementById('hs-toast');
     if (!toast) {
-      toast = document.createElement("div");
-      toast.id = "hs-toast";
-      toast.className = "hs-toast";
+      toast = document.createElement('div');
+      toast.id = 'hs-toast';
+      toast.className = 'hs-toast';
       document.body.appendChild(toast);
     }
     toast.textContent = message;
-    toast.classList.add("show");
-    setTimeout(() => toast.classList.remove("show"), 1200);
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 1200);
   }
 
   function attachClickFeedback() {
-    document.querySelectorAll(".service-card a[href]").forEach((a) => {
+    document.querySelectorAll('.service-card a[href]').forEach((a) => {
       if (a.dataset.hsFeedback) return;
-      a.dataset.hsFeedback = "1";
-      a.addEventListener("click", () => showToast("Abrindo..."));
+      a.dataset.hsFeedback = '1';
+      a.addEventListener('click', () => showToast('Abrindo...'));
     });
   }
 
-  /* Abre o Power Editor a partir do card "Agendamentos"
-     (tab Administração — âncora id="power-schedule"). */
+  /* ---------- Power Editor ---------- */
   function wirePowerCard() {
     const card =
-      document.getElementById("power-schedule") ||
-      [...document.querySelectorAll(".service-card")].find((c) =>
-        /Agendamentos/i.test(c.textContent || "")
+      document.getElementById('power-schedule') ||
+      [...document.querySelectorAll('.service-card')].find((c) =>
+        /Agendamentos/i.test(c.textContent || '')
       );
     if (!card || card.dataset.hsPowerWired) return;
-    card.dataset.hsPowerWired = "1";
-    const link = card.querySelector("a");
+    card.dataset.hsPowerWired = '1';
+    const link = card.querySelector('a');
     const target = link || card;
-    if (!link) card.style.cursor = "pointer";
-    target.addEventListener("click", (e) => {
+    if (!link) card.style.cursor = 'pointer';
+    target.addEventListener('click', (e) => {
       e.preventDefault();
       window.hsOpenPower();
     });
@@ -53,9 +52,9 @@
   }
 
   function watch() {
-    const target = document.getElementById("__next") || document.body;
+    const target = document.getElementById('__next') || document.body;
     const observer = new MutationObserver(() => {
-      if (document.querySelectorAll(".services-group .service-group-name").length > 0) {
+      if (document.querySelectorAll('.services-group .service-group-name').length > 0) {
         attachClickFeedback();
         wirePowerCard();
       }
@@ -63,8 +62,8 @@
     observer.observe(target, { childList: true, subtree: true });
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
       init();
       watch();
     });
@@ -79,22 +78,21 @@
  * ────────────────────────── */
 (() => {
   const BASE =
-    window.location.hostname === "homeserver.local"
-      ? ""
+    window.location.hostname === 'homeserver.local'
+      ? ''
       : `http://${window.location.hostname}:8000`;
 
   function powerFetch(url, opts) {
     return fetch(url, {
       ...opts,
-      headers: { "Content-Type": "application/json", ...opts?.headers },
+      headers: { 'Content-Type': 'application/json', ...opts?.headers },
     }).then((r) => r.json()).then((b) => (b && b.data ? b.data : b));
   }
 
-  /* Overlay modal */
-  const overlay = document.createElement("div");
-  overlay.id = "hs-power-modal";
+  const overlay = document.createElement('div');
+  overlay.id = 'hs-power-modal';
   overlay.style.cssText =
-    "display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:3000;align-items:center;justify-content:center;";
+    'display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:3000;align-items:center;justify-content:center;';
   overlay.innerHTML = `
     <div style="padding:24px;min-width:280px;font-size:.9rem;">
       <h3 style="margin:0 0 16px;font-size:1rem;">Agendamento Automático</h3>
@@ -114,46 +112,45 @@
   document.body.appendChild(overlay);
 
   window.hsOpenPower = function () {
-    powerFetch(BASE + "/api/v1/power").then((d) => {
-      document.getElementById("hs-power-shutdown").value = d.shutdown || "23:30";
-      document.getElementById("hs-power-wake").value = d.wake || "07:00";
+    powerFetch(BASE + '/api/v1/power').then((d) => {
+      document.getElementById('hs-power-shutdown').value = d.shutdown || '23:30';
+      document.getElementById('hs-power-wake').value = d.wake || '07:00';
     });
-    overlay.style.display = "flex";
+    overlay.style.display = 'flex';
   };
 
-  /* Eventos do modal */
-  document.getElementById("hs-power-close").addEventListener("click", () => {
-    overlay.style.display = "none";
+  document.getElementById('hs-power-close').addEventListener('click', () => {
+    overlay.style.display = 'none';
   });
-  overlay.addEventListener("click", (e) => {
-    if (e.target === overlay) overlay.style.display = "none";
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.style.display = 'none';
   });
-  document.getElementById("hs-power-save").addEventListener("click", () => {
-    const s = document.getElementById("hs-power-shutdown").value;
-    const w = document.getElementById("hs-power-wake").value;
-    const msg = document.getElementById("hs-power-msg");
-    msg.textContent = "Salvando...";
-    powerFetch(BASE + "/api/v1/power", {
-      method: "PUT",
+  document.getElementById('hs-power-save').addEventListener('click', () => {
+    const s = document.getElementById('hs-power-shutdown').value;
+    const w = document.getElementById('hs-power-wake').value;
+    const msg = document.getElementById('hs-power-msg');
+    msg.textContent = 'Salvando...';
+    powerFetch(BASE + '/api/v1/power', {
+      method: 'PUT',
       body: JSON.stringify({ shutdown: s, wake: w, enabled: true }),
     })
       .then((d) => {
-        msg.textContent = "Agendado para " + d.shutdown + " — " + d.wake;
-        setTimeout(() => { overlay.style.display = "none"; }, 1500);
+        msg.textContent = `Agendado para ${d.shutdown} — ${d.wake}`;
+        setTimeout(() => { overlay.style.display = 'none'; }, 1500);
       })
-      .catch((e) => { msg.textContent = "Erro: " + e.message; });
+      .catch((e) => { msg.textContent = `Erro: ${e.message}`; });
   });
-  document.getElementById("hs-power-disable").addEventListener("click", () => {
-    const msg = document.getElementById("hs-power-msg");
-    msg.textContent = "Desativando...";
-    powerFetch(BASE + "/api/v1/power", {
-      method: "PUT",
+  document.getElementById('hs-power-disable').addEventListener('click', () => {
+    const msg = document.getElementById('hs-power-msg');
+    msg.textContent = 'Desativando...';
+    powerFetch(BASE + '/api/v1/power', {
+      method: 'PUT',
       body: JSON.stringify({ enabled: false }),
     })
       .then((d) => {
-        msg.textContent = d.enabled ? "Falhou" : "Desativado";
-        setTimeout(() => { overlay.style.display = "none"; }, 1500);
+        msg.textContent = d.enabled ? 'Falhou' : 'Desativado';
+        setTimeout(() => { overlay.style.display = 'none'; }, 1500);
       })
-      .catch((e) => { msg.textContent = "Erro: " + e.message; });
+      .catch((e) => { msg.textContent = `Erro: ${e.message}`; });
   });
 })();

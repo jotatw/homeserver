@@ -109,6 +109,13 @@ body,
   background: transparent !important;
 }
 
+/* Widget nativo de recursos desativado: substituído pelo card
+   "Recursos" (customapi) na tab Meu espaço — o nativo não popula
+   os valores neste ambiente. */
+.information-widget-resource {
+  display: none !important;
+}
+
 .resource-usage {
   background: rgba(255, 255, 255, 0.07) !important;
 }

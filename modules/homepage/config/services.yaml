@@ -13,6 +13,26 @@
 # Meu espaço — atalhos do usuário (tab inicial)
 - Meu espaço:
 
+    - Recursos:
+        id: dash-resources
+        icon: mdi-speedometer
+        widget:
+          type: customapi
+          url: http://api:8000/api/v1/status
+          headers:
+            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
+          refreshInterval: 30000
+          mappings:
+            - field: data.cpu.percent
+              label: CPU
+              format: percent
+            - field: data.memory.percent
+              label: Memória
+              format: percent
+            - field: data.disk.percent
+              label: Disco
+              format: percent
+
     - Arquivos:
         icon: mdi-folder
         href: /files/
