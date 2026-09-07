@@ -10,7 +10,7 @@ homeserver.local {$LAN_IP:192.168.0.10} {
     # usar matcher nomeado com os paths exatos.
     @homepage_custom path /api/config/custom.css /api/config/custom.js
     handle @homepage_custom {
-        header Cache-Control "no-cache"
+        header >Cache-Control "no-cache"
         reverse_proxy homepage:3000
     }
 
@@ -19,7 +19,7 @@ homeserver.local {$LAN_IP:192.168.0.10} {
     # revalidar (a tab bar e os cards novos não apareciam).
     @homepage_root path /
     handle @homepage_root {
-        header Cache-Control "no-cache"
+        header >Cache-Control "no-cache"
         reverse_proxy homepage:3000
     }
 
