@@ -12,6 +12,9 @@ services:
 
     environment:
       - LAN_IP=${HS_HOST_IP:-192.168.0.10}
+      # Token de serviço injetado em GETs anônimos de telemetria (Caddyfile
+      # @api_anon_get). Definido em modules/caddy/.env no servidor (não versionado).
+      - API_SERVICE_TOKEN=${API_…N}
 
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
