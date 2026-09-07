@@ -46,6 +46,7 @@ Um ADR aceito continua sendo um registro histórico mesmo quando posteriormente 
 | [ADR-0007](0007-identity-authentication.md) | Identity & Authentication | Aceito |
 | [ADR-0008](0008-app-api-platform-boundary.md) | Interfaces consumidoras e API como fronteira da plataforma | Aceito |
 | [ADR-0009](0009-service-decoupling-and-modularity.md) | Desacoplamento de capacidades e modularidade progressiva | Aceito |
+| [ADR-0010](0010-portal-telemetry-and-minimal-token-injection.md) | Telemetria do portal via customapi e injeção mínima de token no Caddy | Aceito |
 
 ## Regras para novos ADRs
 
