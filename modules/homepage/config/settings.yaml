@@ -16,7 +16,7 @@ iconStyle: theme
 hideVersion: true
 disableUpdateCheck: true
 disableIndexing: true
-hideErrors: false
+hideErrors: true
 
 quicklaunch:
   searchDescriptions: true
