@@ -77,15 +77,16 @@
  * Power Schedule Editor (preservado da v1; visual via custom.css)
  * ────────────────────────── */
 (() => {
-  const BASE =
-    window.location.hostname === 'homeserver.local'
-      ? ''
-      : `http://${window.location.hostname}:8000`;
+  const BASE = "";
 
   function powerFetch(url, opts) {
+    /* Rotas relativas: o browser chega à API via Caddy. A leitura usa
+       /power/status (Caddy injeta o token de serviço em GET anônimo);
+       a escrita PUT exige sessão admin no App — do portal, o endpoint
+       admin-only responde 403 se não houver sessão. */
     return fetch(url, {
       ...opts,
-      headers: { 'Content-Type': 'application/json', ...opts?.headers },
+      headers: { "Content-Type": "application/json", ...opts?.headers },
     }).then((r) => r.json()).then((b) => (b && b.data ? b.data : b));
   }
 
@@ -112,7 +113,7 @@
   document.body.appendChild(overlay);
 
   window.hsOpenPower = function () {
-    powerFetch(BASE + '/api/v1/power').then((d) => {
+    powerFetch(BASE + '/api/v1/power/status').then((d) => {
       document.getElementById('hs-power-shutdown').value = d.shutdown || '23:30';
       document.getElementById('hs-power-wake').value = d.wake || '07:00';
     });
