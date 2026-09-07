@@ -74,22 +74,12 @@
 })();
 
 /* ──────────────────────────
- * Power Schedule Editor (preservado da v1; visual via custom.css)
+ * Power Schedule — visualização somente-leitura (portal)
+ * A escrita (PUT /api/v1/power) é admin-only e exige sessão do App;
+ * o portal não autentica, então o modal mostra o estado atual e
+ * orienta gerenciar pelo App. (ADR-0010)
  * ────────────────────────── */
 (() => {
-  const BASE = "";
-
-  function powerFetch(url, opts) {
-    /* Rotas relativas: o browser chega à API via Caddy. A leitura usa
-       /power/status (Caddy injeta o token de serviço em GET anônimo);
-       a escrita PUT exige sessão admin no App — do portal, o endpoint
-       admin-only responde 403 se não houver sessão. */
-    return fetch(url, {
-      ...opts,
-      headers: { "Content-Type": "application/json", ...opts?.headers },
-    }).then((r) => r.json()).then((b) => (b && b.data ? b.data : b));
-  }
-
   const overlay = document.createElement('div');
   overlay.id = 'hs-power-modal';
   overlay.style.cssText =
@@ -97,27 +87,34 @@
   overlay.innerHTML = `
     <div style="padding:24px;min-width:280px;font-size:.9rem;">
       <h3 style="margin:0 0 16px;font-size:1rem;">Agendamento Automático</h3>
-      <label style="display:block;margin-bottom:4px;">Desligar</label>
-      <input type="time" id="hs-power-shutdown" value="23:30"
-        style="width:100%;padding:6px 10px;margin-bottom:12px;">
-      <label style="display:block;margin-bottom:4px;">Ligar</label>
-      <input type="time" id="hs-power-wake" value="07:00"
-        style="width:100%;padding:6px 10px;margin-bottom:16px;">
-      <div style="display:flex;gap:8px;">
-        <button id="hs-power-save" style="flex:1;padding:8px;border:none;cursor:pointer;">Salvar</button>
-        <button id="hs-power-disable" style="flex:1;padding:8px;border:none;cursor:pointer;">Desativar</button>
-        <button id="hs-power-close" style="flex:0;padding:8px 12px;border:none;cursor:pointer;">×</button>
+      <div id="hs-power-rows" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;"><span>Desligar</span><b id="hs-power-shutdown">—</b></div>
+        <div style="display:flex;justify-content:space-between;"><span>Ligar</span><b id="hs-power-wake">—</b></div>
+        <div style="display:flex;justify-content:space-between;"><span>Ativo</span><b id="hs-power-enabled">—</b></div>
+      </div>
+      <p style="margin:0 0 16px;font-size:.8rem;opacity:.7;">Para alterar os horários, use o App (Hermes Remote) — a edição exige login de administrador.</p>
+      <div style="display:flex;justify-content:flex-end;">
+        <button id="hs-power-close" style="padding:8px 16px;border:none;cursor:pointer;">Fechar</button>
       </div>
       <p id="hs-power-msg" style="margin:12px 0 0;font-size:.8rem;"></p>
     </div>`;
   document.body.appendChild(overlay);
 
   window.hsOpenPower = function () {
-    powerFetch(BASE + '/api/v1/power/status').then((d) => {
-      document.getElementById('hs-power-shutdown').value = d.shutdown || '23:30';
-      document.getElementById('hs-power-wake').value = d.wake || '07:00';
-    });
     overlay.style.display = 'flex';
+    const msg = document.getElementById('hs-power-msg');
+    msg.textContent = 'Carregando...';
+    /* GET anônimo: o Caddy injeta o token de serviço em /api/v1/power/status */
+    fetch('/api/v1/power/status', { headers: { Accept: 'application/json' } })
+      .then((r) => r.json())
+      .then((b) => {
+        const d = b && b.data ? b.data : b;
+        document.getElementById('hs-power-shutdown').textContent = d.shutdown || '—';
+        document.getElementById('hs-power-wake').textContent = d.wake || '—';
+        document.getElementById('hs-power-enabled').textContent = d.enabled ? 'Sim' : 'Não';
+        msg.textContent = '';
+      })
+      .catch(() => { msg.textContent = 'Não foi possível carregar o agendamento.'; });
   };
 
   document.getElementById('hs-power-close').addEventListener('click', () => {
@@ -125,33 +122,5 @@
   });
   overlay.addEventListener('click', (e) => {
     if (e.target === overlay) overlay.style.display = 'none';
-  });
-  document.getElementById('hs-power-save').addEventListener('click', () => {
-    const s = document.getElementById('hs-power-shutdown').value;
-    const w = document.getElementById('hs-power-wake').value;
-    const msg = document.getElementById('hs-power-msg');
-    msg.textContent = 'Salvando...';
-    powerFetch(BASE + '/api/v1/power', {
-      method: 'PUT',
-      body: JSON.stringify({ shutdown: s, wake: w, enabled: true }),
-    })
-      .then((d) => {
-        msg.textContent = `Agendado para ${d.shutdown} — ${d.wake}`;
-        setTimeout(() => { overlay.style.display = 'none'; }, 1500);
-      })
-      .catch((e) => { msg.textContent = `Erro: ${e.message}`; });
-  });
-  document.getElementById('hs-power-disable').addEventListener('click', () => {
-    const msg = document.getElementById('hs-power-msg');
-    msg.textContent = 'Desativando...';
-    powerFetch(BASE + '/api/v1/power', {
-      method: 'PUT',
-      body: JSON.stringify({ enabled: false }),
-    })
-      .then((d) => {
-        msg.textContent = d.enabled ? 'Falhou' : 'Desativado';
-        setTimeout(() => { overlay.style.display = 'none'; }, 1500);
-      })
-      .catch((e) => { msg.textContent = `Erro: ${e.message}`; });
   });
 })();
