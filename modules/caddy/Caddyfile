@@ -47,12 +47,14 @@ homeserver.local {$LAN_IP:192.168.0.10} {
 		reverse_proxy api:8000
 	}
 
-	# Telemetria read-only: GETs de leitura SEM header de autorização
-	# recebem o token de serviço (widgets do portal fazem fetch pelo
-	# navegador, e `http://api:8000` não resolve fora da rede Docker).
-	# Requests autenticados (App/sessões) passam intactos.
+	# Telemetria read-only para o portal: GETs SEM header de autorização
+	# recebem o token de serviço injetado aqui. Escopo mínimo: só
+	# /power/status, consumido pelo modal de agendamento (custom.js), que
+	# roda no navegador e não tem sessão. Os widgets customapi fazem fetch
+	# server-side com o próprio header ({{HOMEPAGE_VAR_API_TOKEN}}) e não
+	# passam por aqui. Requests autenticados (App) passam intactos.
 	@api_anon_get {
-		path /api/v1/status /api/v1/hardware /api/v1/power/status /api/v1/devices /api/v1/storage /api/v1/storage/status /api/v1/events /api/v1/services/status
+		path /api/v1/power/status
 		method GET
 		not header Authorization *
 	}
