@@ -20,7 +20,7 @@
           type: customapi
           url: http://api:8000/api/v1/status
           headers:
-            Authorization: Bearer $(HOMEPAGE_VAR_API_TOKEN)
+            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
           refreshInterval: 30000
           mappings:
             - field: data.cpu.percent
@@ -60,7 +60,7 @@
           type: customapi
           url: http://api:8000/api/v1/status
           headers:
-            Authorization: Bearer $(HOMEPAGE_VAR_API_TOKEN)
+            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
           refreshInterval: 30000
           mappings:
             - field: data.uptime
@@ -79,7 +79,7 @@
           type: customapi
           url: http://api:8000/api/v1/status
           headers:
-            Authorization: Bearer $(HOMEPAGE_VAR_API_TOKEN)
+            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
           refreshInterval: 30000
           mappings:
             - field: data.disk.percent
@@ -95,7 +95,7 @@
           type: customapi
           url: http://api:8000/api/v1/status
           headers:
-            Authorization: Bearer $(HOMEPAGE_VAR_API_TOKEN)
+            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
           refreshInterval: 60000
           mappings:
             - field: data.backup
@@ -108,7 +108,7 @@
           type: customapi
           url: http://api:8000/api/v1/power/status
           headers:
-            Authorization: Bearer $(HOMEPAGE_VAR_API_TOKEN)
+            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
           refreshInterval: 60000
           mappings:
             - field: data.shutdown
@@ -183,7 +183,7 @@
           type: customapi
           url: http://api:8000/api/v1/status
           headers:
-            Authorization: Bearer $(HOMEPAGE_VAR_API_TOKEN)
+            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
           refreshInterval: 30000
           display: dynamic-list
           mappings:
@@ -197,7 +197,7 @@
           type: customapi
           url: http://api:8000/api/v1/hardware
           headers:
-            Authorization: Bearer $(HOMEPAGE_VAR_API_TOKEN)
+            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
           refreshInterval: 60000
           display: dynamic-list
           mappings:
@@ -212,7 +212,7 @@
           type: customapi
           url: http://api:8000/api/v1/devices
           headers:
-            Authorization: Bearer $(HOMEPAGE_VAR_API_TOKEN)
+            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
           refreshInterval: 15000
           display: dynamic-list
           mappings:
@@ -225,7 +225,7 @@
           type: customapi
           url: http://api:8000/api/v1/storage
           headers:
-            Authorization: Bearer $(HOMEPAGE_VAR_API_TOKEN)
+            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
           refreshInterval: 30000
           mappings:
             - field: data.ready
@@ -252,7 +252,7 @@
           type: customapi
           url: http://api:8000/api/v1/events
           headers:
-            Authorization: Bearer $(HOMEPAGE_VAR_API_TOKEN)
+            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
           refreshInterval: 30000
           display: dynamic-list
           mappings:
@@ -266,7 +266,7 @@
           type: customapi
           url: http://api:8000/api/v1/status
           headers:
-            Authorization: Bearer $(HOMEPAGE_VAR_API_TOKEN)
+            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
           refreshInterval: 30000
           mappings:
             - field: data.hostname
