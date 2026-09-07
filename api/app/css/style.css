@@ -643,6 +643,17 @@ input:focus-visible {
   margin-bottom: var(--hs-space-2);
 }
 
+/* Acesso bloqueado (guard de papel no router) */
+.blocked-view h2 {
+  margin: 0 0 var(--hs-space-2);
+  font-size: 1.1rem;
+}
+
+.blocked-view .btn {
+  margin-top: var(--hs-space-4);
+  text-decoration: none;
+}
+
 .error-msg {
   color: var(--hs-color-danger);
 }

@@ -256,6 +256,20 @@ async function router() {
     print: renderPrint,
   };
 
+  // Guard de papel: rotas admin não renderizam nem montam skeleton para
+  // não-admins (o link some da navegação; acesso direto por URL cai aqui).
+  const navDef = NAV.find((n) => n.route === route);
+  const rank = auth.user?.admin ? 2 : 1;
+  if (navDef && roleRank[navDef.minRole] > rank) {
+    v.innerHTML = "";
+    v.appendChild(el("div", { class: "empty blocked-view" },
+      icon("alert", "empty-icon"),
+      el("h2", {}, "Acesso restrito a administradores."),
+      el("p", { class: "muted" }, "Esta área requer uma conta de administrador."),
+      el("a", { href: "#/dashboard", class: "btn btn-secondary" }, "Voltar ao Meu espaço")));
+    return;
+  }
+
   try {
     await renders[route]();
   } catch (err) {
