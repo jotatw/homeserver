@@ -281,8 +281,10 @@
     font-size: 1.05rem;
   }
 
+  /* Rótulos longos ("Armazenamento") cabem sem truncar em 390px */
   .bottomnav .nav-item span:last-child {
-    font-size: 0.68rem;
+    font-size: 0.62rem;
+    letter-spacing: -0.01em;
   }
 
   /* Dashboard mobile: 1 coluna */

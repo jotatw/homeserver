@@ -34,12 +34,29 @@ async function renderPrint() {
   // Status da impressora
   let printers = [];
   let statusMap = {};
+  let printApiOk = true;
   try {
     const data = await api("/api/v1/print");
     printers = data.printers || [];
     statusMap = data.status || {};
   } catch (err) {
+    printApiOk = false;
     v.appendChild(el("div", { class: "banner danger" }, "Erro ao consultar a impressora: " + err.message));
+  }
+
+  // Sem resposta da API (ex.: erro de permissão): sem fallback inventado —
+  // bloqueia o fluxo com orientação em vez de formulário com dados falsos.
+  if (!printApiOk) {
+    v.appendChild(emptyState(
+      "A impressão requer uma conta de administrador com a impressora configurada."
+    ));
+    return;
+  }
+  if (!printers.length) {
+    v.appendChild(emptyState(
+      "Nenhuma impressora configurada. Configure em Administração → Módulos."
+    ));
+    return;
   }
 
   // ---- Card 1: Impressora e configuração ----
@@ -48,13 +65,13 @@ async function renderPrint() {
 
   const pRow = el("div", { class: "print-prow" });
   const selPrinter = el("select", { id: "pr-printer", class: "select-field", style: "flex:1" });
-  (printers.length ? printers : ["MG3110"]).forEach((p) =>
+  printers.forEach((p) =>
     selPrinter.appendChild(el("option", { value: p }, p)));
   pRow.appendChild(el("label", { class: "print-label", style: "min-width:90px" }, "Impressora"));
   pRow.appendChild(selPrinter);
 
   const statusWrap = el("span", { id: "pr-status", style: "display:inline-flex" });
-  const selP = printers[0] || "MG3110";
+  const selP = printers[0];
   statusWrap.appendChild(printerBadge(statusMap[selP]));
   pRow.appendChild(statusWrap);
   card1.appendChild(pRow);

@@ -29,7 +29,7 @@ async function renderStorage() {
   v.appendChild(el("h3", { class: "section" }, "Dados"));
   const dados = el("div", { class: "feed" });
   dados.appendChild(feedRow("folder", "Raiz de dados", st.root || "—"));
-  dados.appendChild(feedRow("harddrive", "Total armazenado", st.total_size_human || "—"));
+  dados.appendChild(feedRow("harddrive", "Total em /srv/storage", st.total_size_human || "—"));
   dados.appendChild(feedRow("check", "Pronto", st.ready ? "Sim" : "Não"));
   v.appendChild(dados);
 
@@ -40,7 +40,9 @@ async function renderStorage() {
     ["users", "Compartilhado", st.shared ?? 0],
     ["film", "Mídia", st.media ?? 0],
     ["filetext", "Documentos", st.documents ?? 0],
-    ["plug", "Dispositivos", st.devices ?? 0],
+    // Conta subpastas da árvore de armazenamento (usb/sdcard), NÃO
+    // dispositivos conectados agora — os conectados são a seção abaixo.
+    ["plug", "Pastas de dispositivos", st.devices ?? 0],
   ];
   const fgrid = el("div", { class: "grid" });
   folders.forEach(([iconName, label, value]) =>

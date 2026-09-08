@@ -1133,6 +1133,10 @@ dialog::backdrop {
   min-height: 6rem;
 }
 
+.print-textarea[hidden] {
+  display: none;
+}
+
 .print-textarea:focus {
   border-color: var(--hs-border-strong);
   box-shadow: var(--hs-shadow-focus);
@@ -1180,6 +1184,12 @@ dialog::backdrop {
   gap: var(--hs-space-3);
   margin-top: var(--hs-space-3);
   flex-wrap: wrap;
+}
+
+/* display:flex anula o atributo hidden — alternância Texto/Arquivo
+   depende disso (auditoria visual 2026-09-07) */
+.file-row[hidden] {
+  display: none;
 }
 
 .file-row .btn {
@@ -1342,7 +1352,14 @@ dialog::backdrop {
 .widget-drag-handle { cursor: grab; color: var(--hs-text-faint); padding: 4px; }
 .widget-content { padding: var(--hs-space-3); }
 .widget-content .widget-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: var(--hs-space-3); }
-.widget-content .action-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: var(--hs-space-3); }
+.widget-content .action-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: var(--hs-space-3); }
+/* Atalhos do dashboard: rótulos longos ("Aplicações") quebram em 2 linhas
+   em vez de truncar com reticências (auditoria visual 2026-09-07). */
+.widget-content .action-grid .app-card .app-name {
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.25;
+}
 .widget-error { color: var(--hs-text-muted); font-size: var(--hs-code); padding: var(--hs-space-4); text-align: center; }
 .widget-link {
   display: inline-block;
@@ -1351,6 +1368,11 @@ dialog::backdrop {
   text-decoration: none;
   font-size: var(--hs-code);
   font-weight: 500;
+  /* alvo de toque >= 44px sem afetar o visual (auditoria 2026-09-07) */
+  min-height: 44px;
+  line-height: 44px;
+  padding: 0 var(--hs-space-2);
+  margin-bottom: calc(-1 * (44px - 1em - var(--hs-space-2)));
 }
 
 .services-summary {

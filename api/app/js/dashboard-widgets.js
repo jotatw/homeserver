@@ -134,10 +134,12 @@ async function renderDashboard() {
     try {
       var cpu = st.cpu || {}, mem = st.memory || {}, disk = st.disk || {};
       var worst = Math.max(cpu.percent ?? 0, mem.percent ?? 0, disk.percent ?? 0);
+      // Mesmos limiares das barras (statCard em components.js): 60 warn, 85 danger.
       var dot = health.querySelector(".status-dot");
       dot.className = "status-dot " + (worst > 85 ? "danger" : worst > 60 ? "" : "ok");
       health.querySelector(".health-text").textContent =
-        "Tudo normal · CPU " + Math.round(cpu.percent ?? 0) + "% · Memória " + Math.round(mem.percent ?? 0) + "% · Disco " + Math.round(disk.percent ?? 0) + "%";
+        (worst > 85 ? "Sob carga · " : worst > 60 ? "Atenção · " : "Tudo normal · ") +
+        "CPU " + (cpu.percent ?? 0).toFixed(1) + "% · Memória " + (mem.percent ?? 0).toFixed(1) + "% · Disco " + (disk.percent ?? 0).toFixed(1) + "%";
     } catch (_) {}
   });
 
