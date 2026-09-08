@@ -49,15 +49,19 @@ check("Expiração com expiresAt", authSrc.includes("expiresAt"));
 check("Verificação de expiração", authSrc.includes("isExpired"));
 
 // 3. Modelo XSS: html=constantes internas (ícones), dados externos via esc()
+// O app é dividido em app.js (núcleo) + views/*.js — varrer todos.
+const appFiles = ["app/js/app.js", "app/js/views/apps.js", "app/js/views/storage.js",
+  "app/js/views/system.js", "app/js/views/admin.js", "app/js/views/print.js"];
+const allAppSrc = appFiles.map((f) => readFileSync(f, "utf-8")).join("\n");
 const appSrc = readFileSync("app/js/app.js", "utf-8");
 check("el() html é innerHTML (ícones SVG constantes renderizam)",
   /else if \(k === "html"\) e\.innerHTML = v;/.test(appSrc)
 );
 check("esc() global para dados externos em HTML",
-  /function esc\(str\)/.test(authSrc) && appSrc.includes("esc(data.latest)")
+  /function esc\(str\)/.test(authSrc) && allAppSrc.includes("esc(data.latest)")
 );
 check("innerHTML com dados da API são escapados",
-  appSrc.includes("esc(data.latest)") && appSrc.includes("esc(d.upgradable)") && appSrc.includes("esc(label)")
+  allAppSrc.includes("esc(data.latest)") && allAppSrc.includes("esc(d.upgradable)") && allAppSrc.includes("esc(label)")
 );
 check("toast() usa textContent (sem innerHTML)",
   authSrc.includes("t.textContent = message;")
