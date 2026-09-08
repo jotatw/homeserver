@@ -422,5 +422,13 @@ async function init() {
   router();
 }
 
-init();
+/* Init — aguarda TODO o pipeline de scripts (views + store + widgets)
+ * parsearem antes de rodar: init() é async e o await de auth.check()
+ * pode resolver antes do parser terminar os <script> seguintes (corrida
+ * real: renderDashboard is not defined em ~80% dos reloads). */
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", init);
+} else {
+  init();
+}
 
