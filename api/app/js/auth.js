@@ -113,10 +113,24 @@ const auth = {
 /* ---------- Utilidades compartilhadas (login.html e index.html) ---------- */
 
 const HTML_ESCAPE = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#x27;" };
+
+/**
+ * Escapa texto para interpolação segura em HTML. OBRIGATÓRIO para qualquer
+ * dado externo (API, input) inserido via innerHTML — o modelo do app usa
+ * el() com filhos texto (seguro por padrão); esc() existe para os raros
+ * casos de string HTML montada (ex.: badge ADMIN no renderUser).
+ * @param {unknown} str
+ * @returns {string}
+ */
 function esc(str) {
   return String(str).replace(/[&<>"']/g, (c) => HTML_ESCAPE[c]);
 }
 
+/**
+ * Toast efêmero (5s) na região global (#toast-region).
+ * @param {string} message
+ * @param {"info"|"success"|"warn"|"error"} [kind]
+ */
 function toast(message, kind = "info") {
   const region = document.getElementById("toast-region");
   if (!region) return;
@@ -127,6 +141,15 @@ function toast(message, kind = "info") {
   setTimeout(() => t.remove(), 5000);
 }
 
+/**
+ * Fetch autenticado. Desempacota o envelope {ok, data:{...}} da API e
+ * retorna `data` direto. 401 limpa a sessão e joga para o login.
+ * @template T
+ * @param {string} path
+ * @param {RequestInit} [options]
+ * @returns {Promise<T>} o campo `data` da resposta
+ * @throws {Error} mensagem da API ou "HTTP <status>"
+ */
 async function api(path, options = {}) {
   if (auth.isExpired()) {
     _clearSession();
@@ -150,6 +173,14 @@ async function api(path, options = {}) {
   return body.data;
 }
 
+/**
+ * Como api(), mas mostra toast com o erro antes de re-lançar — usar em
+ * ações disparadas por clique, onde o erro precisa ser visível.
+ * @template T
+ * @param {string} path
+ * @param {RequestInit} [options]
+ * @returns {Promise<T>}
+ */
 async function apiOrFail(path, options) {
   try {
     return await api(path, options);

@@ -14,6 +14,15 @@
  * el(): `html` em attrs é SOMENTE para constantes internas (SVGs do ICONS)
  * — dados externos vão como filhos string (createTextNode, seguro).
  */
+/**
+ * Cria elemento DOM. `html` em attrs é SOMENTE para constantes internas
+ * (SVGs de ICONS) — dados externos vão como filhos string (createTextNode,
+ * seguro) ou escapados com esc(). Tipos: app/app.d.ts.
+ * @param {string} tag
+ * @param {Record<string, string|boolean|EventListener|undefined>} [attrs]
+ * @param {...(Node|string|null|undefined)} children
+ * @returns {HTMLElement}
+ */
 function el(tag, attrs = {}, ...children) {
   const e = document.createElement(tag);
   Object.entries(attrs).forEach(([k, v]) => {
@@ -85,11 +94,13 @@ const ICONS = {
   down: '<polyline points="6 9 12 15 18 9"/>',
 };
 
+/** SVG monoline por nome (ICONS); fallback "box". @param {string} name */
 function icon(name, cls = "") {
   const span = el("span", { class: cls, "aria-hidden": "true", html: ICON_WRAP + (ICONS[name] || ICONS.box) + "</svg>" });
   return span;
 }
 
+/** Bytes -> string legível ("3.0 GB"). @param {number} bytes */
 function human(bytes) {
   if (bytes >= 1073741824) return (bytes / 1073741824).toFixed(1) + " GB";
   if (bytes >= 1048576) return (bytes / 1048576).toFixed(1) + " MB";
@@ -97,6 +108,7 @@ function human(bytes) {
   return bytes + " B";
 }
 
+/** Data ISO/SQL -> tempo relativo pt-BR ("há 5 h"). @param {string} dateStr */
 function timeAgo(dateStr) {
   const t = new Date(dateStr.replace(" ", "T"));
   const s = Math.floor((Date.now() - t.getTime()) / 1000);

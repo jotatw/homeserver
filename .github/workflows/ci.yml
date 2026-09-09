@@ -48,6 +48,10 @@ jobs:
       - name: Typecheck
         run: npx tsc --noEmit
 
+      # Tipos das definições globais do frontend (app/app.d.ts)
+      - name: Typecheck (frontend defs)
+        run: npx tsc -p tsconfig.app.json
+
       - name: Build
         run: npm run build
 

@@ -8,7 +8,13 @@
  * ============================================================ */
 
 /* ---------- Botão ---------- */
-/** button({ label, variant: primary|secondary|danger, icon: nome, onClick, title }) */
+/**
+ * Botão padrão do design system.
+ * @param {{label?: string, variant?: "primary"|"secondary"|"danger",
+ *          icon?: string, onClick?: EventListener, title?: string,
+ *          type?: "button"|"submit"}} opts
+ * @returns {HTMLButtonElement}
+ */
 function button(opts = {}) {
   const b = el("button", {
     class: "btn btn-" + (opts.variant || "primary"),
@@ -58,6 +64,15 @@ function badge(text, kind = "info") {
 
 /* ---------- Card de métrica (stat) ---------- */
 /** statCard("CPU", "41%", 41) — barra opcional quando pct > 0. */
+/**
+ * Card de métrica com barra opcional. Limiares de cor da barra:
+ * >85 danger, >60 warn, senão ok — o pill de saúde do dashboard usa
+ * OS MESMOS limiares (dashboard-widgets.js).
+ * @param {string} label
+ * @param {string} value
+ * @param {number} [pct] 0..100; 0 = sem barra (ex.: uptime)
+ * @returns {HTMLDivElement}
+ */
 function statCard(label, value, pct = 0) {
   const bar = pct > 0
     ? el("div", { class: "stat-bar", role: "img", "aria-label": label + ": " + Math.round(pct) + "%" },
@@ -71,6 +86,7 @@ function statCard(label, value, pct = 0) {
 
 /* ---------- Linha de lista/feed ---------- */
 /** feedRow("clock", "Desliga às", "23:00") */
+/** Linha de feed "ícone + rótulo + valor". @returns {HTMLDivElement} */
 function feedRow(iconName, label, value) {
   return el("div", { class: "feed-item" },
     icon(iconName),
@@ -80,6 +96,7 @@ function feedRow(iconName, label, value) {
 
 /* ---------- Card de atalho ---------- */
 /** actionCard("folder", "Arquivos", "/files/") — href # rotas internas. */
+/** Card de atalho; href "#" abre na SPA, externo abre em nova aba. @returns {HTMLAnchorElement} */
 function actionCard(iconName, title, href) {
   const isHash = href.startsWith("#");
   return el("a", { href, class: "app-card", target: isHash ? "_self" : "_blank" },
@@ -95,6 +112,7 @@ function sectionTitle(text) {
 }
 
 /** Estado vazio com mensagem (e ação opcional). */
+/** Estado vazio com mensagem (e ação opcional). @returns {HTMLParagraphElement} */
 function emptyState(message, actionEl) {
   return el("p", { class: "empty" }, message, actionEl || null);
 }
