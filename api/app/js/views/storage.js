@@ -50,7 +50,8 @@ async function renderStorage() {
       icon(iconName, "ic"),
       el("span", { class: "app-name" }, label),
       el("span", { class: "app-host" },
-        value + " pastas" + (sizeHuman && sizeHuman !== "0 B" ? " · " + sizeHuman : "")))));
+        value + (value === 1 ? " pasta" : " pastas") +
+        (value > 0 && sizeHuman && sizeHuman !== "0 B" ? " · " + sizeHuman : "")))));
   v.appendChild(fgrid);
 
   // 4. Dispositivos conectados — descoberta automática (montados ou não)
