@@ -50,13 +50,15 @@ EOF
 if [[ "${1:-apply}" == "status" ]]; then
     gpu_ctrl="$(cat "${GPU_CTRL}" 2>/dev/null || echo desconhecido)"
     gpu_runtime="$(cat "${GPU_RUNTIME}" 2>/dev/null || echo desconhecido)"
-    disk_timeout="$(disk_spindown)"
     screen_blank="desconhecido"
-    [[ -f /sys/class/graphics/fb0/blank ]] && screen_blank=$(cat /sys/class/graphics/fb0/blank 2>/dev/null || echo desconhecido)
+    [[ -f /sys/class/graphics/fb0/blank ]] && screen_blank=$(cat /sys/class/graphics/fb0/blank 2>/dev/null | tr -d '\n[:space:]')
+    [[ -z "${screen_blank}" ]] && screen_blank=0   # sysfs vazio = nao-blanked
     state_saved="false"
     [[ -f "${STATE_FILE}" ]] && state_saved="true"
-    printf '{"gpu_control":"%s","gpu_runtime":"%s","hdd_spindown":"%s","screen_blank":"%s","state_saved":%s}\n' \
-        "${gpu_ctrl}" "${gpu_runtime}" "${disk_timeout}" "${screen_blank}" "${state_saved}"
+    # hdd_state: hdparm -C (active|standby|sleeping) — -S e set-only, nao consulta
+    hdd_state="$("${HDPARM}" -C /dev/sda 2>/dev/null | grep -oE 'active|standby|sleeping' | head -1 || echo desconhecido)"
+    printf '{"gpu_control":"%s","gpu_runtime":"%s","hdd_state":"%s","screen_blank":"%s","state_saved":%s}\n' \
+        "${gpu_ctrl}" "${gpu_runtime}" "${hdd_state:-desconhecido}" "${screen_blank}" "${state_saved}"
     exit 0
 fi
 

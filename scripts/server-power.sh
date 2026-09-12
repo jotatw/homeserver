@@ -29,13 +29,17 @@ show_status() {
     echo "📅 $(date '+%Y-%m-%d %H:%M')"
     echo ""
 
-    # Proximo wake REAL: o night-off registra no log o horario que decidiu.
+    # wake REAL: o night-off registra no log o horario que decidiu. Se o
+    # registro expirou (ex.: servidor ficou desligado na noite — rtcwake
+    # so funciona com a maquina ligada as 22:00), diz isso explicitamente.
     NEXT_WAKE="$(grep "Agendando religamento" "${POWER_LOG}" 2>/dev/null | tail -1 \
         | sed -E 's/.*para ([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}).*/\1/' || true)"
-    if [[ -n "${NEXT_WAKE}" ]]; then
-        echo "⏰ Proximo wake: **${NEXT_WAKE}**"
+    if [[ -z "${NEXT_WAKE}" ]]; then
+        echo "⏰ Wake agendado: **desconhecido** (night-off sem registro no log)"
+    elif [[ "$(date -d "${NEXT_WAKE}" +%s)" -gt "$(date +%s)" ]]; then
+        echo "⏰ Wake agendado: **${NEXT_WAKE}**"
     else
-        echo "⏰ Proximo wake: **desconhecido** (night-off sem registro no log)"
+        echo "⏰ Wake agendado: ${NEXT_WAKE} **(expirado — servidor não estava ligado na hora do disparo?)**"
     fi
 
     # Agenda oficial (core hs.sh — le scheduler.conf + power-schedule.sh)
@@ -50,11 +54,10 @@ print("🕐 Agenda: desliga {} · religa {} · {}".format(
     sudo -n "${POWER_SAVE}" status 2>/dev/null | python3 -c '
 import json, sys
 d = json.load(sys.stdin)
-tela = {"1": "desligada", "0": "ligada"}.get(str(d.get("screen_blank")), "?")
-sp = d.get("hdd_spindown", "?")
-sp = {"0": "sem spindown"}.get(str(sp), "spindown " + str(sp) if sp and sp != "desconhecido" else "?")
+tela = {"1": "desligada", "0": "ligada"}.get(str(d.get("screen_blank")), str(d.get("screen_blank")))
 print("💤 Economia: GPU {} ({}) · tela {} · HDD {}".format(
-    d.get("gpu_control", "?"), d.get("gpu_runtime", "?"), tela, sp))' 2>/dev/null || true
+    d.get("gpu_control", "?"), d.get("gpu_runtime", "?"),
+    tela, d.get("hdd_state", "?")))' 2>/dev/null || true
 
     echo "🟢 Estado: **acordado**"
     echo ""
