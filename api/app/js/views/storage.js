@@ -33,23 +33,24 @@ async function renderStorage() {
   dados.appendChild(feedRow("check", "Pronto", st.ready ? "Sim" : "Não"));
   v.appendChild(dados);
 
-  // 3. Pastas por usuário
+  // 3. Pastas por usuário (contagem + tamanho em disco, quando houver)
   v.appendChild(el("h3", { class: "section" }, "Pastas"));
   const folders = [
-    ["user", "Usuários", st.users ?? 0],
-    ["users", "Compartilhado", st.shared ?? 0],
-    ["film", "Mídia", st.media ?? 0],
-    ["filetext", "Documentos", st.documents ?? 0],
+    ["user", "Usuários", st.users ?? 0, st.users_size_human],
+    ["users", "Compartilhado", st.shared ?? 0, st.shared_size_human],
+    ["film", "Mídia", st.media ?? 0, st.media_size_human],
+    ["filetext", "Documentos", st.documents ?? 0, st.documents_size_human],
     // Conta subpastas da árvore de armazenamento (usb/sdcard), NÃO
     // dispositivos conectados agora — os conectados são a seção abaixo.
-    ["plug", "Pastas de dispositivos", st.devices ?? 0],
+    ["plug", "Pastas de dispositivos", st.devices ?? 0, st.devices_size_human],
   ];
   const fgrid = el("div", { class: "grid" });
-  folders.forEach(([iconName, label, value]) =>
+  folders.forEach(([iconName, label, value, sizeHuman]) =>
     fgrid.appendChild(el("div", { class: "app-card" },
       icon(iconName, "ic"),
       el("span", { class: "app-name" }, label),
-      el("span", { class: "app-host" }, String(value)))));
+      el("span", { class: "app-host" },
+        value + " pastas" + (sizeHuman && sizeHuman !== "0 B" ? " · " + sizeHuman : "")))));
   v.appendChild(fgrid);
 
   // 4. Dispositivos conectados — descoberta automática (montados ou não)

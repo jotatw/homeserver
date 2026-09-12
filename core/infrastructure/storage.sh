@@ -142,7 +142,8 @@ storage_human_size() {
 #
 storage_status_json() {
     local root users shared media documents devices
-    local users_size shared_size media_size documents_size total_size total_human
+    local users_size shared_size media_size documents_size devices_size
+    local total_size total_human
 
     root="$(_storage_root_read)"
 
@@ -156,7 +157,8 @@ storage_status_json() {
     shared_size=$(storage_dir_size "${root}/shared")
     media_size=$(storage_dir_size "${root}/media")
     documents_size=$(storage_dir_size "${root}/documents")
-    total_size=$((users_size + shared_size + media_size + documents_size))
+    devices_size=$(storage_dir_size "${root}/devices")
+    total_size=$((users_size + shared_size + media_size + documents_size + devices_size))
     total_human="$(storage_human_size "${total_size:-0}")"
 
     printf '{\n'
@@ -168,6 +170,15 @@ storage_status_json() {
     printf '  "documents": %s,\n' "${documents:-0}"
     printf '  "devices": %s,\n' "${devices:-0}"
     printf '  "users_size": %s,\n' "${users_size:-0}"
+    printf '  "users_size_human": "%s",\n' "$(storage_human_size "${users_size:-0}")"
+    printf '  "shared_size": %s,\n' "${shared_size:-0}"
+    printf '  "shared_size_human": "%s",\n' "$(storage_human_size "${shared_size:-0}")"
+    printf '  "media_size": %s,\n' "${media_size:-0}"
+    printf '  "media_size_human": "%s",\n' "$(storage_human_size "${media_size:-0}")"
+    printf '  "documents_size": %s,\n' "${documents_size:-0}"
+    printf '  "documents_size_human": "%s",\n' "$(storage_human_size "${documents_size:-0}")"
+    printf '  "devices_size": %s,\n' "${devices_size:-0}"
+    printf '  "devices_size_human": "%s",\n' "$(storage_human_size "${devices_size:-0}")"
     printf '  "total_size": %s,\n' "${total_size:-0}"
     printf '  "total_size_human": "%s"\n' "${total_human}"
     printf '}\n'

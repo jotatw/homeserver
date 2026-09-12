@@ -13,13 +13,33 @@
 # Agendado: timer systemd a cada 5 min (root).
 # Acorda: WOL (testado) ou RTC 08:00 (segurança).
 #
-# Uso: sudo /srv/scripts/auto-suspend.sh [--dry-run]
+# Uso: sudo /srv/scripts/auto-suspend.sh [--dry-run] [--allow-day] [--force] [--wake=HH:MM]
+#      --allow-day  também suspende de dia se ocioso prolongado (default: só fora de 06:00-22:00)
 # ==========================================================
 set -euo pipefail
+# NÃO SUSPENDER à noite – deixa night‑off cuidar
+hora_num=$((10#$(date +%H%M)))
+if (( hora_num >= 2200 || hora_num < 600 )); then
+    exit 0
+fi
+
 
 LOG_FILE="/var/log/hs-auto-suspend.log"
-MODE="${1:-run}"
-FORCE="${2:-}"   # --force ignora horário (apenas teste, combinado com --dry-run)
+MODE="run"
+FORCE=""
+ALLOW_DAY=""
+WAKE_TIME=""   # --wake=HH:MM sobrescreve o default (amanhã 08:00)
+for arg in "$@"; do
+  case "${arg}" in
+    --dry-run) MODE="dry-run" ;;
+    --force)   FORCE="--force" ;;
+    --allow-day) ALLOW_DAY="1" ;;
+    --wake=*)
+      WAKE_TIME="${arg#--wake=}"
+      [[ "${WAKE_TIME}" =~ ^[0-9]{2}:[0-9]{2}$ ]] || { echo "ERRO: --wake espera HH:MM" >&2; exit 2; }
+      ;;
+  esac
+done
 
 log() { echo "[$(date '+%F %T')] $*" >> "${LOG_FILE}"; }
 die() { echo "ERRO: $*" >&2; log "ERRO: $*"; exit 1; }
@@ -54,17 +74,27 @@ if [[ "${container_novo}" -gt 0 ]]; then
     exit 0
 fi
 
-# 4. Horário crítico (06:00-22:00): sempre acordado
+# 4. Horário crítico (06:00-22:00)
+#    Default: sempre acordado de dia (silêncio).
+#    Com --allow-day: suspende de dia apenas se ocioso PROLONGADO
+#    (load baixo por >= 15 min consecutivos e sem SSH/containers/arquivos).
 if [[ "${FORCE}" != "--force" ]]; then
     hora_num="$((10#$(date +%H%M)))"
     if [[ "${hora_num}" -ge 600 && "${hora_num}" -le 2200 ]]; then
-        # Silêncio: horário comercial, normal estar acordado
-        exit 0
+        if [[ "${ALLOW_DAY}" != "1" ]]; then
+            exit 0
+        fi
+        # Modo dia: exige load1 MUITO baixo (ociosidade real, não pico momentâneo)
+        load1="$(cat /proc/loadavg | awk '{print $1}')"
+        if [[ "$(echo "${load1} > 0.30" | bc -l)" == "1" ]]; then
+            log "Dia + CPU ativa (load1=${load1}) — não suspender"
+            exit 0
+        fi
     fi
 fi
 
 # 5. Atividade de arquivos recente (últimos 10 min)?
-recentes="$(find /srv /home/usuario -newermt '-10 minutes' -type f \
+recentes="$(find /srv /home/joao -newermt '-10 minutes' -type f \
   -not -path '*/\.git/*' -not -path '*/node_modules/*' -not -path '*/venv/*' \
   -not -path '*cache*' -not -path '*/public/*' -not -path '*/\.next/*' \
   \( -name '*.log' -o -name '*.sh' -o -name '*.py' -o -name '*.yaml' -o -name '*.yml' \
@@ -80,7 +110,7 @@ fi
 echo "✅ Sistema ocioso — suspendendo (SSH=${ssh_sessoes}, load5=${load5}, hora=$(date +%H:%M))..."
 log "Suspenso (SSH=${ssh_sessoes}, load5=${load5}, hora=$(date +%H:%M))"
 
-if [[ "${MODE}" == "--dry-run" ]]; then
+if [[ "${MODE}" == "dry-run" ]]; then
     echo "[DRY-RUN] Suspenderia agora"
     log "[DRY-RUN] Suspenderia agora"
     exit 0
@@ -96,9 +126,9 @@ _disable_wakes() {
     for dev in ${USB_WAKE_DEVICES}; do
         echo "${dev}" > /proc/acpi/wakeup 2>/dev/null || true
     done
-    # Rede: WOL off durante o sono (evita wake por tráfego)
+    # Rede: WOL g (só magic packet) durante o sono — tráfego normal não acorda
     if command -v ethtool >/dev/null 2>&1; then
-        ethtool -s enp7s0 wol d 2>/dev/null >> "${LOG_FILE}" || true
+        ethtool -s enp7s0 wol g 2>/dev/null >> "${LOG_FILE}" || true
     fi
     log "Wakes desabilitados (USB + NIC)"
 }
@@ -117,9 +147,14 @@ _restore_wakes() {
 
 _disable_wakes
 
-# Acorda às 08:00 via RTC (segurança)
-WAKE_EPOCH="$(date -d 'tomorrow 08:00' +%s)"
-rtcwake -m mem -t "${WAKE_EPOCH}" 2>> "${LOG_FILE}" || {
+# Acorda via RTC (segurança): --wake=HH:MM ou default amanhã 08:00
+if [[ -n "${WAKE_TIME}" ]]; then
+    WAKE_EPOCH="$(date -d "today ${WAKE_TIME}" +%s)"
+    [[ "${WAKE_EPOCH}" -le "$(date +%s)" ]] && WAKE_EPOCH="$(date -d "tomorrow ${WAKE_TIME}" +%s)"
+else
+    WAKE_EPOCH="$(date -d 'tomorrow 08:00' +%s)"
+fi
+/usr/sbin/rtcwake -m mem -t "${WAKE_EPOCH}" 2>> "${LOG_FILE}" || {
     log "rtcwake falhou — tentando systemctl suspend"
     systemctl suspend
 }

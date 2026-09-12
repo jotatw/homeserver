@@ -5,7 +5,7 @@ const execFileAsync = promisify(execFile);
 
 const RUNNER_IMAGE = "debian:bookworm-slim";
 const CORE_ON_HOST = "/srv/git/homeserver/core/hs.sh";
-const BACKUP_SCRIPT = "/srv/scripts/backup.sh";
+const BACKUP_SCRIPT = "/srv/git/homeserver/scripts/backup.sh";
 const LP_STAT_COMPOSITE = [
     "echo '==P=='; lpstat -p;",
     "echo '==A=='; lpstat -a;",
@@ -273,7 +273,7 @@ export async function runOnHost(
         if (args.length < 2) throw new ExecutorError("bash requer script ou -c");
         const script = args[1];
 
-        if (script === "/srv/scripts/backup.sh") {
+        if (script === BACKUP_SCRIPT) {
             if (args.length !== 2) throw new ExecutorError("backup script não aceita argumentos adicionais");
         } else if (script === CORE_ON_HOST) {
             // hs.sh subcomandos: device, module, power, update, scheduler
@@ -324,7 +324,7 @@ export async function runOnHost(
  */
 
 export async function runHostBackup(): Promise<{ ok: boolean }> {
-    await runOnHost(["bash", "/srv/scripts/backup.sh"], { timeout: 300000 });
+    await runOnHost(["bash", BACKUP_SCRIPT], { timeout: 300000 });
     return { ok: true };
 }
 

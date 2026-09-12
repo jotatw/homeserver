@@ -8,7 +8,25 @@ LATEST="${BACKUP_ROOT}/latest"
 KEEP_DAYS=14
 LOG_FILE="/var/log/homeserver-backup.log"
 
-log() { echo "[$(date '+%F %T')] $*" >> "${LOG_FILE}"; }
+log() {
+    # stdout (journal / `hs scheduler run`) + arquivo (backup-check, feed de eventos do app)
+    echo "[$(date '+%F %T')] $*" | tee -a "${LOG_FILE}"
+}
+
+# --- Pré-flight: o disco de backup precisa estar montado ------------------
+# O timer Persistent=true dispara o catch-up imediatamente após o boot,
+# ANTES de /srv/backup (disco externo sdb1) montar. Sem essa espera, o
+# mkdir inicial escreve no diretório vazio por baixo do mount point e os
+# rsyncs falham quando o mount cobre o TARGET (causa da falha de 11/09).
+MOUNT_POINT="/srv/backup"
+for _ in $(seq 1 60); do
+    if mountpoint -q "${MOUNT_POINT}"; then break; fi
+    sleep 5
+done
+if ! mountpoint -q "${MOUNT_POINT}"; then
+    log "ERRO: ${MOUNT_POINT} nao montado apos 5min — abortando"
+    exit 1
+fi
 
 mkdir -p "${TARGET}"
 
@@ -69,9 +87,18 @@ status=$((status + $?))
 set -e
 
 if [[ ${status} -ne 0 && ${status} -ne 24 ]]; then
-    log "Erro no rsync (status ${status})"
+    log "Erro no rsync (status ${status}) — latest NAO atualizado"
     exit 1
 fi
+
+# --- Pós-flight: todo destino crítico precisa existir e ter conteúdo ------
+# (defesa contra falha parcial silenciosa; só move o latest se estiver sadio)
+for sub in docker git storage services; do
+    if [[ ! -d "${TARGET}/${sub}" ]] || [[ -z "$(ls -A "${TARGET}/${sub}" 2>/dev/null)" ]]; then
+        log "ERRO: ${TARGET}/${sub} vazio ou ausente — latest NAO atualizado"
+        exit 1
+    fi
+done
 
 rm -f "${LATEST}"
 ln -s "${TARGET}" "${LATEST}"

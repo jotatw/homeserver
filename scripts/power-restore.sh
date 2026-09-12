@@ -53,7 +53,8 @@ echo 0 > /sys/class/graphics/fb0/blank 2>/dev/null && log "Tela: fb0 unblank" ||
 
 # ── 3. HDD — restaurar timeout ───────────────────────────────
 echo "3/3 HDD: restaurando timeout..."
-if command -v hdparm >/dev/null 2>&1; then
+HDPARM="/usr/sbin/hdparm"   # nao esta no PATH de sessoes systemd/cron
+if [[ -x "${HDPARM}" ]]; then
     if [[ -n "${DISK_VAL}" ]]; then
         hdparm -S "${DISK_VAL}" /dev/sda 2>/dev/null >> "${LOG_FILE}" && log "HDD: spindown -> ${DISK_VAL}" || log "HDD: hdparm falhou"
     else

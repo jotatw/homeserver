@@ -31,10 +31,42 @@ async function renderSystem() {
 
   // Admin: energia + hardware
   if (auth.isAdmin()) {
-    const [power, hardware] = await Promise.all([
+    const [power, hardware, backup] = await Promise.all([
       api("/api/v1/power"),
       api("/api/v1/hardware"),
+      api("/api/v1/backup/status").catch(() => null),
     ]);
+
+    // Backup
+    v.appendChild(el("h3", { class: "section" }, "Backup"));
+    const bk = el("div", { class: "feed" });
+    if (backup) {
+      const fresh = backup.freshness === "ok";
+      bk.appendChild(feedRow("database", "Último", backup.latest || "—"));
+      bk.appendChild(feedRow("shield", "Íntegro", backup.ok ? "Sim" : "Não"));
+      bk.appendChild(feedRow("clock", "Frescor", fresh ? "Atualizado hoje" : "STALE (não rodou hoje)"));
+      if (backup.retained != null) {
+        bk.appendChild(feedRow("layers", "Retidos", String(backup.retained)));
+      }
+    } else {
+      bk.appendChild(emptyState("Sem dados de backup."));
+    }
+    v.appendChild(bk);
+    const backupBtn = button({ label: " Rodar backup agora", variant: "secondary", icon: "refresh" });
+    backupBtn.addEventListener("click", async () => {
+      backupBtn.disabled = true;
+      backupBtn.textContent = "Rodando…";
+      try {
+        await apiOrFail("/api/v1/backup", { method: "POST" });
+        toast("Backup concluído.", "success");
+        renderSystem();
+      } catch (e) {
+        toast("Falha no backup: " + e.message, "error");
+        backupBtn.disabled = false;
+        backupBtn.textContent = " Rodar backup agora";
+      }
+    });
+    v.appendChild(backupBtn);
 
     // Energia
     v.appendChild(el("h3", { class: "section" }, "Energia"));
@@ -42,6 +74,9 @@ async function renderSystem() {
     pwr.appendChild(feedRow("clock", "Desliga às", power.shutdown || "—"));
     pwr.appendChild(feedRow("bell", "Liga às", power.wake || "—"));
     pwr.appendChild(feedRow("zap", "Agendado", power.enabled ? "Sim" : "Não"));
+    if (power.gpu_control) {
+      pwr.appendChild(feedRow("activity", "GPU runtime PM", power.gpu_control + (power.gpu_runtime ? " (" + power.gpu_runtime + ")" : "")));
+    }
     v.appendChild(pwr);
     const editBtn = el("button", { class: "btn btn-secondary", style: "margin-top:var(--hs-space-2)" },
       icon("pencil", "ic"), " Editar agenda");

@@ -82,7 +82,8 @@ async function expectPassValidation(label: string, fn: () => Promise<unknown>) {
     }
 }
 
-await expectPassValidation("Aceita backup script válido", async () => runOnHost(["bash", "/srv/scripts/backup.sh"]));
+await expectPassValidation("Aceita backup script válido", async () => runOnHost(["bash", "/srv/git/homeserver/scripts/backup.sh"]));
+await expectError("Rejeita caminho antigo /srv/scripts/backup.sh", async () => runOnHost(["bash", "/srv/scripts/backup.sh"]));
 await expectPassValidation("Aceita device mount válido", async () => runOnHost(["bash", "/srv/git/homeserver/core/hs.sh", "device", "mount", "usb", "KINGSTON", "sdb1"]));
 await expectPassValidation("Aceita device format válido", async () => runOnHost(["bash", "/srv/git/homeserver/core/hs.sh", "device", "format", "sdb"]));
 await expectPassValidation("Aceita module op válido", async () => runOnHost(["bash", "/srv/git/homeserver/core/hs.sh", "module", "op", "caddy", "start"]));

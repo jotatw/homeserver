@@ -71,10 +71,27 @@ power_enabled() {
 # Estado do agendamento (JSON).
 #
 power_status_json() {
-    printf '{"shutdown":"%s","wake":"%s","enabled":%s}' \
+    printf '{"shutdown":"%s","wake":"%s","enabled":%s%s}' \
         "$(power_shutdown_time)" \
         "$(power_wake_time)" \
-        "$(power_enabled && echo true || echo false)"
+        "$(power_enabled && echo true || echo false)" \
+        "$(_power_economy_fields)"
+}
+
+#
+# Campos de economia de energia (GPU/tela) lidos direto do sysfs do host.
+# O container da API monta /host; hdparm exige root e fica de fora — o
+# valor completo vive em 'sudo power-save.sh status'.
+#
+_power_economy_fields() {
+    local base ctrl runtime blank
+    # Container da API: sysfs do host em /host/sys. No host: /sys direto.
+    if [[ -d "/host/sys" ]]; then base="/host/sys"; else base="/sys"; fi
+    ctrl="desconhecido"; runtime="desconhecido"; blank="desconhecido"
+    [[ -r "${base}/class/drm/card0/device/power/control" ]] && ctrl="$(cat "${base}/class/drm/card0/device/power/control")"
+    [[ -r "${base}/class/drm/card0/device/power/runtime_status" ]] && runtime="$(cat "${base}/class/drm/card0/device/power/runtime_status")"
+    [[ -r "${base}/class/graphics/fb0/blank" ]] && blank="$(cat "${base}/class/graphics/fb0/blank" 2>/dev/null || echo 0)"
+    printf ',"gpu_control":"%s","gpu_runtime":"%s","screen_blank":"%s"' "${ctrl}" "${runtime}" "${blank}"
 }
 
 #

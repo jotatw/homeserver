@@ -46,6 +46,55 @@ interface HsEvent {
   [k: string]: unknown;
 }
 
+/** GET /api/v1/storage (core: storage.sh storage_status_json). */
+interface HsStorageStatus {
+  root: string;
+  ready: boolean;
+  users: number;
+  shared: number;
+  media: number;
+  documents: number;
+  /** subpastas de /srv/storage/devices (NÃO dispositivos conectados) */
+  devices: number;
+  users_size?: number;
+  users_size_human?: string;
+  shared_size?: number;
+  shared_size_human?: string;
+  media_size?: number;
+  media_size_human?: string;
+  documents_size?: number;
+  documents_size_human?: string;
+  devices_size?: number;
+  devices_size_human?: string;
+  total_size: number;
+  total_size_human: string;
+}
+
+/** GET /api/v1/power (core: power.sh power_status_json). */
+interface HsPowerStatus {
+  shutdown: string;
+  wake: string;
+  enabled: boolean;
+  /** campos de economia lidos do sysfs do host; ausentes fora do host */
+  gpu_control?: string;
+  gpu_runtime?: string;
+  screen_blank?: string;
+}
+
+/** GET /api/v1/backup/status (core: backup.sh backup_validate_json — flat). */
+interface HsBackupStatus {
+  ok: boolean;
+  latest: string;
+  target: string;
+  symlink?: string;
+  /** "ok" | "STALE (nao atualizado hoje)" */
+  freshness?: string;
+  storage?: string;
+  docker?: string;
+  manifest?: string;
+  retained?: number;
+}
+
 /** Sessão autenticada (auth.js). */
 interface HsUser {
   username: string;
