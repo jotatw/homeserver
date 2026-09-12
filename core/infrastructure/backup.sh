@@ -53,10 +53,19 @@ backup_validate_json() {
         ok=false
     fi
 
-    # Frescor: o backup mais recente precisa ter sido escrito HOJE.
-    # Sem isso, um 'latest' estruturalmente íntegro de dias atrás
-    # valida OK para sempre (escondeu a falha de 07-11/09/2026).
-    if [[ -n "${target}" ]] && find "${target}" -maxdepth 0 -newermt "$(date +%Y-%m-%d)" 2>/dev/null | grep -q .; then
+    # Frescor: algum CONTEUDO do backup mais recente precisa ter sido
+    # escrito hoje. O container da API usa BusyBox (find SEM -newermt) —
+    # referencia via arquivo tocado + '-newer', portavel nos dois.
+    local today_ref newer_content
+    today_ref="$(mktemp /tmp/hs-backup-today.XXXXXX)"
+    touch -t "$(date +%Y%m%d)0000" "${today_ref}" 2>/dev/null || true
+    if [[ -n "${target}" ]]; then
+        newer_content="$(find "${target}" -mindepth 2 -newer "${today_ref}" -print -quit 2>/dev/null)"
+    else
+        newer_content=""
+    fi
+    rm -f "${today_ref}"
+    if [[ -n "${newer_content}" ]]; then
         checks="${checks} \"freshness\":\"ok\","
     else
         checks="${checks} \"freshness\":\"STALE (nao atualizado hoje)\","
