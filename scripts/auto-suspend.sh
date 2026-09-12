@@ -36,7 +36,10 @@ for arg in "$@"; do
     --allow-day) ALLOW_DAY="1" ;;
     --wake=*)
       WAKE_TIME="${arg#--wake=}"
-      [[ "${WAKE_TIME}" =~ ^[0-9]{2}:[0-9]{2}$ ]] || { echo "ERRO: --wake espera HH:MM" >&2; exit 2; }
+      if [[ ! "${WAKE_TIME}" =~ ^[0-9]{2}:[0-9]{2}$ ]]; then
+        echo "ERRO: --wake espera HH:MM" >&2
+        exit 2
+      fi
       ;;
   esac
 done
