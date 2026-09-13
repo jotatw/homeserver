@@ -60,7 +60,10 @@ backup_validate_json() {
     today_ref="$(mktemp /tmp/hs-backup-today.XXXXXX)"
     touch -t "$(date +%Y%m%d)0000" "${today_ref}" 2>/dev/null || true
     if [[ -n "${target}" ]]; then
-        newer_content="$(find "${target}" -mindepth 2 -newer "${today_ref}" -print -quit 2>/dev/null)"
+        # '|| true': find sai !=0 ao achar dirs sem permissao (ex.: portainer
+        # no backup, root-only) — sob 'set -e' isso abortava a funcao em
+        # execucao como usuario comum. O -print -quit ja capturou o achado.
+        newer_content="$(find "${target}" -mindepth 2 -newer "${today_ref}" -print -quit 2>/dev/null || true)"
     else
         newer_content=""
     fi
@@ -75,7 +78,7 @@ backup_validate_json() {
     if [[ -d "${latest}/storage" ]]; then
         # -print -quit: para no primeiro arquivo (sem SIGPIPE com pipefail)
         local cnt
-        cnt="$(find "${latest}/storage" -type f -print -quit 2>/dev/null | wc -l)"
+        cnt="$(find "${latest}/storage" -type f -print -quit 2>/dev/null | wc -l || true)"
         if [[ "${cnt}" -gt 0 ]]; then
             checks="${checks} \"storage\":\"ok\","
         else
@@ -101,7 +104,7 @@ backup_validate_json() {
 
     # Retenção: conta backups retidos
     local retained
-    retained="$(find "${root}" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l)"
+    retained="$(find "${root}" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l || true)"
 
     checks="${checks} \"retained\":${retained:-0},"
     checks="${checks%","}"
