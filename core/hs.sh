@@ -138,6 +138,7 @@ case "${_command}" in
             password) hs_user_password "${3:?nome do usuário}" "${@:4}" ;;
             verify) hs_user_verify "${3:?nome do usuário}" "${4:?senha}" ;;
             is-admin) hs_user_is_admin "${3:?nome do usuário}" ;;
+            set-admin) hs_user_set_admin "${3:?nome do usuário}" "${4:---admin=true}" ;;
             rm) hs_user_rm "${3:?nome do usuário}" "${@:4}" ;;
             *) _usage; exit 1 ;;
         esac
@@ -203,6 +204,7 @@ case "${_command}" in
             enable) scheduler_enable "${3:?tarefa}" ;;
             disable) scheduler_disable "${3:?tarefa}" ;;
             run) scheduler_run "${3:?tarefa}" ;;
+            log) scheduler_task_log "${3:?tarefa}" "${4:-40}" ;;
             *) _usage; exit 1 ;;
         esac
         ;;

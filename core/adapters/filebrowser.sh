@@ -183,6 +183,38 @@ filebrowser_update_password() {
         -d "{\"what\":\"user\",\"which\":[\"password\"],\"data\":{\"id\":${id},\"password\":\"${password}\"}}" >/dev/null
 }
 
+# Promove/rebaixa admin preservando as demais permissoes.
+# Le o usuario via GET, substitui apenas permissions.admin e envia de
+# volta (PUT com which:["permissions"]). node-first: o container da API
+# nao tem python3.
+filebrowser_set_admin() {
+    local token="$1" id="$2" want="$3"
+    local perms
+    perms="$(curl -fsS -m 10 "${FILEBROWSER_URL}/api/users?id=${id}" \
+        -H "Authorization: Bearer ${token}" \
+        -H "X-Password: ${FILEBROWSER_ADMIN_PASS}" \
+        | node -e '
+let d = "";
+process.stdin.on("data", c => d += c);
+process.stdin.on("end", () => {
+  try {
+    let u = JSON.parse(d);
+    if (Array.isArray(u)) u = u[0];
+    const p = Object.assign({}, u.permissions || u.perm || {},
+                            { admin: process.argv[1] === "true" });
+    process.stdout.write(JSON.stringify(p));
+  } catch (e) { process.exit(1); }
+});' "${want}")" || return 1
+
+    [[ -n "${perms}" ]] || return 1
+
+    curl -fsS -m 10 -X PUT "${FILEBROWSER_URL}/api/users?id=${id}" \
+        -H "Authorization: Bearer ${token}" \
+        -H "X-Password: ${FILEBROWSER_ADMIN_PASS}" \
+        -H "Content-Type: application/json" \
+        -d "{\"what\":\"user\",\"which\":[\"permissions\"],\"data\":{\"id\":${id},\"permissions\":${perms}}}" >/dev/null
+}
+
 # Remove um usuario.
 filebrowser_remove_user() {
     local token="$1" id="$2"

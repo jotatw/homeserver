@@ -15,3 +15,7 @@ export async function disableSchedulerTask(name: string) {
 export async function runSchedulerTask(name: string) {
     return runHostScheduler("run", name);
 }
+
+export async function logSchedulerTask(name: string, lines: number): Promise<string> {
+    return runHostScheduler("log", name, String(lines));
+}

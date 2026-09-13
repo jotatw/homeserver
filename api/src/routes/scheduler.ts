@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
-import { statusScheduler, enableSchedulerTask, disableSchedulerTask, runSchedulerTask } from "../adapters/scheduler.js";
-import { sendOk, sendError } from "../utils/respond.js";
+import { statusScheduler, enableSchedulerTask, disableSchedulerTask, runSchedulerTask, logSchedulerTask } from "../adapters/scheduler.js";
+import { sendOk, sendError, sendInternalError } from "../utils/respond.js";
 import { requireAdmin } from "../plugins/auth.js";
 
 export async function schedulerRoutes(fastify: FastifyInstance) {
@@ -31,5 +31,19 @@ export async function schedulerRoutes(fastify: FastifyInstance) {
     fastify.post("/api/v1/scheduler/:name/run", { preHandler: requireAdmin }, async (request, reply) => {
         const { name } = request.params as { name: string };
         return sendOk(reply, await runSchedulerTask(name));
+    });
+
+    // Log das ultimas execucoes (substitui o journalctl de rotina).
+    fastify.get("/api/v1/scheduler/:name/log", { preHandler: requireAdmin }, async (request, reply) => {
+        const { name } = request.params as { name: string };
+        const q = request.query as { lines?: string };
+        const lines = Math.min(200, Math.max(10, parseInt(q.lines ?? "40", 10) || 40));
+
+        try {
+            const text = await logSchedulerTask(name, lines);
+            return sendOk(reply, { name, lines, text });
+        } catch (error) {
+            return sendInternalError(reply, request.log, error);
+        }
     });
 }

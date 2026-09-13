@@ -36,6 +36,19 @@ export async function listModuleInstances(): Promise<unknown> {
     return value;
 }
 
+export async function addModuleInstance(id: string, name?: string): Promise<unknown> {
+    const extra: string[] = name ? [id, name] : [id];
+    const value = JSON.parse(await runHostModule("instance", "add", ...extra));
+    invalidateInstances();
+    return value;
+}
+
+export async function removeModuleInstance(name: string): Promise<unknown> {
+    const value = JSON.parse(await runHostModule("instance", "remove", name));
+    invalidateInstances();
+    return value;
+}
+
 function invalidateInstances(): void {
     instancesCache = null;
 }

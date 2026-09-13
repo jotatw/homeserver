@@ -3,6 +3,8 @@ import {
     listModuleDefinitions,
     getModuleDefinition,
     listModuleInstances,
+    addModuleInstance,
+    removeModuleInstance,
     runModuleOp,
 } from "../adapters/modules.js";
 import { sendOk, sendError, sendInternalError } from "../utils/respond.js";
@@ -42,6 +44,39 @@ export async function moduleRoutes(fastify: FastifyInstance) {
     fastify.get("/api/v1/modules/instances", { preHandler: requireAdmin }, async (request, reply) => {
         try {
             return sendOk(reply, await listModuleInstances());
+        } catch (error) {
+            return sendInternalError(reply, request.log, error);
+        }
+    });
+
+    // Registro de instância (define "qual módulo roda com qual nome").
+    fastify.post("/api/v1/modules/instances", { preHandler: requireAdmin }, async (request, reply) => {
+        const body = request.body as { id?: string; name?: string } | null;
+
+        if (!body?.id) {
+            return sendError(reply, 400, "id é obrigatório.");
+        }
+
+        if (body.name && !/^[a-z0-9][a-z0-9-]*$/.test(body.name)) {
+            return sendError(reply, 400, "name inválido (use slug [a-z0-9-]).");
+        }
+
+        try {
+            return sendOk(reply, await addModuleInstance(body.id, body.name), 201);
+        } catch (error) {
+            return sendInternalError(reply, request.log, error);
+        }
+    });
+
+    fastify.delete("/api/v1/modules/instances/:name", { preHandler: requireAdmin }, async (request, reply) => {
+        const { name } = request.params as { name: string };
+
+        if (!/^[a-z0-9][a-z0-9-]*$/.test(name)) {
+            return sendError(reply, 400, "nome de instância inválido.");
+        }
+
+        try {
+            return sendOk(reply, await removeModuleInstance(name));
         } catch (error) {
             return sendInternalError(reply, request.log, error);
         }

@@ -1398,6 +1398,20 @@ dialog::backdrop {
   line-height: 1.25;
 }
 .widget-error { color: var(--hs-text-muted); font-size: var(--hs-code); padding: var(--hs-space-4); text-align: center; }
+/* Dialog de log de tarefa (Sprint B): bloco rolável monoespaçado */
+.schedlog-dialog { max-width: 720px; width: calc(100vw - var(--hs-space-6)); }
+.schedlog-body {
+  max-height: 46vh;
+  overflow: auto;
+  background: var(--hs-bg);
+  border: 1px solid var(--hs-border);
+  border-radius: var(--hs-radius-md);
+  padding: var(--hs-space-3);
+  font-family: var(--hs-font-mono, ui-monospace, monospace);
+  font-size: var(--hs-code);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
 /* Placeholder de carregamento (auditoria 2026-09-13): /modules* demoram
    segundos no servidor; sem isto o widget vazio parece quebrado. */
 .widget-loading { display: flex; flex-direction: column; gap: var(--hs-space-2); }

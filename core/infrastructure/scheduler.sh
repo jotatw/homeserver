@@ -125,12 +125,43 @@ scheduler_list_json() {
         next="$(systemctl show "hs-task-${name}.timer" -p NextElapseUSecRealtime --value 2>/dev/null | sed 's/ *$//')"
         [[ -n "${next}" ]] || next=""
 
+        # Historico do ultimo run (Sprint B: admin diagnostica sem journalctl).
+        # Uma consulta por chave: a ordem das propriedades no show multi-p
+        # nao e estavel entre versoes de systemd.
+        local last_start last_exit last_result
+        last_start="$(systemctl show "hs-task-${name}.service" -p ExecMainStartTimestamp --value 2>/dev/null)"
+        [[ "${last_start}" == "n/a" || "${last_start}" == "Thu 1970-01-01"* ]] && last_start=""
+        last_exit="$(systemctl show "hs-task-${name}.service" -p ExecMainStatus --value 2>/dev/null)"
+        last_result="$(systemctl show "hs-task-${name}.service" -p Result --value 2>/dev/null)"
+        [[ "${last_result}" == "success" && "${last_exit}" == "0" ]] && last_result="ok"
+
         [[ ${first} -eq 0 ]] && printf ','
-        printf '\n  {"name":"%s","schedule":"%s","command":"%s","persistent":%s,"enabled":%s,"next":"%s"}' \
-            "${name}" "${schedule}" "${command}" "${persistent}" "${enabled}" "${next}"
+        printf '\n  {"name":"%s","schedule":"%s","command":"%s","persistent":%s,"enabled":%s,"next":"%s","lastStart":"%s","lastExit":%s,"lastResult":"%s"}' \
+            "${name}" "${schedule}" "${command}" "${persistent}" "${enabled}" "${next}" \
+            "${last_start}" "${last_exit:-null}" "${last_result}"
         first=0
     done < <(scheduler_tasks)
     printf '\n]\n'
+}
+
+#
+# Ultimas linhas do log de journal de uma tarefa.
+#
+# Uso:
+#   scheduler_task_log <nome> [linhas]
+#
+scheduler_task_log() {
+    local name="${1:?tarefa}"
+    local lines="${2:-40}"
+    [[ "${name}" =~ ^[a-z0-9][a-z0-9-]*$ ]] || {
+        echo "Nome de tarefa inválido." >&2; return 1
+    }
+    [[ "${lines}" =~ ^[0-9]+$ ]] || lines=40
+    if command -v journalctl >/dev/null 2>&1; then
+        journalctl -u "hs-task-${name}.service" -n "${lines}" --no-pager -o short-iso 2>/dev/null
+    else
+        echo "journalctl indisponível." >&2; return 1
+    fi
 }
 
 #

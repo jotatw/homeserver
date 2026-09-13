@@ -54,7 +54,7 @@ _validate_username() {
 hs_user_create() {
     local username="${1:?nome do usuário}"
     shift
-    local password="" email="" gitea=0
+    local password="" email="" gitea=0 admin=0
     local token id scope
 
     while [[ $# -gt 0 ]]; do
@@ -64,6 +64,7 @@ hs_user_create() {
             --email=*)    email="${1#*=}"; shift ;;
             --email)      email="${2:-}"; shift 2 ;;
             --gitea)      gitea=1; shift ;;
+            --admin)      admin=1; shift ;;
             *)            echo "Argumento desconhecido: $1" >&2; return 1 ;;
         esac
     done
@@ -104,6 +105,10 @@ hs_user_create() {
     fi
     filebrowser_update_password "${token}" "${id}" "${password}"
 
+    if [[ ${admin} -eq 1 ]]; then
+        filebrowser_set_admin "${token}" "${id}" "true" || return 1
+    fi
+
     if [[ ${gitea} -eq 1 ]]; then
         hs_user_create_gitea "${username}" "${password}" "${email}"
     fi
@@ -116,7 +121,8 @@ hs_user_create() {
     printf '  "scope": "%s",\n' "${scope}"
     printf '  "password": "%s",\n' "${password}"
     printf '  "files": true,\n'
-    printf '  "gitea": %s\n' "$([ "${gitea}" -eq 1 ] && echo true || echo false)"
+    printf '  "gitea": %s,\n' "$([ "${gitea}" -eq 1 ] && echo true || echo false)"
+    printf '  "admin": %s\n' "$([ "${admin}" -eq 1 ] && echo true || echo false)"
     printf '}\n'
 }
 
@@ -231,6 +237,48 @@ hs_user_password() {
 
     echo "Senha alterada para: ${username}" >&2
     printf '{"username":"%s","password":"%s"}\n' "${username}" "${password}"
+}
+
+#
+# Promove ou rebaixa um usuário (admin no FileBrowser).
+#
+# Uso:
+#   hs_user_set_admin <nome> --admin=true|false
+#
+# A senha é preservada: lê o hash atual via GET e o reenvia no PUT com
+# "which":["admin"] (mesma API usada por filebrowser_update_password).
+#
+hs_user_set_admin() {
+    local username="${1:?nome do usuário}"
+    shift
+    local want=""
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --admin=true|--admin) want="true"; shift ;;
+            --admin=false)        want="false"; shift ;;
+            *) echo "Argumento desconhecido: $1" >&2; return 1 ;;
+        esac
+    done
+
+    [[ -n "${want}" ]] || { echo "Uso: hs_user_set_admin <nome> --admin=true|false" >&2; return 1; }
+
+    local id token
+    id="$(filebrowser_user_id "${username}")"
+    if [[ -z "${id}" ]]; then
+        echo "Usuário não encontrado: ${username}" >&2
+        return 1
+    fi
+
+    token="$(filebrowser_login)"
+    if [[ -z "${token}" ]]; then return 1; fi
+
+    filebrowser_set_admin "${token}" "${id}" "${want}" || {
+        echo "Falha ao alterar admin de ${username}" >&2
+        return 1
+    }
+
+    printf '{"username":"%s","admin":%s}\n' "${username}" "${want}"
 }
 
 #

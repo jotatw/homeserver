@@ -59,19 +59,29 @@ async function renderAdminUsers() {
   if (users && users.length) {
     const cards = el("div", { class: "feed" });
     users.forEach((u) => {
+      // Quantum entrega `permissions`; o shape antigo usava `perm`.
+      const perms = u.permissions || u.perm || {};
+      const isAdminUser = Boolean(perms.admin);
+      const isSelf = (u.username || u.id) === auth.user.username;
       const card = el("div", { class: "feed-item" },
         el("div", { class: "module-meta" },
           el("div", { class: "app-name" },
             el("strong", {}, u.username || u.id),
-            u.perm && u.perm.admin ? el("span", { class: "badge ok", style: "margin-left:var(--hs-space-2)" }, "Admin") : el("span", { class: "badge", style: "margin-left:var(--hs-space-2)" }, "padrão")),
-          el("div", { class: "app-host" }, u.perm && u.perm.scope ? "/" + u.perm.scope : "/")),
+            isAdminUser ? el("span", { class: "badge ok", style: "margin-left:var(--hs-space-2)" }, "Admin") : el("span", { class: "badge", style: "margin-left:var(--hs-space-2)" }, "padrão")),
+          el("div", { class: "app-host" }, (u.scopes && u.scopes[0] && u.scopes[0].scope) || (u.perm && u.perm.scope) || "/")),
         el("div", { class: "module-ops" },
+          !isSelf ? el("button", { class: "btn btn-secondary", style: "height:var(--hs-touch-compact)" }, isAdminUser ? "Rebaixar" : "Tornar admin") : null,
           el("button", { class: "btn btn-secondary", style: "height:var(--hs-touch-compact)" }, "Senha"),
-          (u.username || u.id) !== auth.user.username ? el("button", { class: "btn btn-danger", style: "height:var(--hs-touch-compact)" }, "Excluir") : null));
+          !isSelf ? el("button", { class: "btn btn-danger", style: "height:var(--hs-touch-compact)" }, "Excluir") : null));
       cards.appendChild(card);
       // Bind buttons after append
-      const pwBtn = card.querySelector(".btn-secondary");
-      if (pwBtn) pwBtn.addEventListener("click", () => openPasswordDialog(u.username || u.id));
+      const opBtns = card.querySelectorAll(".btn-secondary");
+      let idx = 0;
+      if (!isSelf) {
+        opBtns[idx].addEventListener("click", () => toggleUserAdmin(u.username || u.id, !isAdminUser, opBtns[idx]));
+        idx += 1;
+      }
+      opBtns[idx].addEventListener("click", () => openPasswordDialog(u.username || u.id));
       const rmBtn = card.querySelector(".btn-danger");
       if (rmBtn) rmBtn.addEventListener("click", () => confirmDeleteUser(u.username || u.id));
     });
@@ -136,9 +146,10 @@ async function renderAdminModules() {
   const cards = el("div", { class: "feed" });
   if (mods && mods.length) {
     const instMap = {};
-    (instances || []).forEach((i) => { instMap[i.definition] = i; });
+    (instances || []).forEach((i) => { (instMap[i.definition] = instMap[i.definition] || []).push(i); });
     mods.forEach((m) => {
-      const active = Boolean(instMap[m.id]);
+      const insts = instMap[m.id] || [];
+      const active = insts.length > 0;
       const ops = m.operations || [];
       const labels = { start: "Iniciar", stop: "Parar", restart: "Reiniciar", enable: "Ativar", disable: "Desativar", update: "Atualizar", status: "Status" };
       const primaryOp = active ? (ops.includes("stop") ? "stop" : null) : (ops.includes("start") ? "start" : null);
@@ -148,11 +159,11 @@ async function renderAdminModules() {
         el("div", { class: "module-meta" },
           el("div", { class: "app-name" },
             el("strong", {}, m.title || m.id),
-            active ? el("span", { class: "badge ok", style: "margin-left:var(--hs-space-2)" }, "ativa") : el("span", { class: "badge", style: "margin-left:var(--hs-space-2)" }, "ocioso")),
+            active ? el("span", { class: "badge ok", style: "margin-left:var(--hs-space-2)" }, insts.length > 1 ? insts.length + " instâncias" : "ativa") : el("span", { class: "badge", style: "margin-left:var(--hs-space-2)" }, "ocioso")),
           el("div", { class: "app-host" }, m.id + " · v" + m.version)),
         el("div", { class: "module-ops" },
           primaryOp ? el("button", { class: "btn btn-secondary", style: "height:var(--hs-touch-compact)" }, labels[primaryOp]) : null,
-          rest.length ? el("details", { class: "ops-menu" },
+          el("details", { class: "ops-menu" },
             el("summary", { class: "btn btn-secondary ops-menu-btn", "aria-label": "Mais operações de " + m.id }, icon("dots", "ic")),
             el("div", { class: "ops-pop" },
               ...rest.map((op) => {
@@ -161,8 +172,26 @@ async function renderAdminModules() {
                   el("span", {}, labels[op] || op));
                 b.addEventListener("click", () => runModuleOp(m, op, b));
                 return b;
-              }))) : null));
+              }),
+              (() => {
+                const nb = el("button", { type: "button", class: "ops-pop-item" },
+                  icon("plus", "ic"), el("span", {}, "Nova instância"));
+                nb.addEventListener("click", () => openInstanceDialog(m.id, m.title || m.id));
+                return nb;
+              })()))));
       cards.appendChild(card);
+      // linhas por instância: remover sem terminal (Sprint B)
+      insts.forEach((inst) => {
+        const iRow = el("div", { class: "feed-item instance-row" },
+          el("span", { class: "status-dot ok", "aria-hidden": "true" }),
+          el("div", { class: "module-meta" },
+            el("div", { class: "app-name" }, inst.name),
+            el("div", { class: "app-host" }, "instância de " + (m.title || m.id))),
+          el("div", { class: "module-ops" },
+            el("button", { class: "btn btn-danger", style: "height:var(--hs-touch-compact)" }, "Remover")));
+        iRow.querySelector(".btn-danger").addEventListener("click", () => removeModuleInstance(inst.name, iRow));
+        cards.appendChild(iRow);
+      });
       // Bind primary button
       if (primaryOp) {
         const btn = card.querySelector(".btn-secondary");
@@ -288,6 +317,13 @@ async function renderAdminUpdates() {
 
 /* ---------- Scheduler (admin) ---------- */
 
+function schedulerLastLabel(t) {
+  if (!t.lastStart) return "nunca executada";
+  const when = String(t.lastStart).replace(" UTC", "").slice(0, 16);
+  if (t.lastResult === "ok") return "última: " + when;
+  return "última: " + when + " · FALHOU" + (t.lastResult && t.lastResult !== "ok" ? " (" + t.lastResult + ")" : "");
+}
+
 async function refreshScheduler() {
   try {
     const tasks = await api("/api/v1/scheduler");
@@ -302,14 +338,20 @@ async function refreshScheduler() {
 
     tasks.forEach((t) => {
       const enabled = t.enabled;
+      const failed = t.lastStart && t.lastResult && t.lastResult !== "ok";
       const meta = el("div", { class: "module-meta" },
         el("div", { class: "app-name" },
           t.name,
           el("span", { style: "margin-left:var(--hs-space-2)" },
-            enabled ? badge("Ativa", "ok") : badge("Inativa", "warn"))),
-        el("div", { class: "app-host" }, (t.schedule || "") + (t.next ? " · " + t.next : "")));
+            enabled ? badge("Ativa", "ok") : badge("Inativa", "warn")),
+          failed ? el("span", { class: "badge danger", style: "margin-left:var(--hs-space-2)" }, "erro") : null),
+        el("div", { class: "app-host" }, (t.schedule || "") + (t.next ? " · próxima " + t.next : "") + " · " + schedulerLastLabel(t)));
 
       const opsWrap = el("div", { class: "module-ops" });
+
+      const logBtn = el("button", { class: "btn btn-secondary", style: "height:var(--hs-touch-compact)" }, "Log");
+      logBtn.addEventListener("click", () => openSchedulerLog(t.name, logBtn));
+      opsWrap.appendChild(logBtn);
 
       const enableBtn = el("button", { class: "btn " + (enabled ? "btn-secondary" : "btn-primary"), style: "height:var(--hs-touch-compact)" }, enabled ? "Desativar" : "Ativar");
       enableBtn.addEventListener("click", () => runSchedulerOp(t.name, enabled ? "disable" : "enable", enableBtn));
@@ -331,6 +373,33 @@ async function refreshScheduler() {
   }
 }
 
+/* ---------- Dialog: log de tarefa do scheduler (Sprint B) ---------- */
+
+async function openSchedulerLog(name, btn) {
+  btn.disabled = true;
+  let data = null;
+  try {
+    data = await apiOrFail("/api/v1/scheduler/" + encodeURIComponent(name) + "/log?lines=80");
+  } catch (err) {
+    toast(err.message || "Falha ao ler o log.", "error");
+  } finally {
+    btn.disabled = false;
+  }
+  if (!data) return;
+
+  const old = document.getElementById("schedlog-dialog");
+  if (old) old.remove();
+
+  const dialog = el("dialog", { id: "schedlog-dialog", class: "schedlog-dialog" },
+    el("h3", { style: "margin-bottom:var(--hs-space-3)" }, "Log · " + name),
+    el("pre", { class: "schedlog-body" }, (data.text || "").trim() || "Sem linhas no journal."),
+    el("div", { class: "dialog-actions" },
+      el("button", { class: "btn btn-secondary", id: "schedlog-close" }, "Fechar")));
+  document.body.appendChild(dialog);
+  dialog.querySelector("#schedlog-close").addEventListener("click", () => dialog.close());
+  dialog.showModal();
+}
+
 async function runSchedulerOp(name, op, btn) {
   if (op === "disable" && !confirm("Desativar a tarefa " + name + "?")) return;
   if (btn) btn.disabled = true;
@@ -345,6 +414,87 @@ async function runSchedulerOp(name, op, btn) {
   } catch (err) {
     toast(err.message || "Falha em " + op + ".", "error");
     if (btn) btn.disabled = false;
+  }
+}
+
+/* ---------- Instâncias de módulo (Sprint B) ---------- */
+
+function openInstanceDialog(defId, defTitle) {
+  let dialog = document.getElementById("inst-dialog");
+  if (!dialog) {
+    dialog = el("dialog", { id: "inst-dialog" },
+      el("form", { method: "dialog", id: "inst-form" },
+        el("h3", { style: "margin-bottom:var(--hs-space-4)" }, "Nova instância"),
+        el("div", { class: "field" },
+          el("label", { for: "in-def" }, "Módulo"),
+          el("input", { id: "in-def", disabled: "disabled" })),
+        el("div", { class: "field" },
+          el("label", { for: "in-name" }, "Nome da instância"),
+          el("input", { id: "in-name", placeholder: "ex.: home (letras minúsculas, números, -)", pattern: "[a-z][a-z0-9-]*", required: true })),
+        el("p", { class: "power-hint" }, "Registra a instância; use Iniciar/Ativar no card do módulo para subir."),
+        el("div", { class: "dialog-actions" },
+          el("button", { type: "button", class: "btn btn-secondary", id: "in-cancel" }, "Cancelar"),
+          el("button", { type: "submit", class: "btn btn-primary" }, "Registrar"))));
+    document.body.appendChild(dialog);
+
+    dialog.querySelector("#in-cancel").addEventListener("click", () => dialog.close());
+    dialog.querySelector("#inst-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const def = document.getElementById("in-def").dataset.id;
+      const name = document.getElementById("in-name").value.trim();
+      const btn = dialog.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      try {
+        await apiOrFail("/api/v1/modules/instances", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: def, name: name || undefined }),
+        });
+        toast("Instância registrada: " + name, "success");
+        dialog.close();
+        renderAdmin();
+      } catch (err) {
+        toast(err.message || "Falha ao registrar instância.", "error");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  }
+  const defInput = document.getElementById("in-def");
+  defInput.value = defTitle;
+  defInput.dataset.id = defId;
+  document.getElementById("in-name").value = defId;
+  dialog.showModal();
+}
+
+async function removeModuleInstance(name, rowEl) {
+  if (!confirm("Remover a instância \"" + name + "\"? O container é parado e o registro excluído.")) return;
+  const btn = rowEl.querySelector(".btn-danger");
+  btn.disabled = true;
+  try {
+    await apiOrFail("/api/v1/modules/instances/" + encodeURIComponent(name), { method: "DELETE" });
+    toast("Instância removida: " + name, "success");
+    renderAdmin();
+  } catch (err) {
+    toast(err.message || "Falha ao remover instância.", "error");
+    btn.disabled = false;
+  }
+}
+
+async function toggleUserAdmin(username, wantAdmin, btn) {
+  if (!wantAdmin && !confirm("Rebaixar " + username + "? Ele perde o acesso à Administração.")) return;
+  btn.disabled = true;
+  try {
+    await apiOrFail("/api/v1/users/" + encodeURIComponent(username), {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ admin: wantAdmin }),
+    });
+    toast((wantAdmin ? "Administrador: " : "Rebaixado: ") + username, "success");
+    renderAdmin();
+  } catch (err) {
+    toast(err.message || "Falha ao alterar permissão.", "error");
+    btn.disabled = false;
   }
 }
 
@@ -442,6 +592,8 @@ function openUserDialog() {
           el("label", { for: "us-email" }, "E-mail (opcional)"),
           el("input", { id: "us-email", type: "email", placeholder: "usuario@example.com" })),
         el("label", { class: "check-row" },
+          el("input", { id: "us-admin", type: "checkbox" }), " Administrador (acessa Administração)"),
+        el("label", { class: "check-row" },
           el("input", { id: "us-gitea", type: "checkbox" }), " Criar também no Gitea"),
         el("p", { class: "power-hint" }, "A pasta pessoal /srv/storage/users/<nome> é criada automaticamente."),
         el("div", { class: "dialog-actions" },
@@ -456,6 +608,7 @@ function openUserDialog() {
       const password = document.getElementById("us-pass").value;
       const email = document.getElementById("us-email").value.trim();
       const gitea = document.getElementById("us-gitea").checked;
+      const admin = document.getElementById("us-admin").checked;
       const btn = dialog.querySelector('button[type="submit"]');
       btn.disabled = true;
       btn.textContent = "Criando…";
@@ -463,7 +616,7 @@ function openUserDialog() {
         await apiOrFail("/api/v1/users", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, password, email: email || undefined, gitea }),
+          body: JSON.stringify({ username, password, email: email || undefined, gitea, admin }),
         });
         toast("Usuário criado: " + username, "success");
         dialog.close();
@@ -481,6 +634,7 @@ function openUserDialog() {
   document.getElementById("us-pass").value = "";
   document.getElementById("us-email").value = "";
   document.getElementById("us-gitea").checked = false;
+  document.getElementById("us-admin").checked = false;
   dialog.showModal();
 }
 

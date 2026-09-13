@@ -109,8 +109,22 @@ function validateHsArgs(args: string[]): void {
     } else if (sub === "module") {
         if (args.length < 2) throw new ExecutorError("module requer subcomando (definitions, instances, info, status, op)");
         const subSub = args[1];
-        if (!["definitions", "instances", "info", "status", "op"].includes(subSub)) {
-            throw new ExecutorError(`module subcomando inválido: ${subSub}. Use: definitions, instances, info, status, op`);
+        if (!["definitions", "instances", "instance", "info", "status", "op"].includes(subSub)) {
+            throw new ExecutorError(`module subcomando inválido: ${subSub}. Use: definitions, instances, instance, info, status, op`);
+        }
+        if (subSub === "instance") {
+            if (args.length < 3) throw new ExecutorError("module instance requer: add <id> [nome] | remove <nome>");
+            const action = args[2];
+            if (action === "add") {
+                if (args.length < 4 || args.length > 5) throw new ExecutorError("module instance add requer: <id> [nome]");
+                if (!/^[a-z0-9][a-z0-9-]*$/.test(args[3])) throw new ExecutorError(`module id inválido: ${args[3]}. Use slug [a-z0-9-]`);
+                if (args.length === 5 && !/^[a-z0-9][a-z0-9-]*$/.test(args[4])) throw new ExecutorError(`nome de instância inválido: ${args[4]}. Use slug [a-z0-9-]`);
+            } else if (action === "remove") {
+                if (args.length !== 4) throw new ExecutorError("module instance remove requer: <nome>");
+                if (!/^[a-z0-9][a-z0-9-]*$/.test(args[3])) throw new ExecutorError(`nome de instância inválido: ${args[3]}. Use slug [a-z0-9-]`);
+            } else {
+                throw new ExecutorError(`module instance ação inválida: ${action}. Use: add, remove`);
+            }
         }
         if (subSub === "info" || subSub === "status") {
             if (args.length !== 3) throw new ExecutorError(`${subSub} requer: <id>`);
@@ -171,15 +185,23 @@ function validateSchedulerArgs(args: string[]): void {
         if (!/^[a-z0-9][a-z0-9-]*$/.test(args[1])) {
             throw new ExecutorError(`nome de tarefa inválido: ${args[1]}. Use slug [a-z0-9-]`);
         }
+    } else if (sub === "log") {
+        if (args.length < 2 || args.length > 3) throw new ExecutorError(`${sub} requer: <nome da tarefa> [linhas]`);
+        if (!/^[a-z0-9][a-z0-9-]*$/.test(args[1])) {
+            throw new ExecutorError(`nome de tarefa inválido: ${args[1]}. Use slug [a-z0-9-]`);
+        }
+        if (args.length === 3 && !/^[0-9]{1,4}$/.test(args[2])) {
+            throw new ExecutorError("linhas deve ser um número até 4 dígitos");
+        }
     } else {
-        throw new ExecutorError(`scheduler subcomando inválido: ${sub}. Use: list, status, enable, disable, run`);
+        throw new ExecutorError(`scheduler subcomando inválido: ${sub}. Use: list, status, enable, disable, run, log`);
     }
 }
 
 /**
  * Executa comando do scheduler no host via nsenter.
  */
-export async function runHostScheduler(subcmd: "list" | "status" | "enable" | "disable" | "run", ...args: string[]): Promise<string> {
+export async function runHostScheduler(subcmd: "list" | "status" | "enable" | "disable" | "run" | "log", ...args: string[]): Promise<string> {
     if (subcmd === "list" || subcmd === "status") {
         if (arguments.length !== 1) throw new ExecutorError(`${subcmd} não aceita argumentos`);
         return runOnHost(["bash", CORE_ON_HOST, "scheduler", subcmd]);
@@ -191,6 +213,12 @@ export async function runHostScheduler(subcmd: "list" | "status" | "enable" | "d
     if (subcmd === "run") {
         if (arguments.length !== 2) throw new ExecutorError("run requer <tarefa>");
         return runOnHost(["bash", CORE_ON_HOST, "scheduler", "run", ...args]);
+    }
+    if (subcmd === "log") {
+        if (arguments.length < 2 || arguments.length > 3) throw new ExecutorError("log requer <tarefa> [linhas]");
+        const lines = args[1] ?? "40";
+        if (!/^[0-9]{1,4}$/.test(lines)) throw new ExecutorError("linhas deve ser um número até 4 dígitos");
+        return runOnHost(["bash", CORE_ON_HOST, "scheduler", "log", args[0], lines]);
     }
     throw new ExecutorError(`scheduler subcomando inválido: ${arguments[0]}`);
 }
@@ -355,10 +383,14 @@ export async function runHostDeviceAvailable(): Promise<string> {
     return runOnHost(["bash", CORE_ON_HOST, "device", "available"], { timeout: 15000 });
 }
 
-export async function runHostModule(subcmd: "definitions" | "instances" | "info" | "status" | "op", ...args: string[]): Promise<string> {
+export async function runHostModule(subcmd: "definitions" | "instances" | "instance" | "info" | "status" | "op", ...args: string[]): Promise<string> {
     if (subcmd === "definitions" || subcmd === "instances") {
         if (arguments.length !== 1) throw new ExecutorError(`${subcmd} não aceita argumentos`);
         return runOnHost(["bash", CORE_ON_HOST, "module", subcmd]);
+    }
+    if (subcmd === "instance") {
+        if (args.length < 2) throw new ExecutorError("module instance requer: <add|remove> ...");
+        return runOnHost(["bash", CORE_ON_HOST, "module", "instance", ...args]);
     }
     if (subcmd === "info" || subcmd === "status") {
         if (arguments.length !== 2) throw new ExecutorError(`${subcmd} requer <id>`);

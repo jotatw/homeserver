@@ -15,6 +15,7 @@ export interface UserCreateRequest {
     password?: string;
     email?: string;
     gitea?: boolean;
+    admin?: boolean;
 }
 
 export async function createUser(data: UserCreateRequest) {
@@ -23,6 +24,7 @@ export async function createUser(data: UserCreateRequest) {
     if (data.password) args.push(`--password=${data.password}`);
     if (data.email) args.push(`--email=${data.email}`);
     if (data.gitea) args.push("--gitea");
+    if (data.admin) args.push("--admin");
 
     const raw = await runCore(args);
     return JSON.parse(raw);
@@ -38,6 +40,11 @@ export async function deleteUser(username: string, removeFolder: boolean) {
     if (removeFolder) args.push("--remove-folder");
     await runCore(args);
     return { ok: true };
+}
+
+export async function setUserAdmin(username: string, admin: boolean) {
+    const raw = await runCore(["user", "set-admin", username, `--admin=${admin ? "true" : "false"}`]);
+    return JSON.parse(raw);
 }
 
 export async function changeUserPassword(username: string, password: string) {
