@@ -42,11 +42,11 @@ async function renderStorage() {
     ["filetext", "Documentos", st.documents ?? 0, st.documents_size_human],
     // Conta subpastas da árvore de armazenamento (usb/sdcard), NÃO
     // dispositivos conectados agora — os conectados são a seção abaixo.
-    ["plug", "Pastas de dispositivos", st.devices ?? 0, st.devices_size_human],
+    ["plug", "Dispositivos", st.devices ?? 0, st.devices_size_human],
   ];
   const fgrid = el("div", { class: "grid" });
   folders.forEach(([iconName, label, value, sizeHuman]) =>
-    fgrid.appendChild(el("div", { class: "app-card" },
+    fgrid.appendChild(el("div", { class: "app-card folder-card" },
       icon(iconName, "ic"),
       el("span", { class: "app-name" }, label),
       el("span", { class: "app-host" },
@@ -78,9 +78,15 @@ async function renderDevicesSection(mountedDevices) {
 
   let available = [];
   if (auth.isAdmin()) {
+    // A descoberta USB demora ~1-2s; sem placeholder a secao fica muda e
+    // parece quebrada (auditoria UX 2026-09-13).
+    feed.appendChild(el("div", { class: "widget-loading" },
+      el("div", { class: "skeleton" }),
+      el("span", { class: "widget-loading-text" }, "Verificando dispositivos…")));
     try {
       available = await api("/api/v1/devices/available");
     } catch (_) { /* segue com montados apenas */ }
+    feed.innerHTML = "";
   }
 
   // Índice de removíveis por mountpoint para cruzar com montados

@@ -91,7 +91,7 @@ function feedRow(iconName, label, value) {
   return el("div", { class: "feed-item" },
     icon(iconName),
     el("span", { class: "app-name" }, label),
-    el("span", { class: "feed-time" }, value));
+    el("span", { class: "feed-value" }, value));
 }
 
 /* ---------- Card de atalho ---------- */

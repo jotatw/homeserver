@@ -382,6 +382,8 @@ input:focus-visible {
   border-radius: var(--hs-radius-lg);
   padding: var(--hs-space-3);
   display: flex;
+  flex-wrap: wrap; /* .app-card-ops (flex-basis:100%) quebra p/ 2a linha;
+                      sem isto o botao espreme o .app-name a 0px (13/09) */
   align-items: center;
   gap: var(--hs-space-2);
   cursor: pointer;
@@ -434,6 +436,14 @@ input:focus-visible {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Cards de pasta (Armazenamento): rotulo pode quebrar em 2 linhas —
+   o valor ao lado ('5 pastas · 3.1 GB') nao deixa espaco (13/09) */
+.app-card.folder-card .app-name {
+  white-space: normal;
+  overflow-wrap: break-word;
+  line-height: 1.25;
 }
 
 .app-card .app-host {
@@ -524,6 +534,15 @@ input:focus-visible {
   margin-left: auto;
   color: var(--hs-text-faint);
   font-size: var(--hs-meta);
+  white-space: nowrap;
+}
+/* Valor de dados em feedRow: o numero importa mais que o rotulo —
+   secundaria + tabular-nums (auditoria UX 2026-09-13) */
+.feed-item .feed-value {
+  margin-left: auto;
+  color: var(--hs-text-secondary);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 

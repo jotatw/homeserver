@@ -29,13 +29,26 @@ async function renderSystem() {
     el("span", { class: "feed-time" }, stateBadge(s.status)))));
   v.appendChild(checks);
 
-  // Admin: energia + hardware
+  // Admin: temperatura (alerta) primeiro, depois backup/energia/hardware
   if (auth.isAdmin()) {
     const [power, hardware, backup] = await Promise.all([
       api("/api/v1/power"),
       api("/api/v1/hardware"),
       api("/api/v1/backup/status").catch(() => null),
     ]);
+
+    if (hardware.temperature && hardware.temperature.length) {
+      v.appendChild(el("h3", { class: "section" }, "Temperatura"));
+      const tgrid = el("div", { class: "grid" });
+      hardware.temperature.forEach((t) => {
+        const hot = t.temp >= 80;
+        tgrid.appendChild(el("div", { class: "app-card", style: hot ? "border-color:var(--hs-color-danger)" : "" },
+          el("span", { class: "status-dot " + (hot ? "danger" : "ok") }),
+          el("span", { class: "app-name" }, (t.label || t.chip) + (hot ? " · quente" : "")),
+          el("span", { class: "app-host" }, t.temp + "°C")));
+      });
+      v.appendChild(tgrid);
+    }
 
     // Backup
     v.appendChild(el("h3", { class: "section" }, "Backup"));
@@ -91,19 +104,6 @@ async function renderSystem() {
       v.appendChild(net);
     }
 
-    // Temperatura (alerta ≥80°C)
-    if (hardware.temperature && hardware.temperature.length) {
-      v.appendChild(el("h3", { class: "section" }, "Temperatura"));
-      const tgrid = el("div", { class: "grid" });
-      hardware.temperature.forEach((t) => {
-        const hot = t.temp >= 80;
-        tgrid.appendChild(el("div", { class: "app-card", style: hot ? "border-color:var(--hs-color-danger)" : "" },
-          el("span", { class: "status-dot " + (hot ? "danger" : "ok") }),
-          el("span", { class: "app-name" }, (t.label || t.chip) + (hot ? " · quente" : "")),
-          el("span", { class: "app-host" }, t.temp + "°C")));
-      });
-      v.appendChild(tgrid);
-    }
 
     // Discos (blocos)
     if (hardware.disks && hardware.disks.blockdevices && hardware.disks.blockdevices.length) {
