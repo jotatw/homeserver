@@ -209,6 +209,8 @@ function openOverflowSheet() {
         icon("file", "ic"), el("span", {}, "Arquivos")),
       el("button", { class: "sheet-item", id: "sheet-print" },
         icon("printer", "ic"), el("span", {}, "Impressão")),
+      el("button", { class: "sheet-item", id: "sheet-senha" },
+        icon("key", "ic"), el("span", {}, "Minha senha")),
       el("button", { class: "sheet-item", id: "sheet-theme" },
         icon("moon", "ic"), el("span", {}, "Tema")),
       el("button", { class: "sheet-item", id: "sheet-density" },
@@ -322,6 +324,10 @@ document.addEventListener("click", (e) => {
     toggleDensity();
     const sheet = document.getElementById("overflow-sheet");
     if (sheet && sheet.open) sheet.close();
+  } else if (btn.id === "btn-senha" || btn.id === "sheet-senha") {
+    const sheet = document.getElementById("overflow-sheet");
+    if (sheet && sheet.open) sheet.close();
+    openSelfPasswordDialog();
   } else if (btn.id === "btn-sair" || btn.id === "sheet-sair") {
     auth.logout().then(() => {
       window.location.href = "/app/login.html";
@@ -448,3 +454,55 @@ if (document.readyState === "loading") {
   init();
 }
 
+/* ---------- Dialog: minha senha (Sprint A — sem terminal p/ usuário) ----------
+ * Qualquer sessão válida troca a própria senha; o backend exige a senha
+ * atual (prova de posse) e o sync FileBrowser/Quantum é o mesmo do fluxo
+ * admin. A senha do App É a dos Arquivos — mesmo store de credenciais. */
+function openSelfPasswordDialog() {
+  let dialog = document.getElementById("self-pass-dialog");
+  if (!dialog) {
+    dialog = el("dialog", { id: "self-pass-dialog" },
+      el("form", { method: "dialog", id: "self-pass-form" },
+        el("h3", { style: "margin-bottom:var(--hs-space-4)" }, "Minha senha"),
+        el("div", { class: "field" },
+          el("label", { for: "sp-current" }, "Senha atual"),
+          el("input", { id: "sp-current", type: "password", required: true, autocomplete: "current-password" })),
+        el("div", { class: "field" },
+          el("label", { for: "sp-new" }, "Nova senha"),
+          el("input", { id: "sp-new", type: "password", required: true, minlength: 8, autocomplete: "new-password" })),
+        el("div", { class: "field" },
+          el("label", { for: "sp-confirm" }, "Confirmar nova senha"),
+          el("input", { id: "sp-confirm", type: "password", required: true, autocomplete: "new-password" })),
+        el("p", { class: "power-hint" }, "A mesma senha vale para os Arquivos (FileBrowser)."),
+        el("div", { class: "dialog-actions" },
+          el("button", { type: "button", class: "btn btn-secondary", id: "sp-cancel" }, "Cancelar"),
+          el("button", { type: "submit", class: "btn btn-primary" }, "Salvar"))));
+    document.body.appendChild(dialog);
+
+    dialog.querySelector("#sp-cancel").addEventListener("click", () => dialog.close());
+    dialog.querySelector("#self-pass-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const cur = document.getElementById("sp-current").value;
+      const np = document.getElementById("sp-new").value;
+      const cf = document.getElementById("sp-confirm").value;
+      if (np !== cf) { toast("A confirmação não confere com a nova senha.", "error"); return; }
+      const btn = dialog.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      try {
+        await apiOrFail("/api/v1/auth/change-password", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ currentPassword: cur, newPassword: np }),
+        });
+        toast("Senha atualizada.", "success");
+        dialog.close();
+      } catch (err) {
+        toast(err.message || "Falha ao alterar senha.", "error");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  }
+  ["sp-current", "sp-new", "sp-confirm"].forEach((id) => { document.getElementById(id).value = ""; });
+  dialog.showModal();
+}

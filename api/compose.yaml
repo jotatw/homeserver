@@ -18,6 +18,10 @@ services:
       - /sys:/sys:ro
       - /dev:/dev:ro
       - /srv/storage:/srv/storage:ro
+      # Overlay rw apenas em /users: hs_user_create/rm precisam criar e
+      # remover a pasta do usuário (bug A0 — create via App falhava em
+      # produção com read-only). O restante do storage permanece ro.
+      - /srv/storage/users:/srv/storage/users
       - /srv/backup:/srv/backup:ro
       - ${HS_SSH_KEY:-/nonexistent}:/root/.ssh/id_ed25519:ro
       - ./ssh/known_hosts:/root/.ssh/known_hosts:ro

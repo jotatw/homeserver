@@ -1,5 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { verifyCredentials, isAdmin } from "../adapters/auth.js";
+import { changeUserPassword } from "../adapters/users.js";
 import {
     createSession,
     destroySession,
@@ -7,7 +8,7 @@ import {
     sessionExpiresIn,
 } from "../sessions.js";
 import { extractToken } from "../plugins/auth.js";
-import { sendOk, sendError } from "../utils/respond.js";
+import { sendOk, sendError, sendInternalError } from "../utils/respond.js";
 
 interface LoginBody {
     username: string;
@@ -61,6 +62,48 @@ export async function authRoutes(fastify: FastifyInstance) {
         }
 
         return sendOk(reply, { loggedOut: true });
+    });
+
+    // Troca da própria senha. Sem guard admin: qualquer sessão válida pode
+    // trocar a senha dela mesma; exige a senha atual como prova de posse.
+    fastify.put("/api/v1/auth/change-password", {
+        config: {
+            rateLimit: {
+                max: 5,
+                timeWindow: "1 minute",
+            },
+        },
+    }, async (request, reply) => {
+        const token = extractToken(request);
+        const session = token ? getSession(token) : null;
+
+        if (!session) {
+            return sendError(reply, 401, "Sessão inválida ou expirada.");
+        }
+
+        const body = request.body as { currentPassword?: string; newPassword?: string };
+
+        if (!isNonEmptyString(body?.currentPassword) || !isNonEmptyString(body?.newPassword)) {
+            return sendError(reply, 400, "currentPassword e newPassword são obrigatórios.");
+        }
+
+        if (body.newPassword.length < 8) {
+            return sendError(reply, 400, "A nova senha deve ter pelo menos 8 caracteres.");
+        }
+
+        const check = await verifyCredentials(session.username, body.currentPassword);
+
+        if (!check.ok) {
+            return sendError(reply, 403, "Senha atual incorreta.");
+        }
+
+        try {
+            await changeUserPassword(session.username, body.newPassword);
+        } catch {
+            return sendInternalError(reply, request.log, new Error("change-password falhou"));
+        }
+
+        return sendOk(reply, { changed: true });
     });
 
     fastify.get("/api/v1/auth/session", async (request, reply) => {

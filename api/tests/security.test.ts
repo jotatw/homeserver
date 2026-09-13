@@ -168,6 +168,32 @@ check("Users não usa docker exec para pasta",
   !usersSrc.includes("docker exec filebrowser mkdir")
 );
 
+// 14. Sprint A — conta sem terminal (2026-09-13)
+const authRouteSrc = readFileSync("src/routes/auth.ts", "utf-8");
+const composeSrc = readFileSync("compose.yaml", "utf-8");
+check("Rota PUT /auth/change-password existe",
+  authRouteSrc.includes('"/api/v1/auth/change-password"')
+);
+check("change-password exige a senha atual (prova de posse)",
+  authRouteSrc.includes("verifyCredentials(session.username, body.currentPassword)")
+);
+check("change-password tem rate limit próprio",
+  /change-password[\s\S]{0,200}rateLimit/.test(authRouteSrc)
+);
+check("change-password não contorna o guard (não é public path)",
+  authRouteSrc.includes("getSession(token)") &&
+  !readFileSync("src/plugins/auth.ts", "utf-8").includes("change-password")
+);
+check("compose: overlay rw somente em /srv/storage/users",
+  composeSrc.includes("- /srv/storage/users:/srv/storage/users") &&
+  composeSrc.includes("- /srv/storage:/srv/storage:ro")
+);
+const appSelfSrc = appSrc;
+check("App: dialog 'minha senha' usa apiOrFail (sem token manual)",
+  appSelfSrc.includes("openSelfPasswordDialog") &&
+  appSelfSrc.includes('"/api/v1/auth/change-password"')
+);
+
 console.log();
 console.log("Security Validation Tests (S6)");
 console.log(`Total : ${passed + failures}`);
