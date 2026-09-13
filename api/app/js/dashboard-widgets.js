@@ -31,9 +31,10 @@ function getDefaultDashboardConfig() {
       layout: [
         { widgetId: "server-status", size: "large", order: 0 },
         { widgetId: "quick-actions", size: "medium", order: 1 },
-        { widgetId: "services-status", size: "large", order: 2 },
+        { widgetId: "services-status", size: "medium", order: 2 },
         { widgetId: "modules-status", size: "medium", order: 3 },
-        { widgetId: "activity-feed", size: "large", order: 4 },
+        { widgetId: "backup-status", size: "medium", order: 4 },
+        { widgetId: "activity-feed", size: "large", order: 5 },
       ],
       editMode: false
     };
@@ -125,7 +126,8 @@ async function renderDashboard() {
   var cfg = getDashboardConfig();
   var editMode = !!cfg.editMode;
 
-  // Resumo de saúde — "como está meu servidor" em uma linha (UX-03)
+  // Resumo de saúde — alerta compacto com a métrica que cruzou o limiar
+  // (a pill completa duplicava o card Servidor; auditoria 2026-09-13)
   var health = el("div", { class: "health-summary", id: "dashboard-health" },
     el("span", { class: "status-dot", "aria-hidden": "true" }),
     el("span", { class: "health-text" }, "Verificando servidor…"));
@@ -133,13 +135,15 @@ async function renderDashboard() {
   hsStore.subscribe("status", function (st) {
     try {
       var cpu = st.cpu || {}, mem = st.memory || {}, disk = st.disk || {};
-      var worst = Math.max(cpu.percent ?? 0, mem.percent ?? 0, disk.percent ?? 0);
+      var items = [["CPU", cpu.percent ?? 0], ["Memória", mem.percent ?? 0], ["Disco", disk.percent ?? 0]];
+      var worstPair = items.reduce(function (mx, it) { return it[1] > mx[1] ? it : mx; }, ["CPU", 0]);
+      var worst = worstPair[1];
       // Mesmos limiares das barras (statCard em components.js): 60 warn, 85 danger.
       var dot = health.querySelector(".status-dot");
       dot.className = "status-dot " + (worst > 85 ? "danger" : worst > 60 ? "" : "ok");
       health.querySelector(".health-text").textContent =
-        (worst > 85 ? "Sob carga · " : worst > 60 ? "Atenção · " : "Tudo normal · ") +
-        "CPU " + (cpu.percent ?? 0).toFixed(1) + "% · Memória " + (mem.percent ?? 0).toFixed(1) + "% · Disco " + (disk.percent ?? 0).toFixed(1) + "%";
+        (worst > 85 ? "Sob carga" : worst > 60 ? "Atenção" : "Tudo normal") +
+        (worst > 60 ? " · " + worstPair[0] + " " + worst.toFixed(1) + "%" : "");
     } catch (_) {}
   });
 
@@ -364,7 +368,18 @@ function openCustomizeDialog() {
 
 /* ---------- Renderers ---------- */
 
+/* ---------- Estado de carregamento dos widgets (auditoria 2026-09-13):
+   /modules* e /services custam segundos no servidor; sem placeholder,
+   o widget vazio parece quebrado. ---------- */
+function widgetLoading(container) {
+  container.innerHTML = "";
+  container.appendChild(el("div", { class: "widget-loading" },
+    el("div", { class: "skeleton" }),
+    el("span", { class: "widget-loading-text" }, "Carregando…")));
+}
+
 async function renderServerStatusWidget(container) {
+  widgetLoading(container);
   var paint = function (status) {
     var cpu = status.cpu || {}, mem = status.memory || {}, disk = status.disk || {};
     container.innerHTML = "";
@@ -372,9 +387,10 @@ async function renderServerStatusWidget(container) {
       statCardWidget("CPU", (cpu.percent ?? 0) + "%", cpu.percent ?? 0),
       statCardWidget("Memória", (mem.percent ?? 0) + "%", mem.percent ?? 0),
       statCardWidget("Disco", (disk.percent ?? 0) + "%", disk.percent ?? 0),
-      statCardWidget("Uptime", status.uptime || "—", 0)
+      // compacto: texto longo quebra o card (auditoria 2026-09-13)
+      statCardWidget("Uptime", status.uptime_short || status.uptime || "—", 0)
     ));
-    container.appendChild(el("a", { href: "#/system", class: "widget-link" }, "Saúde completa em Sistema →"));
+    // link "Saúde completa" removido — a nav lateral já leva a Sistema (duplicado)
   };
   hsStore.subscribe("status", function (d) {
     try { paint(d); } catch (_) { container.innerHTML = '<div class="widget-error">Sem dados do servidor</div>'; }
@@ -413,6 +429,7 @@ async function renderActivityFeedWidget(container) {
 }
 
 async function renderServicesWidget(container) {
+  widgetLoading(container);
   var paint = function (services) {
     container.innerHTML = "";
     if (!services || !services.length) { container.innerHTML = '<div class="empty">Nenhum serviço</div>'; return; }
@@ -429,6 +446,7 @@ async function renderServicesWidget(container) {
 }
 
 async function renderModulesWidget(container) {
+  widgetLoading(container);
   try {
     var mods = await api("/api/v1/modules");
     var inst = await api("/api/v1/modules/instances");
@@ -481,7 +499,15 @@ async function renderSystemHealthWidget(container) {
 }
 
 async function renderBackupWidget(container) {
-  container.innerHTML = '<div class="feed"><div class="feed-item">' + icon("database").outerHTML + ' <span class="app-name">Backup agendado</span><span class="feed-time">04:30 diário</span></div></div>';
+  var paint = function (st) {
+    container.innerHTML = "";
+    container.appendChild(el("div", { class: "feed" }, el("div", { class: "feed-item" },
+      icon("database"),
+      el("span", { class: "app-name" }, "Último backup"),
+      el("span", { class: "feed-time" }, (st && st.backup) || "—"))));
+  };
+  widgetLoading(container);
+  hsStore.subscribe("status", function (d) { try { paint(d); } catch (_) {} });
 }
 
 async function renderMyFilesWidget(container) {

@@ -10,48 +10,12 @@
 #
 # Hermes Remote é complemento externo e NÃO aparece no portal (ADR-005).
 
-# Meu espaço — atalhos do usuário (tab inicial)
+# Meu espaço — portal do usuário (tab inicial)
+# Revisão 2026-09-13: primeiro as METRICAS de saude, depois os ATALHOS.
+# O card "Recursos" foi removido — duplicava Servidor + Armazenamento com
+# leituras divergentes (dois fetches em instantes diferentes).
+
 - Meu espaço:
-
-    - Recursos:
-        id: dash-resources
-        icon: mdi-speedometer
-        widget:
-          type: customapi
-          url: http://api:8000/api/v1/status
-          headers:
-            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
-          refreshInterval: 30000
-          mappings:
-            - field: data.cpu.percent
-              label: CPU
-              format: percent
-            - field: data.memory.percent
-              label: Memória
-              format: percent
-            - field: data.disk.percent
-              label: Disco
-              format: percent
-
-    - Arquivos:
-        icon: mdi-folder
-        href: /files/
-        description: Gerenciar arquivos
-
-    - Projetos:
-        icon: mdi-code-tags
-        href: /git/
-        description: Abrir Gitea
-
-    - Downloads:
-        icon: mdi-download
-        href: /files/
-        description: Receber arquivos
-
-    - Mídia:
-        icon: mdi-movie
-        href: /files/#/media
-        description: Assistir e ouvir
 
     - Servidor:
         id: dash-server
@@ -60,10 +24,10 @@
           type: customapi
           url: http://api:8000/api/v1/status
           headers:
-            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
+            Authorization: Bearer {{HOME...EN}}
           refreshInterval: 30000
           mappings:
-            - field: data.uptime
+            - field: data.uptime_short
               label: Uptime
             - field: data.cpu.percent
               label: CPU
@@ -74,19 +38,18 @@
 
     - Armazenamento:
         id: dash-storage
-        icon: mdi-harddisk
+        icon: mdi-database
         widget:
           type: customapi
-          url: http://api:8000/api/v1/status
+          url: http://api:8000/api/v1/storage
           headers:
-            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
+            Authorization: Bearer {{HOME...EN}}
           refreshInterval: 30000
           mappings:
-            - field: data.disk.percent
-              label: Disco
-              format: percent
-            - field: data.storage.total_size_human
-              label: Utilizado
+            - field: data.total_size_human
+              label: Em uso
+            - field: data.users
+              label: Pastas de usuários
 
     - Backups:
         id: dash-backup
@@ -95,7 +58,7 @@
           type: customapi
           url: http://api:8000/api/v1/status
           headers:
-            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
+            Authorization: Bearer {{HOME...EN}}
           refreshInterval: 60000
           mappings:
             - field: data.backup
@@ -108,7 +71,7 @@
           type: customapi
           url: http://api:8000/api/v1/power/status
           headers:
-            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
+            Authorization: Bearer {{HOME...EN}}
           refreshInterval: 60000
           mappings:
             - field: data.shutdown
@@ -122,6 +85,26 @@
                   to: Sim
                 - value: false
                   to: Não
+
+    - Arquivos:
+        icon: mdi-folder
+        href: /files/
+        description: /srv/storage/users
+
+    - Projetos:
+        icon: mdi-code-tags
+        href: /git/
+        description: Abrir Gitea
+
+    - App:
+        icon: mdi-monitor-dashboard
+        href: /app/
+        description: Painel do servidor
+
+    - Mídia:
+        icon: mdi-movie-open
+        href: /files/#/media
+        description: Assistir e ouvir
 
 # Aplicações — serviços oficiais com status Docker (tab 2)
 - Aplicações:

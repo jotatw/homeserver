@@ -15,8 +15,12 @@ interface HsStatus {
   cpu: { percent?: number };
   memory: { percent?: number; total?: number; used?: number };
   disk: { percent?: number; total?: number; used?: number };
+  /** texto pt-BR longo ("1 dia, 2 horas, 3 minutos") */
   uptime: string;
-  backup?: { last?: string };
+  /** formato compacto para widgets ("1d 2h 3m") */
+  uptime_short?: string;
+  /** data do último backup ("2026-09-13") — string, não objeto */
+  backup?: string;
   [k: string]: unknown;
 }
 
@@ -170,6 +174,9 @@ declare function sectionTitle(text: string): HTMLHeadingElement;
 
 /** Estado vazio com mensagem (e ação opcional). */
 declare function emptyState(message: string, actionEl?: HTMLElement): HTMLParagraphElement;
+
+/** Placeholder "Carregando…" (skeleton) dentro de um widget do dashboard. */
+declare function widgetLoading(container: HTMLElement): void;
 
 /** Estado canônico de serviço a partir do status bruto da API. */
 declare function serviceState(status?: string): {

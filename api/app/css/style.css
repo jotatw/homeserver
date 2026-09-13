@@ -1361,6 +1361,11 @@ dialog::backdrop {
   line-height: 1.25;
 }
 .widget-error { color: var(--hs-text-muted); font-size: var(--hs-code); padding: var(--hs-space-4); text-align: center; }
+/* Placeholder de carregamento (auditoria 2026-09-13): /modules* demoram
+   segundos no servidor; sem isto o widget vazio parece quebrado. */
+.widget-loading { display: flex; flex-direction: column; gap: var(--hs-space-2); }
+.widget-loading .skeleton { min-height: 44px; }
+.widget-loading-text { color: var(--hs-text-muted); font-size: var(--hs-code); }
 .widget-link {
   display: inline-block;
   margin-top: var(--hs-space-2);

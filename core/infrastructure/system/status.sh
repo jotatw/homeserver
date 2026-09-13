@@ -1,13 +1,14 @@
 system_status_json() {
     local hostname os kernel arch uptime load cpu
     local mem_t mem_u mem_a mem_p disk_t disk_u disk_a disk_p
-    local services backup wol
+    local services backup wol uptime_short
 
     hostname="$(get_hostname)"
     os="$(get_os)"
     kernel="$(get_kernel)"
     arch="$(get_architecture)"
     uptime="$(get_uptime)"
+    uptime_short="$(get_uptime_short)"
     load="$(get_load)"
     cpu="$(get_cpu_percent)"
 
@@ -31,6 +32,7 @@ system_status_json() {
     printf '  "kernel": "%s",\n' "${kernel}"
     printf '  "architecture": "%s",\n' "${arch}"
     printf '  "uptime": "%s",\n' "${uptime}"
+    printf '  "uptime_short": "%s",\n' "${uptime_short}"
     printf '  "load": "%s",\n' "${load}"
     printf '  "cpu": { "percent": %s },\n' "${cpu}"
     printf '  "memory": { "total": %s, "used": %s, "available": %s, "percent": %s },\n' \
