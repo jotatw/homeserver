@@ -399,7 +399,7 @@ async function renderServerStatusWidget(container) {
 
 async function renderQuickActionsWidget(container) {
   var actions = [
-    { icon: "folder", title: "Arquivos", href: "/files/" },
+    { icon: "folder", title: "Arquivos", href: "#/files" },
     { icon: "box", title: "Aplicações", href: "#/apps" },
     { icon: "activity", title: "Sistema", href: "#/system" },
   ];
@@ -513,7 +513,7 @@ async function renderBackupWidget(container) {
 async function renderMyFilesWidget(container) {
   container.innerHTML = "";
   container.appendChild(el("div", { class: "feed" },
-    el("a", { href: "/files/", target: "_blank", class: "feed-item", style: "text-decoration:none;color:inherit" }, icon("folder"), el("span", { class: "app-name" }, "Abrir FileBrowser"), el("span", { class: "feed-time" }, "→")),
+    el("a", { href: "#/files", class: "feed-item", style: "text-decoration:none;color:inherit" }, icon("folder"), el("span", { class: "app-name" }, "Abrir arquivos"), el("span", { class: "feed-time" }, "→")),
     el("div", { class: "feed-item" }, icon("harddrive"), el("span", {}, "Seus arquivos em /srv/storage"))
   ));
 }

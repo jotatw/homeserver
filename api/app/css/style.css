@@ -446,6 +446,22 @@ input:focus-visible {
   line-height: 1.25;
 }
 
+/* ---------- Tela embutida (Arquivos = iframe do FileBrowser) ---------- */
+.embed-wrap { display: flex; flex-direction: column; gap: var(--hs-space-3); }
+.embed-toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--hs-space-2); flex-wrap: wrap;
+}
+.embed-caption { color: var(--hs-text-muted); font-size: var(--hs-code); }
+.embed-actions { display: flex; gap: var(--hs-space-2); align-items: center; }
+.embed-frame {
+  width: 100%;
+  border: 1px solid var(--hs-border);
+  border-radius: var(--hs-radius-lg);
+  background: var(--hs-bg);
+  min-height: 420px;
+}
+
 .app-card .app-host {
   font-size: var(--hs-meta);
   color: var(--hs-text-faint);

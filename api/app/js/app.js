@@ -123,7 +123,8 @@ function timeAgo(dateStr) {
 const NAV = [
   { route: "dashboard", title: "Meu espaço", icon: "home", minRole: "user", desktop: true, mobile: true },
   { route: "apps", title: "Aplicações", icon: "box", minRole: "user", desktop: true, mobile: true },
-  { route: "storage", title: "Armazenamento", icon: "folder", minRole: "user", desktop: true, mobile: true },
+  { route: "files", title: "Arquivos", icon: "file", minRole: "user", desktop: true, mobile: false },
+  { route: "storage", title: "Armazenamento", icon: "harddrive", minRole: "user", desktop: true, mobile: true },
   { route: "system", title: "Sistema", icon: "activity", minRole: "user", desktop: true, mobile: true },
   { route: "admin", title: "Administração", icon: "settings", minRole: "admin", desktop: true, mobile: true },
   { route: "print", title: "Impressão", icon: "printer", minRole: "admin", desktop: true, mobile: false },
@@ -204,6 +205,8 @@ function openOverflowSheet() {
       el("div", { class: "sheet-item" },
         icon("user", "ic"),
         el("span", { class: "app-name", id: "sheet-user" })),
+      el("button", { class: "sheet-item", id: "sheet-files" },
+        icon("file", "ic"), el("span", {}, "Arquivos")),
       el("button", { class: "sheet-item", id: "sheet-print" },
         icon("printer", "ic"), el("span", {}, "Impressão")),
       el("button", { class: "sheet-item", id: "sheet-theme" },
@@ -266,6 +269,7 @@ async function router() {
   const renders = {
     dashboard: renderDashboard,
     apps: renderApps,
+    files: renderFiles,
     storage: renderStorage,
     system: renderSystem,
     admin: renderAdmin,
@@ -322,10 +326,10 @@ document.addEventListener("click", (e) => {
     auth.logout().then(() => {
       window.location.href = "/app/login.html";
     });
-  } else if (btn.id === "sheet-print") {
+  } else if (btn.id === "sheet-print" || btn.id === "sheet-files") {
     const sheet = document.getElementById("overflow-sheet");
     if (sheet && sheet.open) sheet.close();
-    window.location.hash = "#/print";
+    window.location.hash = btn.id === "sheet-files" ? "#/files" : "#/print";
   }
 });
 
