@@ -1354,10 +1354,12 @@ dialog::backdrop {
 .widget-content .widget-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: var(--hs-space-3); }
 .widget-content .action-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: var(--hs-space-3); }
 /* Atalhos do dashboard: rótulos longos ("Aplicações") quebram em 2 linhas
-   em vez de truncar com reticências (auditoria visual 2026-09-07). */
+   em vez de truncar com reticências (auditoria 2026-09-07). overflow-wrap
+   quebra só quando a palavra não cabe; word-break quebrava no meio
+   ("Administraçã/o" — captura 2026-09-13). */
 .widget-content .action-grid .app-card .app-name {
   white-space: normal;
-  word-break: break-word;
+  overflow-wrap: break-word;
   line-height: 1.25;
 }
 .widget-error { color: var(--hs-text-muted); font-size: var(--hs-code); padding: var(--hs-space-4); text-align: center; }
