@@ -1,6 +1,6 @@
 # Plano — App como superfície completa (zero terminal após instalar)
 
-Data: 2026-09-13 · Estado: PLANEJAMENTO (nenhum código alterado)
+Data: 2026-09-13 · Estado: Sprint A CONCLUÍDO (2026-09-13, gate 8/8) — B/C pendentes
 Objetivo: ninguém precisa abrir terminal para nada além da instalação.
 Critérios: utilizável, prático, escalável, fácil de modificar (não "perfeito agora").
 
