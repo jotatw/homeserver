@@ -24,7 +24,7 @@
           type: customapi
           url: http://api:8000/api/v1/status
           headers:
-            Authorization: Bearer {{HOME...EN}}
+            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
           refreshInterval: 30000
           mappings:
             - field: data.uptime_short
@@ -43,7 +43,7 @@
           type: customapi
           url: http://api:8000/api/v1/storage
           headers:
-            Authorization: Bearer {{HOME...EN}}
+            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
           refreshInterval: 30000
           mappings:
             - field: data.total_size_human
@@ -58,7 +58,7 @@
           type: customapi
           url: http://api:8000/api/v1/status
           headers:
-            Authorization: Bearer {{HOME...EN}}
+            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
           refreshInterval: 60000
           mappings:
             - field: data.backup
@@ -71,7 +71,7 @@
           type: customapi
           url: http://api:8000/api/v1/power/status
           headers:
-            Authorization: Bearer {{HOME...EN}}
+            Authorization: Bearer {{HOMEPAGE_VAR_API_TOKEN}}
           refreshInterval: 60000
           mappings:
             - field: data.shutdown
