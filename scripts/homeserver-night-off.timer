@@ -1,9 +1,0 @@
-[Unit]
-Description=Desliga o HomeServer às 22h00 (religa às 07h00 via RTC)
-
-[Timer]
-OnCalendar=*-*-* 22:00:00
-Persistent=false
-
-[Install]
-WantedBy=timers.target
